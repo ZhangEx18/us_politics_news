@@ -40,15 +40,15 @@ def test_digest_targets_match_publish_constraints():
     total = digest.get("total", {})
     columns = digest.get("columns", {})
 
-    assert column.get("target_word_count_min") == 5000
-    assert column.get("target_word_count_max") == 7000
-    assert total.get("target_word_count_min") == 15000
-    assert total.get("target_word_count_max") == 25000
+    assert column.get("target_word_count_min") == 2500
+    assert column.get("target_word_count_max") == 5000
+    assert total.get("target_word_count_min") == 10000
+    assert total.get("target_word_count_max") == 20000
 
     for col_key, col_cfg in columns.items():
-        assert 5 <= col_cfg.get("min_items", 0) <= 8, f"{col_key} min_items 超出范围"
-        assert 5 <= col_cfg.get("target_items", 0) <= 8, f"{col_key} target_items 超出范围"
-        assert 5 <= col_cfg.get("max_items", 0) <= 8, f"{col_key} max_items 超出范围"
+        assert 6 <= col_cfg.get("min_items", 0) <= 10, f"{col_key} min_items 超出范围"
+        assert 6 <= col_cfg.get("target_items", 0) <= 10, f"{col_key} target_items 超出范围"
+        assert 6 <= col_cfg.get("max_items", 0) <= 10, f"{col_key} max_items 超出范围"
         assert col_cfg.get("prefilter_items", 0) >= col_cfg.get("target_items", 0)
 
 

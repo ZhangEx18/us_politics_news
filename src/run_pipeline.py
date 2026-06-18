@@ -24,6 +24,7 @@
 
 import asyncio
 import os
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 
@@ -36,7 +37,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ai_analyzer import (
     score_batch,
     generate_column_digest,
-    generate_meta_digest,
     has_ai_config,
     merge_events,
     _load_ai_config,
@@ -122,12 +122,12 @@ def _load_history_context(db: NewsDatabase, days: int = 3) -> str:
         return ""
 
     lines = []
-    for a in articles[:100]:
+    for a in articles[:30]:
         tags = a.llm_tags or ""
         lines.append(
             f"[score: {a.llm_score or 0}] title:{a.title}\n"
             f"published: {a.published_at or ''}\ntags: {tags}\n"
-            f"source: {a.source}\nsummary: {a.llm_summary or a.summary or ''}"
+            f"source: {a.source}\nsummary: {(a.llm_summary or a.summary or '')[:120]}"
         )
     return "\n\n".join(lines)
 
@@ -244,7 +244,7 @@ def _build_scoring_entries_by_column(
                 "title": item.title,
                 "source": item.source_name,
                 "published": item.published_at.isoformat() if item.published_at else "",
-                "content": item.content or "",
+                "content": (item.content or "")[:600],
                 "column_hint": item.column or col_key,
                 "source_tier": item.source_tier or 4,
             }
@@ -290,6 +290,34 @@ async def _generate_all_column_digests(
         _generate(col_key, col_cfg) for col_key, col_cfg in columns_cfg.items()
     ])
     return {col_key: events for col_key, events in results if events}
+
+
+def _build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> list[str]:
+    """从最终入选事件直接提炼 Reader 顶部今日要点，避免额外 AI 调用。"""
+    highlights: list[str] = []
+    for events in columns.values():
+        for event in events:
+            title = str(event.get("title_zh", "")).strip()
+            core = event.get("core_facts", "")
+            if isinstance(core, list):
+                core = " ".join(str(part).strip() for part in core if str(part).strip())
+            core = str(core).strip()
+
+            if title:
+                text = title
+            else:
+                text = core[:45]
+
+            text = re.sub(r"\s+", " ", text).strip("：:，,。. ")
+            if not text:
+                continue
+            if len(text) > 45:
+                text = text[:45].rstrip() + "…"
+            if text not in highlights:
+                highlights.append(text)
+            if len(highlights) >= limit:
+                return highlights
+    return highlights
 
 
 def _get_daily_window() -> tuple[datetime, datetime]:
@@ -568,15 +596,10 @@ def _run_digest_phase(
         word_count_max=column_word_max,
     ))
 
-    # === 11. generate_meta_digest 生成总导语 ===
-    print("\n[11/13] 生成总导语...")
-    column_summaries: dict[str, str] = {}
-    for col_key, events in column_results.items():
-        top_titles = [e.get("title_zh", "") for e in events[:3]]
-        column_summaries[col_key] = "; ".join(top_titles)
-
-    meta_result = asyncio.run(generate_meta_digest(column_summaries, ai_config))
-    print(f"   今日要点: {len(meta_result.get('highlights', []))} 条")
+    # === 11. 提炼今日要点 ===
+    print("\n[11/13] 提炼今日要点...")
+    highlights = _build_reader_highlights(column_results, limit=8)
+    print(f"   今日要点: {len(highlights)} 条")
 
     # === 12. 代码模板组装 + save_daily_report ===
     print("\n[12/13] 保存日报文件...")
@@ -585,7 +608,7 @@ def _run_digest_phase(
     meta = {
         "title": f"{dt.year}年{dt.month}月{dt.day}日 新闻",
         "lead": "",
-        "highlights": meta_result.get("highlights", []),
+        "highlights": highlights,
         "date": today,
     }
 
