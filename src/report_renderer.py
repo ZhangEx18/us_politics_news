@@ -32,10 +32,10 @@ def _pangu(text: str) -> str:
 # 栏目配置
 # ---------------------------------------------------------------------------
 COLUMN_META: dict[str, dict[str, str]] = {
-    "us_politics": {"heading": "美国政情", "icon": "🏛️"},
-    "global_affairs": {"heading": "国际风云", "icon": "🌍"},
-    "technology": {"heading": "科技前沿", "icon": "🔬"},
-    "economy": {"heading": "财经脉动", "icon": "📊"},
+    "us_politics": {"heading": "美国政情", "icon": ""},
+    "global_affairs": {"heading": "国际风云", "icon": ""},
+    "technology": {"heading": "科技前沿", "icon": ""},
+    "economy": {"heading": "财经脉动", "icon": ""},
 }
 
 # 栏目输出顺序
@@ -248,16 +248,6 @@ footer {
             if why:
                 html.append(f"<div class='why'><strong>为什么值得关注</strong>：{_pangu(why)}</div>")
 
-            # 来源链接
-            source_links = event.get("source_links", [])
-            if source_links:
-                link_parts = []
-                for sl in source_links:
-                    lt = _pangu(sl.get("title", "来源"))
-                    lu = sl.get("url", "#")
-                    link_parts.append(f"<a href='{lu}'>{lt}</a>")
-                html.append(f"<div class='links'>{' | '.join(link_parts)}</div>")
-
             html.append("</div>")
 
     html.append("</body>")
@@ -337,16 +327,6 @@ def render_structured_markdown(
             why = event.get("why_it_matters", "")
             if why:
                 lines.append(f"**为什么值得关注**：{_pangu(why)}")
-                lines.append("")
-
-            # 来源链接
-            source_links = event.get("source_links", [])
-            if source_links:
-                lines.append("**相关阅读**：")
-                for sl in source_links:
-                    lt = _pangu(sl.get("title", "来源"))
-                    lu = sl.get("url", "#")
-                    lines.append(f"- [{lt}]({lu})")
                 lines.append("")
 
     return "\n".join(lines)
