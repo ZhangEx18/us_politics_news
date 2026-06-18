@@ -576,14 +576,15 @@ def _run_digest_phase(
         column_summaries[col_key] = "; ".join(top_titles)
 
     meta_result = asyncio.run(generate_meta_digest(column_summaries, ai_config))
-    print(f"   标题: {meta_result.get('title', '')}")
+    print(f"   今日要点: {len(meta_result.get('highlights', []))} 条")
 
     # === 12. 代码模板组装 + save_daily_report ===
     print("\n[12/13] 保存日报文件...")
     today = datetime.now().strftime("%Y-%m-%d")
+    dt = datetime.strptime(today, "%Y-%m-%d")
     meta = {
-        "title": meta_result.get("title", f"{today} 四维日报"),
-        "lead": meta_result.get("lead", ""),
+        "title": f"{dt.year}年{dt.month}月{dt.day}日 新闻",
+        "lead": "",
         "highlights": meta_result.get("highlights", []),
         "date": today,
     }
