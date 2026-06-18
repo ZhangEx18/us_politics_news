@@ -3,10 +3,7 @@
 
 # 数据库
 data/*.db
-
-# 报告输出
-docs/daily/
-docs/feed.xml
+data/*.json
 
 # Python
 __pycache__/
@@ -18,3 +15,6 @@ venv/
 
 # OS
 .DS_Store
+
+# 临时
+*.log
