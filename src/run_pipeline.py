@@ -86,6 +86,11 @@ def _count_scored_entries(entries: list[dict]) -> int:
     return valid
 
 
+def _is_hard_news_entry(entry: dict) -> bool:
+    """只保留硬新闻进入正文链路。"""
+    return bool(entry.get("is_hard_news", False))
+
+
 def _scored_dicts_to_content_items(
     scored: list[dict],
     original_items: list[ContentItem],
@@ -561,14 +566,19 @@ def _run_digest_phase(
     updated_count = db.update_llm_scores(adapted_for_db)
     print(f"   更新 {updated_count} 条")
 
-    # === 6. 事件级合并 ===
-    print("\n[6/13] 事件级合并（按 event_key）...")
-    merged_events = merge_events(scored_dicts)
-    print(f"   {len(scored_dicts)} 条 -> {len(merged_events)} 个事件")
+    # === 6. 硬新闻过滤 ===
+    print("\n[6/13] 硬新闻过滤...")
+    hard_news_scored = [entry for entry in scored_dicts if _is_hard_news_entry(entry)]
+    print(f"   {len(scored_dicts)} -> {len(hard_news_scored)} 条")
 
-    # === 7. min_llm_score 过滤 ===
+    # === 7. 事件级合并 ===
+    print("\n[7/13] 事件级合并（按 event_key）...")
+    merged_events = merge_events(hard_news_scored)
+    print(f"   {len(hard_news_scored)} 条 -> {len(merged_events)} 个事件")
+
+    # === 8. min_llm_score 过滤 ===
     min_llm_score = analysis_cfg.get("min_llm_score", 65)
-    print(f"\n[7/13] min_llm_score 过滤 (阈值={min_llm_score})...")
+    print(f"\n[8/13] min_llm_score 过滤 (阈值={min_llm_score})...")
     content_items = _scored_dicts_to_content_items(merged_events, merged_items)
     content_items.sort(key=lambda x: x.score or 0, reverse=True)
     filtered_items = [it for it in content_items if (it.score or 0) >= min_llm_score]
@@ -578,8 +588,8 @@ def _run_digest_phase(
     if len(filtered_items) < total_min_items:
         print(f"   警告: 过滤后 {len(filtered_items)} 条 < 最低要求 {total_min_items}，继续运行")
 
-    # === 8. 按四栏分桶 ===
-    print("\n[8/13] 按栏目分桶...")
+    # === 9. 按四栏分桶 ===
+    print("\n[9/13] 按栏目分桶...")
     by_column: dict[str, list[ContentItem]] = {}
     for item in filtered_items:
         col = item.column or "us_politics"
@@ -589,13 +599,15 @@ def _run_digest_phase(
     for col, items in sorted(by_column.items()):
         print(f"   {col}: {len(items)} 条")
 
-    # === 9. 每栏按配额选择候选 ===
-    print("\n[9/13] 每栏按配额选择候选...")
+    # === 10. 每栏按配额选择候选 ===
+    print("\n[10/13] 每栏按配额选择候选...")
     column_candidates: dict[str, list[dict]] = {}
     for col_key, col_cfg in columns_cfg.items():
         col_items = by_column.get(col_key, [])
+        min_n = col_cfg.get("min_items", 0)
         target_n = col_cfg.get("target_items", 6)
-        candidates = col_items[:target_n]
+        max_n = col_cfg.get("max_items", target_n)
+        candidates = col_items[:min(len(col_items), max_n)]
         column_candidates[col_key] = [
             {
                 "title": it.title, "source": it.source_name,
@@ -605,10 +617,12 @@ def _run_digest_phase(
             }
             for it in candidates
         ]
-        print(f"   {col_key}: {len(candidates)} 条 (target={target_n})")
+        if len(candidates) < min_n:
+            print(f"   警告: {col_key} 仅 {len(candidates)} 条 < 最低要求 {min_n}，按质量优先继续")
+        print(f"   {col_key}: {len(candidates)} 条 (target={target_n}, max={max_n})")
 
-    # === 10. 每栏单独 generate_column_digest ===
-    print("\n[10/13] 每栏生成 digest...")
+    # === 11. 每栏单独 generate_column_digest ===
+    print("\n[11/13] 每栏生成 digest...")
     history_context = _load_history_context(db, history_days)
     column_word_min = digest_cfg.get("column", {}).get("target_word_count_min", 5000)
     column_word_max = digest_cfg.get("column", {}).get("target_word_count_max", 7000)
@@ -621,13 +635,13 @@ def _run_digest_phase(
         word_count_max=column_word_max,
     ))
 
-    # === 11. 提炼今日要点 ===
-    print("\n[11/13] 提炼今日要点...")
+    # === 12. 提炼今日要点 ===
+    print("\n[12/13] 提炼今日要点...")
     highlights = _build_reader_highlights(column_results, limit=8)
     print(f"   今日要点: {len(highlights)} 条")
 
-    # === 12. 代码模板组装 + save_daily_report ===
-    print("\n[12/13] 保存日报文件...")
+    # === 13. 代码模板组装 + save_daily_report ===
+    print("\n[13/13] 保存日报文件...")
     today = datetime.now().strftime("%Y-%m-%d")
     dt = datetime.strptime(today, "%Y-%m-%d")
     meta = {
@@ -647,8 +661,8 @@ def _run_digest_phase(
     print(f"   Markdown: {md_path}")
     print(f"   HTML: {html_path}")
 
-    # === 13. save_feed ===
-    print("\n[13/13] 保存 RSS Feed...")
+    # === 14. save_feed ===
+    print("\n[14/13] 保存 RSS Feed...")
     save_feed(meta, columns, feed_path, base_url)
     print(f"   Feed: {feed_path}")
 

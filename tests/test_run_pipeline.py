@@ -5,7 +5,7 @@ from datetime import datetime
 
 from database import Article
 from models import ContentItem
-from run_pipeline import main, _build_reader_highlights, _count_scored_entries
+from run_pipeline import main, _build_reader_highlights, _count_scored_entries, _is_hard_news_entry
 
 
 def test_database_article_can_map_to_content_item_without_id_field():
@@ -88,3 +88,9 @@ def test_count_scored_entries_only_counts_real_ai_results():
     ]
 
     assert _count_scored_entries(scored) == 1
+
+
+def test_is_hard_news_entry_requires_true_flag():
+    assert _is_hard_news_entry({"is_hard_news": True}) is True
+    assert _is_hard_news_entry({"is_hard_news": False}) is False
+    assert _is_hard_news_entry({}) is False
