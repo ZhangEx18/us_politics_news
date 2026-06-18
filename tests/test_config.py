@@ -39,11 +39,13 @@ def test_digest_targets_match_publish_constraints():
     column = digest.get("column", {})
     total = digest.get("total", {})
     columns = digest.get("columns", {})
+    runtime = config.get("runtime", {})
 
     assert column.get("target_word_count_min") == 2500
     assert column.get("target_word_count_max") == 5000
     assert total.get("target_word_count_min") == 10000
     assert total.get("target_word_count_max") == 20000
+    assert runtime.get("min_score_coverage") == 0.7
 
     for col_key, col_cfg in columns.items():
         assert 6 <= col_cfg.get("min_items", 0) <= 10, f"{col_key} min_items 超出范围"
