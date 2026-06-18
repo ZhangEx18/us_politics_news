@@ -583,20 +583,122 @@ footer {
 # ---------------------------------------------------------------------------
 
 def save_daily_report(
-    articles: list[ScoredArticle],
+    articles: list[ScoredArticle] | None = None,
     output_dir: str = "docs/daily",
     config: dict | None = None,
+    digest_text: str = "",
 ) -> tuple[str, str]:
-    """保存日报到 docs/daily/YYYY-MM-DD.md 和 .html"""
+    """保存日报到 docs/daily/YYYY-MM-DD.md 和 .html
+
+    如果提供了 digest_text（AI 生成的完整正文），直接使用；
+    否则从 articles 渲染。
+    """
     date = datetime.now().strftime("%Y-%m-%d")
     os.makedirs(output_dir, exist_ok=True)
 
+    if digest_text:
+        md_content = digest_text
+        html_content = _md_to_html(digest_text, date)
+    else:
+        md_content = render_markdown(articles or [], date, config)
+        html_content = render_html(articles or [], date, config)
+
     md_path = os.path.join(output_dir, f"{date}.md")
     with open(md_path, "w", encoding="utf-8") as f:
-        f.write(render_markdown(articles, date, config))
+        f.write(md_content)
 
     html_path = os.path.join(output_dir, f"{date}.html")
     with open(html_path, "w", encoding="utf-8") as f:
-        f.write(render_html(articles, date, config))
+        f.write(html_content)
 
     return md_path, html_path
+
+
+def _md_to_html(md_text: str, date: str) -> str:
+    """将 Markdown 文本转换为带样式的 HTML（轻量实现，不依赖外部库）"""
+    import re as _re
+
+    # 提取 frontmatter
+    title = f"{date} 四维日报"
+    body = md_text
+    if md_text.startswith("---"):
+        parts = md_text.split("---", 2)
+        if len(parts) >= 3:
+            try:
+                import yaml
+                fm = yaml.safe_load(parts[1]) or {}
+                title = fm.get("title", title)
+            except Exception:
+                pass
+            body = parts[2].strip()
+
+    # 简单 Markdown → HTML 转换
+    lines = body.split("\n")
+    html_lines = []
+    in_list = False
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            if in_list:
+                html_lines.append("</ul>")
+                in_list = False
+            html_lines.append("")
+            continue
+        if stripped.startswith("## "):
+            if in_list:
+                html_lines.append("</ul>")
+                in_list = False
+            html_lines.append(f"<h2>{_pangu(stripped[3:])}</h2>")
+        elif stripped.startswith("### "):
+            if in_list:
+                html_lines.append("</ul>")
+                in_list = False
+            html_lines.append(f"<h3>{_pangu(stripped[4:])}</h3>")
+        elif stripped.startswith("- "):
+            if not in_list:
+                html_lines.append("<ul>")
+                in_list = True
+            html_lines.append(f"<li>{_pangu(stripped[2:])}</li>")
+        elif stripped.startswith("**") and stripped.endswith("**"):
+            if in_list:
+                html_lines.append("</ul>")
+                in_list = False
+            html_lines.append(f"<p><strong>{_pangu(stripped[2:-2])}</strong></p>")
+        else:
+            if in_list:
+                html_lines.append("</ul>")
+                in_list = False
+            # 处理链接 [text](url)
+            text = _pangu(stripped)
+            text = _re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', text)
+            html_lines.append(f"<p>{text}</p>")
+    if in_list:
+        html_lines.append("</ul>")
+
+    body_html = "\n".join(html_lines)
+
+    css = """
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+       max-width: 720px; margin: 0 auto; padding: 24px 20px; line-height: 1.8; color: #1a1a1a; }
+h1 { font-size: 1.6em; border-bottom: 2px solid #1a1a1a; padding-bottom: 12px; }
+h2 { font-size: 1.3em; margin-top: 36px; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px; }
+h3 { font-size: 1.05em; margin-top: 24px; }
+p { margin: 8px 0; }
+ul { padding-left: 20px; }
+li { margin: 4px 0; }
+a { color: #1a6b3c; }
+"""
+
+    return f"""<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>{title} — {date}</title>
+<style>{css}</style>
+</head>
+<body>
+<h1>{title}</h1>
+{body_html}
+</body>
+</html>"""
