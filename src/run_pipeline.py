@@ -101,11 +101,13 @@ def _scored_dicts_to_content_items(
 
 
 def _apply_column_quota(items: list[ContentItem], config: dict) -> list[ContentItem]:
-    """按栏目配额选择文章"""
+    """三段式栏目配额选择：min -> target -> 全局补到 total_target -> 截断 total_max"""
     digest_cfg = config.get("digest", {})
     columns_cfg = digest_cfg.get("columns", {})
+    total_target = digest_cfg.get("total_target_items", 28)
     total_max = digest_cfg.get("total_max_items", 40)
 
+    # 按栏目分组，每组按分数降序
     by_column: dict[str, list[ContentItem]] = {}
     for item in items:
         col = item.column or "us_politics"
@@ -114,11 +116,40 @@ def _apply_column_quota(items: list[ContentItem], config: dict) -> list[ContentI
         by_column[col].sort(key=lambda x: x.score or 0, reverse=True)
 
     selected: list[ContentItem] = []
+    selected_urls: set[str] = set()
+
+    # 第一段：每个栏目先满足 min_items
     for col_key, col_cfg in columns_cfg.items():
         col_items = by_column.get(col_key, [])
-        target = col_cfg.get("target_items", 7)
-        selected.extend(col_items[:target])
+        min_n = col_cfg.get("min_items", 5)
+        taken = [it for it in col_items[:min_n] if str(it.url) not in selected_urls]
+        for it in taken:
+            selected_urls.add(str(it.url))
+        selected.extend(taken)
 
+    # 第二段：每个栏目补到 target_items
+    for col_key, col_cfg in columns_cfg.items():
+        col_items = by_column.get(col_key, [])
+        target_n = col_cfg.get("target_items", 7)
+        taken = []
+        for it in col_items:
+            if len(taken) >= target_n:
+                break
+            if str(it.url) not in selected_urls:
+                selected_urls.add(str(it.url))
+                taken.append(it)
+        selected.extend(taken)
+
+    # 第三段：全局按分数补到 total_target_items
+    if len(selected) < total_target:
+        remaining = [it for it in items if str(it.url) not in selected_urls]
+        remaining.sort(key=lambda x: x.score or 0, reverse=True)
+        need = total_target - len(selected)
+        for it in remaining[:need]:
+            selected_urls.add(str(it.url))
+            selected.append(it)
+
+    # 截断到 total_max_items
     selected.sort(key=lambda x: x.score or 0, reverse=True)
     return selected[:total_max]
 
@@ -219,8 +250,16 @@ def run_pipeline(hours: int = 24) -> dict:
     ]
     scored_dicts, score_errors = asyncio.run(score_batch(entries_for_scoring, ai_config))
     print(f"   完成 {len(scored_dicts)} 条评分")
-    if score_errors:
-        print(f"   警告: {len(score_errors)} 个批次有错误")
+
+    # require_ai 时，评分失败必须退出
+    require_ai = runtime_cfg.get("require_ai", True)
+    if require_ai:
+        candidate_count = len(entries_for_scoring)
+        valid_count = len(scored_dicts)
+        if score_errors or valid_count == 0 or valid_count < candidate_count * 0.5:
+            print(f"\n[错误] AI 评分失败: errors={len(score_errors)}, "
+                  f"valid={valid_count}/{candidate_count}")
+            sys.exit(1)
 
     # === 5. 更新数据库 LLM 评分 ===
     print("\n[5/11] 更新数据库 LLM 评分...")
@@ -242,7 +281,16 @@ def run_pipeline(hours: int = 24) -> dict:
     print("\n[8/11] 按栏目配额选择...")
     content_items = _scored_dicts_to_content_items(merged_events, merged_items)
     content_items.sort(key=lambda x: x.score or 0, reverse=True)
-    balanced_items = _apply_column_quota(content_items, config)
+
+    # 按 min_llm_score 过滤低分候选
+    min_llm_score = analysis_cfg.get("min_llm_score", 65)
+    total_min_items = digest_cfg.get("total_min_items", 20)
+    filtered_items = [it for it in content_items if (it.score or 0) >= min_llm_score]
+    print(f"   min_llm_score={min_llm_score}: {len(content_items)} -> {len(filtered_items)} 条")
+    if len(filtered_items) < total_min_items:
+        print(f"   警告: 过滤后 {len(filtered_items)} 条 < 最低要求 {total_min_items}，继续运行")
+
+    balanced_items = _apply_column_quota(filtered_items, config)
     print(f"   选出 {len(balanced_items)} 个事件")
 
     col_counts: dict[str, int] = {}

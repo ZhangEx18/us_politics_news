@@ -1,113 +1,135 @@
-# 美国政治新闻雷达
+# 四维日报 -- AI 驱动的每日国际新闻长文日报
 
-每日自动抓取、筛选、评分、分类，生成可在 Reader 中阅读的日报。
-
-## 它做什么
-
-每天自动完成一件事：从多个新闻源抓取内容，筛选出美国政治、国际局势、科技发展、经济发展四个维度的重点新闻，生成结构化日报和 RSS Feed，供 Reader 订阅阅读。
+每天自动生成 5000-10000 字中文日报，覆盖美国政情、国际风云、科技前沿、财经脉动四大维度。100+ 新闻源并发抓取，AI 评分筛选、事件合并、AI 写作，输出 Markdown + HTML + RSS 全文 Feed，部署在 GitHub Pages，Reader 订阅即读。
 
 ## 快速开始
 
 ```bash
+# 克隆仓库
+git clone <repo-url> && cd us_politics_news
+
 # 安装依赖
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# 配置环境变量（可选）
+# 配置环境变量
 cp .env.example .env
-# 编辑 .env 填入 NEWSAPI_KEY、TIANAPI_KEY
+# 编辑 .env，填入 AI_API_KEY（必需）、NEWSAPI_KEY / TIANAPI_KEY（可选）
 
 # 运行
 python3 src/run_pipeline.py
 ```
 
-生成的日报在 `docs/daily/`，RSS Feed 在 `docs/feed.xml`。
+生成产物：
+- `docs/daily/YYYY-MM-DD.md` -- 当日日报（Markdown）
+- `docs/daily/YYYY-MM-DD.html` -- 当日日报（HTML）
+- `docs/feed.xml` -- RSS 全文 Feed
+
+## 部署
+
+GitHub Actions 自动运行 `daily_run.sh`，产物推送到 `docs/` 分支，GitHub Pages 托管。
+
+Reader 订阅地址：
+
+```
+https://<username>.github.io/us_politics_news/feed.xml
+```
 
 ## Pipeline 流程
 
 ```
-并发抓取 → 跨源去重 → 评分 → 语义去重 → 均衡摘要 → 生成日报 → 生成 Feed
+并发抓取 -> 跨源去重 -> AI 评分 -> 事件合并 -> AI 写作 -> 生成日报 -> 生成 Feed
 ```
 
 | 步骤 | 说明 |
 |------|------|
 | 并发抓取 | 6 个抓取器异步并发，统一返回 ContentItem |
-| 跨源 URL 去重 | 同一 URL 多源 → 保留内容最丰富的，合并 metadata |
-| 规则评分 | 来源权重 + 主题优先级 + 关键词命中 → 综合评分 |
-| 语义去重 | 标题相似度识别同一事件的不同报道 |
-| 均衡摘要 | 按主题配额控制，避免单一主题占满日报 |
-| 生成日报 | Markdown + HTML，Horizon 风格格式（TOC + 锚点 + 评分） |
-| 生成 Feed | RSS 2.0，Reader 订阅 |
+| 跨源 URL 去重 | 同一 URL 多源 -> 保留内容最丰富的，合并 metadata |
+| AI 评分 | 来源权重 + 主题优先级 + 关键词命中 + AI 深度分析 |
+| 事件合并 | 语义相似度识别同一事件的不同报道 |
+| AI 写作 | 生成 5000-10000 字中文长文日报 |
+| 生成日报 | Markdown + HTML，含目录、锚点、评分 |
+| 生成 Feed | RSS 2.0 全文，Reader 订阅 |
 
 ## 四大维度
 
-### 美国政治
+### 美国政情
 白宫与行政 · 国会与立法 · 选举与竞选 · 最高法院
 
-### 国际局势
+### 国际风云
 中美关系 · 中东局势 · 俄乌冲突 · 外交政策
 
-### 科技发展
+### 科技前沿
 人工智能 · 半导体与芯片 · 科技公司 · 科技监管
 
-### 经济发展
+### 财经脉动
 美联储与货币政策 · 宏观经济 · 贸易与关税 · 金融市场
-
-## 数据源
-
-| 数据源 | 类型 | 维度 | 需要 Key |
-|--------|------|------|----------|
-| NPR Politics | RSS | 美国政治 | 否 |
-| The Hill | RSS | 美国政治 | 否 |
-| Fox News | RSS | 美国政治 | 否 |
-| BBC | RSS | 美国政治 / 国际 | 否 |
-| The Guardian | RSS | 国际局势 | 否 |
-| Al Jazeera | RSS | 国际局势 | 否 |
-| DW News | RSS | 国际局势 | 否 |
-| France24 | RSS | 国际局势 | 否 |
-| TechCrunch | RSS | 科技发展 | 否 |
-| Ars Technica | RSS | 科技发展 | 否 |
-| The Verge | RSS | 科技发展 | 否 |
-| Wired | RSS | 科技发展 | 否 |
-| CNBC Economy | RSS | 经济发展 | 否 |
-| Hacker News | API | 科技 / 社会 | 否 |
-| Google News | RSS | 全维度 | 否 |
-| GDELT | API | 全维度 | 否 |
-| NewsAPI | REST | 全维度 | NEWSAPI_KEY |
-| TianAPI | REST | 中文热搜 | TIANAPI_KEY |
-
-免费源已覆盖全部四个维度，付费源可选。
 
 ## 目录结构
 
 ```
 ├── src/
+│   ├── __init__.py
+│   ├── run_pipeline.py       # 统一入口
 │   ├── models.py             # Pydantic 数据模型
 │   ├── database.py           # SQLite 存储层
 │   ├── fetchers.py           # 异步并发抓取 + 去重
 │   ├── scoring.py            # 规则评分 + 推荐理由
-│   ├── topic_rules.py        # 主题分类规则（20 个主题）
+│   ├── ai_analyzer.py        # AI 深度分析
+│   ├── topic_rules.py        # 主题分类规则
 │   ├── report_renderer.py    # 日报渲染（Markdown + HTML）
-│   ├── feed_builder.py       # RSS Feed 生成
-│   └── run_pipeline.py       # 统一入口
-├── config/config.yaml        # 唯一配置入口
-├── scripts/daily_run.sh      # 定时任务脚本
-├── data/                     # 数据库和历史数据
-├── docs/daily/               # 日报输出（运行后生成）
+│   └── feed_builder.py       # RSS Feed 生成
+├── config/
+│   ├── config.yaml           # 主配置
+│   └── sources.yaml          # 100+ 新闻源配置
+├── scripts/
+│   └── daily_run.sh          # 定时任务脚本（含运行后校验）
+├── docs/
+│   ├── daily/                # 日报输出（运行后生成）
+│   └── feed.xml              # RSS Feed（运行后生成）
+├── data/                     # SQLite 数据库 + 历史抓取数据
 ├── .env.example              # 环境变量模板
 └── requirements.txt
 ```
 
-## 配置
+## 配置说明
 
-所有配置在 `config/config.yaml`：
+### config/config.yaml
 
-- `sources` — 数据源开关和参数
-- `output` — 输出目录和 Feed 路径
-- `storage` — 数据库路径和保留天数
+主配置文件，控制 Pipeline 行为：
 
-环境变量通过 `.env` 文件管理，支持 `${VAR_NAME}` 在配置中引用。
+- `sources` -- 数据源开关和参数
+- `scoring` -- 评分权重和阈值
+- `ai` -- AI 写作 provider 和 prompt 配置
+- `output` -- 输出目录和 Feed 路径
+- `storage` -- 数据库路径和保留天数
+
+### config/sources.yaml
+
+100+ 新闻源，按四大维度分类，每个源包含：
+
+```yaml
+- name: "源名称"
+  url: "https://..."
+  column: us_politics | global_affairs | technology | economy
+  source_tier: 1 | 2 | 3 | 4    # 1=官方一线 2=主流 3=专业智库 4=聚合
+  language: en | zh | multi
+  enabled: true | false
+```
+
+### .env
+
+环境变量通过 `.env` 文件管理，支持 `${VAR_NAME}` 在 YAML 中引用：
+
+| 变量 | 说明 | 必需 |
+|------|------|------|
+| `AI_API_KEY` | AI 服务 API Key | 是 |
+| `AI_PROVIDER` | openai / deepseek / moonshot 等 | 否（默认 openai） |
+| `AI_BASE_URL` | API 端点 | 否（默认 OpenAI） |
+| `AI_MODEL` | 模型名称 | 否（默认 gpt-4o-mini） |
+| `NEWSAPI_KEY` | NewsAPI 密钥 | 否 |
+| `TIANAPI_KEY` | TianAPI 密钥 | 否 |
 
 ## 定时运行
 
@@ -116,21 +138,8 @@ python3 src/run_pipeline.py
 0 8 * * * /path/to/scripts/daily_run.sh
 ```
 
-## Reader 订阅
+脚本会在运行后自动校验：
+- `docs/feed.xml` 包含 `content:encoded`（确保全文 Feed）
+- 日报字数 > 5000（确保内容充实）
 
-部署 `docs/` 到 GitHub Pages 后，Reader 订阅：
-
-```
-https://<username>.github.io/us_politics_news/feed.xml
-```
-
-每天自动出现一篇新日报，点进去是完整可读页面。
-
-## 技术参考
-
-项目架构参考 [Horizon](https://github.com/Thysrael/Horizon)：
-- 统一 ContentItem 数据模型
-- 异步并发抓取
-- 跨源 URL 去重 + 语义去重
-- 均衡摘要配额控制
-- Horizon 风格日报格式
+校验失败会 `exit 1`，便于 CI 告警。

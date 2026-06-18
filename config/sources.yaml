@@ -646,7 +646,7 @@
   enabled: true
 
 # ══════════════════════════════════════════
-# 经济发展 (economy) — 30 源
+# 经济发展 (economy) — 36 源
 # ══════════════════════════════════════════
 
 # -- 官方/一线 --
@@ -825,5 +825,48 @@
   url: "https://news.google.com/rss/search?q=stock+market+Wall+Street&hl=en"
   column: economy
   source_tier: 4
+  language: en
+  enabled: true
+
+# -- 补充源 --
+- name: "BEA News"
+  url: "https://www.bea.gov/news/rss.xml"
+  column: economy
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "U.S. Treasury"
+  url: "https://home.treasury.gov/rss/press-releases"
+  column: economy
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Congressional Budget Office"
+  url: "https://www.cbo.gov/publications/rss"
+  column: economy
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Seeking Alpha"
+  url: "https://seekingalpha.com/market_currents.xml"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Tax Foundation"
+  url: "https://taxfoundation.org/feed/"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Investopedia"
+  url: "https://www.investopedia.com/feedbuilder/feed/getfeed/?feedName=rss_headline"
+  column: economy
+  source_tier: 3
   language: en
   enabled: true
