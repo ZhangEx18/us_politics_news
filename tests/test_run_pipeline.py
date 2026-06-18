@@ -1,9 +1,11 @@
 """run_pipeline 回归测试"""
 
+import pytest
 from datetime import datetime
 
 from database import Article
 from models import ContentItem
+from run_pipeline import main
 
 
 def test_database_article_can_map_to_content_item_without_id_field():
@@ -47,3 +49,13 @@ def test_database_article_can_map_to_content_item_without_id_field():
     assert item.column == "us_politics"
     assert item.event_key == "test_event_20260618"
     assert item.source_tier == 2
+
+
+def test_main_digest_only_exits_when_no_content_generated(monkeypatch):
+    monkeypatch.setattr("sys.argv", ["run_pipeline.py", "--digest-only"])
+    monkeypatch.setattr("run_pipeline.run_digest_only", lambda hours=24: {"total_selected": 0})
+
+    with pytest.raises(SystemExit) as exc:
+        main()
+
+    assert exc.value.code == 1

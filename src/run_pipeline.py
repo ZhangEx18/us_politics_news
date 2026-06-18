@@ -515,6 +515,10 @@ def main():
         else:
             stats = run_pipeline(hours=args.hours)
 
+        if args.digest_only and stats.get("total_selected", 0) == 0:
+            print("[错误] Digest 未生成任何内容")
+            sys.exit(1)
+
         if stats.get("total_fetched", 0) == 0 and not args.digest_only:
             sys.exit(1)
     except SystemExit:
