@@ -25,38 +25,42 @@ digest:
   # 每栏字数目标
   column:
     target_word_count_min: 5000
-    target_word_count: 7000
-    target_word_count_max: 10000
+    target_word_count: 6000
+    target_word_count_max: 7000
   # 全文字数目标
   total:
-    target_word_count_min: 20000
-    target_word_count: 28000
-    target_word_count_max: 40000
+    target_word_count_min: 15000
+    target_word_count: 20000
+    target_word_count_max: 25000
   # 每栏目配额
   columns:
     us_politics:
       label: "美国政情"
-      min_items: 6
-      target_items: 8
-      max_items: 10
+      min_items: 5
+      target_items: 6
+      max_items: 8
+      prefilter_items: 18
     global_affairs:
       label: "国际风云"
-      min_items: 6
-      target_items: 8
-      max_items: 10
+      min_items: 5
+      target_items: 6
+      max_items: 8
+      prefilter_items: 18
     technology:
       label: "科技前沿"
-      min_items: 6
-      target_items: 8
-      max_items: 10
+      min_items: 5
+      target_items: 6
+      max_items: 8
+      prefilter_items: 18
     economy:
       label: "财经脉动"
-      min_items: 6
-      target_items: 8
-      max_items: 10
-  total_min_items: 24
-  total_target_items: 32
-  total_max_items: 40
+      min_items: 5
+      target_items: 6
+      max_items: 8
+      prefilter_items: 18
+  total_min_items: 20
+  total_target_items: 24
+  total_max_items: 32
 
 feed:
   include_full_content: true

@@ -139,6 +139,159 @@ def _assign_level(score: float, important_threshold: float = 85) -> str:
     return "观察"
 
 
+_COLUMN_KEYWORDS: dict[str, tuple[str, ...]] = {
+    "us_politics": ("white house", "trump", "biden", "senate", "house", "supreme court", "congress", "election"),
+    "global_affairs": ("china", "iran", "israel", "ukraine", "russia", "g7", "nato", "diplom"),
+    "technology": ("ai", "openai", "chip", "semiconductor", "tesla", "meta", "google", "microsoft"),
+    "economy": ("fed", "inflation", "tariff", "jobs", "market", "bond", "trade", "gdp"),
+}
+
+
+def _item_recency_hours(item: ContentItem, now: datetime) -> float:
+    """估算条目距当前的小时数，优先用发布时间。"""
+    ref = item.published_at or item.fetched_at
+    if ref is None:
+        return 9999.0
+    if ref.tzinfo is None:
+        ref = ref.replace(tzinfo=timezone.utc)
+    now_utc = now if now.tzinfo else now.replace(tzinfo=timezone.utc)
+    return max((now_utc - ref).total_seconds() / 3600, 0.0)
+
+
+def _keyword_bonus(item: ContentItem) -> int:
+    """按栏目关键词给预筛选打额外权重。"""
+    keywords = _COLUMN_KEYWORDS.get(item.column or "us_politics", ())
+    haystack = f"{item.title} {item.content or ''}".lower()
+    hits = sum(1 for kw in keywords if kw in haystack)
+    return min(hits * 4, 12)
+
+
+def _prefilter_signal(item: ContentItem, now: datetime) -> float:
+    """预筛选综合信号：规则分 + 来源等级 + 时效 + 信息密度 + 关键词。"""
+    tier_bonus = {1: 30, 2: 20, 3: 10, 4: 0}.get(item.source_tier or 4, 0)
+    hours_old = _item_recency_hours(item, now)
+    if hours_old <= 6:
+        recency_bonus = 15
+    elif hours_old <= 12:
+        recency_bonus = 10
+    elif hours_old <= 24:
+        recency_bonus = 5
+    else:
+        recency_bonus = 0
+
+    content_len = len((item.content or "").strip())
+    if content_len >= 600:
+        content_bonus = 8
+    elif content_len >= 240:
+        content_bonus = 4
+    elif content_len >= 80:
+        content_bonus = 1
+    else:
+        content_bonus = 0
+
+    return (item.score or 0) + tier_bonus + recency_bonus + content_bonus + _keyword_bonus(item)
+
+
+def _prefilter_items_for_scoring(
+    items: list[ContentItem],
+    columns_cfg: dict[str, dict],
+    now: datetime | None = None,
+) -> dict[str, list[ContentItem]]:
+    """
+    规则预筛：按栏目压缩候选池，优先保留来源等级高、更新近、信息更完整的条目。
+    """
+    now = now or datetime.now(timezone.utc)
+    deduped: dict[str, ContentItem] = {}
+    for item in items:
+        col = item.column or "us_politics"
+        normalized = item.source_url_normalized or normalize_url(str(item.url))
+        key = f"{col}:{normalized}"
+        current = deduped.get(key)
+        if current is None or _prefilter_signal(item, now) > _prefilter_signal(current, now):
+            deduped[key] = item
+
+    by_column: dict[str, list[ContentItem]] = {col_key: [] for col_key in columns_cfg}
+    for item in deduped.values():
+        col = item.column or "us_politics"
+        by_column.setdefault(col, []).append(item)
+
+    selected: dict[str, list[ContentItem]] = {}
+    for col_key, col_cfg in columns_cfg.items():
+        ranked = sorted(
+            by_column.get(col_key, []),
+            key=lambda item: (
+                _prefilter_signal(item, now),
+                -(item.source_tier or 4),
+                -len((item.content or "").strip()),
+            ),
+            reverse=True,
+        )
+        limit = col_cfg.get("prefilter_items", 18)
+        selected[col_key] = ranked[:limit]
+    return selected
+
+
+def _build_scoring_entries_by_column(
+    column_items: dict[str, list[ContentItem]],
+) -> tuple[list[dict], dict[str, list[dict]]]:
+    """将预筛后的 ContentItem 转成评分输入，同时保留按栏目映射。"""
+    all_entries: list[dict] = []
+    by_column_entries: dict[str, list[dict]] = {}
+    for col_key, items in column_items.items():
+        entries = [
+            {
+                "link": str(item.url),
+                "title": item.title,
+                "source": item.source_name,
+                "published": item.published_at.isoformat() if item.published_at else "",
+                "content": item.content or "",
+                "column_hint": item.column or col_key,
+                "source_tier": item.source_tier or 4,
+            }
+            for item in items
+        ]
+        by_column_entries[col_key] = entries
+        all_entries.extend(entries)
+    return all_entries, by_column_entries
+
+
+async def _generate_all_column_digests(
+    columns_cfg: dict[str, dict],
+    column_candidates: dict[str, list[dict]],
+    history_context: str,
+    ai_config: dict,
+    word_count_min: int,
+    word_count_max: int,
+) -> dict[str, list[dict]]:
+    """并发生成四栏 digest，缩短总发布耗时。"""
+    semaphore = asyncio.Semaphore(4)
+
+    async def _generate(col_key: str, col_cfg: dict) -> tuple[str, list[dict]]:
+        candidates = column_candidates.get(col_key, [])
+        if not candidates:
+            print(f"   {col_key}: 无候选，跳过")
+            return col_key, []
+
+        print(f"   {col_key}: 生成中 ({len(candidates)} 条候选)...")
+        async with semaphore:
+            events = await generate_column_digest(
+                column_key=col_key,
+                column_label=col_cfg.get("label", col_key),
+                events=candidates,
+                history_context=history_context,
+                ai_config=ai_config,
+                word_count_min=word_count_min,
+                word_count_max=word_count_max,
+            )
+        print(f"   {col_key}: 生成 {len(events)} 条事件卡片")
+        return col_key, events
+
+    results = await asyncio.gather(*[
+        _generate(col_key, col_cfg) for col_key, col_cfg in columns_cfg.items()
+    ])
+    return {col_key: events for col_key, events in results if events}
+
+
 def _get_daily_window() -> tuple[datetime, datetime]:
     """获取今日日报的时间窗口：昨日 8:00 - 今日 8:00"""
     now = datetime.now()
@@ -319,7 +472,6 @@ def _run_digest_phase(
 ) -> dict:
     """步骤 4-13：评分 + 分栏 digest + 输出"""
     output_cfg = config.get("output", {})
-    storage_cfg = config.get("storage", {})
     digest_cfg = config.get("digest", {})
     analysis_cfg = config.get("analysis", {})
     runtime_cfg = config.get("runtime", {})
@@ -328,19 +480,15 @@ def _run_digest_phase(
     feed_path = output_cfg.get("feed_path", "docs/feed.xml")
     base_url = output_cfg.get("base_url", "")
     history_days = analysis_cfg.get("history_context_days", 3)
-    since = start_time - timedelta(days=history_days)
+    columns_cfg = digest_cfg.get("columns", {})
 
     # === 4. AI score_batch ===
     print("\n[4/13] AI 批量评分...")
-    today_articles = db.fetch_since(since)
-    entries_for_scoring = [
-        {
-            "link": a.url, "title": a.title, "source": a.source,
-            "published": a.published_at.isoformat() if a.published_at else "",
-            "content": a.summary or "",
-        }
-        for a in today_articles
-    ]
+    prefiltered_by_column = _prefilter_items_for_scoring(merged_items, columns_cfg)
+    for col_key, items in sorted(prefiltered_by_column.items()):
+        print(f"   预筛 {col_key}: {len(items)} 条")
+    entries_for_scoring, _ = _build_scoring_entries_by_column(prefiltered_by_column)
+    print(f"   送评总数: {len(entries_for_scoring)} 条")
     scored_dicts, score_errors = asyncio.run(score_batch(entries_for_scoring, ai_config))
     print(f"   完成 {len(scored_dicts)} 条评分")
 
@@ -379,7 +527,6 @@ def _run_digest_phase(
 
     # === 8. 按四栏分桶 ===
     print("\n[8/13] 按栏目分桶...")
-    columns_cfg = digest_cfg.get("columns", {})
     by_column: dict[str, list[ContentItem]] = {}
     for item in filtered_items:
         col = item.column or "us_politics"
@@ -394,7 +541,7 @@ def _run_digest_phase(
     column_candidates: dict[str, list[dict]] = {}
     for col_key, col_cfg in columns_cfg.items():
         col_items = by_column.get(col_key, [])
-        target_n = col_cfg.get("target_items", 8)
+        target_n = col_cfg.get("target_items", 6)
         candidates = col_items[:target_n]
         column_candidates[col_key] = [
             {
@@ -411,27 +558,15 @@ def _run_digest_phase(
     print("\n[10/13] 每栏生成 digest...")
     history_context = _load_history_context(db, history_days)
     column_word_min = digest_cfg.get("column", {}).get("target_word_count_min", 5000)
-    column_word_max = digest_cfg.get("column", {}).get("target_word_count_max", 10000)
-
-    column_results: dict[str, list[dict]] = {}
-    for col_key, col_cfg in columns_cfg.items():
-        col_label = col_cfg.get("label", col_key)
-        candidates = column_candidates.get(col_key, [])
-        if not candidates:
-            print(f"   {col_key}: 无候选，跳过")
-            continue
-        print(f"   {col_key}: 生成中 ({len(candidates)} 条候选)...")
-        events = asyncio.run(generate_column_digest(
-            column_key=col_key,
-            column_label=col_label,
-            events=candidates,
-            history_context=history_context,
-            ai_config=ai_config,
-            word_count_min=column_word_min,
-            word_count_max=column_word_max,
-        ))
-        column_results[col_key] = events
-        print(f"   {col_key}: 生成 {len(events)} 条事件卡片")
+    column_word_max = digest_cfg.get("column", {}).get("target_word_count_max", 7000)
+    column_results = asyncio.run(_generate_all_column_digests(
+        columns_cfg=columns_cfg,
+        column_candidates=column_candidates,
+        history_context=history_context,
+        ai_config=ai_config,
+        word_count_min=column_word_min,
+        word_count_max=column_word_max,
+    ))
 
     # === 11. generate_meta_digest 生成总导语 ===
     print("\n[11/13] 生成总导语...")
