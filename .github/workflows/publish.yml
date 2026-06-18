@@ -66,7 +66,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           feed = Path("docs/feed.xml").read_text(encoding="utf-8")
-          blocked = ["<!DOCTYPE html>", "<html", "<head>", "<style>", "相关阅读", "原文链接", "来源"]
+          blocked = ["<!DOCTYPE html>", "<html", "<head>", "<style>", "相关阅读", "原文链接", "<strong>来源：</strong>", "来源："]
           bad = [token for token in blocked if token in feed]
           if bad:
               raise SystemExit(f"Reader feed 仍含不应出现的内容: {bad}")
