@@ -46,6 +46,7 @@ from fetchers import (
     fetch_all_sources,
     merge_cross_source_duplicates,
     save_to_db,
+    normalize_url,
 )
 from models import ContentItem, SourceType
 from report_renderer import save_daily_report
@@ -287,13 +288,21 @@ def run_digest_only(hours: int = 24) -> dict:
     # 转为 dict 格式供 score_batch 使用
     merged_items = [
         ContentItem(
-            id=a.id,
+            id=f"db:{db.url_hash(db.normalize_url(a.url))}",
             source_type=SourceType(a.source_type) if a.source_type else SourceType.RSS,
             title=a.title,
             url=a.url,
             content=a.summary or "",
             source_name=a.source,
             published_at=a.published_at,
+            column=a.column or "",
+            source_tier=a.source_tier or 4,
+            event_key=a.event_key or "",
+            source_url_normalized=a.source_url_normalized or normalize_url(a.url),
+            topic=a.topic or "",
+            score=a.score or 0.0,
+            reason=a.reason or "",
+            level=a.level or "",
         )
         for a in today_articles
     ]
@@ -319,7 +328,7 @@ def _run_digest_phase(
     feed_path = output_cfg.get("feed_path", "docs/feed.xml")
     base_url = output_cfg.get("base_url", "")
     history_days = analysis_cfg.get("history_context_days", 3)
-    since = start_time - timedelta(hours=history_days)
+    since = start_time - timedelta(days=history_days)
 
     # === 4. AI score_batch ===
     print("\n[4/13] AI 批量评分...")

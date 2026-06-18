@@ -256,6 +256,66 @@ footer {
     return "\n".join(html)
 
 
+def render_reader_content(
+    meta: dict,
+    columns: dict[str, list[dict]],
+) -> str:
+    """
+    为 RSS Reader 生成纯正文 HTML 片段。
+
+    约束：
+    - 只保留标题 + 导语 + 四大栏目正文
+    - 不输出完整 HTML 文档壳
+    - 不输出 highlights / 来源 / 原文链接 / 阅读链接
+    - 即使样式被 Reader 剥离，也能保持清晰层次
+    """
+    title = _pangu(meta.get("title", ""))
+    lead = _pangu(meta.get("lead", ""))
+
+    html: list[str] = ["<article>"]
+
+    if title:
+        html.append(f"<h1>{title}</h1>")
+    if lead:
+        html.append(f"<p>{lead}</p>")
+
+    for col_key in COLUMN_ORDER:
+        events = columns.get(col_key, [])
+        if not events:
+            continue
+
+        meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
+        num = _COLUMN_NUM.get(col_key, "")
+        html.append(f"<h2>{num}、{meta_col['heading']}</h2>")
+
+        for idx, event in enumerate(events, 1):
+            event_title = _pangu(event.get("title_zh", ""))
+            is_followup = event.get("is_followup", False)
+            suffix = " [持续跟踪]" if is_followup else ""
+            html.append(f"<h3>{idx}. {event_title}{suffix}</h3>")
+
+            core_facts = event.get("core_facts", [])
+            if isinstance(core_facts, list):
+                core_text = " ".join(_pangu(str(fact)) for fact in core_facts if str(fact).strip())
+            else:
+                core_text = _pangu(str(core_facts)) if core_facts else ""
+            if core_text:
+                html.append(f"<p><strong>核心事实：</strong>{core_text}</p>")
+
+            background_impact = event.get("background_impact", "")
+            if background_impact:
+                html.append(
+                    f"<p><strong>背景与影响：</strong>{_pangu(background_impact)}</p>"
+                )
+
+            why = event.get("why_it_matters", "")
+            if why:
+                html.append(f"<p><strong>为什么值得关注：</strong>{_pangu(why)}</p>")
+
+    html.append("</article>")
+    return "\n".join(html)
+
+
 # ---------------------------------------------------------------------------
 # 核心渲染：结构化 → Markdown
 # ---------------------------------------------------------------------------
