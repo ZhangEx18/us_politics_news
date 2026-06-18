@@ -138,10 +138,26 @@ def _assign_level(score: float, important_threshold: float = 85) -> str:
     return "观察"
 
 
+def _get_daily_window() -> tuple[datetime, datetime]:
+    """获取今日日报的时间窗口：昨日 8:00 - 今日 8:00"""
+    now = datetime.now()
+    today_8am = now.replace(hour=8, minute=0, second=0, microsecond=0)
+    if now >= today_8am:
+        # 今日 8:00 已过，窗口为昨日 8:00 - 今日 8:00
+        since = today_8am - timedelta(days=1)
+        until = today_8am
+    else:
+        # 今日 8:00 未到，窗口为前日 8:00 - 昨日 8:00
+        since = today_8am - timedelta(days=2)
+        until = today_8am - timedelta(days=1)
+    return since, until
+
+
 def run_pipeline(hours: int = 24) -> dict:
     """完整流程：抓取 + 评分 + 分栏 digest"""
     start_time = datetime.now()
-    since = start_time - timedelta(hours=hours)
+    since, until = _get_daily_window()
+    print(f"日报窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}")
 
     config = _load_config()
     output_cfg = config.get("output", {})
