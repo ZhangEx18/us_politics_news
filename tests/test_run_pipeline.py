@@ -5,7 +5,13 @@ from datetime import datetime
 
 from database import Article
 from models import ContentItem
-from run_pipeline import main, _build_reader_highlights, _count_scored_entries, _is_hard_news_entry
+from run_pipeline import (
+    main,
+    _augment_ai_config_with_runtime,
+    _build_reader_highlights,
+    _count_scored_entries,
+    _is_hard_news_entry,
+)
 
 
 def test_database_article_can_map_to_content_item_without_id_field():
@@ -94,3 +100,35 @@ def test_is_hard_news_entry_requires_true_flag():
     assert _is_hard_news_entry({"is_hard_news": True}) is True
     assert _is_hard_news_entry({"is_hard_news": False}) is False
     assert _is_hard_news_entry({}) is False
+
+
+def test_augment_ai_config_with_runtime_applies_llm_limits():
+    config = {
+        "llm": {
+            "max_concurrent": 5,
+            "max_prompt_chars": 120000,
+            "timeout_seconds": 180,
+            "score_max_concurrent": 2,
+            "score_max_prompt_chars": 9000,
+            "score_timeout_seconds": 120,
+            "score_content_chars": 400,
+            "score_retry_split_depth": 3,
+            "digest_timeout_seconds": 240,
+            "digest_content_chars": 1000,
+            "meta_timeout_seconds": 120,
+        }
+    }
+
+    ai_config = _augment_ai_config_with_runtime(
+        {"api_key": "k", "base_url": "https://example.com", "model": "m"},
+        config,
+    )
+
+    assert ai_config["score_max_concurrent"] == 2
+    assert ai_config["score_max_prompt_chars"] == 9000
+    assert ai_config["score_timeout_seconds"] == 120
+    assert ai_config["score_content_chars"] == 400
+    assert ai_config["score_retry_split_depth"] == 3
+    assert ai_config["digest_timeout_seconds"] == 240
+    assert ai_config["digest_content_chars"] == 1000
+    assert ai_config["meta_timeout_seconds"] == 120
