@@ -1,0 +1,43 @@
+name: Fetch News
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download database
+        uses: actions/download-artifact@v4
+        with:
+          name: news-db
+          path: data/
+        continue-on-error: true
+
+      - name: Fetch news
+        run: python3 src/run_pipeline.py --fetch-only --hours 2
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          TIANAPI_KEY: ${{ secrets.TIANAPI_KEY }}
+
+      - name: Upload database
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-db
+          path: data/news.db
+          retention-days: 7
+          overwrite: true

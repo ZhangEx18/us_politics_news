@@ -1,0 +1,60 @@
+name: Daily Publish
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download database
+        uses: actions/download-artifact@v4
+        with:
+          name: news-db
+          path: data/
+        continue-on-error: true
+
+      - name: Generate daily digest
+        run: python3 src/run_pipeline.py --digest-only --hours 24
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+
+      - name: Validate output
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          grep -q "content:encoded" docs/feed.xml || { echo "feed.xml 缺少 content:encoded"; exit 1; }
+          [ -f "docs/daily/$TODAY.md" ] || { echo "日报不存在"; exit 1; }
+          CHARS=$(wc -c < "docs/daily/$TODAY.md")
+          echo "日报字节: $CHARS"
+          [ "$CHARS" -gt 10000 ] || { echo "日报字数过少"; exit 1; }
+          echo "校验通过"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+
+      - name: Upload database
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-db
+          path: data/news.db
+          retention-days: 7
+          overwrite: true
