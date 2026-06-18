@@ -264,10 +264,10 @@ def render_reader_content(
     为 RSS Reader 生成纯正文 HTML 片段。
 
     约束：
-    - 只保留标题 + 导语 + 四大栏目正文
+    - 只保留标题 + 今日要点 + 四大栏目正文
     - 不输出完整 HTML 文档壳
-    - 不输出 highlights / 来源 / 原文链接 / 阅读链接
-    - 即使样式被 Reader 剥离，也能保持清晰层次
+    - 不输出来源、原文链接、标签式小标题
+    - 所有事件统一为标题 + 单段概述
     """
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
     try:
@@ -302,32 +302,9 @@ def render_reader_content(
             is_followup = event.get("is_followup", False)
             suffix = " [持续跟踪]" if is_followup else ""
             html.append(f"<h3>{idx}. {event_title}{suffix}</h3>")
-
-            detail_level = str(event.get("detail_level", "brief")).strip().lower()
-            core_facts = event.get("core_facts", [])
-            if isinstance(core_facts, list):
-                core_text = " ".join(_pangu(str(fact)) for fact in core_facts if str(fact).strip())
-            else:
-                core_text = _pangu(str(core_facts)) if core_facts else ""
-            if core_text:
-                html.append(f"<p><strong>核心事实：</strong>{core_text}</p>")
-
-            if detail_level == "full":
-                background_context = event.get("background_context", event.get("background_impact", ""))
-                if background_context:
-                    html.append(
-                        f"<p><strong>背景脉络：</strong>{_pangu(background_context)}</p>"
-                    )
-
-                possible_impact = event.get("possible_impact", "")
-                if possible_impact:
-                    html.append(
-                        f"<p><strong>可能影响：</strong>{_pangu(possible_impact)}</p>"
-                    )
-
-                why = event.get("why_it_matters", "")
-                if why:
-                    html.append(f"<p><strong>为什么值得关注：</strong>{_pangu(why)}</p>")
+            reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
+            if reader_body:
+                html.append(f"<p>{_pangu(reader_body)}</p>")
 
     html.append("</article>")
     return "\n".join(html)

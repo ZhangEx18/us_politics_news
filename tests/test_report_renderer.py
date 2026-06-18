@@ -13,17 +13,12 @@ def test_render_reader_content_is_plain_article_fragment():
     columns = {
         "us_politics": [{
             "title_zh": "美国事件",
-            "detail_level": "full",
-            "core_facts": ["事实一", "事实二"],
-            "background_context": "背景信息",
-            "possible_impact": "影响信息",
-            "why_it_matters": "原因说明",
+            "reader_body": "美国事件概述正文",
             "source_links": [{"title": "原文", "url": "https://example.com"}],
         }],
         "global_affairs": [{
             "title_zh": "国际事件",
-            "detail_level": "brief",
-            "core_facts": "单段事实",
+            "reader_body": "国际事件单段概述",
         }],
         "technology": [],
         "economy": [],
@@ -41,11 +36,12 @@ def test_render_reader_content_is_plain_article_fragment():
     assert "<h2>二、国际风云</h2>" in html
     assert "<h3>1. 美国事件</h3>" in html
     assert "<h3>1. 国际事件</h3>" in html
-    assert "核心事实：" in html
-    assert "背景脉络：" in html
-    assert "可能影响：" in html
-    assert "为什么值得关注：" in html
-    assert "单段事实" in html
+    assert "<p>美国事件概述正文</p>" in html
+    assert "<p>国际事件单段概述</p>" in html
+    assert "核心事实：" not in html
+    assert "背景脉络：" not in html
+    assert "可能影响：" not in html
+    assert "为什么值得关注：" not in html
     assert "<!DOCTYPE html>" not in html
     assert "<html" not in html
     assert "<head>" not in html

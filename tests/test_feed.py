@@ -55,17 +55,13 @@ def test_save_feed_uses_reader_friendly_fragment():
     columns = {
         "us_politics": [{
             "title_zh": "测试事件",
-            "detail_level": "full",
-            "core_facts": ["事实一", "事实二"],
-            "background_context": "背景信息",
-            "possible_impact": "影响信息",
-            "why_it_matters": "值得关注原因",
+            "reader_body": "测试事件的单段概述正文。",
+            "core_facts": "测试事件的单段概述正文。",
             "source_links": [{"title": "原文", "url": "https://example.com"}],
         }],
         "global_affairs": [{
             "title_zh": "简要事件",
-            "detail_level": "brief",
-            "core_facts": "一句核心事实",
+            "reader_body": "简要事件的一段概述。",
         }],
         "technology": [],
         "economy": [],
@@ -83,11 +79,13 @@ def test_save_feed_uses_reader_friendly_fragment():
         assert "<h2>一、美国政情</h2>" in content
         assert "<h2>二、国际风云</h2>" in content
         assert "<h3>1. 测试事件</h3>" in content
-        assert "核心事实：" in content
-        assert "背景脉络：" in content
-        assert "可能影响：" in content
-        assert "为什么值得关注：" in content
+        assert "测试事件的单段概述正文" in content
         assert "<h3>1. 简要事件</h3>" in content
+        assert "简要事件的一段概述" in content
+        assert "核心事实：" not in content
+        assert "背景脉络：" not in content
+        assert "可能影响：" not in content
+        assert "为什么值得关注：" not in content
         assert "<!DOCTYPE html>" not in content
         assert "<html" not in content
         assert "<head>" not in content
