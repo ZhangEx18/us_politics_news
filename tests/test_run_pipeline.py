@@ -5,7 +5,7 @@ from datetime import datetime
 
 from database import Article
 from models import ContentItem
-from run_pipeline import main
+from run_pipeline import main, _build_reader_highlights
 
 
 def test_database_article_can_map_to_content_item_without_id_field():
@@ -59,3 +59,21 @@ def test_main_digest_only_exits_when_no_content_generated(monkeypatch):
         main()
 
     assert exc.value.code == 1
+
+
+def test_build_reader_highlights_prefers_titles_and_deduplicates():
+    columns = {
+        "us_politics": [
+            {"title_zh": "华为案证据裁定：孟晚舟供述可被美国检方使用", "core_facts": "事实一"},
+            {"title_zh": "华为案证据裁定：孟晚舟供述可被美国检方使用", "core_facts": "重复标题"},
+        ],
+        "global_affairs": [
+            {"title_zh": "", "core_facts": "美国首次公开与伊朗达成的 14 点谅解备忘录全文"},
+        ],
+    }
+
+    highlights = _build_reader_highlights(columns, limit=8)
+
+    assert highlights[0].startswith("华为案证据裁定")
+    assert len(highlights) == 2
+    assert any("伊朗" in item for item in highlights)
