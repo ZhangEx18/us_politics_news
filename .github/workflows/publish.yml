@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -21,12 +23,26 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Download database
-        uses: actions/download-artifact@v4
-        with:
-          name: news-db
-          path: data/
-        continue-on-error: true
+      - name: Restore database from news-data branch
+        run: |
+          mkdir -p data
+          git ls-remote --exit-code --heads origin news-data >/dev/null 2>&1 || { echo "news-data 分支不存在"; exit 1; }
+          git fetch origin news-data
+          git show origin/news-data:data/news.db > data/news.db
+          test -s data/news.db || { echo "数据库恢复失败"; exit 1; }
+
+      - name: Restore existing feed history from gh-pages
+        run: |
+          mkdir -p docs
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages
+            if git cat-file -e origin/gh-pages:feed.xml 2>/dev/null; then
+              git show origin/gh-pages:feed.xml > docs/feed.xml
+              echo "已恢复历史 feed.xml"
+            else
+              echo "gh-pages 尚无 feed.xml"
+            fi
+          fi
 
       - name: Generate daily digest
         run: python3 src/run_pipeline.py --digest-only --hours 24
@@ -40,9 +56,22 @@ jobs:
           TODAY=$(date +%Y-%m-%d)
           grep -q "content:encoded" docs/feed.xml || { echo "feed.xml 缺少 content:encoded"; exit 1; }
           [ -f "docs/daily/$TODAY.md" ] || { echo "日报不存在"; exit 1; }
+          grep -q "一、美国政情" "docs/daily/$TODAY.md" || { echo "缺少美国政情栏目"; exit 1; }
+          grep -q "二、国际风云" "docs/daily/$TODAY.md" || { echo "缺少国际风云栏目"; exit 1; }
+          grep -q "三、科技前沿" "docs/daily/$TODAY.md" || { echo "缺少科技前沿栏目"; exit 1; }
+          grep -q "四、财经脉动" "docs/daily/$TODAY.md" || { echo "缺少财经脉动栏目"; exit 1; }
           CHARS=$(wc -c < "docs/daily/$TODAY.md")
           echo "日报字节: $CHARS"
           [ "$CHARS" -gt 10000 ] || { echo "日报字数过少"; exit 1; }
+          python3 - <<'PY'
+          from pathlib import Path
+          feed = Path("docs/feed.xml").read_text(encoding="utf-8")
+          blocked = ["<!DOCTYPE html>", "<html", "<head>", "<style>", "相关阅读", "原文链接", "来源"]
+          bad = [token for token in blocked if token in feed]
+          if bad:
+              raise SystemExit(f"Reader feed 仍含不应出现的内容: {bad}")
+          print("Reader feed 格式校验通过")
+          PY
           echo "校验通过"
 
       - name: Deploy to GitHub Pages
@@ -51,10 +80,19 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
 
-      - name: Upload database
-        uses: actions/upload-artifact@v4
-        with:
-          name: news-db
-          path: data/news.db
-          retention-days: 7
-          overwrite: true
+      - name: Persist database to news-data branch
+        run: |
+          test -f data/news.db || { echo "数据库文件不存在"; exit 1; }
+          TMP_DIR=$(mktemp -d)
+          mkdir -p "$TMP_DIR/data"
+          cp data/news.db "$TMP_DIR/data/news.db"
+          printf "*.pyc\n__pycache__/\n.DS_Store\n" > "$TMP_DIR/.gitignore"
+          cd "$TMP_DIR"
+          git init
+          git checkout -b news-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/news.db .gitignore
+          git commit -m "Update news database"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin HEAD:news-data --force

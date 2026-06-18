@@ -4,12 +4,17 @@ on:
     - cron: '0 */2 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -18,12 +23,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Download database
-        uses: actions/download-artifact@v4
-        with:
-          name: news-db
-          path: data/
-        continue-on-error: true
+      - name: Restore database from news-data branch
+        run: |
+          mkdir -p data
+          if git ls-remote --exit-code --heads origin news-data >/dev/null 2>&1; then
+            git fetch origin news-data
+            git show origin/news-data:data/news.db > data/news.db
+            echo "已从 news-data 分支恢复数据库"
+          else
+            echo "news-data 分支不存在，将创建新数据库"
+          fi
 
       - name: Fetch news
         run: python3 src/run_pipeline.py --fetch-only --hours 2
@@ -34,10 +43,19 @@ jobs:
           NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
           TIANAPI_KEY: ${{ secrets.TIANAPI_KEY }}
 
-      - name: Upload database
-        uses: actions/upload-artifact@v4
-        with:
-          name: news-db
-          path: data/news.db
-          retention-days: 7
-          overwrite: true
+      - name: Persist database to news-data branch
+        run: |
+          test -f data/news.db || { echo "数据库文件不存在"; exit 1; }
+          TMP_DIR=$(mktemp -d)
+          mkdir -p "$TMP_DIR/data"
+          cp data/news.db "$TMP_DIR/data/news.db"
+          printf "*.pyc\n__pycache__/\n.DS_Store\n" > "$TMP_DIR/.gitignore"
+          cd "$TMP_DIR"
+          git init
+          git checkout -b news-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/news.db .gitignore
+          git commit -m "Update news database"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin HEAD:news-data --force
