@@ -40,12 +40,21 @@ def test_digest_targets_match_publish_constraints():
     total = digest.get("total", {})
     columns = digest.get("columns", {})
     runtime = config.get("runtime", {})
+    llm = config.get("llm", {})
 
     assert column.get("target_word_count_min") == 2500
     assert column.get("target_word_count_max") == 5000
     assert total.get("target_word_count_min") == 10000
     assert total.get("target_word_count_max") == 20000
     assert runtime.get("min_score_coverage") == 0.7
+    assert llm.get("score_max_concurrent") == 2
+    assert llm.get("score_max_prompt_chars") == 9000
+    assert llm.get("score_timeout_seconds") == 120
+    assert llm.get("score_content_chars") == 400
+    assert llm.get("score_retry_split_depth") == 3
+    assert llm.get("digest_timeout_seconds") == 240
+    assert llm.get("digest_content_chars") == 1000
+    assert llm.get("meta_timeout_seconds") == 120
     assert digest.get("total_min_items") == 28
     assert digest.get("total_target_items") == 35
     assert digest.get("total_max_items") == 45

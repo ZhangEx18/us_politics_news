@@ -80,6 +80,11 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
             return msg.get("content") or msg.get("reasoning_content", "")
 
 
+def _timeout_for(config: dict, scope: str, default: int) -> int:
+    """按调用场景读取超时配置。"""
+    return int(config.get(f"{scope}_timeout_seconds") or config.get("timeout_seconds") or default)
+
+
 # ── JSON 解析工具 ──
 
 
@@ -309,13 +314,14 @@ async def _score_single_batch(
     entries: list[dict], config: dict, batch_index: int = 0
 ) -> tuple[list[dict], list[str]]:
     """对单批 entries 评分，返回 (matched_scores, errors)"""
+    content_limit = int(config.get("score_content_chars", 400))
     entries_for_llm = [
         {
             "link": e.get("link", ""),
             "title": e.get("title", "无标题"),
             "source": e.get("source", "未知来源"),
             "published": e.get("published", ""),
-            "content": (e.get("content", "") or "")[:2000],
+            "content": (e.get("content", "") or "")[:content_limit],
         }
         for e in entries
     ]
@@ -323,7 +329,11 @@ async def _score_single_batch(
     prompt = SCORE_PROMPT_TEMPLATE.replace("{entries_json}", entries_json)
 
     try:
-        response = await _call_llm(prompt, config)
+        response = await _call_llm(
+            prompt,
+            config,
+            timeout=_timeout_for(config, "score", 120),
+        )
         results = _parse_score_response(response)
         if not isinstance(results, list):
             raise ValueError(f"LLM 返回非数组: {type(results)}")
@@ -349,6 +359,99 @@ async def _score_single_batch(
         return [], [msg]
 
 
+def _is_retryable_score_error(errors: list[str]) -> bool:
+    """只有超时或结果不完整才值得拆小重试。"""
+    if not errors:
+        return False
+    retryable_tokens = ("TimeoutError", "结果不完整")
+    return any(token in err for err in errors for token in retryable_tokens)
+
+
+async def _score_batch_with_retry(
+    entries: list[dict],
+    config: dict,
+    batch_index: int = 0,
+    depth: int = 0,
+) -> tuple[list[dict], list[str]]:
+    """对单批执行评分；失败时拆分重试，尽量恢复覆盖率。"""
+    scores, errors = await _score_single_batch(entries, config, batch_index)
+    if not entries:
+        return scores, errors
+
+    matched_links = {
+        score.get("link") or score.get("url", "")
+        for score in scores
+        if isinstance(score, dict)
+    }
+    missing_entries = [
+        entry for entry in entries
+        if (entry.get("link") or entry.get("url", "")) not in matched_links
+    ]
+
+    retry_depth = int(config.get("score_retry_split_depth", 3))
+    if (
+        depth >= retry_depth
+        or not _is_retryable_score_error(errors)
+        or not missing_entries
+    ):
+        return scores, errors
+
+    print(
+        f"  [AI] 批次{batch_index + 1} 拆分重试: "
+        f"{len(missing_entries)} 条, depth={depth + 1}/{retry_depth}"
+    )
+
+    if len(missing_entries) == 1:
+        retry_scores, retry_errors = await _score_batch_with_retry(
+            missing_entries,
+            config,
+            batch_index,
+            depth + 1,
+        )
+        merged_scores = {
+            (item.get("link") or item.get("url", "")): item
+            for item in scores + retry_scores
+            if isinstance(item, dict) and (item.get("link") or item.get("url", ""))
+        }
+        if len(merged_scores) == len(entries):
+            return list(merged_scores.values()), []
+        unresolved_link = missing_entries[0].get("link") or missing_entries[0].get("url", "")
+        return list(merged_scores.values()), retry_errors + [
+            f"批次{batch_index + 1} 拆分后仍缺失 1 条: ['{unresolved_link}']"
+        ]
+
+    mid = len(missing_entries) // 2
+    left_scores, left_errors = await _score_batch_with_retry(
+        missing_entries[:mid], config, batch_index, depth + 1
+    )
+    right_scores, right_errors = await _score_batch_with_retry(
+        missing_entries[mid:], config, batch_index, depth + 1
+    )
+
+    merged_scores: dict[str, dict] = {}
+    for item in scores + left_scores + right_scores:
+        if not isinstance(item, dict):
+            continue
+        link = item.get("link") or item.get("url", "")
+        if link:
+            merged_scores[link] = item
+
+    recovered_links = set(merged_scores.keys())
+    unresolved = [
+        entry for entry in entries
+        if (entry.get("link") or entry.get("url", "")) not in recovered_links
+    ]
+    if unresolved:
+        unresolved_links = [entry.get("link") or entry.get("url", "") for entry in unresolved]
+        retry_errors = left_errors + right_errors
+        retry_errors.append(
+            f"批次{batch_index + 1} 拆分后仍缺失 {len(unresolved)} 条: {unresolved_links}"
+        )
+        return list(merged_scores.values()), retry_errors
+
+    return list(merged_scores.values()), []
+
+
 async def score_batch(
     entries: list[dict],
     config: Optional[dict] = None,
@@ -372,18 +475,21 @@ async def score_batch(
     if not entries:
         return [], []
 
+    max_prompt_chars = int(config.get("score_max_prompt_chars", max_prompt_chars))
+    max_concurrent = int(config.get("score_max_concurrent", max_concurrent))
+
     batches = _split_entries_for_batch(entries, max_prompt_chars)
     print(f"  [AI] 评分: {len(entries)} 条 -> {len(batches)} 批")
 
     if len(batches) == 1:
-        scores, errors = await _score_single_batch(batches[0], config, 0)
+        scores, errors = await _score_batch_with_retry(batches[0], config, 0)
         return _merge_scores(entries, scores), errors
 
     semaphore = asyncio.Semaphore(max_concurrent)
 
     async def _limited(idx: int, batch: list[dict]):
         async with semaphore:
-            return await _score_single_batch(batch, config, idx)
+            return await _score_batch_with_retry(batch, config, idx)
 
     results = await asyncio.gather(*[_limited(i, b) for i, b in enumerate(batches)])
 
@@ -599,7 +705,7 @@ async def generate_column_digest(
             "source": e.get("source", ""),
             "score": e.get("score", 0),
             "summary": e.get("summary", ""),
-            "content": (e.get("content", "") or "")[:3000],
+            "content": (e.get("content", "") or "")[:int(ai_config.get("digest_content_chars", 1000))],
             "source_links": e.get("source_links", []),
         })
 
@@ -617,7 +723,11 @@ async def generate_column_digest(
         json.dumps(events_for_llm, ensure_ascii=False, indent=2),
     )
 
-    response = await _call_llm(prompt, ai_config, timeout=180)
+    response = await _call_llm(
+        prompt,
+        ai_config,
+        timeout=_timeout_for(ai_config, "digest", 180),
+    )
 
     # 解析 JSON 响应（兼容 markdown 代码块包裹）
     text = _strip_markdown_fence(response)
@@ -732,7 +842,11 @@ async def generate_meta_digest(
         "{column_summaries_text}", column_summaries_text
     )
 
-    response = await _call_llm(prompt, ai_config, timeout=120)
+    response = await _call_llm(
+        prompt,
+        ai_config,
+        timeout=_timeout_for(ai_config, "meta", 120),
+    )
 
     # 解析 JSON 响应（兼容 markdown 代码块包裹）
     text = _strip_markdown_fence(response)

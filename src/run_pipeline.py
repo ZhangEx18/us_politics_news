@@ -59,6 +59,22 @@ def _load_config() -> dict:
         return yaml.safe_load(f) or {}
 
 
+def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
+    """把 config.yaml 里的 LLM 运行参数注入 AI 配置。"""
+    llm_cfg = config.get("llm", {})
+    ai_config.update({
+        "score_max_prompt_chars": llm_cfg.get("score_max_prompt_chars", llm_cfg.get("max_prompt_chars", 12000)),
+        "score_max_concurrent": llm_cfg.get("score_max_concurrent", max(1, min(llm_cfg.get("max_concurrent", 3), 2))),
+        "score_timeout_seconds": llm_cfg.get("score_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
+        "score_content_chars": llm_cfg.get("score_content_chars", 400),
+        "score_retry_split_depth": llm_cfg.get("score_retry_split_depth", 3),
+        "digest_timeout_seconds": llm_cfg.get("digest_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
+        "digest_content_chars": llm_cfg.get("digest_content_chars", 1000),
+        "meta_timeout_seconds": llm_cfg.get("meta_timeout_seconds", 120),
+    })
+    return ai_config
+
+
 class _ScoredAdapter:
     """将 score_batch 返回的 dict 适配为 update_llm_scores 期望的属性访问"""
     __slots__ = ("url", "llm_score", "llm_summary", "llm_tags", "column", "event_key", "source_tier")
@@ -373,7 +389,7 @@ def run_pipeline(hours: int = 24) -> dict:
     history_days = analysis_cfg.get("history_context_days", 3)
 
     # 从环境变量加载 AI 配置
-    ai_config = _load_ai_config()
+    ai_config = _augment_ai_config_with_runtime(_load_ai_config(), config)
 
     print("=" * 60)
     print("四维日报 Pipeline v3")
@@ -467,7 +483,7 @@ def run_digest_only(hours: int = 24) -> dict:
     db_path = storage_cfg.get("db_path", "data/news.db")
 
     # 从环境变量加载 AI 配置
-    ai_config = _load_ai_config()
+    ai_config = _augment_ai_config_with_runtime(_load_ai_config(), config)
 
     print("=" * 60)
     print("四维日报 Pipeline — Digest 模式")
