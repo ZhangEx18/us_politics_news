@@ -73,6 +73,19 @@ class _ScoredAdapter:
         self.source_tier = 4
 
 
+def _count_scored_entries(entries: list[dict]) -> int:
+    """统计真正拿到 AI 评分结果的条目数。"""
+    valid = 0
+    for entry in entries:
+        if (
+            str(entry.get("event_key", "")).strip()
+            and str(entry.get("column", "")).strip()
+            and str(entry.get("summary", "")).strip()
+        ):
+            valid += 1
+    return valid
+
+
 def _scored_dicts_to_content_items(
     scored: list[dict],
     original_items: list[ContentItem],
@@ -524,11 +537,23 @@ def _run_digest_phase(
     require_ai = runtime_cfg.get("require_ai", True)
     if require_ai:
         candidate_count = len(entries_for_scoring)
-        valid_count = len(scored_dicts)
-        if score_errors or valid_count == 0 or valid_count < candidate_count * 0.5:
+        valid_count = _count_scored_entries(scored_dicts)
+        min_coverage = float(runtime_cfg.get("min_score_coverage", 0.7))
+        coverage = (valid_count / candidate_count) if candidate_count else 0.0
+
+        if valid_count == 0 or coverage < min_coverage:
             print(f"\n[错误] AI 评分失败: errors={len(score_errors)}, "
-                  f"valid={valid_count}/{candidate_count}")
+                  f"valid={valid_count}/{candidate_count}, "
+                  f"coverage={coverage:.0%}, required>={min_coverage:.0%}")
+            for err in score_errors[:3]:
+                print(f"   - {err}")
             sys.exit(1)
+        if score_errors:
+            print(f"\n[警告] AI 评分存在部分批次异常，但覆盖率达标: "
+                  f"errors={len(score_errors)}, valid={valid_count}/{candidate_count}, "
+                  f"coverage={coverage:.0%}")
+            for err in score_errors[:3]:
+                print(f"   - {err}")
 
     # === 5. 更新数据库 LLM 评分 ===
     print("\n[5/13] 更新数据库 LLM 评分...")

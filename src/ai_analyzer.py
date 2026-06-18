@@ -312,7 +312,8 @@ async def _score_single_batch(
         return matched, errors
 
     except Exception as e:
-        msg = f"批次{batch_index + 1} 评分失败: {e}"
+        detail = str(e).strip() or repr(e)
+        msg = f"批次{batch_index + 1} 评分失败: {type(e).__name__}: {detail}"
         print(f"  [AI] {msg}")
         return [], [msg]
 

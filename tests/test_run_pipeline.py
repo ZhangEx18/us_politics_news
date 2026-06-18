@@ -5,7 +5,7 @@ from datetime import datetime
 
 from database import Article
 from models import ContentItem
-from run_pipeline import main, _build_reader_highlights
+from run_pipeline import main, _build_reader_highlights, _count_scored_entries
 
 
 def test_database_article_can_map_to_content_item_without_id_field():
@@ -77,3 +77,14 @@ def test_build_reader_highlights_prefers_titles_and_deduplicates():
     assert highlights[0].startswith("华为案证据裁定")
     assert len(highlights) == 2
     assert any("伊朗" in item for item in highlights)
+
+
+def test_count_scored_entries_only_counts_real_ai_results():
+    scored = [
+        {"link": "https://example.com/1", "column": "us_politics", "summary": "摘要", "event_key": "a_20260618"},
+        {"link": "https://example.com/2", "column": "", "summary": "摘要", "event_key": "b_20260618"},
+        {"link": "https://example.com/3", "column": "technology", "summary": "", "event_key": "c_20260618"},
+        {"link": "https://example.com/4", "column": "economy", "summary": "摘要", "event_key": ""},
+    ]
+
+    assert _count_scored_entries(scored) == 1

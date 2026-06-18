@@ -74,4 +74,5 @@ storage:
 
 runtime:
   require_ai: true
+  min_score_coverage: 0.7
   proxy_from_env: true
