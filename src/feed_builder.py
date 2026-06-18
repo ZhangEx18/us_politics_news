@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""RSS Feed 生成器：生成符合 RSS 2.0 规范的 feed.xml
+"""RSS Feed 生成器 v3：短摘要 + 全文分层
 
 特性：
-- item 内嵌完整日报 HTML 正文（content:encoded）
+- description 只放短摘要（highlights 拼接，< 300 字）
+- content:encoded 放完整 HTML（render_structured_html）
 - 保留最近 30 天历史 item
 - guid 基于日期，同一天重复运行不会产生重复 item
 - atom:link 仅在 base_url 非空时输出
@@ -13,8 +14,7 @@ import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 
-from report_renderer import render_html
-from scoring import ScoredArticle
+from report_renderer import render_structured_html
 
 RSS_NS = "http://purl.org/rss/1.0/modules/content/"
 ATOM_NS = "http://www.w3.org/2005/Atom"
@@ -36,25 +36,41 @@ def _rfc2822(dt: datetime) -> str:
     return dt.strftime("%a, %d %b %Y %H:%M:%S +0800")
 
 
-def _build_item_xml(date: str, html_body: str, title: str, base_url: str) -> str:
+def _build_short_description(meta: dict) -> str:
+    """从 highlights 生成短摘要，< 300 字"""
+    parts = []
+    if meta.get("lead"):
+        parts.append(meta["lead"][:150])
+    for h in meta.get("highlights", []):
+        parts.append(f"• {h}")
+    return "\n".join(parts)[:300]
+
+
+def _build_item_xml(
+    date: str,
+    title: str,
+    short_description: str,
+    html_body: str,
+    base_url: str,
+) -> str:
     """
     生成单个 RSS <item> XML 片段
 
     Args:
         date: YYYY-MM-DD 格式日期
-        html_body: 完整日报 HTML 正文
-        title: item 标题（来自 frontmatter）
+        title: item 标题
+        short_description: 短摘要（<description>）
+        html_body: 完整 HTML 正文（<content:encoded>）
         base_url: 日报基础 URL
     """
     link = f"{base_url}/daily/{date}.html" if base_url else f"daily/{date}.html"
     pub_date = _rfc2822(datetime.now())
-    # guid 基于日期，同一天重复运行保持不变
     guid = f"daily/{date}"
 
     return f"""    <item>
       <title>{_escape_xml(title)}</title>
       <link>{_escape_xml(link)}</link>
-      <description>{_escape_xml(title)}</description>
+      <description><![CDATA[{short_description}]]></description>
       <content:encoded><![CDATA[{html_body}]]></content:encoded>
       <pubDate>{pub_date}</pubDate>
       <guid isPermaLink="false">{_escape_xml(guid)}</guid>
@@ -68,7 +84,6 @@ def _parse_existing_items(feed_xml: str) -> list[str]:
     Returns:
         item XML 片段列表（原始字符串）
     """
-    # 用正则提取 <item>...</item> 块，避免命名空间解析问题
     return re.findall(r"<item>.*?</item>", feed_xml, re.DOTALL)
 
 
@@ -92,15 +107,12 @@ def _merge_items(new_item: str, existing_items: list[str], max_days: int = 30) -
         item_date = _extract_item_date(item)
         if item_date is None:
             continue
-        # 跳过过期条目
         if item_date < cutoff:
             continue
-        # 跳过与新 item 同日期的旧条目（由新条目替代）
         if new_date and item_date == new_date:
             continue
         merged.append(item)
 
-    # 按日期降序排列
     def _sort_key(item: str) -> str:
         d = _extract_item_date(item)
         return d or "0000-00-00"
@@ -138,48 +150,40 @@ def build_feed(items: list[str], base_url: str = "") -> str:
 
 
 def save_feed(
-    articles: list[ScoredArticle] | None = None,
+    meta: dict,
+    columns: dict[str, list[dict]],
     output_path: str = "docs/feed.xml",
     base_url: str = "",
-    digest_text: str = "",
-    title: str = "",
 ) -> str:
     """
-    保存 RSS feed 到文件
+    保存 RSS feed 到文件（v3 短摘要 + 全文分层）
 
-    - item description/content:encoded 内嵌完整日报 HTML
+    - description: 短摘要（< 300 字）
+    - content:encoded: 完整 HTML 日报正文
     - 保留最近 30 天历史 item
     - 同一天重复运行时替换而非追加
-    - atom:link 仅在 base_url 非空时输出
-    - 如果提供 digest_text，直接用 AI 生成的正文
+
+    Args:
+        meta: {"title", "lead", "highlights", "date"}
+        columns: {"us_politics": [events...], ...}
+        output_path: 输出文件路径
+        base_url: 日报基础 URL
 
     Returns:
         保存的文件路径
     """
-    date = datetime.now().strftime("%Y-%m-%d")
+    date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
+    title = meta.get("title", f"{date} 四维日报")
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
 
-    # 生成完整 HTML 日报正文
-    if digest_text:
-        from report_renderer import _md_to_html
-        html_body = _md_to_html(digest_text, date)
-    else:
-        html_body = render_html(articles or [], date)
+    # 短摘要（description）
+    short_description = _build_short_description(meta)
 
-    # 标题：优先使用传入的 title，否则从 articles 生成
-    if not title:
-        if articles:
-            key_articles = [a for a in articles if a.level == "重点"]
-            if key_articles:
-                top_title = key_articles[0].title_zh or key_articles[0].title
-                title = f"{date} {top_title}"
-            else:
-                title = f"{date} 四维日报"
-        else:
-            title = f"{date} 四维日报"
+    # 完整 HTML（content:encoded）
+    html_body = render_structured_html(meta, columns)
 
     # 构建今天的 item
-    new_item = _build_item_xml(date, html_body, title, base_url)
+    new_item = _build_item_xml(date, title, short_description, html_body, base_url)
 
     # 读取已有 feed，合并历史 items
     existing_items: list[str] = []

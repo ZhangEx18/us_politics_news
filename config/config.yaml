@@ -18,42 +18,51 @@ llm:
   base_url: "https://token-plan-cn.xiaomimimo.com/v1"
   max_concurrent: 5
   max_prompt_chars: 120000
-  timeout_seconds: 120
+  timeout_seconds: 180
 
 digest:
   language: zh
-  target_word_count_min: 5000
-  target_word_count: 8000
-  target_word_count_max: 10000
+  # 每栏字数目标
+  column:
+    target_word_count_min: 5000
+    target_word_count: 7000
+    target_word_count_max: 10000
+  # 全文字数目标
+  total:
+    target_word_count_min: 20000
+    target_word_count: 28000
+    target_word_count_max: 40000
+  # 每栏目配额
   columns:
     us_politics:
       label: "美国政情"
-      min_items: 5
-      target_items: 7
+      min_items: 6
+      target_items: 8
       max_items: 10
     global_affairs:
       label: "国际风云"
-      min_items: 5
-      target_items: 7
+      min_items: 6
+      target_items: 8
       max_items: 10
     technology:
       label: "科技前沿"
-      min_items: 5
-      target_items: 7
+      min_items: 6
+      target_items: 8
       max_items: 10
     economy:
       label: "财经脉动"
-      min_items: 5
-      target_items: 7
+      min_items: 6
+      target_items: 8
       max_items: 10
-  total_min_items: 20
-  total_target_items: 28
+  total_min_items: 24
+  total_target_items: 32
   total_max_items: 40
 
 feed:
   include_full_content: true
   keep_days: 30
   stable_daily_guid: true
+  description_max_chars: 300
 
 storage:
   db_path: "data/news.db"

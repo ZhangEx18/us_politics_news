@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-AI 分析层 — 两段式流程
+AI 分析层 — 三段式流程
 
 1. score_batch: 批量评分，输出 score/column/tags/summary/event_key
-2. generate_digest: 生成完整日报正文（YAML frontmatter + Markdown）
+2. generate_column_digest: 按栏目生成结构化事件卡片
+3. generate_meta_digest: 从四栏摘要生成总标题/导语/highlights
 """
 
 import asyncio
@@ -439,178 +440,289 @@ def merge_events(items: list[dict]) -> list[dict]:
     return merged
 
 
-# ── generate_digest ──
+# ── generate_column_digest ──
 
-DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你的任务是将今天杂乱无章、来源各异的信息碎片，熔炼、重组成一篇结构极度清晰、主次分明、洞察深刻的日报。
 
-## 核心排版与整合规则（必须严格遵守）：
+COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你的任务是为「{column_label}」栏目生成结构化事件卡片。
 
-1. **新旧剥离与进展追踪**：
-   - 对比今天的新信息与近几天已推送上下文。如果今天的信息只是重复已报道的事实，请直接丢弃。
-   - 如果今天的信息是历史事件的延续，请将标题标记为 `[持续跟踪]`，并在正文中清晰划分"前情提要"与"最新突破"。
+## 栏目定义
 
-2. **精准的事件级融合**：
-   - 正确做法：把讨论同一具体事件的多方信息合并为一条新闻，提炼全貌。
-   - 错误做法：不要把两个毫不相关的事件强行塞进同一条！独立事件请独立输出。
+{column_definition}
 
-3. **精选原则**：
-   - 只挑选真正有价值的事件。每条必须对行业、技术演进或公众利益有宏观价值。
-   - 绝对剔除：KOL 个人动态、公关软文、纯情绪发泄、未经验证的小道消息、无实质内容的闲聊。
+## 结构要求
 
-4. **每条事件的结构（必须严格遵守）**：
-   - **核心事实**（2-4 句）：客观陈述发生了什么，关键数据和人物
-   - **背景/影响**（1-2 句）：这件事的来龙去脉，或对行业/社会的影响
-   - **为什么值得关注**（1 句）：用一句话点明这件事对读者的意义
-   - **原文链接**：列出所有相关来源
+每条事件必须包含以下字段：
+- **title_zh**：中文标题，简洁准确
+- **core_facts**：核心事实，2-4 句，{normal_min}-{normal_max} 字。客观陈述发生了什么，关键数据和人物
+- **background_impact**：背景与影响，1-2 句。这件事的来龙去脉，或对行业/社会的影响
+- **why_it_matters**：为什么值得关注，1 句。点明这件事对读者的意义
+- **source_links**：相关阅读，列出所有相关来源，格式 [{{"title": "来源名", "url": "https://..."}}]
+- **is_followup**：布尔值，是否为历史事件的持续跟踪
 
-5. **字数控制**：
-   - 今日导读：{lead_min}-{lead_max} 字
-   - 普通事件：{event_min}-{event_max} 字
-   - 重点事件（score >= {important_score}）：{important_min}-{important_max} 字
-   - 全文总字数目标：{word_count_min}-{word_count_max} 字
+## 字数控制
 
-6. **客观专业**：用简练中文，像分析师一样指出事件的行业意义。保留所有原文链接。
+- 普通事件：{normal_min}-{normal_max} 字（core_facts 部分）
+- 重点事件（score >= {important_score}）：{important_min}-{important_max} 字（core_facts 部分）
+- 本栏总字数目标：{word_count_min}-{word_count_max} 字
 
-7. **避免风格趋同**：前言导读必须从今日素材本身的具体事实出发，严禁评价性措辞 / 总结性套话 / 宏大叙事框架。
+## 新旧剥离与去重规则
 
-8. **正文不要写开头引言**：正文直接从第一条新闻 `### 1.` 开始。导语由 frontmatter 的 `lead` 字段承载。
+{history_section}
 
-## 四大板块
+## 负面清单（必须剔除）
 
-正文按以下板块分组，每个板块用 `## 板块名` 二级标题：
-
-- `## 美国政情`：美国国内政治、国会、总统、选举、政策
-- `## 国际风云`：国际关系、地缘政治、外交、军事冲突
-- `## 科技前沿`：科技前沿、AI、互联网、半导体、新能源
-- `## 经济财经`：经济数据、金融市场、贸易、就业、通胀
-
-如果某个板块今日无素材，直接省略该板块标题。
-
-## 栏目配额
-
-{column_quota_text}
+- KOL 个人动态、公关软文
+- 纯情绪发泄、未经验证的小道消息
+- 无实质内容的闲聊
+- 今天的信息如果只是重复已报道的事实，请直接丢弃
 
 ## 输出格式
 
-输出必须以 YAML frontmatter 起始，紧跟空行后接 markdown 正文。
-
-frontmatter 字段：
-- `title`: 短标题，核心事实陈述，8-30 字
-- `lead`: {lead_min}-{lead_max} 字前言导读，只陈述今日具体发生的事实
-- `highlights`: 2-3 条最值得关注的事件，每条 15-30 字
-
-示例：
-
-```yaml
----
-title: "国会通过芯片补贴法案，Fed 维持利率不变"
-lead: "美国参议院以 64 票对 33 票通过 520 亿美元芯片补贴法案；美联储宣布维持基准利率 5.25% 不变，暗示年内仍有加息可能。"
-highlights:
-  - "参议院通过 520 亿美元芯片补贴法案"
-  - "美联储维持利率 5.25% 不变"
----
-```
-
-## 参考数据
-
-### 待处理的高分候选（共 {count} 条）：
+必须返回严格 JSON 对象，以 "{{" 开始，以 "}}" 结尾：
 
 ```json
-{entries}
+{{
+  "events": [
+    {{
+      "title_zh": "中文标题",
+      "core_facts": "核心事实 2-4 句",
+      "background_impact": "背景与影响 1-2 句",
+      "why_it_matters": "为什么值得关注 1 句",
+      "source_links": [{{"title": "来源名", "url": "https://..."}}],
+      "is_followup": false
+    }}
+  ]
+}}
 ```
 
-### 近几天已推送上下文（仅供查重，严禁模仿其措辞和结构）：
+## 重要提示
 
-<RECENT_PUSH_CONTEXT>
-{recent_push_context}
-</RECENT_PUSH_CONTEXT>
+1. 只返回 JSON 对象，不要添加额外文字
+2. events 数组中的每条事件都必须来自下方输入数据
+3. source_links 必须保留原文链接，不要编造
+4. 用简练中文，像分析师一样指出事件的行业意义
 
-### 近几天已处理的碎片化信息（供洞察参考）：
+## 输入数据（共 {count} 条候选事件）
 
-{context}
+```json
+{events_json}
+```
 """
 
 
-async def generate_digest(
-    entries: list[dict],
-    recent_context: list[dict],
-    config: Optional[dict] = None,
-    recent_push_context: str = "",
-    digest_config: Optional[dict] = None,
-) -> str:
-    """生成完整日报正文。
+# 栏目定义映射
+_COLUMN_DEFINITIONS: dict[str, str] = {
+    "us_politics": "美国国内政治、国会、总统、选举、政策",
+    "global_affairs": "国际关系、地缘政治、外交、军事冲突",
+    "technology": "科技前沿、AI、互联网、半导体、新能源",
+    "economy": "经济数据、金融市场、贸易、就业、通胀",
+}
+
+
+async def generate_column_digest(
+    column_key: str,
+    column_label: str,
+    events: list[dict],
+    history_context: str,
+    ai_config: dict,
+    word_count_min: int = 5000,
+    word_count_max: int = 10000,
+) -> list[dict]:
+    """
+    为单个栏目生成结构化事件卡片
 
     Args:
-        entries: 高分候选列表（已评分，含 score/column/tags/summary/content）
-        recent_context: 近几天已处理的碎片化信息（用于去重参考）
-        config: AI 配置，None 则从环境变量读取
-        recent_push_context: 近几天已推送事件的文本摘要
-        digest_config: 字数目标和栏目配额配置，包含：
-            - target_word_count_min: 最低字数
-            - target_word_count: 目标字数
-            - target_word_count_max: 最高字数
-            - columns: 栏目配额配置
+        column_key: 栏目 key (us_politics/global_affairs/technology/economy)
+        column_label: 栏目中文名
+        events: 该栏目的候选事件列表 [{"title", "source", "score", "summary", "content", "source_links"}]
+        history_context: 近几天已推送事件文本
+        ai_config: AI 配置 {api_key, base_url, model}
+        word_count_min/max: 字数目标
 
     Returns:
-        LLM 生成的 YAML frontmatter + Markdown 正文
+        [{"title_zh", "core_facts", "background_impact", "why_it_matters", "source_links", "is_followup"}, ...]
     """
-    if config is None:
-        config = _load_ai_config()
+    if not events:
+        return []
 
-    # 读取字数目标配置
-    dc = digest_config or {}
-    word_count_min = dc.get("target_word_count_min", 5000)
-    word_count_max = dc.get("target_word_count_max", 10000)
-    important_score = dc.get("important_score", 85)
+    # 构建历史上下文段落
+    if history_context:
+        history_section = (
+            "对比近几天已推送的事件上下文。如果今天的信息只是重复已报道的事实，请直接丢弃。\n"
+            "如果今天的信息是历史事件的延续，将 is_followup 设为 true。\n\n"
+            f"<RECENT_PUSH_CONTEXT>\n{history_context}\n</RECENT_PUSH_CONTEXT>"
+        )
+    else:
+        history_section = "(无历史上下文)"
 
-    # 构建栏目配额文本
-    columns_cfg = dc.get("columns", {})
-    column_quota_lines = []
+    # 简化事件数据给 LLM
+    events_for_llm = []
+    for e in events:
+        events_for_llm.append({
+            "title": e.get("title", ""),
+            "source": e.get("source", ""),
+            "score": e.get("score", 0),
+            "summary": e.get("summary", ""),
+            "content": (e.get("content", "") or "")[:3000],
+            "source_links": e.get("source_links", []),
+        })
+
+    column_definition = _COLUMN_DEFINITIONS.get(column_key, column_label)
+
+    prompt = COLUMN_DIGEST_PROMPT_TEMPLATE
+    prompt = prompt.replace("{column_label}", column_label)
+    prompt = prompt.replace("{column_definition}", column_definition)
+    prompt = prompt.replace("{normal_min}", "150")
+    prompt = prompt.replace("{normal_max}", "250")
+    prompt = prompt.replace("{important_score}", "85")
+    prompt = prompt.replace("{important_min}", "300")
+    prompt = prompt.replace("{important_max}", "500")
+    prompt = prompt.replace("{word_count_min}", str(word_count_min))
+    prompt = prompt.replace("{word_count_max}", str(word_count_max))
+    prompt = prompt.replace("{history_section}", history_section)
+    prompt = prompt.replace("{count}", str(len(events)))
+    prompt = prompt.replace(
+        "{events_json}",
+        json.dumps(events_for_llm, ensure_ascii=False, indent=2),
+    )
+
+    response = await _call_llm(prompt, ai_config, timeout=180)
+
+    # 解析 JSON 响应（兼容 markdown 代码块包裹）
+    text = _strip_markdown_fence(response)
+    parsed = None
+
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            try:
+                parsed = json.loads(m.group())
+            except json.JSONDecodeError:
+                pass
+
+    if parsed is None:
+        raise RuntimeError(f"generate_column_digest JSON 解析失败: {response[:300]}")
+
+    # 提取 events 数组
+    if isinstance(parsed, dict) and isinstance(parsed.get("events"), list):
+        return parsed["events"]
+
+    raise RuntimeError(
+        f"generate_column_digest 响应中未找到 events 数组: {response[:300]}"
+    )
+
+
+# ── generate_meta_digest ──
+
+
+META_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报总编辑。你的任务是从四个栏目的摘要中，生成日报的总标题、导语和重点提示。
+
+## 输入
+
+以下是四个栏目的标题和前 3 条事件摘要：
+
+{column_summaries_text}
+
+## 输出要求
+
+- **title**：8-30 字，核心事实陈述，像报纸头版标题
+- **lead**：150-300 字，只陈述今日具体发生的事实，不做评价
+- **highlights**：3-6 条，每条 15-30 字，最值得关注的事件
+
+## 严格约束
+
+1. 严禁评价性措辞、套话、宏大叙事
+2. 只做总编排，不重复正文细节
+3. title 必须是事实陈述，不能是空泛概括
+4. lead 必须从今日素材本身的具体事实出发
+5. highlights 每条必须指向一个具体事件
+
+## 输出格式
+
+必须返回严格 JSON 对象，以 "{{" 开始，以 "}}" 结尾：
+
+```json
+{{
+  "title": "8-30字核心事实陈述",
+  "lead": "150-300字只陈述事实的导语",
+  "highlights": ["重点1（15-30字）", "重点2（15-30字）", "重点3（15-30字）"]
+}}
+```
+
+## 重要提示
+
+1. 只返回 JSON 对象，不要添加额外文字
+2. highlights 数组长度 3-6 条
+3. 所有内容用简练中文
+"""
+
+
+async def generate_meta_digest(
+    column_summaries: dict[str, str],
+    ai_config: dict,
+) -> dict:
+    """
+    从四栏摘要生成总标题/导语/highlights
+
+    Args:
+        column_summaries: {"us_politics": "前3条标题摘要", "global_affairs": ...}
+        ai_config: AI 配置
+
+    Returns:
+        {"title": "8-30字", "lead": "150-300字", "highlights": ["重点1", "重点2", ...]}
+    """
+    # 构建栏目摘要文本
     col_label_map = {
         "us_politics": "美国政情",
         "global_affairs": "国际风云",
         "technology": "科技前沿",
         "economy": "经济财经",
     }
+    sections = []
     for col_key, label in col_label_map.items():
-        col_cfg = columns_cfg.get(col_key, {})
-        min_items = col_cfg.get("min_items", 5)
-        target_items = col_cfg.get("target_items", 7)
-        max_items = col_cfg.get("max_items", 10)
-        column_quota_lines.append(f"- {label}（{col_key}）：{min_items}-{max_items} 条，目标 {target_items} 条")
-    column_quota_text = "\n".join(column_quota_lines) if column_quota_lines else "(无配额限制)"
+        summary = column_summaries.get(col_key, "").strip()
+        if summary:
+            sections.append(f"### {label}（{col_key}）\n{summary}")
 
-    # 构建 context 文本
-    context_lines = []
-    for c in recent_context:
-        tags_str = ", ".join(c.get("tags", [])) if c.get("tags") else ""
-        context_lines.append(
-            f"[score: {c.get('score', 0)}] {c.get('title', '')}\n"
-            f"published: {c.get('published', '')}\n"
-            f"tags: {tags_str}\n"
-            f"source: {c.get('source', '')}\n"
-            f"summary: {c.get('summary', '')}"
+    column_summaries_text = "\n\n".join(sections) if sections else "(无栏目摘要)"
+
+    prompt = META_DIGEST_PROMPT_TEMPLATE.replace(
+        "{column_summaries_text}", column_summaries_text
+    )
+
+    response = await _call_llm(prompt, ai_config, timeout=120)
+
+    # 解析 JSON 响应（兼容 markdown 代码块包裹）
+    text = _strip_markdown_fence(response)
+    parsed = None
+
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            try:
+                parsed = json.loads(m.group())
+            except json.JSONDecodeError:
+                pass
+
+    if parsed is None:
+        raise RuntimeError(f"generate_meta_digest JSON 解析失败: {response[:300]}")
+
+    # 验证必要字段
+    if not isinstance(parsed, dict):
+        raise RuntimeError(f"generate_meta_digest 响应非对象: {response[:300]}")
+
+    required_fields = ("title", "lead", "highlights")
+    missing = [f for f in required_fields if f not in parsed]
+    if missing:
+        raise RuntimeError(
+            f"generate_meta_digest 响应缺少字段 {missing}: {response[:300]}"
         )
 
-    prompt = DIGEST_PROMPT_TEMPLATE
-    # 替换字数相关占位符
-    prompt = prompt.replace("{word_count_min}", str(word_count_min))
-    prompt = prompt.replace("{word_count_max}", str(word_count_max))
-    prompt = prompt.replace("{lead_min}", "150")
-    prompt = prompt.replace("{lead_max}", "300")
-    prompt = prompt.replace("{event_min}", "150")
-    prompt = prompt.replace("{event_max}", "250")
-    prompt = prompt.replace("{important_score}", str(important_score))
-    prompt = prompt.replace("{important_min}", "300")
-    prompt = prompt.replace("{important_max}", "500")
-    prompt = prompt.replace("{column_quota_text}", column_quota_text)
-    # 替换数据占位符
-    prompt = prompt.replace("{count}", str(len(entries)))
-    prompt = prompt.replace("{entries}", json.dumps(entries, ensure_ascii=False, indent=2))
-    prompt = prompt.replace("{recent_push_context}", recent_push_context or "(无)")
-    prompt = prompt.replace("{context}", "\n\n".join(context_lines) or "(无)")
-
-    return await _call_llm(prompt, config, timeout=180)
+    return parsed
 
 
 def has_ai_config() -> bool:
