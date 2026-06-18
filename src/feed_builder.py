@@ -14,7 +14,7 @@ import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 
-from report_renderer import render_structured_html
+from report_renderer import render_reader_content
 
 RSS_NS = "http://purl.org/rss/1.0/modules/content/"
 ATOM_NS = "http://www.w3.org/2005/Atom"
@@ -37,13 +37,11 @@ def _rfc2822(dt: datetime) -> str:
 
 
 def _build_short_description(meta: dict) -> str:
-    """从 highlights 生成短摘要，< 300 字"""
-    parts = []
-    if meta.get("lead"):
-        parts.append(meta["lead"][:150])
-    for h in meta.get("highlights", []):
-        parts.append(f"• {h}")
-    return "\n".join(parts)[:300]
+    """只从导语生成短摘要，避免 Reader 列表页碎片化。"""
+    lead = re.sub(r"\s+", " ", str(meta.get("lead", "") or "")).strip()
+    if not lead:
+        return ""
+    return lead[:220]
 
 
 def _build_item_xml(
@@ -179,8 +177,8 @@ def save_feed(
     # 短摘要（description）
     short_description = _build_short_description(meta)
 
-    # 完整 HTML（content:encoded）
-    html_body = render_structured_html(meta, columns)
+    # Reader 专用正文片段（content:encoded）
+    html_body = render_reader_content(meta, columns)
 
     # 构建今天的 item
     new_item = _build_item_xml(date, title, short_description, html_body, base_url)
