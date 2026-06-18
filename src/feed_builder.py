@@ -137,7 +137,13 @@ def build_feed(items: list[str], base_url: str = "") -> str:
 </rss>"""
 
 
-def save_feed(articles: list[ScoredArticle], output_path: str = "docs/feed.xml", base_url: str = "") -> str:
+def save_feed(
+    articles: list[ScoredArticle] | None = None,
+    output_path: str = "docs/feed.xml",
+    base_url: str = "",
+    digest_text: str = "",
+    title: str = "",
+) -> str:
     """
     保存 RSS feed 到文件
 
@@ -145,6 +151,7 @@ def save_feed(articles: list[ScoredArticle], output_path: str = "docs/feed.xml",
     - 保留最近 30 天历史 item
     - 同一天重复运行时替换而非追加
     - atom:link 仅在 base_url 非空时输出
+    - 如果提供 digest_text，直接用 AI 生成的正文
 
     Returns:
         保存的文件路径
@@ -153,15 +160,23 @@ def save_feed(articles: list[ScoredArticle], output_path: str = "docs/feed.xml",
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
 
     # 生成完整 HTML 日报正文
-    html_body = render_html(articles, date)
-
-    # frontmatter title（第一条重点新闻标题，或默认标题）
-    key_articles = [a for a in articles if a.level == "重点"]
-    if key_articles:
-        top_title = key_articles[0].title_zh or key_articles[0].title
-        title = f"{date} {top_title}"
+    if digest_text:
+        from report_renderer import _md_to_html
+        html_body = _md_to_html(digest_text, date)
     else:
-        title = f"{date} 四维日报"
+        html_body = render_html(articles or [], date)
+
+    # 标题：优先使用传入的 title，否则从 articles 生成
+    if not title:
+        if articles:
+            key_articles = [a for a in articles if a.level == "重点"]
+            if key_articles:
+                top_title = key_articles[0].title_zh or key_articles[0].title
+                title = f"{date} {top_title}"
+            else:
+                title = f"{date} 四维日报"
+        else:
+            title = f"{date} 四维日报"
 
     # 构建今天的 item
     new_item = _build_item_xml(date, html_body, title, base_url)
