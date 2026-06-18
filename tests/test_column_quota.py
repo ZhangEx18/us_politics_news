@@ -1,5 +1,7 @@
 """栏目配额与过滤测试 — run_pipeline.py (v3)"""
 
+from datetime import datetime, timedelta, timezone
+
 from models import ContentItem, SourceType
 
 
@@ -59,3 +61,57 @@ def test_assign_level_observe():
     from run_pipeline import _assign_level
     assert _assign_level(84) == "观察"
     assert _assign_level(50) == "观察"
+
+
+def test_prefilter_items_prefers_higher_signal_items():
+    from run_pipeline import _prefilter_items_for_scoring
+
+    now = datetime(2026, 6, 18, 12, 0, tzinfo=timezone.utc)
+    items = [
+        ContentItem(
+            id="test:1",
+            source_type=SourceType.RSS,
+            title="White House tariff update",
+            url="https://example.com/us-1",
+            content="A" * 700,
+            source_name="Official",
+            column="us_politics",
+            source_tier=1,
+            score=82,
+            published_at=now - timedelta(hours=2),
+            source_url_normalized="example.com/us-1",
+        ),
+        ContentItem(
+            id="test:2",
+            source_type=SourceType.RSS,
+            title="White House tariff update duplicate",
+            url="https://example.com/us-1?dup=1",
+            content="short",
+            source_name="Aggregator",
+            column="us_politics",
+            source_tier=4,
+            score=90,
+            published_at=now - timedelta(hours=10),
+            source_url_normalized="example.com/us-1",
+        ),
+        ContentItem(
+            id="test:3",
+            source_type=SourceType.RSS,
+            title="Senate hearing on AI",
+            url="https://example.com/us-2",
+            content="B" * 500,
+            source_name="Media",
+            column="us_politics",
+            source_tier=2,
+            score=78,
+            published_at=now - timedelta(hours=3),
+            source_url_normalized="example.com/us-2",
+        ),
+    ]
+    columns_cfg = {"us_politics": {"prefilter_items": 2}}
+
+    selected = _prefilter_items_for_scoring(items, columns_cfg, now=now)
+
+    assert len(selected["us_politics"]) == 2
+    assert selected["us_politics"][0].id == "test:1"
+    assert {item.id for item in selected["us_politics"]} == {"test:1", "test:3"}
