@@ -1,0 +1,829 @@
+# 新闻源配置 — 100+ 源，四大栏目
+# 每个源必须有 name, url, column, source_tier, enabled
+#
+# column: us_politics | global_affairs | technology | economy
+# source_tier: 1=官方/一线媒体 | 2=主流媒体 | 3=专业/智库 | 4=聚合/社区
+# language: en | zh | multi
+
+# ══════════════════════════════════════════
+# 美国政治 (us_politics) — 30 源
+# ══════════════════════════════════════════
+
+# -- 官方/一线 --
+- name: "Associated Press Politics"
+  url: "https://rsshub.app/apnews/topics/politics"
+  column: us_politics
+  source_tier: 1
+  language: en
+  enabled: false  # 需要 RSSHub 实例
+
+- name: "Reuters Politics"
+  url: "https://www.reutersagency.com/feed/?best-topics=politicalgeneral&post_type=reuters-best"
+  column: us_politics
+  source_tier: 1
+  language: en
+  enabled: false  # RSS 可能失效
+
+- name: "NPR Politics"
+  url: "https://feeds.npr.org/1014/rss.xml"
+  column: us_politics
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "NPR National"
+  url: "https://feeds.npr.org/1003/rss.xml"
+  column: us_politics
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "PBS NewsHour"
+  url: "https://www.pbs.org/newshour/feeds/rss/politics"
+  column: us_politics
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "BBC US & Canada"
+  url: "http://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
+  column: us_politics
+  source_tier: 1
+  language: en
+  enabled: true
+
+# -- 主流媒体 --
+- name: "The Hill"
+  url: "https://thehill.com/feed/"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Politico"
+  url: "https://rss.politico.com/politics-news.xml"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Fox News Politics"
+  url: "https://moxie.foxnews.com/google-publisher/politics.xml"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "CNN Politics"
+  url: "http://rss.cnn.com/rss/cnn_allpolitics.rss"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "NBC News Politics"
+  url: "https://feeds.nbcnews.com/nbcnews/politics"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "ABC News Politics"
+  url: "https://abcnews.go.com/abcnews/politicsheadlines"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Washington Post Politics"
+  url: "https://feeds.washingtonpost.com/rss/politics"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "New York Times Politics"
+  url: "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Axios Politics"
+  url: "https://api.axios.com/feed/politics"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "USA Today Politics"
+  url: "https://rss.usatoday.com/News/Politics"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The Guardian US"
+  url: "https://www.theguardian.com/us-news/rss"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Daily Beast"
+  url: "https://feeds.thedailybeast.com/summary"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The New Yorker - Politics"
+  url: "https://www.newyorker.com/feed/news/news-desk/politics/rss"
+  column: us_politics
+  source_tier: 2
+  language: en
+  enabled: true
+
+# -- 专业/智库 --
+- name: "Brookings - Governance"
+  url: "https://www.brookings.edu/topic/governance/feed/"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Council on Foreign Relations"
+  url: "https://www.cfr.org/rss/analysis"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Foreign Affairs"
+  url: "https://www.foreignaffairs.com/rss.xml"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "C-SPAN"
+  url: "https://www.c-span.org/feeds/rss/all"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "The American Conservative"
+  url: "https://www.theamericanconservative.com/feed/"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "The Nation"
+  url: "https://www.thenation.com/feed/"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "National Review"
+  url: "https://www.nationalreview.com/feed/"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Slate - Politics"
+  url: "https://slate.com/feeds/all.rss"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "RealClearPolitics"
+  url: "https://www.realclearpolitics.com/index.xml"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "FiveThirtyEight"
+  url: "https://fivethirtyeight.com/features/feed/"
+  column: us_politics
+  source_tier: 3
+  language: en
+  enabled: true
+
+# -- 聚合 --
+- name: "Google News - US Politics"
+  url: "https://news.google.com/rss/search?q=US+politics&hl=en&gl=US"
+  column: us_politics
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Trump"
+  url: "https://news.google.com/rss/search?q=Trump+policy&hl=en&gl=US"
+  column: us_politics
+  source_tier: 4
+  language: en
+  enabled: true
+
+# ══════════════════════════════════════════
+# 全球局势 (global_affairs) — 35 源
+# ══════════════════════════════════════════
+
+# -- 官方/一线 --
+- name: "BBC World"
+  url: "http://feeds.bbci.co.uk/news/world/rss.xml"
+  column: global_affairs
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Reuters World"
+  url: "https://www.reutersagency.com/feed/?best-topics=world&post_type=reuters-best"
+  column: global_affairs
+  source_tier: 1
+  language: en
+  enabled: false  # RSS 可能失效
+
+- name: "AP News - World"
+  url: "https://rsshub.app/apnews/topics/world-news"
+  column: global_affairs
+  source_tier: 1
+  language: en
+  enabled: false
+
+- name: "Al Jazeera"
+  url: "https://www.aljazeera.com/xml/rss/all.xml"
+  column: global_affairs
+  source_tier: 1
+  language: en
+  enabled: true
+
+# -- 主流媒体 --
+- name: "The Guardian World"
+  url: "https://www.theguardian.com/world/rss"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The Guardian - Asia"
+  url: "https://www.theguardian.com/world/asia/rss"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The Guardian - Middle East"
+  url: "https://www.theguardian.com/world/middleeast/rss"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "DW News"
+  url: "https://rss.dw.com/rdf/rss-en-all"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "France24"
+  url: "https://www.france24.com/en/rss"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "NHK World"
+  url: "https://www3.nhk.or.jp/nhkworld/en/news/feeds/"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "South China Morning Post"
+  url: "https://www.scmp.com/rss/91/feed"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The Diplomat"
+  url: "https://thediplomat.com/feed/"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Nikkei Asia"
+  url: "https://asia.nikkei.com/rss"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "ABC News Australia"
+  url: "https://www.abc.net.au/news/feed/2942460/rss.xml"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "CBC News - World"
+  url: "https://rss.cbc.ca/lineup/world.xml"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The Times of India - World"
+  url: "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms"
+  column: global_affairs
+  source_tier: 2
+  language: en
+  enabled: true
+
+# -- 专业/智库 --
+- name: "Foreign Affairs - Analysis"
+  url: "https://www.foreignaffairs.com/rss.xml"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Carnegie Endowment"
+  url: "https://carnegieendowment.org/publications/rss"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "RAND Corporation"
+  url: "https://www.rand.org/pubs/topics/rss.xml"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Chatham House"
+  url: "https://www.chathamhouse.org/feed"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "International Crisis Group"
+  url: "https://www.crisisgroup.org/rss.xml"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "CSIS"
+  url: "https://www.csis.org/analysis/feed"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "War on the Rocks"
+  url: "https://warontherocks.com/feed/"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "The Intercept"
+  url: "https://theintercept.com/feed/"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Asia Times"
+  url: "https://asiatimes.com/feed/"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Middle East Eye"
+  url: "https://www.middleeasteye.net/rss"
+  column: global_affairs
+  source_tier: 3
+  language: en
+  enabled: true
+
+# -- 聚合 --
+- name: "Google News - China Geopolitics"
+  url: "https://news.google.com/rss/search?q=China+geopolitics&hl=en"
+  column: global_affairs
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Middle East"
+  url: "https://news.google.com/rss/search?q=Middle+East+conflict&hl=en"
+  column: global_affairs
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Russia Ukraine"
+  url: "https://news.google.com/rss/search?q=Russia+Ukraine&hl=en"
+  column: global_affairs
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - NATO"
+  url: "https://news.google.com/rss/search?q=NATO+defense&hl=en"
+  column: global_affairs
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Iran Nuclear"
+  url: "https://news.google.com/rss/search?q=Iran+nuclear+deal&hl=en"
+  column: global_affairs
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Taiwan Strait"
+  url: "https://news.google.com/rss/search?q=Taiwan+strait+military&hl=en"
+  column: global_affairs
+  source_tier: 4
+  language: en
+  enabled: true
+
+# ══════════════════════════════════════════
+# 科技发展 (technology) — 30 源
+# ══════════════════════════════════════════
+
+# -- 官方/一线 --
+- name: "OpenAI Blog"
+  url: "https://openai.com/blog/rss.xml"
+  column: technology
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Google AI Blog"
+  url: "https://blog.google/technology/ai/rss/"
+  column: technology
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Anthropic Blog"
+  url: "https://www.anthropic.com/rss.xml"
+  column: technology
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Meta AI Blog"
+  url: "https://ai.meta.com/blog/rss/"
+  column: technology
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "NVIDIA Blog"
+  url: "https://blogs.nvidia.com/feed/"
+  column: technology
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Apple Newsroom"
+  url: "https://www.apple.com/newsroom/rss-feed.rss"
+  column: technology
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Microsoft Blog"
+  url: "https://blogs.microsoft.com/feed/"
+  column: technology
+  source_tier: 1
+  language: en
+  enabled: true
+
+# -- 主流科技媒体 --
+- name: "TechCrunch"
+  url: "https://techcrunch.com/feed/"
+  column: technology
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Ars Technica"
+  url: "https://feeds.arstechnica.com/arstechnica/index"
+  column: technology
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The Verge"
+  url: "https://www.theverge.com/rss/index.xml"
+  column: technology
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Wired"
+  url: "https://www.wired.com/feed/rss"
+  column: technology
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Engadget"
+  url: "https://www.engadget.com/rss.xml"
+  column: technology
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "MIT Technology Review"
+  url: "https://www.technologyreview.com/feed/"
+  column: technology
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "ZDNet"
+  url: "https://www.zdnet.com/news/rss.xml"
+  column: technology
+  source_tier: 2
+  language: en
+  enabled: true
+
+# -- 专业/深度 --
+- name: "Hacker News - Top"
+  url: "https://hnrss.org/frontpage"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Hacker News - Best"
+  url: "https://hnrss.org/best"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "SemiAnalysis"
+  url: "https://www.semianalysis.com/feed"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "The Batch (Andrew Ng)"
+  url: "https://www.deeplearning.ai/the-batch/feed/"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Import AI"
+  url: "https://importai.substack.com/feed"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Stratechery"
+  url: "https://stratechery.com/feed/"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "IEEE Spectrum"
+  url: "https://spectrum.ieee.org/feeds/feed.rss"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "InfoQ"
+  url: "https://feed.infoq.com/"
+  column: technology
+  source_tier: 3
+  language: en
+  enabled: true
+
+# -- 聚合 --
+- name: "Google News - AI Technology"
+  url: "https://news.google.com/rss/search?q=AI+technology&hl=en"
+  column: technology
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Semiconductor"
+  url: "https://news.google.com/rss/search?q=semiconductor+chip&hl=en"
+  column: technology
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - LLM"
+  url: "https://news.google.com/rss/search?q=large+language+model&hl=en"
+  column: technology
+  source_tier: 4
+  language: en
+  enabled: true
+
+# ══════════════════════════════════════════
+# 经济发展 (economy) — 30 源
+# ══════════════════════════════════════════
+
+# -- 官方/一线 --
+- name: "Federal Reserve"
+  url: "https://www.federalreserve.gov/feeds/press_all.xml"
+  column: economy
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "Bureau of Labor Statistics"
+  url: "https://www.bls.gov/feed/bls_latest.rss"
+  column: economy
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "World Bank"
+  url: "https://blogs.worldbank.org/rss.xml"
+  column: economy
+  source_tier: 1
+  language: en
+  enabled: true
+
+- name: "IMF Blog"
+  url: "https://www.imf.org/en/Blogs/rss"
+  column: economy
+  source_tier: 1
+  language: en
+  enabled: true
+
+# -- 主流财经 --
+- name: "CNBC Economy"
+  url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "The Economist"
+  url: "https://www.economist.com/finance-and-economics/rss.xml"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "MarketWatch"
+  url: "https://feeds.marketwatch.com/marketwatch/topstories/"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Yahoo Finance"
+  url: "https://finance.yahoo.com/news/rssindex"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Fortune"
+  url: "https://fortune.com/feed/fortune-feeds/?id=3230629"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: true
+
+- name: "Bloomberg"
+  url: "https://feeds.bloomberg.com/markets/news.rss"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: false  # 可能需要订阅
+
+- name: "Financial Times"
+  url: "https://www.ft.com/rss/home/international"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: false  # 需要订阅
+
+- name: "Wall Street Journal - Economy"
+  url: "https://feeds.a.dj.com/rss/RSSWSJD.xml"
+  column: economy
+  source_tier: 2
+  language: en
+  enabled: false
+
+# -- 专业/智库 --
+- name: "Brookings - Economy"
+  url: "https://www.brookings.edu/topic/economies/feed/"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "NBER"
+  url: "https://www.nber.org/rss/new.xml"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Peterson Institute"
+  url: "https://www.piie.com/rss.xml"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "VoxEU"
+  url: "https://cepr.org/voxeu/rss"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "FT Alphaville"
+  url: "https://www.ft.com/alphaville/rss"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Zero Hedge"
+  url: "https://feeds.feedburner.com/zerohedge/feed"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Calculated Risk"
+  url: "https://www.calculatedriskblog.com/feeds/posts/default"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "Marginal Revolution"
+  url: "https://marginalrevolution.com/feed"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+- name: "The Grumpy Economist"
+  url: "https://johnhcochrane.blogspot.com/feeds/posts/default"
+  column: economy
+  source_tier: 3
+  language: en
+  enabled: true
+
+# -- 聚合 --
+- name: "Google News - US Economy"
+  url: "https://news.google.com/rss/search?q=US+economy+Federal+Reserve&hl=en"
+  column: economy
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Global Trade"
+  url: "https://news.google.com/rss/search?q=global+trade+tariff&hl=en"
+  column: economy
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Inflation"
+  url: "https://news.google.com/rss/search?q=inflation+CPI&hl=en"
+  column: economy
+  source_tier: 4
+  language: en
+  enabled: true
+
+- name: "Google News - Stock Market"
+  url: "https://news.google.com/rss/search?q=stock+market+Wall+Street&hl=en"
+  column: economy
+  source_tier: 4
+  language: en
+  enabled: true

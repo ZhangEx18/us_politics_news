@@ -1,0 +1,6 @@
+aiohttp
+feedparser
+requests
+pyyaml
+python-dotenv
+pydantic>=2.0
