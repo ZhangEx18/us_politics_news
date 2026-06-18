@@ -269,15 +269,24 @@ def render_reader_content(
     - 不输出 highlights / 来源 / 原文链接 / 阅读链接
     - 即使样式被 Reader 剥离，也能保持清晰层次
     """
-    title = _pangu(meta.get("title", ""))
-    lead = _pangu(meta.get("lead", ""))
+    date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
+    try:
+        dt = datetime.strptime(date, "%Y-%m-%d")
+        title = f"{dt.year}年{dt.month}月{dt.day}日 新闻"
+    except ValueError:
+        title = _pangu(meta.get("title", ""))
+    highlights = meta.get("highlights", []) or []
 
     html: list[str] = ["<article>"]
 
     if title:
         html.append(f"<h1>{title}</h1>")
-    if lead:
-        html.append(f"<p>{lead}</p>")
+    if highlights:
+        html.append("<h2>今日要点</h2>")
+        html.append("<ul>")
+        for item in highlights:
+            html.append(f"<li>{_pangu(str(item))}</li>")
+        html.append("</ul>")
 
     for col_key in COLUMN_ORDER:
         events = columns.get(col_key, [])
@@ -294,6 +303,7 @@ def render_reader_content(
             suffix = " [持续跟踪]" if is_followup else ""
             html.append(f"<h3>{idx}. {event_title}{suffix}</h3>")
 
+            detail_level = str(event.get("detail_level", "brief")).strip().lower()
             core_facts = event.get("core_facts", [])
             if isinstance(core_facts, list):
                 core_text = " ".join(_pangu(str(fact)) for fact in core_facts if str(fact).strip())
@@ -302,15 +312,22 @@ def render_reader_content(
             if core_text:
                 html.append(f"<p><strong>核心事实：</strong>{core_text}</p>")
 
-            background_impact = event.get("background_impact", "")
-            if background_impact:
-                html.append(
-                    f"<p><strong>背景与影响：</strong>{_pangu(background_impact)}</p>"
-                )
+            if detail_level == "full":
+                background_context = event.get("background_context", event.get("background_impact", ""))
+                if background_context:
+                    html.append(
+                        f"<p><strong>背景脉络：</strong>{_pangu(background_context)}</p>"
+                    )
 
-            why = event.get("why_it_matters", "")
-            if why:
-                html.append(f"<p><strong>为什么值得关注：</strong>{_pangu(why)}</p>")
+                possible_impact = event.get("possible_impact", "")
+                if possible_impact:
+                    html.append(
+                        f"<p><strong>可能影响：</strong>{_pangu(possible_impact)}</p>"
+                    )
+
+                why = event.get("why_it_matters", "")
+                if why:
+                    html.append(f"<p><strong>为什么值得关注：</strong>{_pangu(why)}</p>")
 
     html.append("</article>")
     return "\n".join(html)
