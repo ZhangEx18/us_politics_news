@@ -3,6 +3,8 @@
 
 output:
   daily_dir: "docs/daily"
+  weekly_dir: "docs/weekly"
+  monthly_dir: "docs/monthly"
   feed_path: "docs/feed.xml"
   base_url: ""
 
@@ -45,30 +47,42 @@ digest:
     us_politics:
       label: "美国政情"
       min_items: 8
-      target_items: 9
-      max_items: 10
-      prefilter_items: 18
+      target_items: 5
+      max_items: 6
+      headline_items: 5
+      prefilter_items: 25
     global_affairs:
       label: "国际风云"
       min_items: 10
-      target_items: 12
-      max_items: 15
-      prefilter_items: 22
+      target_items: 6
+      max_items: 7
+      headline_items: 6
+      prefilter_items: 40
     technology:
       label: "科技前沿"
       min_items: 5
-      target_items: 7
-      max_items: 10
-      prefilter_items: 14
+      target_items: 4
+      max_items: 5
+      headline_items: 4
+      prefilter_items: 24
     economy:
       label: "财经脉动"
       min_items: 5
-      target_items: 7
-      max_items: 10
-      prefilter_items: 14
+      target_items: 4
+      max_items: 5
+      headline_items: 4
+      prefilter_items: 24
   total_min_items: 28
   total_target_items: 35
   total_max_items: 45
+  weekly:
+    target_word_count_min: 8000
+    target_word_count: 12000
+    target_word_count_max: 16000
+  monthly:
+    target_word_count_min: 15000
+    target_word_count: 20000
+    target_word_count_max: 30000
 
 feed:
   include_full_content: true

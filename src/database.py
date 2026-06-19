@@ -115,22 +115,21 @@ class NewsDatabase:
     def url_hash(url: str) -> str:
         return hashlib.sha256(url.encode()).hexdigest()[:16]
 
-    def is_duplicate(self, url: str, window_hours: int = 48) -> bool:
+    def url_exists(self, url: str) -> bool:
+        """查询 URL 是否已存在（只读辅助，不参与写入判定）"""
         normalized = self.normalize_url(url)
         h = self.url_hash(normalized)
-        cutoff = (datetime.now() - timedelta(hours=window_hours)).isoformat()
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT 1 FROM articles WHERE url_hash = ? AND fetched_at > ?",
-                (h, cutoff),
+                "SELECT 1 FROM articles WHERE url_hash = ?",
+                (h,),
             ).fetchone()
             return row is not None
 
     def insert(self, article: Article) -> bool:
+        """单条插入，依赖 url_hash UNIQUE 索引幂等"""
         normalized = self.normalize_url(article.url)
         h = self.url_hash(normalized)
-        if self.is_duplicate(article.url):
-            return False
         with self._connect() as conn:
             conn.execute(
                 """INSERT OR IGNORE INTO articles
@@ -155,11 +154,36 @@ class NewsDatabase:
             return conn.total_changes > 0
 
     def insert_many(self, articles: List[Article]) -> int:
-        count = 0
-        for a in articles:
-            if self.insert(a):
-                count += 1
-        return count
+        """单连接、单事务批量插入，依赖 url_hash UNIQUE 索引幂等"""
+        if not articles:
+            return 0
+        rows = []
+        for article in articles:
+            normalized = self.normalize_url(article.url)
+            h = self.url_hash(normalized)
+            rows.append((
+                h, article.url, article.title, article.summary,
+                article.source, article.source_type,
+                article.published_at.isoformat() if article.published_at else None,
+                article.fetched_at.isoformat(),
+                article.category, article.score, article.topic,
+                article.reason, article.level,
+                article.column, article.source_tier,
+                article.event_key, article.source_url_normalized,
+                article.llm_score, article.llm_summary,
+                article.llm_tags, article.llm_reason,
+            ))
+        with self._connect() as conn:
+            cursor = conn.executemany(
+                """INSERT OR IGNORE INTO articles
+                (url_hash, url, title, summary, source, source_type,
+                 published_at, fetched_at, category, score, topic, reason, level,
+                 "column", source_tier, event_key, source_url_normalized,
+                 llm_score, llm_summary, llm_tags, llm_reason)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                rows,
+            )
+            return cursor.rowcount
 
     def fetch_since(self, since: datetime) -> List[Article]:
         cutoff = since.isoformat()
@@ -242,25 +266,30 @@ class NewsDatabase:
             conn.execute("DELETE FROM articles WHERE fetched_at < ?", (cutoff,))
             conn.execute("DELETE FROM fetch_log WHERE fetched_at < ?", (cutoff,))
 
-    def update_llm_scores(self, scored_items: list) -> int:
+    def update_llm_scores(self, scored_items: list[dict]) -> int:
+        """批量更新 LLM 评分，直接消费 score_batch 返回的 dict 列表"""
         count = 0
         with self._connect() as conn:
             for item in scored_items:
-                normalized = self.normalize_url(item.url)
+                link = item.get("link", "")
+                if not link:
+                    continue
+                normalized = self.normalize_url(link)
                 h = self.url_hash(normalized)
-                tags_str = ",".join(item.llm_tags) if hasattr(item, 'llm_tags') else ""
+                tags = item.get("tags", [])
+                tags_str = ",".join(tags) if isinstance(tags, list) else str(tags)
                 cursor = conn.execute(
                     """UPDATE articles
                     SET llm_score = ?, llm_summary = ?, llm_tags = ?,
                         "column" = ?, event_key = ?, source_tier = ?
                     WHERE url_hash = ?""",
                     (
-                        getattr(item, 'llm_score', None),
-                        getattr(item, 'llm_summary', ''),
+                        item.get("score"),
+                        item.get("summary", ""),
                         tags_str,
-                        getattr(item, 'column', ''),
-                        getattr(item, 'event_key', ''),
-                        getattr(item, 'source_tier', 4),
+                        item.get("column", ""),
+                        item.get("event_key", ""),
+                        item.get("source_tier", 4),
                         h,
                     ),
                 )

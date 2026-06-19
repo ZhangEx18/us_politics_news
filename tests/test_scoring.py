@@ -1,8 +1,7 @@
-"""评分模块测试 — scoring.py 与 run_pipeline._assign_level"""
+"""评分模块测试 — run_pipeline._assign_level + ai_analyzer._score_batch_with_retry"""
 
 import asyncio
 
-from scoring import ScoredArticle as LegacyScoredArticle
 from models import ScoredArticle
 from ai_analyzer import _score_batch_with_retry
 

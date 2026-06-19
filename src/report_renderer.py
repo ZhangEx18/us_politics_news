@@ -60,9 +60,18 @@ _COLUMN_NUM: dict[str, str] = {
 # 核心渲染：结构化 → HTML
 # ---------------------------------------------------------------------------
 
+# 报告类型 → 默认标题文案
+_REPORT_TYPE_TITLE: dict[str, str] = {
+    "daily": "每日新闻",
+    "weekly": "每周新闻",
+    "monthly": "每月新闻",
+}
+
+
 def render_structured_html(
     meta: dict,
     columns: dict[str, list[dict]],
+    report_type: str = "daily",
 ) -> str:
     """
     从结构化数据直接生成干净 HTML
@@ -71,8 +80,15 @@ def render_structured_html(
         meta: {"title", "lead", "highlights", "date"}
         columns: {"us_politics": [{"title_zh", "core_facts", "background_impact",
                    "why_it_matters", "source_links", "is_followup"}, ...], ...}
+        report_type: 报告类型（daily / weekly / monthly），影响默认标题
     """
-    title = _pangu(meta.get("title", ""))
+    # meta.title 优先；否则根据 report_type 生成默认标题
+    if meta.get("title"):
+        title = _pangu(meta["title"])
+    else:
+        date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
+        type_label = _REPORT_TYPE_TITLE.get(report_type, "每日新闻")
+        title = f"{date} {type_label}"
     lead = _pangu(meta.get("lead", ""))
     highlights = meta.get("highlights", [])
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
@@ -210,15 +226,23 @@ footer {
 
     # 四大栏目
     for col_key in COLUMN_ORDER:
-        events = columns.get(col_key, [])
-        if not events:
+        col_data = columns.get(col_key, {})
+        if isinstance(col_data, list):
+            detailed = col_data
+            headline_only = []
+        else:
+            detailed = col_data.get("detailed_events", [])
+            headline_only = col_data.get("headline_only_events", [])
+
+        if not detailed and not headline_only:
             continue
 
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
         num = _COLUMN_NUM.get(col_key, "")
         html.append(f"<h2>{meta_col['icon']} {num}、{meta_col['heading']}</h2>")
 
-        for idx, event in enumerate(events, 1):
+        # 编号条目
+        for idx, event in enumerate(detailed, 1):
             event_title = _pangu(event.get("title_zh", ""))
             is_followup = event.get("is_followup", False)
             suffix = " [持续跟踪]" if is_followup else ""
@@ -226,29 +250,30 @@ footer {
             html.append("<div class='event'>")
             html.append(f"<h3>{idx}. {event_title}{suffix}</h3>")
 
-            # 核心事实
-            core_facts = event.get("core_facts", [])
-            if core_facts:
-                if isinstance(core_facts, list):
-                    html.append("<div class='facts'><strong>核心事实</strong>：</div>")
-                    html.append("<ul>")
-                    for fact in core_facts:
-                        html.append(f"<li>{_pangu(fact)}</li>")
-                    html.append("</ul>")
-                else:
-                    html.append(f"<div class='facts'><strong>核心事实</strong>：{_pangu(str(core_facts))}</div>")
+            reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
+            if reader_body:
+                html.append(f"<p>{_pangu(reader_body)}</p>")
 
-            # 背景与影响
-            background_impact = event.get("background_impact", "")
-            if background_impact:
-                html.append(f"<div class='impact'><strong>背景与影响</strong>：{_pangu(background_impact)}</div>")
-
-            # 为什么值得关注
-            why = event.get("why_it_matters", "")
-            if why:
-                html.append(f"<div class='why'><strong>为什么值得关注</strong>：{_pangu(why)}</div>")
+            source_links = event.get("source_links", [])
+            if source_links:
+                html.append("<div class='links'>")
+                for link in source_links:
+                    link_title = _pangu(str(link.get("title", "原文")))
+                    link_url = str(link.get("url", ""))
+                    if link_url:
+                        html.append(f"<a href='{link_url}'>{link_title}</a> ")
+                html.append("</div>")
 
             html.append("</div>")
+
+        # 无序条目：仅标题
+        if headline_only:
+            html.append("<ul>")
+            for event in headline_only:
+                event_title = _pangu(event.get("title_zh", ""))
+                if event_title:
+                    html.append(f"<li>{event_title}</li>")
+            html.append("</ul>")
 
     html.append("</body>")
     html.append("</html>")
@@ -256,18 +281,30 @@ footer {
     return "\n".join(html)
 
 
+# 报告类型 → 要点标题
+_HIGHLIGHTS_HEADING: dict[str, str] = {
+    "daily": "今日要点",
+    "weekly": "本周要点",
+    "monthly": "本月要点",
+}
+
+
 def render_reader_content(
     meta: dict,
     columns: dict[str, list[dict]],
+    report_type: str = "daily",
 ) -> str:
     """
     为 RSS Reader 生成纯正文 HTML 片段。
 
     约束：
-    - 只保留标题 + 今日要点 + 四大栏目正文
+    - 只保留标题 + 要点 + 四大栏目正文
     - 不输出完整 HTML 文档壳
     - 不输出来源、原文链接、标签式小标题
     - 所有事件统一为标题 + 单段概述
+
+    参数：
+        report_type: 报告类型（daily / weekly / monthly），影响要点标题
     """
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
     try:
@@ -279,25 +316,33 @@ def render_reader_content(
 
     html: list[str] = ["<article>"]
 
-    if title:
-        html.append(f"<h1>{title}</h1>")
     if highlights:
-        html.append("<h2>今日要点</h2>")
+        heading = _HIGHLIGHTS_HEADING.get(report_type, "今日要点")
+        html.append(f"<h2>{heading}</h2>")
         html.append("<ul>")
         for item in highlights:
             html.append(f"<li>{_pangu(str(item))}</li>")
         html.append("</ul>")
 
     for col_key in COLUMN_ORDER:
-        events = columns.get(col_key, [])
-        if not events:
+        col_data = columns.get(col_key, {})
+        # 兼容旧格式（纯列表）和新格式（dict with detailed_events + headline_only_events）
+        if isinstance(col_data, list):
+            detailed = col_data
+            headline_only = []
+        else:
+            detailed = col_data.get("detailed_events", [])
+            headline_only = col_data.get("headline_only_events", [])
+
+        if not detailed and not headline_only:
             continue
 
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
         num = _COLUMN_NUM.get(col_key, "")
         html.append(f"<h2>{num}、{meta_col['heading']}</h2>")
 
-        for idx, event in enumerate(events, 1):
+        # 编号条目：带正文
+        for idx, event in enumerate(detailed, 1):
             event_title = _pangu(event.get("title_zh", ""))
             is_followup = event.get("is_followup", False)
             suffix = " [持续跟踪]" if is_followup else ""
@@ -305,6 +350,15 @@ def render_reader_content(
             reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
             if reader_body:
                 html.append(f"<p>{_pangu(reader_body)}</p>")
+
+        # 无序条目：仅标题，无分组标题
+        if headline_only:
+            html.append("<ul>")
+            for event in headline_only:
+                event_title = _pangu(event.get("title_zh", ""))
+                if event_title:
+                    html.append(f"<li>{event_title}</li>")
+            html.append("</ul>")
 
     html.append("</article>")
     return "\n".join(html)
@@ -317,13 +371,23 @@ def render_reader_content(
 def render_structured_markdown(
     meta: dict,
     columns: dict[str, list[dict]],
+    report_type: str = "daily",
 ) -> str:
     """
     从结构化数据生成 Markdown
 
     格式严格按内容协议：YAML frontmatter + 四大栏目 + 每条事件详情
+
+    参数：
+        report_type: 报告类型（daily / weekly / monthly），影响默认标题
     """
-    title = meta.get("title", "")
+    # meta.title 优先；否则根据 report_type 生成默认标题
+    if meta.get("title"):
+        title = meta["title"]
+    else:
+        date_raw = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
+        type_label = _REPORT_TYPE_TITLE.get(report_type, "每日新闻")
+        title = f"{date_raw} {type_label}"
     lead = meta.get("lead", "")
     highlights = meta.get("highlights", [])
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
@@ -343,8 +407,15 @@ def render_structured_markdown(
 
     # 四大栏目
     for col_key in COLUMN_ORDER:
-        events = columns.get(col_key, [])
-        if not events:
+        col_data = columns.get(col_key, {})
+        if isinstance(col_data, list):
+            detailed = col_data
+            headline_only = []
+        else:
+            detailed = col_data.get("detailed_events", [])
+            headline_only = col_data.get("headline_only_events", [])
+
+        if not detailed and not headline_only:
             continue
 
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
@@ -352,7 +423,8 @@ def render_structured_markdown(
         lines.append(f"## {meta_col['icon']} {num}、{meta_col['heading']}")
         lines.append("")
 
-        for idx, event in enumerate(events, 1):
+        # 编号条目
+        for idx, event in enumerate(detailed, 1):
             event_title = _pangu(event.get("title_zh", ""))
             is_followup = event.get("is_followup", False)
             suffix = " [持续跟踪]" if is_followup else ""
@@ -360,28 +432,27 @@ def render_structured_markdown(
             lines.append(f"### {idx}. {event_title}{suffix}")
             lines.append("")
 
-            # 核心事实
-            core_facts = event.get("core_facts", [])
-            if core_facts:
-                if isinstance(core_facts, list):
-                    lines.append("**核心事实**：")
-                    for fact in core_facts:
-                        lines.append(f"- {_pangu(fact)}")
-                else:
-                    lines.append(f"**核心事实**：{_pangu(str(core_facts))}")
+            reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
+            if reader_body:
+                lines.append(_pangu(reader_body))
                 lines.append("")
 
-            # 背景与影响
-            background_impact = event.get("background_impact", "")
-            if background_impact:
-                lines.append(f"**背景与影响**：{_pangu(background_impact)}")
+            source_links = event.get("source_links", [])
+            if source_links:
+                for link in source_links:
+                    link_title = str(link.get("title", "原文"))
+                    link_url = str(link.get("url", ""))
+                    if link_url:
+                        lines.append(f"- [{link_title}]({link_url})")
                 lines.append("")
 
-            # 为什么值得关注
-            why = event.get("why_it_matters", "")
-            if why:
-                lines.append(f"**为什么值得关注**：{_pangu(why)}")
-                lines.append("")
+        # 无序条目：仅标题
+        if headline_only:
+            for event in headline_only:
+                event_title = _pangu(event.get("title_zh", ""))
+                if event_title:
+                    lines.append(f"- {event_title}")
+            lines.append("")
 
     return "\n".join(lines)
 
@@ -390,17 +461,34 @@ def render_structured_markdown(
 # 保存
 # ---------------------------------------------------------------------------
 
+# 报告类型 → 输出子目录
+_REPORT_TYPE_DIR: dict[str, str] = {
+    "daily": "docs/daily",
+    "weekly": "docs/weekly",
+    "monthly": "docs/monthly",
+}
+
+
 def save_daily_report(
     meta: dict,
     columns: dict[str, list[dict]],
-    output_dir: str = "docs/daily",
+    output_dir: str | None = None,
+    report_type: str = "daily",
 ) -> tuple[str, str]:
-    """保存日报到 docs/daily/YYYY-MM-DD.md 和 .html"""
+    """
+    保存报告到对应目录的 YYYY-MM-DD.md 和 .html
+
+    参数：
+        output_dir: 输出目录；为 None 时根据 report_type 自动选择
+        report_type: 报告类型（daily / weekly / monthly）
+    """
+    if output_dir is None:
+        output_dir = _REPORT_TYPE_DIR.get(report_type, "docs/daily")
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
     os.makedirs(output_dir, exist_ok=True)
 
-    md_content = render_structured_markdown(meta, columns)
-    html_content = render_structured_html(meta, columns)
+    md_content = render_structured_markdown(meta, columns, report_type=report_type)
+    html_content = render_structured_html(meta, columns, report_type=report_type)
 
     md_path = os.path.join(output_dir, f"{date}.md")
     with open(md_path, "w", encoding="utf-8") as f:
