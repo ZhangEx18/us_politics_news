@@ -4,3 +4,4 @@ requests
 pyyaml
 python-dotenv
 pydantic>=2.0
+pytest

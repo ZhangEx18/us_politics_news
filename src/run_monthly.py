@@ -13,40 +13,24 @@ import sys
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-import yaml
-
 _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(_project_root)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database import NewsDatabase
 from ai_analyzer import _load_ai_config
-from models import ContentItem, SourceType
+from config import load_config, augment_ai_config_with_runtime
 from report_engine import ReportSpec, build_report
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 
 
 def _load_config() -> dict:
-    path = os.path.join(_project_root, "config", "config.yaml")
-    with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+    return load_config()
 
 
 def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
-    """把 config.yaml 里的 LLM 运行参数注入 AI 配置。"""
-    llm_cfg = config.get("llm", {})
-    ai_config.update({
-        "score_max_prompt_chars": llm_cfg.get("score_max_prompt_chars", llm_cfg.get("max_prompt_chars", 12000)),
-        "score_max_concurrent": llm_cfg.get("score_max_concurrent", max(1, min(llm_cfg.get("max_concurrent", 3), 2))),
-        "score_timeout_seconds": llm_cfg.get("score_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
-        "score_content_chars": llm_cfg.get("score_content_chars", 400),
-        "score_retry_split_depth": llm_cfg.get("score_retry_split_depth", 3),
-        "digest_timeout_seconds": llm_cfg.get("digest_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
-        "digest_content_chars": llm_cfg.get("digest_content_chars", 1000),
-        "meta_timeout_seconds": llm_cfg.get("meta_timeout_seconds", 120),
-    })
-    return ai_config
+    return augment_ai_config_with_runtime(ai_config, config)
 
 
 def _get_monthly_window() -> tuple[datetime, datetime, str]:
@@ -54,10 +38,7 @@ def _get_monthly_window() -> tuple[datetime, datetime, str]:
     now = datetime.now(BEIJING_TZ)
     # 本月 1 日 07:00
     this_month_1st = now.replace(day=1, hour=7, minute=0, second=0, microsecond=0)
-    if now >= this_month_1st:
-        until = this_month_1st
-    else:
-        until = this_month_1st
+    until = this_month_1st
     # 上月 1 日
     if until.month == 1:
         since = until.replace(year=until.year - 1, month=12)

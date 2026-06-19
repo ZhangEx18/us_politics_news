@@ -1,6 +1,6 @@
 """日报渲染测试 — Reader 专用输出"""
 
-from report_renderer import render_reader_content
+from report_renderer import render_reader_content, render_structured_html, render_structured_markdown
 
 
 def test_render_reader_content_is_plain_article_fragment():
@@ -143,3 +143,36 @@ def test_render_old_list_format_still_works():
     html = render_reader_content(meta, columns, report_type="daily")
     assert "<h3>1. 旧格式事件</h3>" in html
     assert "<p>正文。</p>" in html
+
+
+def test_renderers_escape_external_text_and_drop_unsafe_links():
+    meta = {
+        "title": "标题<script>alert(1)</script>",
+        "lead": "导语<img src=x onerror=alert(2)>",
+        "highlights": ["要点<script>x</script>"],
+        "date": "2026-06-19",
+    }
+    columns = {
+        "us_politics": {
+            "detailed_events": [{
+                "title_zh": "事件<script>alert(3)</script>",
+                "reader_body": "正文<img src=x onerror=alert(4)>",
+                "source_links": [{"title": "原文", "url": "javascript:alert(5)"}],
+            }],
+            "headline_only_events": [],
+        },
+        "global_affairs": [],
+        "technology": [],
+        "economy": [],
+    }
+
+    html = render_structured_html(meta, columns)
+    reader = render_reader_content(meta, columns)
+    markdown = render_structured_markdown(meta, columns)
+
+    for output in (html, reader, markdown):
+        assert "<script>" not in output
+        assert "javascript:alert" not in output
+        assert "&lt;script&gt;" in output
+        assert "<img src=x" not in output
+        assert "&lt;img src=x onerror=alert" in output

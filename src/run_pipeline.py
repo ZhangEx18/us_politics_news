@@ -30,18 +30,19 @@ _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(_project_root)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from ai_analyzer import (
-    score_batch,
-    _load_ai_config,
+from ai_analyzer import score_batch, _load_ai_config
+from config import (
+    load_config,
+    augment_ai_config_with_runtime as _augment_real,
 )
-from database import NewsDatabase
+from database import NewsDatabase, article_to_content_item
 from fetchers import (
     fetch_all_sources,
     merge_cross_source_duplicates,
     save_to_db,
     normalize_url,
 )
-from models import ContentItem, SourceType
+from models import ContentItem
 from report_engine import ReportSpec, build_report
 
 
@@ -52,9 +53,7 @@ DEFAULT_PUBLISH_AT = "07:45"
 
 
 def _load_config() -> dict:
-    path = os.path.join(_project_root, "config", "config.yaml")
-    with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+    return load_config()
 
 
 def _load_sources() -> list[dict]:
@@ -91,19 +90,7 @@ def _parse_schedule_time(value: str, fallback: str) -> tuple[int, int]:
 
 
 def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
-    """把 config.yaml 里的 LLM 运行参数注入 AI 配置。"""
-    llm_cfg = config.get("llm", {})
-    ai_config.update({
-        "score_max_prompt_chars": llm_cfg.get("score_max_prompt_chars", llm_cfg.get("max_prompt_chars", 12000)),
-        "score_max_concurrent": llm_cfg.get("score_max_concurrent", max(1, min(llm_cfg.get("max_concurrent", 3), 2))),
-        "score_timeout_seconds": llm_cfg.get("score_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
-        "score_content_chars": llm_cfg.get("score_content_chars", 400),
-        "score_retry_split_depth": llm_cfg.get("score_retry_split_depth", 3),
-        "digest_timeout_seconds": llm_cfg.get("digest_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
-        "digest_content_chars": llm_cfg.get("digest_content_chars", 1000),
-        "meta_timeout_seconds": llm_cfg.get("meta_timeout_seconds", 120),
-    })
-    return ai_config
+    return _augment_real(ai_config, config)
 
 
 def _get_source_max_age_hours(source_name: str, sources: list[dict], default_hours: int) -> int:
@@ -549,25 +536,9 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
 
     print(f"\n从数据库加载 {len(today_articles)} 条文章")
 
-    # 转为 dict 格式供 score_batch 使用
+    # 转为 ContentItem 供后续 pipeline 使用
     merged_items = [
-        ContentItem(
-            id=f"db:{db.url_hash(normalize_url(a.url))}",
-            source_type=SourceType(a.source_type) if a.source_type else SourceType.RSS,
-            title=a.title,
-            url=a.url,
-            content=a.summary or "",
-            source_name=a.source,
-            published_at=a.published_at,
-            column=a.column or "",
-            source_tier=a.source_tier or 4,
-            event_key=a.event_key or "",
-            source_url_normalized=a.source_url_normalized or normalize_url(a.url),
-            topic=a.topic or "",
-            score=a.score or 0.0,
-            reason=a.reason or "",
-            level=a.level or "",
-        )
+        article_to_content_item(a, url_hash_fn=db.url_hash)
         for a in today_articles
     ]
 

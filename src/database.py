@@ -4,10 +4,13 @@
 import hashlib
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import List, Optional
+from zoneinfo import ZoneInfo
 from urls import normalize_url
+
+LEGACY_STORAGE_TZ = ZoneInfo("Asia/Shanghai")
 
 
 @dataclass
@@ -48,12 +51,75 @@ _V2_COLUMNS = [
 ]
 
 
+def _to_utc_storage(dt: Optional[datetime]) -> str | None:
+    """数据库统一存带 +00:00 的 UTC ISO，避免新写入数据再混入本地时区。"""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc).isoformat()
+
+
+def _from_utc_storage(value: str | None) -> Optional[datetime]:
+    if not value:
+        return None
+    dt = datetime.fromisoformat(value)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _is_naive_iso_datetime(value: str | None) -> bool:
+    if not value:
+        return False
+    try:
+        dt = datetime.fromisoformat(value)
+    except ValueError:
+        return False
+    return dt.tzinfo is None
+
+
+def _legacy_local_to_utc_storage(value: str | None) -> str | None:
+    if not _is_naive_iso_datetime(value):
+        return value
+    local_dt = datetime.fromisoformat(value).replace(tzinfo=LEGACY_STORAGE_TZ)
+    return _to_utc_storage(local_dt)
+
+
+def article_to_content_item(article: "Article", url_hash_fn=None) -> "ContentItem":
+    """将数据库 Article 转换为 ContentItem，消除 run_pipeline / run_weekly 的重复转换逻辑。"""
+    from models import ContentItem, SourceType
+
+    url_norm = article.source_url_normalized or ""
+    if not url_norm and url_hash_fn:
+        url_norm = normalize_url(article.url)
+
+    return ContentItem(
+        id=f"db:{url_hash_fn(normalize_url(article.url))}" if url_hash_fn else f"db:{article.url}",
+        source_type=SourceType(article.source_type) if article.source_type else SourceType.RSS,
+        title=article.title,
+        url=article.url,
+        content=article.summary or "",
+        source_name=article.source,
+        published_at=article.published_at,
+        column=article.column or "",
+        source_tier=article.source_tier or 4,
+        event_key=article.event_key or "",
+        source_url_normalized=url_norm,
+        topic=article.topic or "",
+        score=article.score or 0.0,
+        reason=article.reason or "",
+        level=article.level or "",
+    )
+
+
 class NewsDatabase:
     def __init__(self, db_path: str = "data/news.db"):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_tables()
         self._migrate_v2()
+        self._migrate_legacy_datetimes()
 
     def _connect(self):
         conn = sqlite3.connect(str(self.db_path))
@@ -102,6 +168,31 @@ class NewsDatabase:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_column ON articles(\"column\")")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_event_key ON articles(event_key)")
 
+    def _migrate_legacy_datetimes(self):
+        """把旧版本写入的本地 naive 时间迁移为显式 UTC ISO。"""
+        with self._connect() as conn:
+            article_rows = conn.execute(
+                "SELECT id, published_at, fetched_at FROM articles"
+            ).fetchall()
+            for row in article_rows:
+                published_at = _legacy_local_to_utc_storage(row["published_at"])
+                fetched_at = _legacy_local_to_utc_storage(row["fetched_at"])
+                if published_at != row["published_at"] or fetched_at != row["fetched_at"]:
+                    conn.execute(
+                        "UPDATE articles SET published_at = ?, fetched_at = ? WHERE id = ?",
+                        (published_at, fetched_at, row["id"]),
+                    )
+            fetch_log_rows = conn.execute(
+                "SELECT id, fetched_at FROM fetch_log"
+            ).fetchall()
+            for row in fetch_log_rows:
+                fetched_at = _legacy_local_to_utc_storage(row["fetched_at"])
+                if fetched_at != row["fetched_at"]:
+                    conn.execute(
+                        "UPDATE fetch_log SET fetched_at = ? WHERE id = ?",
+                        (fetched_at, row["id"]),
+                    )
+
     @staticmethod
     def url_hash(url: str) -> str:
         return hashlib.sha256(url.encode()).hexdigest()[:16]
@@ -132,8 +223,8 @@ class NewsDatabase:
                 (
                     h, article.url, article.title, article.summary,
                     article.source, article.source_type,
-                    article.published_at.isoformat() if article.published_at else None,
-                    article.fetched_at.isoformat(),
+                    _to_utc_storage(article.published_at),
+                    _to_utc_storage(article.fetched_at),
                     article.category, article.score, article.topic,
                     article.reason, article.level,
                     article.column, article.source_tier,
@@ -155,8 +246,8 @@ class NewsDatabase:
             rows.append((
                 h, article.url, article.title, article.summary,
                 article.source, article.source_type,
-                article.published_at.isoformat() if article.published_at else None,
-                article.fetched_at.isoformat(),
+                _to_utc_storage(article.published_at),
+                _to_utc_storage(article.fetched_at),
                 article.category, article.score, article.topic,
                 article.reason, article.level,
                 article.column, article.source_tier,
@@ -177,7 +268,7 @@ class NewsDatabase:
             return cursor.rowcount
 
     def fetch_since(self, since: datetime) -> List[Article]:
-        cutoff = since.isoformat()
+        cutoff = _to_utc_storage(since)
         with self._connect() as conn:
             rows = conn.execute(
                 """SELECT * FROM articles
@@ -188,7 +279,7 @@ class NewsDatabase:
             return [self._row_to_article(r) for r in rows]
 
     def fetch_today(self) -> List[Article]:
-        today = datetime.now().strftime("%Y-%m-%d")
+        today = datetime.now(timezone.utc).date().isoformat()
         with self._connect() as conn:
             rows = conn.execute(
                 """SELECT * FROM articles
@@ -199,7 +290,7 @@ class NewsDatabase:
             return [self._row_to_article(r) for r in rows]
 
     def fetch_by_column(self, column: str, since: datetime) -> List[Article]:
-        cutoff = since.isoformat()
+        cutoff = _to_utc_storage(since)
         with self._connect() as conn:
             rows = conn.execute(
                 """SELECT * FROM articles
@@ -210,7 +301,7 @@ class NewsDatabase:
             return [self._row_to_article(r) for r in rows]
 
     def fetch_by_category(self, category: str, days: int = 1) -> List[Article]:
-        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+        cutoff = _to_utc_storage(datetime.now(timezone.utc) - timedelta(days=days))
         with self._connect() as conn:
             rows = conn.execute(
                 """SELECT * FROM articles
@@ -221,7 +312,7 @@ class NewsDatabase:
             return [self._row_to_article(r) for r in rows]
 
     def get_stats(self, days: int = 1) -> dict:
-        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+        cutoff = _to_utc_storage(datetime.now(timezone.utc) - timedelta(days=days))
         with self._connect() as conn:
             total = conn.execute(
                 "SELECT COUNT(*) FROM articles WHERE fetched_at >= ?", (cutoff,)
@@ -248,11 +339,11 @@ class NewsDatabase:
         with self._connect() as conn:
             conn.execute(
                 "INSERT INTO fetch_log (source, fetched_at, count, status) VALUES (?, ?, ?, ?)",
-                (source, datetime.now().isoformat(), count, status),
+                (source, _to_utc_storage(datetime.now(timezone.utc)), count, status),
             )
 
     def cleanup_old(self, days: int = 30):
-        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+        cutoff = _to_utc_storage(datetime.now(timezone.utc) - timedelta(days=days))
         with self._connect() as conn:
             conn.execute("DELETE FROM articles WHERE fetched_at < ?", (cutoff,))
             conn.execute("DELETE FROM fetch_log WHERE fetched_at < ?", (cutoff,))
@@ -310,8 +401,8 @@ class NewsDatabase:
             summary=row["summary"] or "",
             source=row["source"],
             source_type=row["source_type"],
-            published_at=datetime.fromisoformat(row["published_at"]) if row["published_at"] else None,
-            fetched_at=datetime.fromisoformat(row["fetched_at"]),
+            published_at=_from_utc_storage(row["published_at"]),
+            fetched_at=_from_utc_storage(row["fetched_at"]) or datetime.now(timezone.utc),
             category=row["category"] or "",
             score=row["score"] or 0.0,
             topic=row["topic"] or "",

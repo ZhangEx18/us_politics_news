@@ -12,8 +12,12 @@
 
 import os
 import re
+import html
 from datetime import datetime
 from typing import TYPE_CHECKING
+from urllib.parse import urlparse
+
+import yaml
 
 if TYPE_CHECKING:
     from publish_manifest import ReportManifest
@@ -30,6 +34,43 @@ def _pangu(text: str) -> str:
     text = re.sub(rf"({_CJK})({_ASCII})", r"\1 \2", text)
     text = re.sub(rf"({_ASCII})({_CJK})", r"\1 \2", text)
     return text
+
+
+def _html_text(text: object) -> str:
+    """渲染外部文本前转义 HTML，避免源站或 LLM 输出注入页面。"""
+    if text is None:
+        return ""
+    return html.escape(_pangu(str(text)), quote=False)
+
+
+def _safe_http_url(url: object) -> str:
+    raw = str(url or "").strip()
+    parsed = urlparse(raw)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        return ""
+    return html.escape(raw, quote=True)
+
+
+def _markdown_text(text: object) -> str:
+    if text is None:
+        return ""
+    return html.escape(_pangu(str(text)), quote=False)
+
+
+def _markdown_link_title(text: object) -> str:
+    escaped = _markdown_text(text)
+    return escaped.replace("[", "\\[").replace("]", "\\]")
+
+
+def _frontmatter(title: str, lead: str, highlights: list, date: str) -> str:
+    payload = {
+        "title": title,
+        "lead": lead,
+        "highlights": highlights,
+        "date": date,
+    }
+    dumped = yaml.safe_dump(payload, allow_unicode=True, sort_keys=False).strip()
+    return f"---\n{dumped}\n---\n"
 
 
 # ---------------------------------------------------------------------------
@@ -88,14 +129,14 @@ def render_structured_html(
     """
     # meta.title 优先；否则根据 report_type 生成默认标题
     if meta.get("title"):
-        title = _pangu(meta["title"])
+        title = _html_text(meta["title"])
     else:
         date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
         type_label = _REPORT_TYPE_TITLE.get(report_type, "每日新闻")
-        title = f"{date} {type_label}"
-    lead = _pangu(meta.get("lead", ""))
+        title = _html_text(f"{date} {type_label}")
+    lead = _html_text(meta.get("lead", ""))
     highlights = meta.get("highlights", [])
-    date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
+    date = _html_text(meta.get("date", datetime.now().strftime("%Y-%m-%d")))
 
     css = """
 body {
@@ -224,7 +265,7 @@ footer {
         html.append("<div class='highlights'>")
         html.append("<ul>")
         for h in highlights:
-            html.append(f"<li>{_pangu(h)}</li>")
+            html.append(f"<li>{_html_text(h)}</li>")
         html.append("</ul>")
         html.append("</div>")
 
@@ -247,7 +288,7 @@ footer {
 
         # 编号条目
         for idx, event in enumerate(detailed, 1):
-            event_title = _pangu(event.get("title_zh", ""))
+            event_title = _html_text(event.get("title_zh", ""))
             is_followup = event.get("is_followup", False)
             suffix = " [持续跟踪]" if is_followup else ""
 
@@ -256,14 +297,14 @@ footer {
 
             reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
             if reader_body:
-                html.append(f"<p>{_pangu(reader_body)}</p>")
+                html.append(f"<p>{_html_text(reader_body)}</p>")
 
             source_links = event.get("source_links", [])
             if source_links:
                 html.append("<div class='links'>")
                 for link in source_links:
-                    link_title = _pangu(str(link.get("title", "原文")))
-                    link_url = str(link.get("url", ""))
+                    link_title = _html_text(link.get("title", "原文"))
+                    link_url = _safe_http_url(link.get("url", ""))
                     if link_url:
                         html.append(f"<a href='{link_url}'>{link_title}</a> ")
                 html.append("</div>")
@@ -274,7 +315,7 @@ footer {
         if headline_only:
             html.append("<ul>")
             for event in headline_only:
-                event_title = _pangu(event.get("title_zh", ""))
+                event_title = _html_text(event.get("title_zh", ""))
                 if event_title:
                     html.append(f"<li>{event_title}</li>")
             html.append("</ul>")
@@ -314,14 +355,14 @@ def render_reader_content(
     """
     # manifest 提供时优先使用其标题
     if manifest:
-        title = _pangu(manifest.title)
+        title = _html_text(manifest.title)
     else:
         date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
         try:
             dt = datetime.strptime(date, "%Y-%m-%d")
-            title = f"{dt.year}年{dt.month}月{dt.day}日 新闻"
+            title = _html_text(f"{dt.year}年{dt.month}月{dt.day}日 新闻")
         except ValueError:
-            title = _pangu(meta.get("title", ""))
+            title = _html_text(meta.get("title", ""))
     highlights = meta.get("highlights", []) or []
 
     html: list[str] = ["<article>"]
@@ -331,7 +372,7 @@ def render_reader_content(
         html.append(f"<h2>{heading}</h2>")
         html.append("<ul>")
         for item in highlights:
-            html.append(f"<li>{_pangu(str(item))}</li>")
+            html.append(f"<li>{_html_text(item)}</li>")
         html.append("</ul>")
 
     for col_key in COLUMN_ORDER:
@@ -353,18 +394,18 @@ def render_reader_content(
 
         # 编号条目：带正文
         for idx, event in enumerate(detailed, 1):
-            event_title = _pangu(event.get("title_zh", ""))
+            event_title = _html_text(event.get("title_zh", ""))
             is_followup = event.get("is_followup", False)
             suffix = " [持续跟踪]" if is_followup else ""
             html.append(f"<h3>{idx}. {event_title}{suffix}</h3>")
             reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
             if reader_body:
-                html.append(f"<p>{_pangu(reader_body)}</p>")
+                html.append(f"<p>{_html_text(reader_body)}</p>")
 
         if headline_only:
             html.append("<ul>")
             for event in headline_only:
-                event_title = _pangu(event.get("title_zh", ""))
+                event_title = _html_text(event.get("title_zh", ""))
                 if event_title:
                     html.append(f"<li>{event_title}</li>")
             html.append("</ul>")
@@ -392,27 +433,16 @@ def render_structured_markdown(
     """
     # meta.title 优先；否则根据 report_type 生成默认标题
     if meta.get("title"):
-        title = meta["title"]
+        title = _markdown_text(meta["title"])
     else:
         date_raw = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
         type_label = _REPORT_TYPE_TITLE.get(report_type, "每日新闻")
-        title = f"{date_raw} {type_label}"
-    lead = meta.get("lead", "")
-    highlights = meta.get("highlights", [])
+        title = _markdown_text(f"{date_raw} {type_label}")
+    lead = _markdown_text(meta.get("lead", ""))
+    highlights = [_markdown_text(h) for h in meta.get("highlights", [])]
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
 
-    lines: list[str] = []
-
-    # frontmatter
-    lines.append("---")
-    lines.append(f'title: "{title}"')
-    lines.append(f'lead: "{lead}"')
-    lines.append("highlights:")
-    for h in highlights:
-        lines.append(f'  - "{h}"')
-    lines.append(f'date: "{date}"')
-    lines.append("---")
-    lines.append("")
+    lines: list[str] = [_frontmatter(title, lead, highlights, date), ""]
 
     # 四大栏目
     for col_key in COLUMN_ORDER:
@@ -434,7 +464,7 @@ def render_structured_markdown(
 
         # 编号条目
         for idx, event in enumerate(detailed, 1):
-            event_title = _pangu(event.get("title_zh", ""))
+            event_title = _markdown_text(event.get("title_zh", ""))
             is_followup = event.get("is_followup", False)
             suffix = " [持续跟踪]" if is_followup else ""
 
@@ -443,14 +473,14 @@ def render_structured_markdown(
 
             reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
             if reader_body:
-                lines.append(_pangu(reader_body))
+                lines.append(_markdown_text(reader_body))
                 lines.append("")
 
             source_links = event.get("source_links", [])
             if source_links:
                 for link in source_links:
-                    link_title = str(link.get("title", "原文"))
-                    link_url = str(link.get("url", ""))
+                    link_title = _markdown_link_title(link.get("title", "原文"))
+                    link_url = _safe_http_url(link.get("url", ""))
                     if link_url:
                         lines.append(f"- [{link_title}]({link_url})")
                 lines.append("")
@@ -458,7 +488,7 @@ def render_structured_markdown(
         # 无序条目：仅标题
         if headline_only:
             for event in headline_only:
-                event_title = _pangu(event.get("title_zh", ""))
+                event_title = _markdown_text(event.get("title_zh", ""))
                 if event_title:
                     lines.append(f"- {event_title}")
             lines.append("")

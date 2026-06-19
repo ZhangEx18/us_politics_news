@@ -14,40 +14,25 @@ import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-import yaml
-
 _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(_project_root)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from database import NewsDatabase
+from database import NewsDatabase, article_to_content_item
 from ai_analyzer import _load_ai_config
-from models import ContentItem, SourceType
+from config import load_config, augment_ai_config_with_runtime
+from models import ContentItem
 from report_engine import ReportSpec, build_report
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 
 
 def _load_config() -> dict:
-    path = os.path.join(_project_root, "config", "config.yaml")
-    with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+    return load_config()
 
 
 def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
-    """把 config.yaml 里的 LLM 运行参数注入 AI 配置。"""
-    llm_cfg = config.get("llm", {})
-    ai_config.update({
-        "score_max_prompt_chars": llm_cfg.get("score_max_prompt_chars", llm_cfg.get("max_prompt_chars", 12000)),
-        "score_max_concurrent": llm_cfg.get("score_max_concurrent", max(1, min(llm_cfg.get("max_concurrent", 3), 2))),
-        "score_timeout_seconds": llm_cfg.get("score_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
-        "score_content_chars": llm_cfg.get("score_content_chars", 400),
-        "score_retry_split_depth": llm_cfg.get("score_retry_split_depth", 3),
-        "digest_timeout_seconds": llm_cfg.get("digest_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
-        "digest_content_chars": llm_cfg.get("digest_content_chars", 1000),
-        "meta_timeout_seconds": llm_cfg.get("meta_timeout_seconds", 120),
-    })
-    return ai_config
+    return augment_ai_config_with_runtime(ai_config, config)
 
 
 def _get_weekly_window() -> tuple[datetime, datetime, str]:
@@ -66,6 +51,33 @@ def _get_weekly_window() -> tuple[datetime, datetime, str]:
     week_num = since.isocalendar()[1]
     report_key = f"{since.year}-W{week_num:02d}"
     return since, until, report_key
+
+
+def _build_weekly_scored_events(filtered_items: list[ContentItem], articles: list) -> tuple[list[dict], int]:
+    articles_by_url = {a.url: a for a in articles}
+    event_dicts: list[dict] = []
+    skipped = 0
+    for item in filtered_items:
+        article = articles_by_url.get(str(item.url))
+        if article is None or article.llm_score is None:
+            skipped += 1
+            continue
+        tags = [t.strip() for t in (article.llm_tags or "").split(",") if t.strip()]
+        event_dicts.append({
+            "link": str(item.url),
+            "title": item.title,
+            "source": item.source_name,
+            "score": article.llm_score,
+            "summary": article.llm_summary or item.content or "",
+            "content": item.content or "",
+            "tags": tags,
+            "event_key": item.event_key or "",
+            "column": item.column or "",
+            "source_tier": item.source_tier or 4,
+            "is_hard_news": True,
+            "source_links": [],
+        })
+    return event_dicts, skipped
 
 
 def run_weekly() -> dict:
@@ -94,25 +106,8 @@ def run_weekly() -> dict:
         return {"total_selected": 0}
 
     # === 3. 转为 ContentItem 并过滤到窗口内 ===
-    from fetchers import normalize_url
     merged_items = [
-        ContentItem(
-            id=f"db:{db.url_hash(db.normalize_url(a.url))}",
-            source_type=SourceType(a.source_type) if a.source_type else SourceType.RSS,
-            title=a.title,
-            url=a.url,
-            content=a.summary or "",
-            source_name=a.source,
-            published_at=a.published_at,
-            column=a.column or "",
-            source_tier=a.source_tier or 4,
-            event_key=a.event_key or "",
-            source_url_normalized=a.source_url_normalized or normalize_url(a.url),
-            topic=a.topic or "",
-            score=a.score or 0.0,
-            reason=a.reason or "",
-            level=a.level or "",
-        )
+        article_to_content_item(a, url_hash_fn=db.url_hash)
         for a in articles
     ]
 
@@ -133,21 +128,13 @@ def run_weekly() -> dict:
         print("[警告] 周报窗口内无文章，无法生成周报")
         return {"total_selected": 0}
 
-    # === 4. 构建 scored_events dict 列表 ===
-    event_dicts = [
-        {
-            "link": str(it.url),
-            "title": it.title,
-            "source": it.source_name,
-            "score": it.score,
-            "summary": it.content or "",
-            "content": it.content or "",
-            "event_key": it.event_key or "",
-            "column": it.column or "",
-            "source_tier": it.source_tier or 4,
-        }
-        for it in filtered_items
-    ]
+    # === 4. 构建 scored_events dict 列表（跳过未评分） ===
+    event_dicts, skipped = _build_weekly_scored_events(filtered_items, articles)
+    print(f"[周报] 已评分 {len(event_dicts)} 条（跳过 {skipped} 条未评分）")
+
+    if not event_dicts:
+        print("[警告] 无已评分文章")
+        return {"total_selected": 0}
 
     # === 5. 构造 ReportSpec，调用 build_report() ===
     spec = ReportSpec(

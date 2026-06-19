@@ -63,7 +63,7 @@ class RSSFetcher(BaseFetcher):
         for field in ["published", "updated", "created"]:
             if f"{field}_parsed" in entry and entry[f"{field}_parsed"]:
                 try:
-                    return datetime(*entry[f"{field}_parsed"][:6])
+                    return datetime(*entry[f"{field}_parsed"][:6], tzinfo=timezone.utc)
                 except Exception:
                     continue
         return None
@@ -427,7 +427,7 @@ def save_to_db(items: List[ContentItem], db: NewsDatabase) -> dict:
             source=item.source_name,
             source_type=item.source_type,
             published_at=item.published_at,
-            fetched_at=datetime.now(),
+            fetched_at=datetime.now(timezone.utc),
             topic=item.topic,
             score=item.score,
             reason=item.reason,
@@ -444,7 +444,7 @@ def save_to_db(items: List[ContentItem], db: NewsDatabase) -> dict:
     return stats
 
 
-def run_all_fetchers(db: NewsDatabase) -> dict:
+def run_all_fetchers(db: NewsDatabase, sources: list[dict]) -> dict:
     since = datetime.now() - timedelta(hours=24)
-    items = asyncio.run(fetch_all_sources(since))
+    items = asyncio.run(fetch_all_sources(since, sources))
     return save_to_db(items, db)
