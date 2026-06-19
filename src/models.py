@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, HttpUrl
 class SourceType(str, Enum):
     """支持的信息源类型"""
     RSS = "rss"
+    CUSTOM = "custom"
     NEWSAPI = "newsapi"
     GDELT = "gdelt"
     HACKERNEWS = "hackernews"

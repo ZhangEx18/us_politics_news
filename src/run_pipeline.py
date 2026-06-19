@@ -115,6 +115,18 @@ def _count_scored_entries(entries: list[dict]) -> int:
     return valid
 
 
+def _is_cn_source_item(item: ContentItem) -> bool:
+    language = str(item.metadata.get("language", "")).lower()
+    tags = {str(tag).lower() for tag in item.metadata.get("tags", [])}
+    return language.startswith("zh") or "cn_source" in tags
+
+
+def _is_cn_source_entry(entry: dict) -> bool:
+    language = str(entry.get("language", "")).lower()
+    tags = {str(tag).lower() for tag in entry.get("tags", [])}
+    return language.startswith("zh") or "cn_source" in tags
+
+
 def _is_hard_news_entry(entry: dict) -> bool:
     """只保留硬新闻进入正文链路。"""
     return bool(entry.get("is_hard_news", False))
@@ -272,6 +284,8 @@ def _build_scoring_entries_by_column(
                 "content": (item.content or "")[:600],
                 "column_hint": item.column or col_key,
                 "source_tier": item.source_tier or 4,
+                "language": item.metadata.get("language", ""),
+                "tags": list(item.metadata.get("tags", [])),
             }
             for item in items
         ]
@@ -601,9 +615,13 @@ def _run_digest_phase(
             "report_key": report_date,
         },
         "pipeline": pipeline_context or {},
+        "cn_source_fetched": 0,
+        "cn_source_selected": 0,
+        "cn_source_selected_by_column": {},
         "columns": {},
         "ai": {"score_errors": len([]), "digest_failures": {}},
     }
+    phase_metrics["cn_source_fetched"] = sum(1 for item in merged_items if _is_cn_source_item(item))
 
     # === 4. 预筛 + Pre-LLM 硬过滤 + AI score_batch ===
     print("\n[4/13] 预筛 + AI 批量评分...")
@@ -668,6 +686,15 @@ def _run_digest_phase(
     for c in sorted(_hard_by_col):
         print(f"     {c}: {_hard_by_col[c]} 条硬新闻")
         phase_metrics["columns"].setdefault(c, {})["hard_news_scored"] = _hard_by_col[c]
+
+    cn_selected_by_column: dict[str, int] = {}
+    for entry in hard_news_scored:
+        if not _is_cn_source_entry(entry):
+            continue
+        col = entry.get("column", "unknown")
+        cn_selected_by_column[col] = cn_selected_by_column.get(col, 0) + 1
+    phase_metrics["cn_source_selected"] = sum(cn_selected_by_column.values())
+    phase_metrics["cn_source_selected_by_column"] = cn_selected_by_column
 
     # === 7+. 构造 ReportSpec，委托 report_engine 完成后续阶段 ===
     dt_val = datetime.strptime(report_date, "%Y-%m-%d")

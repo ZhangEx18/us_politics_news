@@ -7,6 +7,7 @@ from report_engine import (
     ReportSpec,
     _generate_all_column_digests,
     build_reader_highlights,
+    build_report,
     sanitize_or_validate_events,
 )
 
@@ -113,3 +114,68 @@ def test_generate_all_column_digests_falls_back_per_column():
     assert results["global_affairs"][0]["title_zh"] == "国际事件"
     assert "摘要" in results["global_affairs"][0]["reader_body"]
     assert failures == {"global_affairs": "llm timeout"}
+
+
+def test_build_report_tracks_cn_source_metrics(tmp_path):
+    spec = ReportSpec(
+        report_type="daily",
+        report_key="2026-06-19",
+        title="测试日报",
+        since=datetime(2026, 6, 18, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 19, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "daily"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 3, "max_items": 3, "headline_items": 0},
+            "global_affairs": {"label": "国际局势", "target_items": 3, "max_items": 3, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 3, "max_items": 3, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 3, "max_items": 3, "headline_items": 0},
+        },
+    )
+    scored_events = [
+        {
+            "title": "中文国际事件",
+            "source": "联合早报 - 国际",
+            "score": 88,
+            "summary": "摘要",
+            "content": "正文",
+            "column": "global_affairs",
+            "event_key": "cn_event_20260619",
+            "language": "zh",
+            "tags": ["cn_source", "geopolitics"],
+            "source_links": [{"title": "原文", "url": "https://example.com/a"}],
+        },
+        {
+            "title": "英文经济事件",
+            "source": "Supply Chain Dive",
+            "score": 86,
+            "summary": "摘要",
+            "content": "正文",
+            "column": "economy",
+            "event_key": "en_event_20260619",
+            "language": "en",
+            "tags": ["supply_chain"],
+            "source_links": [{"title": "原文", "url": "https://example.com/b"}],
+        },
+    ]
+    config = {"rules": {"quality_gate": {"min_chars": 2, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        return [{
+            "title_zh": kwargs["events"][0]["title"],
+            "reader_body": "已生成正文。",
+            "core_facts": "已生成正文。",
+            "source_links": kwargs["events"][0].get("source_links", []),
+        }]
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)):
+        stats = build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    metrics = stats["metrics"]
+    assert metrics["cn_source_selected"] == 1
+    assert metrics["cn_source_selected_by_column"]["global_affairs"] == 1

@@ -14,6 +14,8 @@ from run_pipeline import (
     _filter_items_by_freshness,
     _get_report_publish_time,
     _get_report_window,
+    _is_cn_source_entry,
+    _is_cn_source_item,
     _load_schedule_config,
     _is_hard_news_entry,
 )
@@ -106,6 +108,22 @@ def test_is_hard_news_entry_requires_true_flag():
     assert _is_hard_news_entry({"is_hard_news": True}) is True
     assert _is_hard_news_entry({"is_hard_news": False}) is False
     assert _is_hard_news_entry({}) is False
+
+
+def test_cn_source_helpers_detect_language_and_tag():
+    item = ContentItem(
+        id="1",
+        source_type="rss",
+        title="中文源",
+        url="https://example.com/cn",
+        source_name="Example CN",
+        metadata={"language": "zh", "tags": ["cn_source", "macro"]},
+    )
+
+    assert _is_cn_source_item(item) is True
+    assert _is_cn_source_entry({"language": "zh", "tags": []}) is True
+    assert _is_cn_source_entry({"language": "en", "tags": ["cn_source"]}) is True
+    assert _is_cn_source_entry({"language": "en", "tags": ["policy"]}) is False
 
 
 def test_augment_ai_config_with_runtime_applies_llm_limits():
