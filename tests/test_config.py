@@ -56,31 +56,31 @@ def test_digest_targets_match_publish_constraints():
     assert llm.get("digest_content_chars") == 1000
     assert llm.get("meta_timeout_seconds") == 120
     assert digest.get("total_min_items") == 28
-    assert digest.get("total_target_items") == 35
-    assert digest.get("total_max_items") == 45
+    assert digest.get("total_target_items") == 60
+    assert digest.get("total_max_items") == 60
 
     assert columns["us_politics"]["min_items"] == 8
-    assert columns["us_politics"]["target_items"] == 6
-    assert columns["us_politics"]["max_items"] == 6
-    assert columns["us_politics"]["headline_items"] == 4
+    assert columns["us_politics"]["target_items"] == 12
+    assert columns["us_politics"]["max_items"] == 12
+    assert columns["us_politics"]["headline_items"] == 8
     assert columns["us_politics"]["prefilter_items"] == 25
 
     assert columns["global_affairs"]["min_items"] == 10
-    assert columns["global_affairs"]["target_items"] == 8
-    assert columns["global_affairs"]["max_items"] == 9
-    assert columns["global_affairs"]["headline_items"] == 6
+    assert columns["global_affairs"]["target_items"] == 12
+    assert columns["global_affairs"]["max_items"] == 12
+    assert columns["global_affairs"]["headline_items"] == 8
     assert columns["global_affairs"]["prefilter_items"] == 40
 
     assert columns["technology"]["min_items"] == 5
-    assert columns["technology"]["target_items"] == 5
-    assert columns["technology"]["max_items"] == 6
-    assert columns["technology"]["headline_items"] == 4
+    assert columns["technology"]["target_items"] == 7
+    assert columns["technology"]["max_items"] == 7
+    assert columns["technology"]["headline_items"] == 3
     assert columns["technology"]["prefilter_items"] == 24
 
     assert columns["economy"]["min_items"] == 5
-    assert columns["economy"]["target_items"] == 5
-    assert columns["economy"]["max_items"] == 6
-    assert columns["economy"]["headline_items"] == 4
+    assert columns["economy"]["target_items"] == 7
+    assert columns["economy"]["max_items"] == 7
+    assert columns["economy"]["headline_items"] == 3
     assert columns["economy"]["prefilter_items"] == 24
 
     for col_cfg in columns.values():
