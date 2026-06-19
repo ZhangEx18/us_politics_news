@@ -68,8 +68,8 @@ def test_render_reader_content_monthly_highlights():
     assert "本月要点" in html
 
 
-def test_render_dual_style_daily_has_numbered_and_bullet():
-    """日报双样式：编号条目带正文，无序条目仅标题"""
+def test_render_reader_has_numbered_events_and_bullet_titles():
+    """Reader 栏目内先显示编号正文，再显示次要 bullet 标题。"""
     meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
     columns = {
         "us_politics": {
@@ -87,24 +87,21 @@ def test_render_dual_style_daily_has_numbered_and_bullet():
         "economy": {"detailed_events": [], "headline_only_events": []},
     }
     html = render_reader_content(meta, columns, report_type="daily")
-    # 编号条目（_pangu 会在中英文间加空格）
     assert "<h3>1. 重要事件 A</h3>" in html
     assert "<h3>2. 重要事件 B</h3>" in html
     assert "<p>这是正文。第二句。</p>" in html
-    # 无序条目
     assert "<li>快讯 C</li>" in html
     assert "<li>快讯 D</li>" in html
-    # 无序条目前没有分组标题
     assert "其他要闻" not in html
     assert "补充快讯" not in html
 
 
-def test_render_dual_style_no_extra_heading_between():
-    """无序条目前不插入任何分区标题"""
+def test_render_reader_skips_headline_only_column():
+    """只有 headline_only_events 的栏目在 Reader 中不显示。"""
     meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
     columns = {
         "us_politics": {
-            "detailed_events": [{"title_zh": "事件A", "reader_body": "正文。"}],
+            "detailed_events": [],
             "headline_only_events": [{"title_zh": "标题B"}],
         },
         "global_affairs": {"detailed_events": [], "headline_only_events": []},
@@ -112,29 +109,8 @@ def test_render_dual_style_no_extra_heading_between():
         "economy": {"detailed_events": [], "headline_only_events": []},
     }
     html = render_reader_content(meta, columns, report_type="daily")
-    # 在 </h3> 和 <li> 之间不应有额外标题
-    h3_pos = html.index("</h3>")
-    li_pos = html.index("<li>")
-    between = html[h3_pos:li_pos]
-    assert "<h2>" not in between
-    assert "<h3>" not in between
-
-
-def test_render_headline_only_has_no_body():
-    """无序条目只有标题，没有正文"""
-    meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
-    columns = {
-        "us_politics": {
-            "detailed_events": [],
-            "headline_only_events": [{"title_zh": "仅标题"}],
-        },
-        "global_affairs": {"detailed_events": [], "headline_only_events": []},
-        "technology": {"detailed_events": [], "headline_only_events": []},
-        "economy": {"detailed_events": [], "headline_only_events": []},
-    }
-    html = render_reader_content(meta, columns, report_type="daily")
-    assert "<li>仅标题</li>" in html
-    assert "<p>" not in html
+    assert "标题 B" not in html
+    assert "<h2>一、美国政局</h2>" not in html
 
 
 def test_render_weekly_no_headline_only():

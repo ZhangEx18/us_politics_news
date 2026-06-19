@@ -238,7 +238,7 @@ footer {
             detailed = col_data.get("detailed_events", [])
             headline_only = col_data.get("headline_only_events", [])
 
-        if not detailed and not headline_only:
+        if not detailed:
             continue
 
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
@@ -344,7 +344,7 @@ def render_reader_content(
             detailed = col_data.get("detailed_events", [])
             headline_only = col_data.get("headline_only_events", [])
 
-        if not detailed and not headline_only:
+        if not detailed:
             continue
 
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
@@ -361,7 +361,6 @@ def render_reader_content(
             if reader_body:
                 html.append(f"<p>{_pangu(reader_body)}</p>")
 
-        # 无序条目：仅标题，无分组标题
         if headline_only:
             html.append("<ul>")
             for event in headline_only:

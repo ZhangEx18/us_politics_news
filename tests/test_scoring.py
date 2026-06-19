@@ -3,7 +3,7 @@
 import asyncio
 
 from models import ScoredArticle
-from ai_analyzer import _score_batch_with_retry
+from ai_analyzer import _score_batch_with_retry, merge_events
 
 
 # ── ScoredArticle 默认值 ──
@@ -127,3 +127,37 @@ def test_score_batch_with_retry_keeps_unresolved_errors(monkeypatch):
 
     assert len(scores) == 1
     assert any("拆分后仍缺失" in err for err in errors)
+
+
+def test_merge_events_preserves_source_evidence_for_writer():
+    items = [
+        {
+            "link": "https://example.com/a",
+            "title": "A",
+            "source": "source-a",
+            "score": 90,
+            "summary": "官方宣布新政策。",
+            "content": "官方文件说明政策适用对象和执行时间。",
+            "event_key": "policy_change_20260619",
+            "tags": ["政策"],
+        },
+        {
+            "link": "https://example.com/b",
+            "title": "B",
+            "source": "source-b",
+            "score": 88,
+            "summary": "监管机构给出执行细节。",
+            "content": "监管机构列出申报流程和企业合规要求。",
+            "event_key": "policy_change_20260619",
+            "tags": ["监管"],
+        },
+    ]
+
+    merged = merge_events(items)
+
+    assert len(merged) == 1
+    content = merged[0]["content"]
+    assert "摘要：官方宣布新政策。" in content
+    assert "原文片段：官方文件说明政策适用对象和执行时间。" in content
+    assert "摘要：监管机构给出执行细节。" in content
+    assert "原文片段：监管机构列出申报流程和企业合规要求。" in content
