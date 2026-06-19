@@ -91,30 +91,58 @@ async def _generate_all_column_digests(
     ai_config: dict,
     word_count_min: int,
     word_count_max: int,
-) -> dict[str, list[dict]]:
+) -> tuple[dict[str, list[dict]], dict[str, str]]:
     """并发生成四栏 digest。"""
     semaphore = asyncio.Semaphore(4)
 
-    async def _generate(col_key: str, col_cfg: dict) -> tuple[str, list[dict]]:
+    def _fallback_reader_body(candidate: dict) -> str:
+        summary = str(candidate.get("summary", "")).strip()
+        content = str(candidate.get("content", "")).strip()
+        body = summary or content
+        body = re.sub(r"\s+", " ", body)
+        if len(body) > 220:
+            body = body[:220].rstrip(" ，,。. ") + "。"
+        return body or "该事件写作降级为简版概述，保留标题供后续人工复核。"
+
+    def _fallback_events(candidates: list[dict]) -> list[dict]:
+        events: list[dict] = []
+        for candidate in candidates[:3]:
+            title = str(candidate.get("title", "")).strip()
+            if not title:
+                continue
+            events.append({
+                "title_zh": title,
+                "reader_body": _fallback_reader_body(candidate),
+                "core_facts": _fallback_reader_body(candidate),
+            })
+        return events
+
+    async def _generate(col_key: str, col_cfg: dict) -> tuple[str, list[dict], str | None]:
         candidates = column_candidates.get(col_key, [])
         if not candidates:
-            return col_key, []
+            return col_key, [], None
         async with semaphore:
-            events = await generate_column_digest(
-                column_key=col_key,
-                column_label=col_cfg.get("label", col_key),
-                events=candidates,
-                history_context=history_context,
-                ai_config=ai_config,
-                word_count_min=word_count_min,
-                word_count_max=word_count_max,
-            )
-        return col_key, events
+            try:
+                events = await generate_column_digest(
+                    column_key=col_key,
+                    column_label=col_cfg.get("label", col_key),
+                    events=candidates,
+                    history_context=history_context,
+                    ai_config=ai_config,
+                    word_count_min=word_count_min,
+                    word_count_max=word_count_max,
+                )
+                return col_key, events, None
+            except Exception as exc:
+                fallback = _fallback_events(candidates)
+                return col_key, fallback, str(exc)
 
     results = await asyncio.gather(*[
         _generate(col_key, col_cfg) for col_key, col_cfg in columns_cfg.items()
     ])
-    return {col_key: events for col_key, events in results if events}
+    column_results = {col_key: events for col_key, events, _ in results if events}
+    failures = {col_key: err for col_key, _, err in results if err}
+    return column_results, failures
 
 
 # ── 质量门禁 ──
@@ -210,6 +238,7 @@ def build_report(
     config: dict,
     ai_config: dict,
     db,
+    phase_metrics: dict | None = None,
 ) -> dict:
     """
     共享报告编排器。
@@ -222,6 +251,9 @@ def build_report(
     start_time = datetime.now()
     digest_cfg = config.get("digest", {})
     columns_cfg = spec.column_quotas
+    metrics = phase_metrics.copy() if phase_metrics else {}
+    metrics.setdefault("columns", {})
+    metrics.setdefault("ai", {})
 
     print("=" * 60)
     print(spec.title)
@@ -263,6 +295,7 @@ def build_report(
         by_column[col].sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
     for col in sorted(by_column):
         print(f"   {col}: {len(by_column[col])} 条")
+        metrics["columns"].setdefault(col, {})["post_score_filtered"] = len(by_column[col])
 
     # ── 每栏按配额选择候选（双样式） ──
     print(f"\n[候选] 每栏按配额选择...")
@@ -292,13 +325,15 @@ def build_report(
             for e in headline_items
         ]
         print(f"   {col_key}: 编号 {len(detailed_items)} + 无序 {len(headline_items)}")
+        metrics["columns"].setdefault(col_key, {})["detailed_candidates"] = len(detailed_items)
+        metrics["columns"].setdefault(col_key, {})["headline_only"] = len(headline_items)
 
     # ── 历史上下文 ──
     history_context = _load_history_context(db, spec.history_days)
 
     # ── 每栏生成 digest ──
     print(f"\n[写作] 每栏生成 digest...")
-    column_results = asyncio.run(_generate_all_column_digests(
+    column_results, digest_failures = asyncio.run(_generate_all_column_digests(
         columns_cfg=columns_cfg,
         column_candidates=column_candidates,
         history_context=history_context,
@@ -306,6 +341,9 @@ def build_report(
         word_count_min=spec.word_count_min,
         word_count_max=spec.word_count_max,
     ))
+    metrics["ai"]["digest_failures"] = digest_failures
+    for col_key, error in digest_failures.items():
+        print(f"   [{col_key}] 栏目写作失败，已降级为候选摘要: {error}")
 
     # ── 提炼要点 ──
     print(f"\n[要点] 提炼要点...")
@@ -335,6 +373,8 @@ def build_report(
             "detailed_events": column_results.get(col_key, []),
             "headline_only_events": column_headline_only.get(col_key, []),
         }
+        metrics["columns"].setdefault(col_key, {})["rendered_detailed"] = len(columns[col_key]["detailed_events"])
+        metrics["columns"].setdefault(col_key, {})["rendered_headline_only"] = len(columns[col_key]["headline_only_events"])
 
     # ── 构造统一发布元数据 ──
     manifest = build_manifest(
@@ -382,6 +422,14 @@ def build_report(
         "total_selected": total_events,
         "column_counts": col_counts,
         "outputs": {"markdown": md_path, "html": html_path, "feed": spec.feed_path},
+        "metrics": {
+            **metrics,
+            "report": {
+                "title": spec.title,
+                "published_at": manifest.pub_date.isoformat(),
+                "duration_seconds": round(duration, 1),
+            },
+        },
     }
 
     print(f"\n{'=' * 60}")

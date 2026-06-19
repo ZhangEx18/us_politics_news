@@ -47,6 +47,7 @@ def test_digest_targets_match_publish_constraints():
     assert total.get("target_word_count_min") == 10000
     assert total.get("target_word_count_max") == 20000
     assert runtime.get("min_score_coverage") == 0.7
+    schedule = config.get("schedule", {})
     assert llm.get("score_max_concurrent") == 2
     assert llm.get("score_max_prompt_chars") == 9000
     assert llm.get("score_timeout_seconds") == 120
@@ -58,6 +59,11 @@ def test_digest_targets_match_publish_constraints():
     assert digest.get("total_min_items") == 28
     assert digest.get("total_target_items") == 60
     assert digest.get("total_max_items") == 60
+    assert config.get("analysis", {}).get("freshness_hours") == 30
+    assert schedule.get("timezone") == "Asia/Shanghai"
+    assert schedule.get("cutoff_hour") == 7
+    assert schedule.get("fetch_at") == "07:00"
+    assert schedule.get("publish_at") == "07:45"
 
     assert columns["us_politics"]["min_items"] == 8
     assert columns["us_politics"]["target_items"] == 12
@@ -122,6 +128,13 @@ def test_each_source_has_required_keys():
     for i, s in enumerate(sources):
         missing = REQUIRED_SOURCE_KEYS - set(s.keys())
         assert not missing, f"源 #{i} ({s.get('name', '?')}) 缺少字段: {missing}"
+
+
+def test_global_affairs_contains_cfr_and_foreign_affairs():
+    sources = _load_yaml(SOURCES_PATH)
+    by_name = {s["name"]: s for s in sources}
+    assert by_name["Council on Foreign Relations"]["column"] == "global_affairs"
+    assert by_name["Foreign Affairs"]["column"] == "global_affairs"
 
 
 # ── rules 配置 ──
