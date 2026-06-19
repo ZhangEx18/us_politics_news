@@ -297,6 +297,18 @@ def build_report(
         print(f"   {col}: {len(by_column[col])} 条")
         metrics["columns"].setdefault(col, {})["post_score_filtered"] = len(by_column[col])
 
+    cn_selected_by_column: dict[str, int] = {}
+    for col_key, entries in by_column.items():
+        cn_selected_by_column[col_key] = sum(
+            1
+            for entry in entries
+            if str(entry.get("language", "")).lower().startswith("zh")
+            or "cn_source" in {str(tag).lower() for tag in entry.get("tags", [])}
+        )
+    if cn_selected_by_column:
+        metrics["cn_source_selected_by_column"] = cn_selected_by_column
+        metrics["cn_source_selected"] = sum(cn_selected_by_column.values())
+
     # ── 每栏按配额选择候选（双样式） ──
     print(f"\n[候选] 每栏按配额选择...")
     column_candidates: dict[str, list[dict]] = {}
@@ -317,6 +329,8 @@ def build_report(
                 "score": e.get("score", 0), "summary": e.get("summary", ""),
                 "content": e.get("content", ""),
                 "source_links": e.get("source_links", []),
+                "language": e.get("language", ""),
+                "tags": e.get("tags", []),
             }
             for e in detailed_items
         ]

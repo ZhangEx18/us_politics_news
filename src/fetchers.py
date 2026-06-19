@@ -10,7 +10,9 @@ import hashlib
 import os
 import re
 from datetime import datetime, timedelta, timezone
+from html import unescape
 from typing import List, Optional
+from urllib.parse import urljoin
 import aiohttp
 import feedparser
 
@@ -43,20 +45,62 @@ class BaseFetcher:
             return await resp.json()
 
 
+def _resolve_fetch_mode(source: dict) -> str:
+    """向后兼容旧配置，同时允许新配置显式指定抓取模式。"""
+    explicit = str(source.get("fetch_mode", "")).strip().lower()
+    if explicit:
+        return explicit
+
+    url = str(source.get("url", "")).lower()
+    name = str(source.get("name", "")).lower()
+    if url.startswith("https://news.google.com/rss"):
+        return "google_news"
+    if "rsshub.app" in url:
+        return "rsshub"
+    if "gdelt" in name:
+        return "gdelt"
+    if "hacker news" in name or "hnrss" in url:
+        return "hacker_news"
+    return "rss"
+
+
+def _build_item_metadata(source_cfg: dict, entry_tags: list[str] | None = None) -> dict:
+    metadata = {
+        "language": source_cfg.get("language", "en"),
+        "tags": list(source_cfg.get("tags", [])),
+        "fetch_mode": _resolve_fetch_mode(source_cfg),
+    }
+    if entry_tags:
+        merged_tags = []
+        seen = set()
+        for tag in [*metadata["tags"], *entry_tags]:
+            if tag and tag not in seen:
+                seen.add(tag)
+                merged_tags.append(tag)
+        metadata["tags"] = merged_tags
+    return metadata
+
+
+def _extract_html_text(raw_html: str) -> str:
+    text = re.sub(r"<script[^>]*>.*?</script>", "", raw_html, flags=re.IGNORECASE | re.DOTALL)
+    text = re.sub(r"<style[^>]*>.*?</style>", "", text, flags=re.IGNORECASE | re.DOTALL)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = unescape(text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
 # ── RSS 抓取器（从 sources.yaml 读取）──
 
 class RSSFetcher(BaseFetcher):
-    """RSS/Atom 抓取器 — 读取 sources 中所有非 Google News/GDELT/HN 的源"""
+    """RSS/Atom 抓取器 — 读取 sources 中所有 rss/rsshub 源"""
 
     def __init__(self, sources: list[dict]):
         super().__init__()
         self.feeds = [
             s for s in sources
             if s.get("enabled", True)
-            and not s["url"].startswith("https://news.google.com/rss")
-            and "gdelt" not in s.get("name", "").lower()
-            and "hacker news" not in s.get("name", "").lower()
-            and "hnrss" not in s.get("url", "")
+            and _resolve_fetch_mode(s) in {"rss", "rsshub"}
         ]
 
     def _parse_date(self, entry: dict) -> Optional[datetime]:
@@ -103,7 +147,7 @@ class RSSFetcher(BaseFetcher):
                     entry_hash = self._hash_id(str(entry_id))
 
                     items.append(ContentItem(
-                        id=self._generate_id("rss", feed_cfg["name"].replace(" ", "_"), entry_hash),
+                        id=self._generate_id(_resolve_fetch_mode(feed_cfg), feed_cfg["name"].replace(" ", "_"), entry_hash),
                         source_type=SourceType.RSS,
                         title=title,
                         url=link,
@@ -113,7 +157,10 @@ class RSSFetcher(BaseFetcher):
                         column=feed_cfg.get("column", ""),
                         source_tier=feed_cfg.get("source_tier", 4),
                         source_url_normalized=normalize_url(link),
-                        metadata={"tags": [tag.term for tag in entry.get("tags", [])]},
+                        metadata=_build_item_metadata(
+                            feed_cfg,
+                            [tag.term for tag in entry.get("tags", [])],
+                        ),
                     ))
             except Exception as e:
                 print(f"  [RSS] {feed_cfg['name']} 失败: {e}")
@@ -179,7 +226,7 @@ class GDELTFetcher(BaseFetcher):
 class HackerNewsFetcher(BaseFetcher):
     def __init__(self, sources: list[dict]):
         super().__init__()
-        self.hn_sources = [s for s in sources if "hacker news" in s.get("name", "").lower() and s.get("enabled", True)]
+        self.hn_sources = [s for s in sources if _resolve_fetch_mode(s) == "hacker_news" and s.get("enabled", True)]
 
     async def fetch(self, since: datetime) -> List[ContentItem]:
         hn_sources = self.hn_sources
@@ -213,7 +260,7 @@ class HackerNewsFetcher(BaseFetcher):
                         published_at=pub,
                         column="technology",
                         source_tier=3,
-                        metadata={"score": story.get("score", 0)},
+                        metadata={"score": story.get("score", 0), "fetch_mode": "hacker_news"},
                     ))
                 except Exception:
                     continue
@@ -229,7 +276,7 @@ class GoogleNewsFetcher(BaseFetcher):
         super().__init__()
         self.feeds = [
             s for s in sources
-            if s.get("enabled", True) and s["url"].startswith("https://news.google.com/rss")
+            if s.get("enabled", True) and _resolve_fetch_mode(s) == "google_news"
         ]
 
     async def fetch(self, since: datetime) -> List[ContentItem]:
@@ -254,10 +301,86 @@ class GoogleNewsFetcher(BaseFetcher):
                         column=feed_cfg.get("column", ""),
                         source_tier=4,
                         source_url_normalized=normalize_url(link),
+                        metadata=_build_item_metadata(feed_cfg),
                     ))
             except Exception as e:
                 print(f"  [Google News] '{feed_cfg['name']}' 失败: {e}")
         return items
+
+
+class CustomFeedFetcher(BaseFetcher):
+    """自定义抓取器分派层。当前优先覆盖中文站点列表页解析。"""
+
+    def __init__(self, sources: list[dict]):
+        super().__init__()
+        self.sources = [
+            s for s in sources
+            if s.get("enabled", True) and _resolve_fetch_mode(s) == "custom"
+        ]
+        self.handlers = {
+            "china_media_article_list": self._fetch_china_media_article_list,
+            "china_tech_site": self._fetch_china_media_article_list,
+            "legislative_or_public_records": self._fetch_feed_like_page,
+            "intl_org_feed": self._fetch_feed_like_page,
+        }
+
+    async def fetch(self, since: datetime) -> List[ContentItem]:
+        items: list[ContentItem] = []
+        for source_cfg in self.sources:
+            fetcher_key = str(source_cfg.get("fetcher_key", "")).strip()
+            handler = self.handlers.get(fetcher_key)
+            if not handler:
+                print(f"  [Custom] {source_cfg['name']} 未知 fetcher_key: {fetcher_key}")
+                continue
+            try:
+                items.extend(await handler(source_cfg, since))
+            except Exception as exc:
+                print(f"  [Custom] {source_cfg['name']} 失败: {exc}")
+        return items
+
+    async def _fetch_feed_like_page(self, source_cfg: dict, since: datetime) -> List[ContentItem]:
+        """对公告/记录类页面做保守解析，优先抓取带链接标题的块。"""
+        return await self._fetch_china_media_article_list(source_cfg, since)
+
+    async def _fetch_china_media_article_list(self, source_cfg: dict, since: datetime) -> List[ContentItem]:
+        html = await self._get(source_cfg["url"], timeout=aiohttp.ClientTimeout(total=30))
+        selectors = source_cfg.get("custom", {}).get("item_patterns") or [
+            r'<a[^>]+href="(?P<href>[^"]+)"[^>]*>(?P<title>[^<]{8,120})</a>'
+        ]
+        summary_limit = int(source_cfg.get("custom", {}).get("summary_chars", 240))
+        max_items = int(source_cfg.get("custom", {}).get("max_items", 12))
+
+        extracted: list[ContentItem] = []
+        seen_links: set[str] = set()
+        page_text = _extract_html_text(html)
+        for pattern in selectors:
+            for match in re.finditer(pattern, html, flags=re.IGNORECASE | re.DOTALL):
+                href = (match.groupdict().get("href") or "").strip()
+                title = _extract_html_text(match.groupdict().get("title") or "")
+                if not href or not title:
+                    continue
+                link = urljoin(source_cfg["url"], href)
+                normalized_link = normalize_url(link)
+                if normalized_link in seen_links:
+                    continue
+                seen_links.add(normalized_link)
+                native_id = self._hash_id(link)
+                extracted.append(ContentItem(
+                    id=self._generate_id("custom", source_cfg["name"].replace(" ", "_"), native_id),
+                    source_type=SourceType.CUSTOM,
+                    title=title[:180],
+                    url=link,
+                    content=page_text[:summary_limit],
+                    source_name=source_cfg["name"],
+                    published_at=None,
+                    column=source_cfg.get("column", ""),
+                    source_tier=source_cfg.get("source_tier", 4),
+                    source_url_normalized=normalized_link,
+                    metadata=_build_item_metadata(source_cfg),
+                ))
+                if len(extracted) >= max_items:
+                    return extracted
+        return extracted
 
 
 # ── 并发抓取 ──
@@ -266,6 +389,7 @@ async def fetch_all_sources(since: datetime, sources: list[dict]) -> List[Conten
     """并发抓取所有数据源，sources 从外部注入而非模块全局读取。"""
     fetchers = [
         ("RSS", RSSFetcher(sources)),
+        ("Custom", CustomFeedFetcher(sources)),
         ("GDELT", GDELTFetcher()),
         ("Hacker News", HackerNewsFetcher(sources)),
         ("Google News", GoogleNewsFetcher(sources)),

@@ -8,8 +8,9 @@ PROJECT_ROOT = os.path.join(os.path.dirname(__file__), "..")
 CONFIG_PATH = os.path.join(PROJECT_ROOT, "config", "config.yaml")
 SOURCES_PATH = os.path.join(PROJECT_ROOT, "config", "sources.yaml")
 
-REQUIRED_SOURCE_KEYS = {"name", "url", "column", "source_tier"}
+REQUIRED_SOURCE_KEYS = {"name", "url", "fetch_mode", "column", "source_tier", "language", "enabled"}
 EXPECTED_COLUMNS = {"us_politics", "global_affairs", "technology", "economy"}
+VALID_FETCH_MODES = {"rss", "rsshub", "google_news", "custom", "hacker_news"}
 
 
 def _load_yaml(path: str) -> dict | list:
@@ -128,6 +129,47 @@ def test_each_source_has_required_keys():
     for i, s in enumerate(sources):
         missing = REQUIRED_SOURCE_KEYS - set(s.keys())
         assert not missing, f"源 #{i} ({s.get('name', '?')}) 缺少字段: {missing}"
+
+
+def test_each_source_has_valid_fetch_mode():
+    sources = _load_yaml(SOURCES_PATH)
+    for i, s in enumerate(sources):
+        fetch_mode = s.get("fetch_mode")
+        assert fetch_mode in VALID_FETCH_MODES, (
+            f"源 #{i} ({s.get('name', '?')}) fetch_mode 非法: {fetch_mode}"
+        )
+
+
+def test_custom_sources_require_fetcher_key():
+    sources = _load_yaml(SOURCES_PATH)
+    custom_sources = [s for s in sources if s.get("fetch_mode") == "custom"]
+    assert custom_sources, "至少应存在一个 custom 源"
+    for s in custom_sources:
+        assert s.get("fetcher_key"), f"custom 源缺少 fetcher_key: {s.get('name')}"
+
+
+def test_cn_sources_cover_all_four_columns():
+    sources = _load_yaml(SOURCES_PATH)
+    cn_sources = [s for s in sources if s.get("language") == "zh"]
+    assert cn_sources, "必须存在中文源"
+    covered = {s.get("column") for s in cn_sources}
+    assert EXPECTED_COLUMNS.issubset(covered), f"中文源未覆盖四栏，实际覆盖: {covered}"
+
+
+def test_priority_cn_sources_exist():
+    sources = _load_yaml(SOURCES_PATH)
+    by_name = {s["name"]: s for s in sources}
+    expected = {
+        "财新国际 - 美国政治": "us_politics",
+        "联合早报 - 国际": "global_affairs",
+        "36氪 - 科技": "technology",
+        "华尔街见闻 - 宏观/全球": "economy",
+    }
+    for name, column in expected.items():
+        assert name in by_name, f"缺少中文优先源: {name}"
+        assert by_name[name]["column"] == column
+        assert by_name[name]["language"] == "zh"
+        assert "cn_source" in by_name[name].get("tags", [])
 
 
 def test_global_affairs_contains_cfr_and_foreign_affairs():

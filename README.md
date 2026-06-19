@@ -1,6 +1,6 @@
 # 观察日报 -- AI 驱动的每日国际新闻长文日报
 
-每天自动生成 5000-10000 字中文日报，覆盖美国政局、国际局势、科技前沿、经济走势四大维度。100+ 新闻源并发抓取，AI 评分筛选、事件合并、AI 写作，输出 Markdown + HTML + RSS 全文 Feed，部署在 GitHub Pages，Reader 订阅即读。
+每天自动生成 5000-10000 字中文日报，覆盖美国政局、国际局势、科技前沿、经济走势四大维度。100+ 多接入方式新闻源并发抓取，AI 评分筛选、事件合并、AI 写作，输出 Markdown + HTML + RSS 全文 Feed，部署在 GitHub Pages，Reader 订阅即读。
 
 ## 快速开始
 
@@ -44,7 +44,7 @@ https://<username>.github.io/us_politics_news/feed.xml
 
 | 步骤 | 说明 |
 |------|------|
-| 并发抓取 | 6 个抓取器异步并发，统一返回 ContentItem |
+| 并发抓取 | RSS / RSSHub / Google News / Custom 等抓取器异步并发，统一返回 ContentItem |
 | 跨源 URL 去重 | 同一 URL 多源 -> 保留内容最丰富的，合并 metadata |
 | AI 评分 | 来源权重 + 主题优先级 + 关键词命中 + AI 深度分析 |
 | 事件合并 | 语义相似度识别同一事件的不同报道 |
@@ -107,14 +107,17 @@ https://<username>.github.io/us_politics_news/feed.xml
 
 ### config/sources.yaml
 
-100+ 新闻源，按四大维度分类，每个源包含：
+100+ 多接入方式新闻源，按四大维度分类，每个源包含：
 
 ```yaml
 - name: "源名称"
   url: "https://..."
+  fetch_mode: rss | rsshub | google_news | custom | hacker_news
+  fetcher_key: china_media_article_list   # 仅 custom 必填
   column: us_politics | global_affairs | technology | economy
   source_tier: 1 | 2 | 3 | 4    # 1=官方一线 2=主流 3=专业智库 4=聚合
   language: en | zh | multi
+  tags: [cn_source, policy, macro]
   enabled: true | false
 ```
 
