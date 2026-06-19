@@ -5,7 +5,7 @@
 特性：
 - 从结构化 dict 直接生成 HTML / Markdown，不经过 Markdown → HTML 转换
 - YAML frontmatter（title / lead / highlights / date）
-- 四大栏目分组：美国政情 / 国际风云 / 科技前沿 / 财经脉动
+- 四大栏目分组：美国政局 / 国际局势 / 科技前沿 / 经济走势
 - 每条事件：核心事实 + 背景与影响 + 为什么值得关注 + 来源链接
 - 中英文混排自动空格（Pangu spacing）
 """
@@ -13,6 +13,10 @@
 import os
 import re
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from publish_manifest import ReportManifest
 
 # ---------------------------------------------------------------------------
 # Pangu spacing：中英文之间自动加空格
@@ -32,10 +36,10 @@ def _pangu(text: str) -> str:
 # 栏目配置
 # ---------------------------------------------------------------------------
 COLUMN_META: dict[str, dict[str, str]] = {
-    "us_politics": {"heading": "美国政情", "icon": ""},
-    "global_affairs": {"heading": "国际风云", "icon": ""},
+    "us_politics": {"heading": "美国政局", "icon": ""},
+    "global_affairs": {"heading": "国际局势", "icon": ""},
     "technology": {"heading": "科技前沿", "icon": ""},
-    "economy": {"heading": "财经脉动", "icon": ""},
+    "economy": {"heading": "经济走势", "icon": ""},
 }
 
 # 栏目输出顺序
@@ -293,6 +297,7 @@ def render_reader_content(
     meta: dict,
     columns: dict[str, list[dict]],
     report_type: str = "daily",
+    manifest: "ReportManifest | None" = None,
 ) -> str:
     """
     为 RSS Reader 生成纯正文 HTML 片段。
@@ -305,19 +310,24 @@ def render_reader_content(
 
     参数：
         report_type: 报告类型（daily / weekly / monthly），影响要点标题
+        manifest: 统一发布元数据；提供时优先使用其 title 和 highlights_heading
     """
-    date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
-    try:
-        dt = datetime.strptime(date, "%Y-%m-%d")
-        title = f"{dt.year}年{dt.month}月{dt.day}日 新闻"
-    except ValueError:
-        title = _pangu(meta.get("title", ""))
+    # manifest 提供时优先使用其标题
+    if manifest:
+        title = _pangu(manifest.title)
+    else:
+        date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
+        try:
+            dt = datetime.strptime(date, "%Y-%m-%d")
+            title = f"{dt.year}年{dt.month}月{dt.day}日 新闻"
+        except ValueError:
+            title = _pangu(meta.get("title", ""))
     highlights = meta.get("highlights", []) or []
 
     html: list[str] = ["<article>"]
 
     if highlights:
-        heading = _HIGHLIGHTS_HEADING.get(report_type, "今日要点")
+        heading = manifest.highlights_heading if manifest else _HIGHLIGHTS_HEADING.get(report_type, "今日要点")
         html.append(f"<h2>{heading}</h2>")
         html.append("<ul>")
         for item in highlights:
@@ -474,6 +484,7 @@ def save_daily_report(
     columns: dict[str, list[dict]],
     output_dir: str | None = None,
     report_type: str = "daily",
+    manifest: "ReportManifest | None" = None,
 ) -> tuple[str, str]:
     """
     保存报告到对应目录的 YYYY-MM-DD.md 和 .html
@@ -481,6 +492,7 @@ def save_daily_report(
     参数：
         output_dir: 输出目录；为 None 时根据 report_type 自动选择
         report_type: 报告类型（daily / weekly / monthly）
+        manifest: 统一发布元数据；提供时用于推导输出目录等
     """
     if output_dir is None:
         output_dir = _REPORT_TYPE_DIR.get(report_type, "docs/daily")

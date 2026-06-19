@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional
-from urllib.parse import urlparse
+from urls import normalize_url
 
 
 @dataclass
@@ -103,21 +103,12 @@ class NewsDatabase:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_event_key ON articles(event_key)")
 
     @staticmethod
-    def normalize_url(url: str) -> str:
-        parsed = urlparse(url)
-        host = parsed.hostname or ""
-        if host.startswith("www."):
-            host = host[4:]
-        path = parsed.path.rstrip("/")
-        return f"{host}{path}"
-
-    @staticmethod
     def url_hash(url: str) -> str:
         return hashlib.sha256(url.encode()).hexdigest()[:16]
 
     def url_exists(self, url: str) -> bool:
         """查询 URL 是否已存在（只读辅助，不参与写入判定）"""
-        normalized = self.normalize_url(url)
+        normalized = normalize_url(url)
         h = self.url_hash(normalized)
         with self._connect() as conn:
             row = conn.execute(
@@ -128,7 +119,7 @@ class NewsDatabase:
 
     def insert(self, article: Article) -> bool:
         """单条插入，依赖 url_hash UNIQUE 索引幂等"""
-        normalized = self.normalize_url(article.url)
+        normalized = normalize_url(article.url)
         h = self.url_hash(normalized)
         with self._connect() as conn:
             conn.execute(
@@ -159,7 +150,7 @@ class NewsDatabase:
             return 0
         rows = []
         for article in articles:
-            normalized = self.normalize_url(article.url)
+            normalized = normalize_url(article.url)
             h = self.url_hash(normalized)
             rows.append((
                 h, article.url, article.title, article.summary,
@@ -274,7 +265,7 @@ class NewsDatabase:
                 link = item.get("link", "")
                 if not link:
                     continue
-                normalized = self.normalize_url(link)
+                normalized = normalize_url(link)
                 h = self.url_hash(normalized)
                 tags = item.get("tags", [])
                 tags_str = ",".join(tags) if isinstance(tags, list) else str(tags)
@@ -300,7 +291,7 @@ class NewsDatabase:
         count = 0
         with self._connect() as conn:
             for article in scored_articles:
-                normalized = self.normalize_url(article.url)
+                normalized = normalize_url(article.url)
                 h = self.url_hash(normalized)
                 cursor = conn.execute(
                     """UPDATE articles

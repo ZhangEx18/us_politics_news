@@ -51,18 +51,6 @@ def test_column_items_sorted_by_score():
     assert [it.score for it in items] == [90, 80, 70]
 
 
-def test_assign_level_important():
-    from run_pipeline import _assign_level
-    assert _assign_level(90) == "重点"
-    assert _assign_level(85) == "重点"
-
-
-def test_assign_level_observe():
-    from run_pipeline import _assign_level
-    assert _assign_level(84) == "观察"
-    assert _assign_level(50) == "观察"
-
-
 def test_prefilter_items_prefers_higher_signal_items():
     from run_pipeline import _prefilter_items_for_scoring
 

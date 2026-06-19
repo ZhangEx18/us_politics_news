@@ -120,3 +120,15 @@ def test_each_source_has_required_keys():
     for i, s in enumerate(sources):
         missing = REQUIRED_SOURCE_KEYS - set(s.keys())
         assert not missing, f"源 #{i} ({s.get('name', '?')}) 缺少字段: {missing}"
+
+
+# ── rules 配置 ──
+
+
+def test_rules_config_exists():
+    """config.yaml 应包含 rules 下的关键词和门禁配置"""
+    config = _load_yaml(CONFIG_PATH)
+    rules = config.get("rules", {})
+    assert "soft_news_keywords" in rules
+    assert "hard_news_keywords" in rules
+    assert "quality_gate" in rules

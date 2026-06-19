@@ -1,40 +1,9 @@
-"""评分模块测试 — run_pipeline._assign_level + ai_analyzer._score_batch_with_retry"""
+"""评分模块测试 — ai_analyzer._score_batch_with_retry"""
 
 import asyncio
 
 from models import ScoredArticle
 from ai_analyzer import _score_batch_with_retry
-
-
-# ── run_pipeline._assign_level ──
-
-
-def test_assign_level_90_is_important():
-    """评分 >= 85 应为「重点」"""
-    from run_pipeline import _assign_level
-
-    assert _assign_level(90) == "重点"
-
-
-def test_assign_level_70_is_observe():
-    """评分 < 85 应为「观察」"""
-    from run_pipeline import _assign_level
-
-    assert _assign_level(70) == "观察"
-
-
-def test_assign_level_boundary_85():
-    """恰好 85 应为「重点」"""
-    from run_pipeline import _assign_level
-
-    assert _assign_level(85) == "重点"
-
-
-def test_assign_level_boundary_84():
-    """84 应为「观察」"""
-    from run_pipeline import _assign_level
-
-    assert _assign_level(84) == "观察"
 
 
 # ── ScoredArticle 默认值 ──

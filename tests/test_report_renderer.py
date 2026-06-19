@@ -31,8 +31,8 @@ def test_render_reader_content_is_plain_article_fragment():
     assert "<h2>今日要点</h2>" in html
     assert "<li>要点一</li>" in html
     assert "<li>要点二</li>" in html
-    assert "<h2>一、美国政情</h2>" in html
-    assert "<h2>二、国际风云</h2>" in html
+    assert "<h2>一、美国政局</h2>" in html
+    assert "<h2>二、国际局势</h2>" in html
     assert "<h3>1. 美国事件</h3>" in html
     assert "<h3>1. 国际事件</h3>" in html
     assert "<p>美国事件概述正文</p>" in html

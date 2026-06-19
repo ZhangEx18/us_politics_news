@@ -18,6 +18,11 @@ from zoneinfo import ZoneInfo
 
 from report_renderer import render_reader_content
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from publish_manifest import ReportManifest
+
 RSS_NS = "http://purl.org/rss/1.0/modules/content/"
 ATOM_NS = "http://www.w3.org/2005/Atom"
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
@@ -77,6 +82,26 @@ def _build_item_xml(
     link = f"{base_url}/{link_path}" if base_url else link_path
     pub_date_text = _rfc2822(pub_date or datetime.now(BEIJING_TZ))
 
+    return f"""    <item>
+      <title>{_escape_xml(title)}</title>
+      <link>{_escape_xml(link)}</link>
+      <description><![CDATA[{short_description}]]></description>
+      <content:encoded><![CDATA[{html_body}]]></content:encoded>
+      <pubDate>{pub_date_text}</pubDate>
+      <guid isPermaLink="false">{_escape_xml(guid)}</guid>
+    </item>"""
+
+
+def _build_item_xml_from_manifest(
+    title: str,
+    short_description: str,
+    html_body: str,
+    link: str,
+    pub_date: datetime,
+    guid: str,
+) -> str:
+    """从 manifest 字段直接构建 RSS <item> XML 片段。"""
+    pub_date_text = _rfc2822(pub_date)
     return f"""    <item>
       <title>{_escape_xml(title)}</title>
       <link>{_escape_xml(link)}</link>
@@ -168,9 +193,9 @@ def build_feed(items: list[str], base_url: str = "") -> str:
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="{ATOM_NS}" xmlns:content="{RSS_NS}">
   <channel>
-    <title>四维日报</title>
+    <title>观察日报</title>
     <link>{_escape_xml(base_url) if base_url else "."}</link>
-    <description>每日国际新闻精选：美国政情 · 国际风云 · 科技前沿 · 财经脉动</description>
+    <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
     <language>zh-cn</language>
     <lastBuildDate>{now}</lastBuildDate>{atom_link}
 {items_xml}
@@ -195,7 +220,7 @@ def _generate_title(report_type: str, report_key: str | None, date: str) -> str:
         dt = datetime.strptime(date, "%Y-%m-%d")
         return f"{dt.year}年{dt.month}月{dt.day}日日报"
     except ValueError:
-        return f"{date} 四维日报"
+        return f"{date} 观察日报"
 
 
 def save_feed(
@@ -205,6 +230,7 @@ def save_feed(
     base_url: str = "",
     report_type: str = "daily",
     report_key: str | None = None,
+    manifest: "ReportManifest | None" = None,
 ) -> str:
     """
     保存 RSS feed 到文件（v3 短摘要 + 全文分层）
@@ -221,30 +247,45 @@ def save_feed(
         base_url: 日报基础 URL
         report_type: 报告类型（daily / weekly / monthly）
         report_key: 报告标识，如 "2026-W25"、"2026-06"
+        manifest: 统一发布元数据；提供时优先使用其 title/guid/link/pubDate
 
     Returns:
         保存的文件路径
     """
-    date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
-    title = meta.get("title") or _generate_title(report_type, report_key, date)
+    # manifest 提供时优先使用其元数据
+    if manifest:
+        title = manifest.title
+        guid = manifest.guid
+        link_path = manifest.link_path
+        pub_date = manifest.pub_date
+        _report_type = manifest.report_type
+        _report_key = manifest.report_key
+    else:
+        date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
+        title = meta.get("title") or _generate_title(report_type, report_key, date)
+        _report_type = report_type
+        _report_key = report_key or date
+        guid = f"{_report_type}/{_report_key}"
+        link_path = f"{_report_type}/{_report_key}.html"
+        pub_date_raw = meta.get("pub_date")
+        if isinstance(pub_date_raw, str) and pub_date_raw:
+            pub_date = datetime.fromisoformat(pub_date_raw)
+        elif isinstance(pub_date_raw, datetime):
+            pub_date = pub_date_raw
+        else:
+            pub_date = datetime.now(BEIJING_TZ)
+
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
 
     # 短摘要（description）
     short_description = _build_short_description(meta)
 
     # Reader 专用正文片段（content:encoded）
-    html_body = render_reader_content(meta, columns, report_type=report_type)
+    html_body = render_reader_content(meta, columns, report_type=_report_type, manifest=manifest)
 
     # 构建今天的 item
-    pub_date_raw = meta.get("pub_date")
-    if isinstance(pub_date_raw, str) and pub_date_raw:
-        pub_date = datetime.fromisoformat(pub_date_raw)
-    elif isinstance(pub_date_raw, datetime):
-        pub_date = pub_date_raw
-    else:
-        pub_date = datetime.now(BEIJING_TZ)
-
-    new_item = _build_item_xml(date, title, short_description, html_body, base_url, pub_date, report_type, report_key)
+    link = f"{base_url}/{link_path}" if base_url else link_path
+    new_item = _build_item_xml_from_manifest(title, short_description, html_body, link, pub_date, guid)
 
     # 读取已有 feed，合并历史 items
     existing_items: list[str] = []

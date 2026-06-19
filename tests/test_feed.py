@@ -92,8 +92,8 @@ def test_save_feed_uses_reader_friendly_fragment():
         assert "<article>" in content
         assert "<h2>今日要点</h2>" in content
         assert "<li>重点 1</li>" in content
-        assert "<h2>一、美国政情</h2>" in content
-        assert "<h2>二、国际风云</h2>" in content
+        assert "<h2>一、美国政局</h2>" in content
+        assert "<h2>二、国际局势</h2>" in content
         assert "<h3>1. 测试事件</h3>" in content
         assert "测试事件的单段概述正文" in content
         assert "<h3>1. 简要事件</h3>" in content

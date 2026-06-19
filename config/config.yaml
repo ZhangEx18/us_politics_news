@@ -1,4 +1,4 @@
-# 四维日报运行配置
+# 观察日报运行配置
 # 源列表在 sources.yaml
 
 output:
@@ -45,14 +45,14 @@ digest:
   # 每栏目配额
   columns:
     us_politics:
-      label: "美国政情"
+      label: "美国政局"
       min_items: 8
       target_items: 5
       max_items: 6
       headline_items: 5
       prefilter_items: 25
     global_affairs:
-      label: "国际风云"
+      label: "国际局势"
       min_items: 10
       target_items: 6
       max_items: 7
@@ -66,7 +66,7 @@ digest:
       headline_items: 4
       prefilter_items: 24
     economy:
-      label: "财经脉动"
+      label: "经济走势"
       min_items: 5
       target_items: 4
       max_items: 5
@@ -98,3 +98,84 @@ runtime:
   require_ai: true
   min_score_coverage: 0.7
   proxy_from_env: true
+
+rules:
+  soft_news_keywords:
+    - "celebrity"
+    - "sports"
+    - "entertainment"
+    - "movie"
+    - "music"
+    - "lifestyle"
+    - "watchlist"
+    - "stock to watch"
+    - "buy rating"
+    - "price target"
+    - "opinion"
+    - "editorial"
+    - "column"
+    - "reaction"
+    - "mocked"
+    - "blasted"
+    - "viral"
+    - "awkward moment"
+    - "red carpet"
+    - "box office"
+    - "观察名单"
+    - "荐股"
+    - "买入评级"
+    - "目标价"
+    - "娱乐"
+    - "体育"
+    - "明星"
+    - "网友热议"
+    - "尴尬瞬间"
+    - "语无伦次"
+    - "直播中断"
+
+  hard_news_keywords:
+    - "court"
+    - "supreme court"
+    - "ruling"
+    - "lawsuit"
+    - "congress"
+    - "senate"
+    - "white house"
+    - "executive order"
+    - "regulation"
+    - "sanctions"
+    - "tariff"
+    - "fed"
+    - "federal reserve"
+    - "inflation"
+    - "jobs"
+    - "earnings"
+    - "revenue"
+    - "chip"
+    - "ai "
+    - "artificial intelligence"
+    - "semiconductor"
+    - "military"
+    - "ceasefire"
+    - "nato"
+    - "g7"
+    - "diplomacy"
+    - "treaty"
+    - "法院"
+    - "最高法院"
+    - "国会"
+    - "白宫"
+    - "行政命令"
+    - "制裁"
+    - "美联储"
+    - "通胀"
+    - "就业"
+    - "财报"
+    - "芯片"
+    - "半导体"
+
+  quality_gate:
+    min_chars: 80
+    max_chars: 260
+    min_sentences: 2
+    max_sentences: 4
