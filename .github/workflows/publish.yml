@@ -56,10 +56,10 @@ jobs:
           TODAY=$(date +%Y-%m-%d)
           grep -q "content:encoded" docs/feed.xml || { echo "feed.xml 缺少 content:encoded"; exit 1; }
           [ -f "docs/daily/$TODAY.md" ] || { echo "日报不存在"; exit 1; }
-          grep -q "一、美国政情" "docs/daily/$TODAY.md" || { echo "缺少美国政情栏目"; exit 1; }
-          grep -q "二、国际风云" "docs/daily/$TODAY.md" || { echo "缺少国际风云栏目"; exit 1; }
+          grep -q "一、美国政局" "docs/daily/$TODAY.md" || { echo "缺少美国政局栏目"; exit 1; }
+          grep -q "二、国际局势" "docs/daily/$TODAY.md" || { echo "缺少国际局势栏目"; exit 1; }
           grep -q "三、科技前沿" "docs/daily/$TODAY.md" || { echo "缺少科技前沿栏目"; exit 1; }
-          grep -q "四、财经脉动" "docs/daily/$TODAY.md" || { echo "缺少财经脉动栏目"; exit 1; }
+          grep -q "四、经济走势" "docs/daily/$TODAY.md" || { echo "缺少经济走势栏目"; exit 1; }
           CHARS=$(wc -c < "docs/daily/$TODAY.md")
           echo "日报字节: $CHARS"
           [ "$CHARS" -gt 10000 ] || { echo "日报字数过少"; exit 1; }

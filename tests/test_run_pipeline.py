@@ -9,13 +9,13 @@ from models import ContentItem
 from run_pipeline import (
     main,
     _augment_ai_config_with_runtime,
-    _build_reader_highlights,
     _count_scored_entries,
     _filter_articles_to_window,
     _get_report_publish_time,
     _get_report_window,
     _is_hard_news_entry,
 )
+from report_engine import build_reader_highlights
 
 
 def test_database_article_can_map_to_content_item_without_id_field():
@@ -82,7 +82,7 @@ def test_build_reader_highlights_prefers_titles_and_deduplicates():
         ],
     }
 
-    highlights = _build_reader_highlights(columns, limit=8)
+    highlights = build_reader_highlights(columns, limit=8)
 
     assert highlights[0].startswith("华为案证据裁定")
     assert len(highlights) == 2

@@ -4,10 +4,12 @@ import re
 
 from models import ContentItem, SourceType
 from run_pipeline import (
+    _pre_llm_hard_filter,
+)
+from report_engine import (
     _sanitize_event_text,
     _validate_event,
     sanitize_or_validate_events,
-    _pre_llm_hard_filter,
     _FORBIDDEN_LABELS,
     _FORBIDDEN_PHRASES,
 )

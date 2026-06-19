@@ -11,43 +11,12 @@ import os
 import re
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
-from urllib.parse import quote, urlparse
-
 import aiohttp
 import feedparser
-import yaml
 
 from database import Article, NewsDatabase
 from models import ContentItem, SourceType
-
-
-# ── 配置加载 ──
-
-_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-def _load_config() -> dict:
-    path = os.path.join(_project_root, "config", "config.yaml")
-    with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
-
-def _load_sources() -> list[dict]:
-    path = os.path.join(_project_root, "config", "sources.yaml")
-    with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) or []
-
-CONFIG = _load_config()
-SOURCES = _load_sources()
-
-
-# ── URL 规范化 ──
-
-def normalize_url(url: str) -> str:
-    parsed = urlparse(str(url))
-    host = parsed.hostname or ""
-    if host.startswith("www."):
-        host = host[4:]
-    path = parsed.path.rstrip("/")
-    return f"{host}{path}"
+from urls import normalize_url
 
 
 # ── 抓取器基类 ──
@@ -77,12 +46,12 @@ class BaseFetcher:
 # ── RSS 抓取器（从 sources.yaml 读取）──
 
 class RSSFetcher(BaseFetcher):
-    """RSS/Atom 抓取器 — 读取 sources.yaml 中所有非 Google News/GDELT/HN 的源"""
+    """RSS/Atom 抓取器 — 读取 sources 中所有非 Google News/GDELT/HN 的源"""
 
-    def __init__(self):
+    def __init__(self, sources: list[dict]):
         super().__init__()
         self.feeds = [
-            s for s in SOURCES
+            s for s in sources
             if s.get("enabled", True)
             and not s["url"].startswith("https://news.google.com/rss")
             and "gdelt" not in s.get("name", "").lower()
@@ -208,8 +177,12 @@ class GDELTFetcher(BaseFetcher):
 # ── Hacker News 抓取器 ──
 
 class HackerNewsFetcher(BaseFetcher):
+    def __init__(self, sources: list[dict]):
+        super().__init__()
+        self.hn_sources = [s for s in sources if "hacker news" in s.get("name", "").lower() and s.get("enabled", True)]
+
     async def fetch(self, since: datetime) -> List[ContentItem]:
-        hn_sources = [s for s in SOURCES if "hacker news" in s.get("name", "").lower() and s.get("enabled", True)]
+        hn_sources = self.hn_sources
         if not hn_sources:
             return []
 
@@ -252,10 +225,10 @@ class HackerNewsFetcher(BaseFetcher):
 # ── Google News 抓取器（从 sources.yaml 读取）──
 
 class GoogleNewsFetcher(BaseFetcher):
-    def __init__(self):
+    def __init__(self, sources: list[dict]):
         super().__init__()
         self.feeds = [
-            s for s in SOURCES
+            s for s in sources
             if s.get("enabled", True) and s["url"].startswith("https://news.google.com/rss")
         ]
 
@@ -289,12 +262,13 @@ class GoogleNewsFetcher(BaseFetcher):
 
 # ── 并发抓取 ──
 
-async def fetch_all_sources(since: datetime) -> List[ContentItem]:
+async def fetch_all_sources(since: datetime, sources: list[dict]) -> List[ContentItem]:
+    """并发抓取所有数据源，sources 从外部注入而非模块全局读取。"""
     fetchers = [
-        ("RSS", RSSFetcher()),
+        ("RSS", RSSFetcher(sources)),
         ("GDELT", GDELTFetcher()),
-        ("Hacker News", HackerNewsFetcher()),
-        ("Google News", GoogleNewsFetcher()),
+        ("Hacker News", HackerNewsFetcher(sources)),
+        ("Google News", GoogleNewsFetcher(sources)),
     ]
 
     headers = {"User-Agent": "Mozilla/5.0 (compatible; USPoliticsNews/2.0)"}
@@ -418,8 +392,11 @@ def merge_topic_duplicates(items: List[ContentItem], threshold: float = 0.45) ->
     return keep
 
 
-def apply_balanced_digest(items: List[ContentItem], max_items: int = 20) -> List[ContentItem]:
-    quota = CONFIG.get("digest", {}).get("column_quota", {
+def apply_balanced_digest(items: List[ContentItem], max_items: int = 20, config: dict | None = None) -> List[ContentItem]:
+    """按栏目配额平衡选取条目，config 从外部注入。"""
+    if config is None:
+        config = {}
+    quota = config.get("digest", {}).get("column_quota", {
         "us_politics": 5, "global_affairs": 5, "technology": 5, "economy": 5,
     })
 
