@@ -18,6 +18,7 @@
 """
 
 import asyncio
+import json
 import os
 import sys
 from datetime import datetime, timedelta, timezone
@@ -44,9 +45,10 @@ from models import ContentItem, SourceType
 from report_engine import ReportSpec, build_report
 
 
-BEIJING_TZ = ZoneInfo("Asia/Shanghai")
-REPORT_CUTOFF_HOUR = 7
-REPORT_PUBLISH_HOUR = 8
+DEFAULT_TZ = "Asia/Shanghai"
+DEFAULT_CUTOFF_HOUR = 7
+DEFAULT_FETCH_AT = "07:00"
+DEFAULT_PUBLISH_AT = "07:45"
 
 
 def _load_config() -> dict:
@@ -59,6 +61,33 @@ def _load_sources() -> list[dict]:
     path = os.path.join(_project_root, "config", "sources.yaml")
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f) or []
+
+
+def _load_schedule_config(config: dict | None = None) -> dict:
+    """加载日报调度配置，并提供稳定默认值。"""
+    cfg = config or _load_config()
+    schedule_cfg = cfg.get("schedule", {})
+    return {
+        "timezone": schedule_cfg.get("timezone", DEFAULT_TZ),
+        "cutoff_hour": int(schedule_cfg.get("cutoff_hour", DEFAULT_CUTOFF_HOUR)),
+        "fetch_at": str(schedule_cfg.get("fetch_at", DEFAULT_FETCH_AT)),
+        "publish_at": str(schedule_cfg.get("publish_at", DEFAULT_PUBLISH_AT)),
+    }
+
+
+def _get_schedule_timezone(config: dict | None = None) -> ZoneInfo:
+    schedule_cfg = _load_schedule_config(config)
+    return ZoneInfo(schedule_cfg["timezone"])
+
+
+def _parse_schedule_time(value: str, fallback: str) -> tuple[int, int]:
+    raw = (value or fallback).strip() or fallback
+    try:
+        hour_str, minute_str = raw.split(":", 1)
+        return int(hour_str), int(minute_str)
+    except (ValueError, AttributeError):
+        fallback_hour, fallback_minute = fallback.split(":", 1)
+        return int(fallback_hour), int(fallback_minute)
 
 
 def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
@@ -75,6 +104,13 @@ def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
         "meta_timeout_seconds": llm_cfg.get("meta_timeout_seconds", 120),
     })
     return ai_config
+
+
+def _get_source_max_age_hours(source_name: str, sources: list[dict], default_hours: int) -> int:
+    for source in sources:
+        if source.get("name") == source_name:
+            return int(source.get("max_age_hours", default_hours))
+    return default_hours
 
 
 
@@ -257,11 +293,14 @@ def _build_scoring_entries_by_column(
     return all_entries, by_column_entries
 
 
-def _get_report_window(now: datetime | None = None) -> tuple[datetime, datetime, str]:
-    """固定晨报窗口：北京时间前一天 07:00 到当天 07:00。"""
-    now_local = now.astimezone(BEIJING_TZ) if now and now.tzinfo else datetime.now(BEIJING_TZ)
+def _get_report_window(now: datetime | None = None, config: dict | None = None) -> tuple[datetime, datetime, str]:
+    """固定晨报窗口：配置时区下前一天 cutoff 到当天 cutoff。"""
+    schedule_cfg = _load_schedule_config(config)
+    local_tz = ZoneInfo(schedule_cfg["timezone"])
+    cutoff_hour = schedule_cfg["cutoff_hour"]
+    now_local = now.astimezone(local_tz) if now and now.tzinfo else datetime.now(local_tz)
     today_cutoff = now_local.replace(
-        hour=REPORT_CUTOFF_HOUR,
+        hour=cutoff_hour,
         minute=0,
         second=0,
         microsecond=0,
@@ -277,22 +316,31 @@ def _get_report_window(now: datetime | None = None) -> tuple[datetime, datetime,
     return since_local, until_local, report_date
 
 
-def _get_report_publish_time(report_date: str) -> datetime:
-    """晨报 RSS 发布时间固定为当天北京时间 08:00。"""
+def _get_report_publish_time(report_date: str, config: dict | None = None) -> datetime:
+    """晨报 RSS 发布时间由配置驱动。"""
+    schedule_cfg = _load_schedule_config(config)
+    local_tz = ZoneInfo(schedule_cfg["timezone"])
+    publish_hour, publish_minute = _parse_schedule_time(schedule_cfg["publish_at"], DEFAULT_PUBLISH_AT)
     report_day = datetime.strptime(report_date, "%Y-%m-%d").date()
     return datetime(
         report_day.year,
         report_day.month,
         report_day.day,
-        REPORT_PUBLISH_HOUR,
+        publish_hour,
+        publish_minute,
         0,
-        0,
-        tzinfo=BEIJING_TZ,
+        tzinfo=local_tz,
     )
 
 
-def _filter_articles_to_window(items: list[ContentItem], since: datetime, until: datetime) -> list[ContentItem]:
+def _filter_articles_to_window(
+    items: list[ContentItem],
+    since: datetime,
+    until: datetime,
+    config: dict | None = None,
+) -> list[ContentItem]:
     """只保留日报固定窗口内抓取到的新闻。"""
+    local_tz = _get_schedule_timezone(config)
     filtered: list[ContentItem] = []
     for item in items:
         ref = item.published_at or item.fetched_at
@@ -300,19 +348,61 @@ def _filter_articles_to_window(items: list[ContentItem], since: datetime, until:
             continue
         if ref.tzinfo is None:
             ref = ref.replace(tzinfo=timezone.utc)
-        ref_local = ref.astimezone(BEIJING_TZ)
+        ref_local = ref.astimezone(local_tz)
         if since <= ref_local < until:
             filtered.append(item)
     return filtered
 
 
+def _filter_items_by_freshness(
+    items: list[ContentItem],
+    sources: list[dict],
+    config: dict,
+    now: datetime | None = None,
+) -> tuple[list[ContentItem], dict[str, int]]:
+    """抓取后按全局/来源时效过滤，避免旧文反复挤占当天候选池。"""
+    analysis_cfg = config.get("analysis", {})
+    schedule_tz = _get_schedule_timezone(config)
+    current = now.astimezone(schedule_tz) if now and now.tzinfo else datetime.now(schedule_tz)
+    default_hours = int(analysis_cfg.get("freshness_hours", analysis_cfg.get("window_hours", 24)))
+
+    kept: list[ContentItem] = []
+    dropped = 0
+    dropped_by_column: dict[str, int] = {}
+    for item in items:
+        max_age_hours = _get_source_max_age_hours(item.source_name, sources, default_hours)
+        age_hours = _item_recency_hours(item, current.astimezone(timezone.utc))
+        if age_hours <= max_age_hours:
+            kept.append(item)
+            continue
+        dropped += 1
+        col = item.column or "unknown"
+        dropped_by_column[col] = dropped_by_column.get(col, 0) + 1
+
+    return kept, {
+        "freshness_hours": default_hours,
+        "dropped": dropped,
+        "kept": len(kept),
+        **{f"dropped_{col}": count for col, count in dropped_by_column.items()},
+    }
+
+
+def _write_metrics_file(output_root: str, metrics: dict) -> str:
+    """写出最新一次发布观测数据，供运营排查栏目不足原因。"""
+    metrics_dir = os.path.join(output_root, "metrics")
+    os.makedirs(metrics_dir, exist_ok=True)
+    path = os.path.join(metrics_dir, "latest.json")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(metrics, f, ensure_ascii=False, indent=2)
+    return path
+
+
 def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
     """完整流程：抓取 + 评分 + 分栏 digest"""
     start_time = datetime.now()
-    since, until, report_date = _get_report_window()
-    print(f"日报窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}")
-
     config = _load_config()
+    since, until, report_date = _get_report_window(config=config)
+    print(f"日报窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}")
     output_cfg = config.get("output", {})
     storage_cfg = config.get("storage", {})
     digest_cfg = config.get("digest", {})
@@ -356,13 +446,33 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
     merged_items = merge_cross_source_duplicates(all_items)
     print(f"   合并 {len(all_items) - len(merged_items)} 条 -> {len(merged_items)} 条唯一")
 
+    print("\n[2.5/13] 新鲜度过滤...")
+    merged_items, freshness_stats = _filter_items_by_freshness(merged_items, sources, config)
+    print(f"   保留 {freshness_stats['kept']} 条，过滤陈旧内容 {freshness_stats['dropped']} 条")
+
     # === 3. 入库 ===
     print("\n[3/13] 入库...")
     fetch_stats = save_to_db(merged_items, db)
     print(f"   新增 {sum(fetch_stats.values())} 条")
 
     # === 4-13: digest 流程 ===
-    return _run_digest_phase(config, db, merged_items, ai_config, start_time, since, until, report_date, report_type=report_type)
+    return _run_digest_phase(
+        config,
+        db,
+        merged_items,
+        ai_config,
+        start_time,
+        since,
+        until,
+        report_date,
+        report_type=report_type,
+        pipeline_context={
+            "sources": sources,
+            "freshness": freshness_stats,
+            "raw_fetched": len(all_items),
+            "raw_merged": len(merged_items),
+        },
+    )
 
 
 def run_fetch_only(hours: int = 24) -> dict:
@@ -416,9 +526,9 @@ def run_fetch_only(hours: int = 24) -> dict:
 def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
     """只执行 digest 流程（步骤 4-13），从数据库读取已有数据"""
     start_time = datetime.now()
-    since, until, report_date = _get_report_window(start_time.replace(tzinfo=BEIJING_TZ))
-
     config = _load_config()
+    schedule_tz = _get_schedule_timezone(config)
+    since, until, report_date = _get_report_window(start_time.replace(tzinfo=schedule_tz), config=config)
     storage_cfg = config.get("storage", {})
     db_path = storage_cfg.get("db_path", "data/news.db")
 
@@ -461,13 +571,31 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
         for a in today_articles
     ]
 
-    merged_items = _filter_articles_to_window(merged_items, since, until)
+    sources = _load_sources()
+    merged_items = _filter_articles_to_window(merged_items, since, until, config=config)
+    merged_items, freshness_stats = _filter_items_by_freshness(merged_items, sources, config)
     print(f"固定窗口过滤后保留 {len(merged_items)} 条文章")
     if not merged_items:
         print("\n[警告] 固定日报窗口内无文章，无法生成 digest")
         return {"total_selected": 0}
 
-    return _run_digest_phase(config, db, merged_items, ai_config, start_time, since, until, report_date, report_type=report_type)
+    return _run_digest_phase(
+        config,
+        db,
+        merged_items,
+        ai_config,
+        start_time,
+        since,
+        until,
+        report_date,
+        report_type=report_type,
+        pipeline_context={
+            "sources": sources,
+            "freshness": freshness_stats,
+            "raw_fetched": len(today_articles),
+            "raw_merged": len(merged_items),
+        },
+    )
 
 
 def _run_digest_phase(
@@ -480,6 +608,7 @@ def _run_digest_phase(
     window_until: datetime,
     report_date: str,
     report_type: str = "daily",
+    pipeline_context: dict | None = None,
 ) -> dict:
     """步骤 4-13：评分 + 分栏 digest + 输出"""
     output_cfg = config.get("output", {})
@@ -492,12 +621,25 @@ def _run_digest_phase(
     base_url = output_cfg.get("base_url", "")
     history_days = analysis_cfg.get("history_context_days", 3)
     columns_cfg = digest_cfg.get("columns", {})
+    schedule_cfg = _load_schedule_config(config)
+    phase_metrics: dict[str, object] = {
+        "schedule": schedule_cfg,
+        "window": {
+            "since": window_since.isoformat(),
+            "until": window_until.isoformat(),
+            "report_key": report_date,
+        },
+        "pipeline": pipeline_context or {},
+        "columns": {},
+        "ai": {"score_errors": len([]), "digest_failures": {}},
+    }
 
     # === 4. 预筛 + Pre-LLM 硬过滤 + AI score_batch ===
     print("\n[4/13] 预筛 + AI 批量评分...")
     prefiltered_by_column = _prefilter_items_for_scoring(merged_items, columns_cfg)
     for col_key, items in sorted(prefiltered_by_column.items()):
         print(f"   预筛 {col_key}: {len(items)} 条")
+        phase_metrics["columns"].setdefault(col_key, {})["prefiltered"] = len(items)
     # Pre-LLM 硬过滤：在预筛后、送评前移除高置信度软新闻
     pre_llm_before = sum(len(v) for v in prefiltered_by_column.values())
     prefiltered_by_column = {
@@ -508,11 +650,13 @@ def _run_digest_phase(
     print(f"   Pre-LLM 过滤: {pre_llm_before} -> {pre_llm_after} 条")
     for col_key, items in sorted(prefiltered_by_column.items()):
         print(f"   送评 {col_key}: {len(items)} 条")
+        phase_metrics["columns"].setdefault(col_key, {})["hard_news_candidates"] = len(items)
 
     entries_for_scoring, _ = _build_scoring_entries_by_column(prefiltered_by_column)
     print(f"   送评总数: {len(entries_for_scoring)} 条")
     scored_dicts, score_errors = asyncio.run(score_batch(entries_for_scoring, ai_config))
     print(f"   完成 {len(scored_dicts)} 条评分")
+    phase_metrics["ai"]["score_errors"] = len(score_errors)
 
     # require_ai 时，评分失败必须退出
     require_ai = runtime_cfg.get("require_ai", True)
@@ -552,13 +696,14 @@ def _run_digest_phase(
     print(f"   {len(scored_dicts)} -> {len(hard_news_scored)} 条")
     for c in sorted(_hard_by_col):
         print(f"     {c}: {_hard_by_col[c]} 条硬新闻")
+        phase_metrics["columns"].setdefault(c, {})["hard_news_scored"] = _hard_by_col[c]
 
     # === 7+. 构造 ReportSpec，委托 report_engine 完成后续阶段 ===
     dt_val = datetime.strptime(report_date, "%Y-%m-%d")
     spec = ReportSpec(
         report_type=report_type,
         report_key=report_date,
-        title=f"{dt_val.year}年{dt_val.month}月{dt_val.day}日日报",
+        title=f"{dt_val.year}年{dt_val.month}月{dt_val.day}日 新闻",
         since=window_since,
         until=window_until,
         output_dir=daily_dir,
@@ -569,15 +714,27 @@ def _run_digest_phase(
         word_count_max=digest_cfg.get("column", {}).get("target_word_count_max", 5000),
         highlights_limit=8,
         allow_headline_only=True,
-        pub_date=_get_report_publish_time(report_date),
+        pub_date=_get_report_publish_time(report_date, config=config),
         history_days=history_days,
         min_llm_score=analysis_cfg.get("min_llm_score", 65),
     )
 
-    stats = build_report(spec, hard_news_scored, config, ai_config, db)
+    stats = build_report(spec, hard_news_scored, config, ai_config, db, phase_metrics=phase_metrics)
 
     # 补充 pipeline 阶段统计
     stats["total_fetched"] = len(merged_items)
+    output_root = os.path.dirname(output_cfg.get("daily_dir", "docs/daily")) or "."
+    metrics_payload = stats.get("metrics") or {
+        **phase_metrics,
+        "report": {
+            "title": spec.title,
+            "published_at": spec.pub_date.isoformat() if spec.pub_date else "",
+            "duration_seconds": round((datetime.now() - start_time).total_seconds(), 1),
+        },
+    }
+    metrics_path = _write_metrics_file(output_root, metrics_payload)
+    stats.setdefault("outputs", {})["metrics"] = metrics_path
+    stats["metrics"] = metrics_payload
     return stats
 
 

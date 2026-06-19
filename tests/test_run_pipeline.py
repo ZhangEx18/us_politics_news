@@ -11,8 +11,10 @@ from run_pipeline import (
     _augment_ai_config_with_runtime,
     _count_scored_entries,
     _filter_articles_to_window,
+    _filter_items_by_freshness,
     _get_report_publish_time,
     _get_report_window,
+    _load_schedule_config,
     _is_hard_news_entry,
 )
 from report_engine import build_reader_highlights
@@ -140,29 +142,32 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
 
 def test_get_report_window_locks_to_beijing_7am_cutoff():
     tz = ZoneInfo("Asia/Shanghai")
+    config = {"schedule": {"timezone": "Asia/Shanghai", "cutoff_hour": 7, "publish_at": "07:45"}}
 
-    since, until, report_date = _get_report_window(datetime(2026, 6, 19, 8, 30, tzinfo=tz))
+    since, until, report_date = _get_report_window(datetime(2026, 6, 19, 8, 30, tzinfo=tz), config=config)
     assert since == datetime(2026, 6, 18, 7, 0, tzinfo=tz)
     assert until == datetime(2026, 6, 19, 7, 0, tzinfo=tz)
     assert report_date == "2026-06-19"
 
-    since, until, report_date = _get_report_window(datetime(2026, 6, 19, 6, 30, tzinfo=tz))
+    since, until, report_date = _get_report_window(datetime(2026, 6, 19, 6, 30, tzinfo=tz), config=config)
     assert since == datetime(2026, 6, 17, 7, 0, tzinfo=tz)
     assert until == datetime(2026, 6, 18, 7, 0, tzinfo=tz)
     assert report_date == "2026-06-18"
 
 
-def test_get_report_publish_time_fixed_to_8am_beijing():
+def test_get_report_publish_time_reads_schedule_publish_at():
     tz = ZoneInfo("Asia/Shanghai")
-    pub_dt = _get_report_publish_time("2026-06-19")
+    config = {"schedule": {"timezone": "Asia/Shanghai", "publish_at": "07:45"}}
+    pub_dt = _get_report_publish_time("2026-06-19", config=config)
 
-    assert pub_dt == datetime(2026, 6, 19, 8, 0, tzinfo=tz)
+    assert pub_dt == datetime(2026, 6, 19, 7, 45, tzinfo=tz)
 
 
 def test_filter_articles_to_window_uses_fixed_bounds():
     tz = ZoneInfo("Asia/Shanghai")
     since = datetime(2026, 6, 18, 7, 0, tzinfo=tz)
     until = datetime(2026, 6, 19, 7, 0, tzinfo=tz)
+    config = {"schedule": {"timezone": "Asia/Shanghai"}}
     items = [
         ContentItem(
             id="1",
@@ -184,6 +189,63 @@ def test_filter_articles_to_window_uses_fixed_bounds():
         ),
     ]
 
-    filtered = _filter_articles_to_window(items, since, until)
+    filtered = _filter_articles_to_window(items, since, until, config=config)
 
     assert [item.title for item in filtered] == ["inside"]
+
+
+def test_load_schedule_config_provides_defaults():
+    cfg = _load_schedule_config({})
+    assert cfg["timezone"] == "Asia/Shanghai"
+    assert cfg["cutoff_hour"] == 7
+    assert cfg["fetch_at"] == "07:00"
+    assert cfg["publish_at"] == "07:45"
+
+
+def test_filter_items_by_freshness_supports_source_override():
+    now = datetime(2026, 6, 19, 7, 0, tzinfo=ZoneInfo("Asia/Shanghai"))
+    config = {
+        "analysis": {"freshness_hours": 30},
+        "schedule": {"timezone": "Asia/Shanghai"},
+    }
+    sources = [
+        {"name": "Fast Feed", "max_age_hours": 12},
+        {"name": "Slow Feed", "max_age_hours": 48},
+    ]
+    items = [
+        ContentItem(
+            id="1",
+            source_type="rss",
+            title="fresh enough",
+            url="https://example.com/1",
+            content="body",
+            source_name="Fast Feed",
+            published_at=datetime(2026, 6, 18, 22, 0, tzinfo=timezone.utc),
+            column="us_politics",
+        ),
+        ContentItem(
+            id="2",
+            source_type="rss",
+            title="too old for fast feed",
+            url="https://example.com/2",
+            content="body",
+            source_name="Fast Feed",
+            published_at=datetime(2026, 6, 18, 10, 0, tzinfo=timezone.utc),
+            column="us_politics",
+        ),
+        ContentItem(
+            id="3",
+            source_type="rss",
+            title="allowed for slow feed",
+            url="https://example.com/3",
+            content="body",
+            source_name="Slow Feed",
+            published_at=datetime(2026, 6, 17, 12, 0, tzinfo=timezone.utc),
+            column="global_affairs",
+        ),
+    ]
+
+    kept, stats = _filter_items_by_freshness(items, sources, config, now=now)
+
+    assert [item.title for item in kept] == ["fresh enough", "allowed for slow feed"]
+    assert stats["dropped"] == 1

@@ -154,14 +154,14 @@
 
 - name: "Council on Foreign Relations"
   url: "https://www.cfr.org/rss/analysis"
-  column: us_politics
+  column: global_affairs
   source_tier: 3
   language: en
   enabled: true
 
 - name: "Foreign Affairs"
   url: "https://www.foreignaffairs.com/rss.xml"
-  column: us_politics
+  column: global_affairs
   source_tier: 3
   language: en
   enabled: true

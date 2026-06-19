@@ -1,9 +1,11 @@
-"""报告编排器测试 — ReportSpec、质量门禁、要点提炼"""
+"""报告编排器测试 — ReportSpec、质量门禁、要点提炼、栏级降级"""
 
 from datetime import datetime, timezone
+from unittest.mock import AsyncMock, patch
 
 from report_engine import (
     ReportSpec,
+    _generate_all_column_digests,
     build_reader_highlights,
     sanitize_or_validate_events,
 )
@@ -80,3 +82,34 @@ def test_build_reader_highlights_empty():
     columns = {"us_politics": [], "global_affairs": []}
     highlights = build_reader_highlights(columns)
     assert highlights == []
+
+
+def test_generate_all_column_digests_falls_back_per_column():
+    columns_cfg = {
+        "us_politics": {"label": "美国政局"},
+        "global_affairs": {"label": "国际局势"},
+    }
+    candidates = {
+        "us_politics": [{"title": "重要事件", "summary": "摘要一。摘要二。"}],
+        "global_affairs": [{"title": "国际事件", "summary": "国际摘要。"}],
+    }
+
+    async def _fake_digest(**kwargs):
+        if kwargs["column_key"] == "global_affairs":
+            raise RuntimeError("llm timeout")
+        return [{"title_zh": "重要事件", "reader_body": "生成正文。"}]
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)):
+        results, failures = __import__("asyncio").run(_generate_all_column_digests(
+            columns_cfg=columns_cfg,
+            column_candidates=candidates,
+            history_context="",
+            ai_config={},
+            word_count_min=100,
+            word_count_max=200,
+        ))
+
+    assert results["us_politics"][0]["reader_body"] == "生成正文。"
+    assert results["global_affairs"][0]["title_zh"] == "国际事件"
+    assert "摘要" in results["global_affairs"][0]["reader_body"]
+    assert failures == {"global_affairs": "llm timeout"}

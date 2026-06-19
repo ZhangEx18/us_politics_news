@@ -10,6 +10,7 @@ output:
 
 analysis:
   window_hours: 24
+  freshness_hours: 30
   history_context_days: 3
   min_llm_score: 65
   important_score: 85
@@ -98,6 +99,12 @@ runtime:
   require_ai: true
   min_score_coverage: 0.7
   proxy_from_env: true
+
+schedule:
+  timezone: "Asia/Shanghai"
+  cutoff_hour: 7
+  fetch_at: "07:00"
+  publish_at: "07:45"
 
 rules:
   soft_news_keywords:

@@ -1,7 +1,6 @@
 name: Fetch News
 on:
   schedule:
-    - cron: '0 */2 * * *'
     - cron: '0 23 * * *'
   workflow_dispatch:
 
@@ -36,7 +35,7 @@ jobs:
           fi
 
       - name: Fetch news
-        run: python3 src/run_pipeline.py --fetch-only --hours 2
+        run: python3 src/run_pipeline.py --fetch-only --hours 24
         env:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
