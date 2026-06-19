@@ -3,7 +3,7 @@
 import asyncio
 
 from models import ScoredArticle
-from ai_analyzer import _score_batch_with_retry, merge_events
+from ai_analyzer import _build_digest_evidence, _score_batch_with_retry, merge_events
 
 
 # ── ScoredArticle 默认值 ──
@@ -161,3 +161,21 @@ def test_merge_events_preserves_source_evidence_for_writer():
     assert "原文片段：官方文件说明政策适用对象和执行时间。" in content
     assert "摘要：监管机构给出执行细节。" in content
     assert "原文片段：监管机构列出申报流程和企业合规要求。" in content
+
+
+def test_build_digest_evidence_excludes_raw_article_content():
+    event = {
+        "summary": "监管机构宣布新规。",
+        "content": "这是一段不应直接进入写作模型的原文长片段。",
+        "source_links": [
+            {"title": "Agency announces rule", "url": "https://example.com/a"},
+            {"title": "Agency announces rule", "url": "https://example.com/b"},
+            {"title": "Companies face compliance deadline", "url": "https://example.com/c"},
+        ],
+    }
+
+    evidence = _build_digest_evidence(event)
+
+    assert "摘要：监管机构宣布新规。" in evidence
+    assert "来源标题：Agency announces rule；Companies face compliance deadline" in evidence
+    assert "原文长片段" not in evidence

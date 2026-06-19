@@ -587,11 +587,29 @@ def merge_events(items: list[dict]) -> list[dict]:
 # ── generate_column_digest ──
 
 
+def _build_digest_evidence(event: dict) -> str:
+    """为写作模型构造低风险证据摘要，避免把长原文直接送入 digest。"""
+    evidence_lines: list[str] = []
+    summary = str(event.get("summary") or "").strip()
+    if summary:
+        evidence_lines.append(f"摘要：{summary}")
+    source_titles = []
+    for source_link in event.get("source_links", []):
+        if not isinstance(source_link, dict):
+            continue
+        title = str(source_link.get("title") or "").strip()
+        if title and title not in source_titles:
+            source_titles.append(title)
+    if source_titles:
+        evidence_lines.append("来源标题：" + "；".join(source_titles[:5]))
+    return "\n".join(evidence_lines)
+
+
 COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你的任务是为「{column_label}」栏目生成结构化事件卡片。
 
 ## 事实边界（最高优先级）
 
-- 只能使用输入数据中的 title、summary、content、source_links 所提供的信息。
+- 只能使用输入数据中的 title、summary、evidence、source_links 所提供的信息。
 - 不得补写输入中没有出现的人名、机构、票数、金额、比例、日期、地点、法律条款或市场价格。
 - 不得把示例、历史常识、模型记忆或推断当作当天事实写入正文。
 - 如果输入信息不足，只写可证实的“发生了什么”，不要扩展成政策结论或市场结论。
@@ -755,7 +773,7 @@ async def generate_column_digest(
             "source": e.get("source", ""),
             "score": e.get("score", 0),
             "summary": e.get("summary", ""),
-            "content": (e.get("content", "") or "")[:int(ai_config.get("digest_content_chars", 1000))],
+            "evidence": _build_digest_evidence(e)[:int(ai_config.get("digest_content_chars", 1000))],
             "source_links": e.get("source_links", []),
         })
 
