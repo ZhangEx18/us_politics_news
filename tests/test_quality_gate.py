@@ -206,14 +206,22 @@ def test_prompt_contains_fact_change_consequence():
     assert "后果" in COLUMN_DIGEST_PROMPT_TEMPLATE
 
 
-def test_prompt_contains_few_shot_examples():
-    """确认 prompt 包含 few-shot 示例。"""
+def test_prompt_contains_evidence_boundary():
+    """确认 prompt 限制模型只能基于输入证据写作。"""
     from ai_analyzer import COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "示例 1" in COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "最高法院裁定大麻使用者不丧失持枪权" in COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "Baseten" in COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "NASA" in COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "苹果" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "只能使用输入数据" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "不得补写输入中没有出现" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "模型记忆" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "示例不是新闻素材" in COLUMN_DIGEST_PROMPT_TEMPLATE
+
+
+def test_prompt_does_not_include_concrete_news_examples():
+    """写作 prompt 不能包含会污染当天新闻的具体案例实体。"""
+    from ai_analyzer import COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "最高法院裁定大麻使用者不丧失持枪权" not in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "Baseten" not in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "NASA" not in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "苹果确认将提高产品价格" not in COLUMN_DIGEST_PROMPT_TEMPLATE
 
 
 def test_prompt_forbids_labels():

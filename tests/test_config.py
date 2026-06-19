@@ -60,30 +60,32 @@ def test_digest_targets_match_publish_constraints():
     assert digest.get("total_max_items") == 45
 
     assert columns["us_politics"]["min_items"] == 8
-    assert columns["us_politics"]["target_items"] == 5
+    assert columns["us_politics"]["target_items"] == 6
     assert columns["us_politics"]["max_items"] == 6
-    assert columns["us_politics"]["headline_items"] == 5
+    assert columns["us_politics"]["headline_items"] == 4
     assert columns["us_politics"]["prefilter_items"] == 25
 
     assert columns["global_affairs"]["min_items"] == 10
-    assert columns["global_affairs"]["target_items"] == 6
-    assert columns["global_affairs"]["max_items"] == 7
+    assert columns["global_affairs"]["target_items"] == 8
+    assert columns["global_affairs"]["max_items"] == 9
     assert columns["global_affairs"]["headline_items"] == 6
     assert columns["global_affairs"]["prefilter_items"] == 40
 
     assert columns["technology"]["min_items"] == 5
-    assert columns["technology"]["target_items"] == 4
-    assert columns["technology"]["max_items"] == 5
+    assert columns["technology"]["target_items"] == 5
+    assert columns["technology"]["max_items"] == 6
     assert columns["technology"]["headline_items"] == 4
     assert columns["technology"]["prefilter_items"] == 24
 
     assert columns["economy"]["min_items"] == 5
-    assert columns["economy"]["target_items"] == 4
-    assert columns["economy"]["max_items"] == 5
+    assert columns["economy"]["target_items"] == 5
+    assert columns["economy"]["max_items"] == 6
     assert columns["economy"]["headline_items"] == 4
     assert columns["economy"]["prefilter_items"] == 24
 
     for col_cfg in columns.values():
+        total_items = col_cfg.get("max_items", 0) + col_cfg.get("headline_items", 0)
+        assert total_items >= col_cfg.get("min_items", 0)
         assert col_cfg.get("prefilter_items", 0) >= col_cfg.get("target_items", 0)
 
 

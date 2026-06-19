@@ -47,29 +47,29 @@ digest:
     us_politics:
       label: "美国政局"
       min_items: 8
-      target_items: 5
+      target_items: 6
       max_items: 6
-      headline_items: 5
+      headline_items: 4
       prefilter_items: 25
     global_affairs:
       label: "国际局势"
       min_items: 10
-      target_items: 6
-      max_items: 7
+      target_items: 8
+      max_items: 9
       headline_items: 6
       prefilter_items: 40
     technology:
       label: "科技前沿"
       min_items: 5
-      target_items: 4
-      max_items: 5
+      target_items: 5
+      max_items: 6
       headline_items: 4
       prefilter_items: 24
     economy:
       label: "经济走势"
       min_items: 5
-      target_items: 4
-      max_items: 5
+      target_items: 5
+      max_items: 6
       headline_items: 4
       prefilter_items: 24
   total_min_items: 28
