@@ -38,6 +38,13 @@ def test_build_item_contains_content_encoded():
     assert "</content:encoded>" in item
 
 
+def test_build_item_splits_cdata_end_markers():
+    item = _build_item_xml("2026-06-18", "Test Title", "bad ]]> desc", "<p>bad ]]> body</p>", "")
+    assert "bad ]]> desc" not in item
+    assert "bad ]]> body" not in item
+    assert "]]]]><![CDATA[>" in item
+
+
 def test_build_item_uses_fixed_pub_date_when_provided():
     item = _build_item_xml(
         "2026-06-19",

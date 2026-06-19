@@ -39,6 +39,11 @@ def _escape_xml(s: str) -> str:
     )
 
 
+def _escape_cdata(s: str) -> str:
+    """CDATA 中不能直接出现 ]]>，需要拆成相邻 CDATA 片段。"""
+    return str(s).replace("]]>", "]]]]><![CDATA[>")
+
+
 def _rfc2822(dt: datetime) -> str:
     """格式化为 RFC 2822 日期"""
     dt_local = dt.astimezone(BEIJING_TZ) if dt.tzinfo else dt.replace(tzinfo=BEIJING_TZ)
@@ -85,8 +90,8 @@ def _build_item_xml(
     return f"""    <item>
       <title>{_escape_xml(title)}</title>
       <link>{_escape_xml(link)}</link>
-      <description><![CDATA[{short_description}]]></description>
-      <content:encoded><![CDATA[{html_body}]]></content:encoded>
+      <description><![CDATA[{_escape_cdata(short_description)}]]></description>
+      <content:encoded><![CDATA[{_escape_cdata(html_body)}]]></content:encoded>
       <pubDate>{pub_date_text}</pubDate>
       <guid isPermaLink="false">{_escape_xml(guid)}</guid>
     </item>"""
@@ -105,8 +110,8 @@ def _build_item_xml_from_manifest(
     return f"""    <item>
       <title>{_escape_xml(title)}</title>
       <link>{_escape_xml(link)}</link>
-      <description><![CDATA[{short_description}]]></description>
-      <content:encoded><![CDATA[{html_body}]]></content:encoded>
+      <description><![CDATA[{_escape_cdata(short_description)}]]></description>
+      <content:encoded><![CDATA[{_escape_cdata(html_body)}]]></content:encoded>
       <pubDate>{pub_date_text}</pubDate>
       <guid isPermaLink="false">{_escape_xml(guid)}</guid>
     </item>"""
