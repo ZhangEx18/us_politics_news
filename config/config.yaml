@@ -47,34 +47,34 @@ digest:
     us_politics:
       label: "美国政局"
       min_items: 8
-      target_items: 6
-      max_items: 6
-      headline_items: 4
+      target_items: 12
+      max_items: 12
+      headline_items: 8
       prefilter_items: 25
     global_affairs:
       label: "国际局势"
       min_items: 10
-      target_items: 8
-      max_items: 9
-      headline_items: 6
+      target_items: 12
+      max_items: 12
+      headline_items: 8
       prefilter_items: 40
     technology:
       label: "科技前沿"
       min_items: 5
-      target_items: 5
-      max_items: 6
-      headline_items: 4
+      target_items: 7
+      max_items: 7
+      headline_items: 3
       prefilter_items: 24
     economy:
       label: "经济走势"
       min_items: 5
-      target_items: 5
-      max_items: 6
-      headline_items: 4
+      target_items: 7
+      max_items: 7
+      headline_items: 3
       prefilter_items: 24
   total_min_items: 28
-  total_target_items: 35
-  total_max_items: 45
+  total_target_items: 60
+  total_max_items: 60
   weekly:
     target_word_count_min: 8000
     target_word_count: 12000
