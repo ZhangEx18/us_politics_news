@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-AI 分析层 — 三段式流程
+AI 分析层 — 两段式流程
 
 1. score_batch: 批量评分，输出 score/column/tags/summary/event_key
 2. generate_column_digest: 按栏目生成结构化事件卡片
-3. generate_meta_digest: 从四栏摘要生成总标题/导语/highlights
 """
 
 import asyncio
@@ -591,19 +590,62 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 
 每条事件必须包含以下字段：
 - **title_zh**：中文标题，简洁准确
-- **reader_body**：Reader 专用单段概述，120-220 字，直接写完整事实和最必要含义
-- **core_facts**：站内兼容字段，使用与 reader_body 一致的单段概述
-- **source_links**：相关阅读，列出所有相关来源，格式 [{{"title": "来源名", "url": "https://..."}}]
+- **reader_body**：Reader 专用正文，按”事实 → 变化 → 后果”结构写成单段 2-4 句，目标 120-200 字
+- **core_facts**：站内兼容字段，使用与 reader_body 一致的内容
+- **source_links**：相关阅读，格式 [{{“title”: “来源名”, “url”: “https://...”}}]
 - **is_followup**：布尔值，是否为历史事件的持续跟踪
 
-## 写作要求
+## reader_body 写作规范（核心）
 
-- 所有事件统一写成单段硬新闻体，不分 `full` / `brief`
-- 禁止输出“核心事实：”“背景脉络：”“可能影响：”“为什么值得关注：”这些标签
-- 第一部分交代发生了什么
-- 后半部分补充最必要的政治 / 经济 / 产业含义
-- 禁止空泛总结、禁止“对于读者来说”“值得关注的是”等套话
-- 本栏总字数目标：{word_count_min}-{word_count_max} 字
+每条 reader_body 必须按以下逻辑链组织，写成一段连贯叙述：
+
+**第 1-2 句：发生了什么（事实）**
+- 直接陈述主体、动作、结果
+- 必须包含具体数字、机构、人名、金额、比例、时间、地点中至少两项
+- 禁止用”据报道””据悉””有消息称”开头
+
+**第 3 句：这改变了什么（变化）**
+- 说清”以前怎样，现在怎样”
+- 用对比句式，例如”此前……此次裁定意味着……”
+- 给一个锚点定位事件在大图景中的位置
+
+**第 4 句：接下来影响谁（后果）**
+- 指向具体对象：选民、党派、法院、国会、市场、消费者、企业、产业链、地区安全
+- 必须有具体方向，不能以”存在不确定性””增添了变数”收尾
+- 可以保留分歧，但要说清分歧点在哪
+
+## 示例（仅作结构参考，不要复制内容）
+
+### 示例 1：政策类
+标题：最高法院裁定大麻使用者不丧失持枪权
+正文：最高法院以 6 比 3 裁定，单纯使用大麻不构成剥夺持枪权的联邦法律依据。案件源于一名德克萨斯州合法大麻使用者的上诉——她因持有大麻被联邦法认定为”非法药物使用者”而禁止购枪。此裁定意味着 24 个已实现大麻合法化的州中，合法使用者的持枪权将获得明确联邦保护。这是最高法院继 2022 年 Bruen 案后，再次以”历史传统”标准收紧联邦枪权限制的信号。
+
+### 示例 2：科技类
+标题：AI 推理公司 Baseten 据报正进行 15 亿美元融资
+正文：AI 推理部署公司 Baseten 据报正在进行 15 亿美元新融资，估值将达 130 亿美元，距其上一轮融资仅隔数月。Baseten 的业务是将大模型高效部署为生产级 API，客户包括 Cursor 和 Perplexity。推理环节正成为 AI 落地的关键瓶颈——模型训练完成后，企业需要低成本、低延迟的方式把模型跑起来，Baseten 正卡在这个位置。但 130 亿估值对应约 25 亿美元年收入，倍数远超同阶段 SaaS 公司，市场对 AI 基础设施的定价是否合理仍有分歧。
+
+### 示例 3：航天类
+标题：NASA 要求诺斯罗普·格鲁曼停止月球门户 HALO 模块工作
+正文：NASA 要求诺斯罗普·格鲁曼停止月球门户空间站 HALO 居住舱模块的后续工作。HALO 原是门户站的核心舱段，宇航员在月球轨道的生活和工作都在这个模块里完成。停掉它意味着 NASA 正在重新评估门户站的整体方案——此前波音已就门户站合同重组与 NASA 谈判，HALO 的暂停可能是谈判结果的一部分。门户站是阿尔忒弥斯重返月球计划中”月球轨道中转站”概念的核心硬件，如果最终取消，整个登月路线可能从”轨道中转”退回到”直飞月面”。
+
+### 示例 4：财经类
+标题：苹果确认将提高产品价格 存储芯片成本上升是主因
+正文：苹果 CEO 蒂姆·库克确认，因存储芯片成本上升，公司计划提高部分产品价格。存储芯片价格自去年下半年以来持续走高，三星和美光的 NAND 闪存报价涨幅已超过 20%，苹果作为全球最大存储芯片采购方之一，成本压力直接传导至终端定价。苹果提价可能为整个消费电子行业树立价格基准，推动手机和笔记本电脑的平均售价上行。
+
+## 禁止清单
+
+以下内容一律禁止出现在 reader_body 中：
+
+**禁止的开头**：据报道、据悉、有消息称
+**禁止的连接词**：值得注意的是、需要指出的是
+**禁止的空泛动词**：凸显了、反映了、意味着、标志着
+**禁止的收尾**：引发了讨论、增添了变数、存在不确定性、产生深远影响、仍需观察
+**禁止的套话**：对于读者来说、值得关注的是
+**禁止的标签**：核心事实：、背景脉络：、背景与影响：、可能影响：、为什么值得关注：
+
+## 本栏总字数目标
+
+{word_count_min}-{word_count_max} 字
 
 ## 新旧剥离与去重规则
 
@@ -619,17 +661,17 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 
 ## 输出格式
 
-必须返回严格 JSON 对象，以 "{{" 开始，以 "}}" 结尾：
+必须返回严格 JSON 对象，以 “{{“ 开始，以 “}}” 结尾：
 
 ```json
 {{
-  "events": [
+  “events”: [
     {{
-      "title_zh": "中文标题",
-      "reader_body": "单段概述正文，直接交代事实与最必要含义。",
-      "core_facts": "与 reader_body 一致的单段正文。",
-      "source_links": [{{"title": "来源名", "url": "https://..."}}],
-      "is_followup": false
+      “title_zh”: “中文标题”,
+      “reader_body”: “事实 → 变化 → 后果单段正文，120-200 字。”,
+      “core_facts”: “与 reader_body 一致。”,
+      “source_links”: [{{“title”: “来源名”, “url”: “https://...”}}],
+      “is_followup”: false
     }}
   ]
 }}
@@ -642,7 +684,9 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 3. source_links 必须保留原文链接，不要编造
 4. 只输出硬新闻，不要输出评论稿和观察名单
 5. 同一主线事件不要拆成多个近义条目
-6. 用简练中文，像严肃日报，不像评论区或券商喊单
+6. reader_body 必须讲一个完整的故事：发生了什么、改变了什么、谁会受到影响
+7. 禁止输出”核心事实：””背景与影响：””为什么值得关注：”等标签
+8. 每句一个事实，不堆砌；同一主语不连续出现超过 2 次
 
 ## 输入数据（共 {count} 条候选事件）
 
@@ -757,9 +801,9 @@ async def generate_column_digest(
                 **event,
                 "reader_body": reader_body,
                 "core_facts": reader_body or event.get("core_facts", ""),
-                "detail_level": "brief",
-                # 兼容站内旧字段
-                "background_impact": event.get("background_context", event.get("background_impact", "")),
+                "detail_level": "standard",
+                # 兼容站内旧字段（reader_body 已包含完整内容，不再单独生成）
+                "background_impact": "",
             }
             normalized_events.append(normalized)
         return normalized_events
@@ -769,120 +813,13 @@ async def generate_column_digest(
     )
 
 
-# ── generate_meta_digest ──
-
-
-META_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报总编辑。你的任务是从四个栏目的摘要中，生成日报的重点提示。
-
-## 输入
-
-以下是四个栏目的标题和前 3 条事件摘要：
-
-{column_summaries_text}
-
-## 输出要求
-
-- **highlights**：4-8 条，每条 20-45 字，必须是完整事实句或高密度概括
-
-## 严格约束
-
-1. 严禁评价性措辞、套话、宏大叙事
-2. 只做总编排，不重复正文细节
-3. highlights 每条必须指向一个具体事件
-4. 禁止空泛总结，禁止重复标题原文，禁止“今日值得关注的是”这类套话
-
-## 输出格式
-
-必须返回严格 JSON 对象，以 "{{" 开始，以 "}}" 结尾：
-
-```json
-{{
-  "highlights": ["重点1（20-45字）", "重点2（20-45字）", "重点3（20-45字）", "重点4（20-45字）"]
-}}
-```
-
-## 重要提示
-
-1. 只返回 JSON 对象，不要添加额外文字
-2. highlights 数组长度 4-8 条
-3. 所有内容用简练中文
-"""
-
-
-async def generate_meta_digest(
-    column_summaries: dict[str, str],
-    ai_config: dict,
-) -> dict:
-    """
-    从四栏摘要生成 Reader 顶部要点
-
-    Args:
-        column_summaries: {"us_politics": "前3条标题摘要", "global_affairs": ...}
-        ai_config: AI 配置
-
-    Returns:
-        {"highlights": ["重点1", "重点2", ...]}
-    """
-    # 构建栏目摘要文本
-    col_label_map = {
-        "us_politics": "美国政情",
-        "global_affairs": "国际风云",
-        "technology": "科技前沿",
-        "economy": "经济财经",
-    }
-    sections = []
-    for col_key, label in col_label_map.items():
-        summary = column_summaries.get(col_key, "").strip()
-        if summary:
-            sections.append(f"### {label}（{col_key}）\n{summary}")
-
-    column_summaries_text = "\n\n".join(sections) if sections else "(无栏目摘要)"
-
-    prompt = META_DIGEST_PROMPT_TEMPLATE.replace(
-        "{column_summaries_text}", column_summaries_text
-    )
-
-    response = await _call_llm(
-        prompt,
-        ai_config,
-        timeout=_timeout_for(ai_config, "meta", 120),
-    )
-
-    # 解析 JSON 响应（兼容 markdown 代码块包裹）
-    text = _strip_markdown_fence(response)
-    parsed = None
-
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", text, re.DOTALL)
-        if m:
-            try:
-                parsed = json.loads(m.group())
-            except json.JSONDecodeError:
-                pass
-
-    if parsed is None:
-        raise RuntimeError(f"generate_meta_digest JSON 解析失败: {response[:300]}")
-
-    # 验证必要字段
-    if not isinstance(parsed, dict):
-        raise RuntimeError(f"generate_meta_digest 响应非对象: {response[:300]}")
-
-    required_fields = ("highlights",)
-    missing = [f for f in required_fields if f not in parsed]
-    if missing:
-        raise RuntimeError(
-            f"generate_meta_digest 响应缺少字段 {missing}: {response[:300]}"
-        )
-
-    return parsed
-
-
 def has_ai_config() -> bool:
-    """检查是否配置了 AI API Key"""
-    config = _load_ai_config()
-    return bool(config.get("api_key"))
+    """检查是否配置了 AI API Key（无 key 时返回 False，不抛异常）"""
+    try:
+        config = _load_ai_config()
+        return bool(config.get("api_key"))
+    except RuntimeError:
+        return False
 
 
 # 导出别名

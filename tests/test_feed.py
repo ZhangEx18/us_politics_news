@@ -1,13 +1,18 @@
 """RSS Feed 生成测试 — feed_builder.py (v3)"""
 
 import os
+import re
 import tempfile
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from feed_builder import (
     _build_item_xml,
     _merge_items,
     _extract_item_date,
+    _extract_item_guid,
     _build_short_description,
+    _generate_title,
     build_feed,
     save_feed,
     RSS_NS,
@@ -31,6 +36,18 @@ def test_build_item_contains_content_encoded():
     item = _build_item_xml("2026-06-18", "Test Title", "Short desc", "<h1>Hello</h1>", "https://example.com")
     assert "<content:encoded>" in item
     assert "</content:encoded>" in item
+
+
+def test_build_item_uses_fixed_pub_date_when_provided():
+    item = _build_item_xml(
+        "2026-06-19",
+        "Title",
+        "Desc",
+        "<p>Body</p>",
+        "",
+        datetime(2026, 6, 19, 8, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+    )
+    assert "<pubDate>Fri, 19 Jun 2026 08:00:00 +0800</pubDate>" in item
 
 
 def test_save_feed_generates_valid_xml_with_namespaces():
@@ -73,7 +90,6 @@ def test_save_feed_uses_reader_friendly_fragment():
             content = f.read()
 
         assert "<article>" in content
-        assert "<h1>2026年6月18日 新闻</h1>" in content
         assert "<h2>今日要点</h2>" in content
         assert "<li>重点 1</li>" in content
         assert "<h2>一、美国政情</h2>" in content
@@ -93,6 +109,27 @@ def test_save_feed_uses_reader_friendly_fragment():
         assert "原文链接" not in content
         assert "相关阅读" not in content
         assert "来源" not in content
+        assert "<h1>2026年6月18日 新闻</h1>" not in content
+
+
+def test_save_feed_uses_meta_pub_date_for_reeder_timestamp():
+    meta = {
+        "title": "2026年6月19日 新闻",
+        "lead": "",
+        "highlights": [],
+        "date": "2026-06-19",
+        "pub_date": "2026-06-19T08:00:00+08:00",
+    }
+    columns = {"us_politics": [], "global_affairs": [], "technology": [], "economy": []}
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = os.path.join(tmpdir, "feed.xml")
+        save_feed(meta=meta, columns=columns, output_path=path, base_url="https://example.com")
+        content = open(path, encoding="utf-8").read()
+
+    pub_date = re.search(r"<pubDate>(.*?)</pubDate>", content)
+    assert pub_date
+    assert pub_date.group(1) == "Fri, 19 Jun 2026 08:00:00 +0800"
 
 
 def test_guid_based_on_date():
@@ -133,3 +170,166 @@ def test_merge_items_dedup_mixed_list():
     dates = [_extract_item_date(r) for r in result]
     assert dates.count("2026-06-18") == 1
     assert len(result) == 2
+
+
+# === report_type 相关测试 ===
+
+
+def test_build_item_weekly_type():
+    """weekly 类型的 guid 和 link 使用 report_key"""
+    item = _build_item_xml(
+        "2026-06-19", "Weekly Report", "Desc", "<p>Body</p>",
+        "https://example.com", report_type="weekly", report_key="2026-W25",
+    )
+    guid = re.search(r"<guid[^>]*>([^<]+)</guid>", item)
+    assert guid and guid.group(1) == "weekly/2026-W25"
+    assert "weekly/2026-W25.html" in item
+
+
+def test_build_item_monthly_type():
+    """monthly 类型的 guid 和 link 使用 report_key"""
+    item = _build_item_xml(
+        "2026-06-01", "Monthly Report", "Desc", "<p>Body</p>",
+        "", report_type="monthly", report_key="2026-06",
+    )
+    guid = re.search(r"<guid[^>]*>([^<]+)</guid>", item)
+    assert guid and guid.group(1) == "monthly/2026-06"
+    assert "monthly/2026-06.html" in item
+
+
+def test_extract_item_guid_new_format():
+    """_extract_item_guid 提取新格式 guid"""
+    assert _extract_item_guid('<item><guid>weekly/2026-W25</guid></item>') == "weekly/2026-W25"
+    assert _extract_item_guid('<item><guid>monthly/2026-06</guid></item>') == "monthly/2026-06"
+    assert _extract_item_guid('<item><guid>daily/2026-06-18</guid></item>') == "daily/2026-06-18"
+
+
+def test_extract_item_guid_old_format_compat():
+    """_extract_item_guid 向后兼容旧格式（纯日期）"""
+    assert _extract_item_guid('<item><guid>2026-06-18</guid></item>') == "daily/2026-06-18"
+
+
+def test_extract_item_guid_returns_none_for_missing():
+    """_extract_item_guid 无 guid 时返回 None"""
+    assert _extract_item_guid("<item><title>no guid</title></item>") is None
+
+
+def test_merge_items_different_report_types_coexist():
+    """不同 report_type 的 item 按 guid 共存，不互相替换"""
+    daily = _build_item_xml("2026-06-19", "Daily", "D", "<p>D</p>", "", report_type="daily", report_key="2026-06-19")
+    weekly = _build_item_xml("2026-06-19", "Weekly", "W", "<p>W</p>", "", report_type="weekly", report_key="2026-W25")
+    result = _merge_items(daily, [weekly])
+    assert len(result) == 2  # 不同 report_type 共存
+
+
+def test_merge_items_same_report_type_replaces():
+    """同 report_type + report_key 的 item 被替换"""
+    old = _build_item_xml(
+        "2026-06-18", "Old Weekly", "O", "<p>O</p>", "",
+        report_type="weekly", report_key="2026-W25",
+    )
+    new = _build_item_xml(
+        "2026-06-19", "New Weekly", "N", "<p>N</p>", "",
+        report_type="weekly", report_key="2026-W25",
+    )
+    result = _merge_items(new, [old])
+    assert len(result) == 1
+    assert "New Weekly" in result[0]
+
+
+def test_generate_title_daily():
+    """daily 类型标题格式"""
+    assert _generate_title("daily", None, "2026-06-18") == "2026年6月18日日报"
+
+
+def test_generate_title_weekly():
+    """weekly 类型标题格式"""
+    assert _generate_title("weekly", "2026-W25", "2026-06-18") == "2026年第25周周报"
+
+
+def test_generate_title_monthly():
+    """monthly 类型标题格式"""
+    assert _generate_title("monthly", "2026-06", "2026-06-01") == "2026年6月月报"
+
+
+def test_save_feed_weekly_type():
+    """save_feed 支持 weekly 类型，生成对应 guid 和标题"""
+    meta = {"title": "", "lead": "", "highlights": [], "date": "2026-06-19"}
+    columns = {"us_politics": [], "global_affairs": [], "technology": [], "economy": []}
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = os.path.join(tmpdir, "feed.xml")
+        save_feed(
+            meta=meta, columns=columns, output_path=path,
+            base_url="https://example.com",
+            report_type="weekly", report_key="2026-W25",
+        )
+        content = open(path, encoding="utf-8").read()
+        assert "weekly/2026-W25" in content
+        assert "2026年第25周周报" in content
+
+
+def test_guid_format_daily():
+    """daily 类型 guid 包含 daily/ 前缀"""
+    item = _build_item_xml("2026-06-19", "Title", "Desc", "<p>Body</p>", "", report_type="daily", report_key="2026-06-19")
+    guid = re.search(r"<guid[^>]*>([^<]+)</guid>", item)
+    assert guid and "daily/" in guid.group(1)
+
+
+def test_guid_format_weekly():
+    """weekly 类型 guid 包含 weekly/ 前缀"""
+    item = _build_item_xml("2026-06-19", "Title", "Desc", "<p>Body</p>", "", report_type="weekly", report_key="2026-W25")
+    guid = re.search(r"<guid[^>]*>([^<]+)</guid>", item)
+    assert guid and "weekly/" in guid.group(1)
+
+
+def test_guid_format_monthly():
+    """monthly 类型 guid 包含 monthly/ 前缀"""
+    item = _build_item_xml("2026-06-19", "Title", "Desc", "<p>Body</p>", "", report_type="monthly", report_key="2026-06")
+    guid = re.search(r"<guid[^>]*>([^<]+)</guid>", item)
+    assert guid and "monthly/" in guid.group(1)
+
+
+def test_save_feed_weekly_uses_weekly_highlights():
+    """save_feed report_type=weekly 时 content:encoded 包含'本周要点'"""
+    meta = {
+        "title": "2026年第25周周报",
+        "lead": "",
+        "highlights": ["要点一", "要点二"],
+        "date": "2026-06-19",
+    }
+    columns = {
+        "us_politics": [{"title_zh": "事件", "reader_body": "正文。"}],
+        "global_affairs": [],
+        "technology": [],
+        "economy": [],
+    }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = os.path.join(tmpdir, "feed.xml")
+        save_feed(meta=meta, columns=columns, output_path=path, base_url="",
+                  report_type="weekly", report_key="2026-W25")
+        content = open(path, encoding="utf-8").read()
+        assert "本周要点" in content
+        assert "今日要点" not in content
+
+
+def test_save_feed_monthly_uses_monthly_highlights():
+    """save_feed report_type=monthly 时 content:encoded 包含'本月要点'"""
+    meta = {
+        "title": "2026年6月月报",
+        "lead": "",
+        "highlights": ["要点一"],
+        "date": "2026-06-19",
+    }
+    columns = {
+        "us_politics": [],
+        "global_affairs": [{"title_zh": "事件", "reader_body": "正文。"}],
+        "technology": [],
+        "economy": [],
+    }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = os.path.join(tmpdir, "feed.xml")
+        save_feed(meta=meta, columns=columns, output_path=path, base_url="",
+                  report_type="monthly", report_key="2026-06")
+        content = open(path, encoding="utf-8").read()
+        assert "本月要点" in content
+        assert "今日要点" not in content

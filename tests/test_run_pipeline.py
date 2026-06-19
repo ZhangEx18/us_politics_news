@@ -1,7 +1,8 @@
 """run_pipeline 回归测试"""
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from database import Article
 from models import ContentItem
@@ -10,6 +11,9 @@ from run_pipeline import (
     _augment_ai_config_with_runtime,
     _build_reader_highlights,
     _count_scored_entries,
+    _filter_articles_to_window,
+    _get_report_publish_time,
+    _get_report_window,
     _is_hard_news_entry,
 )
 
@@ -59,7 +63,7 @@ def test_database_article_can_map_to_content_item_without_id_field():
 
 def test_main_digest_only_exits_when_no_content_generated(monkeypatch):
     monkeypatch.setattr("sys.argv", ["run_pipeline.py", "--digest-only"])
-    monkeypatch.setattr("run_pipeline.run_digest_only", lambda hours=24: {"total_selected": 0})
+    monkeypatch.setattr("run_pipeline.run_digest_only", lambda hours=24, report_type="daily": {"total_selected": 0})
 
     with pytest.raises(SystemExit) as exc:
         main()
@@ -132,3 +136,54 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
     assert ai_config["digest_timeout_seconds"] == 240
     assert ai_config["digest_content_chars"] == 1000
     assert ai_config["meta_timeout_seconds"] == 120
+
+
+def test_get_report_window_locks_to_beijing_7am_cutoff():
+    tz = ZoneInfo("Asia/Shanghai")
+
+    since, until, report_date = _get_report_window(datetime(2026, 6, 19, 8, 30, tzinfo=tz))
+    assert since == datetime(2026, 6, 18, 7, 0, tzinfo=tz)
+    assert until == datetime(2026, 6, 19, 7, 0, tzinfo=tz)
+    assert report_date == "2026-06-19"
+
+    since, until, report_date = _get_report_window(datetime(2026, 6, 19, 6, 30, tzinfo=tz))
+    assert since == datetime(2026, 6, 17, 7, 0, tzinfo=tz)
+    assert until == datetime(2026, 6, 18, 7, 0, tzinfo=tz)
+    assert report_date == "2026-06-18"
+
+
+def test_get_report_publish_time_fixed_to_8am_beijing():
+    tz = ZoneInfo("Asia/Shanghai")
+    pub_dt = _get_report_publish_time("2026-06-19")
+
+    assert pub_dt == datetime(2026, 6, 19, 8, 0, tzinfo=tz)
+
+
+def test_filter_articles_to_window_uses_fixed_bounds():
+    tz = ZoneInfo("Asia/Shanghai")
+    since = datetime(2026, 6, 18, 7, 0, tzinfo=tz)
+    until = datetime(2026, 6, 19, 7, 0, tzinfo=tz)
+    items = [
+        ContentItem(
+            id="1",
+            source_type="rss",
+            title="inside",
+            url="https://example.com/inside",
+            content="body",
+            source_name="Example",
+            fetched_at=datetime(2026, 6, 18, 2, 0, tzinfo=timezone.utc),
+        ),
+        ContentItem(
+            id="2",
+            source_type="rss",
+            title="outside",
+            url="https://example.com/outside",
+            content="body",
+            source_name="Example",
+            fetched_at=datetime(2026, 6, 19, 8, 0, tzinfo=timezone.utc),
+        ),
+    ]
+
+    filtered = _filter_articles_to_window(items, since, until)
+
+    assert [item.title for item in filtered] == ["inside"]
