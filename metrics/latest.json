@@ -1422,44 +1422,44 @@
     ],
     "freshness": {
       "freshness_hours": 30,
-      "dropped": 39,
-      "kept": 2267,
-      "dropped_us_politics": 17,
-      "dropped_global_affairs": 14,
+      "dropped": 46,
+      "kept": 2168,
+      "dropped_us_politics": 20,
+      "dropped_global_affairs": 17,
       "dropped_technology": 6,
-      "dropped_economy": 2
+      "dropped_economy": 3
     },
-    "raw_fetched": 2363,
-    "raw_merged": 2267
+    "raw_fetched": 2270,
+    "raw_merged": 2168
   },
   "cn_source_fetched": 12,
   "cn_source_selected": 0,
   "cn_source_selected_by_column": {
-    "us_politics": 0,
-    "global_affairs": 0,
+    "economy": 0,
     "technology": 0,
-    "economy": 0
+    "us_politics": 0,
+    "global_affairs": 0
   },
   "columns": {
     "economy": {
       "prefiltered": 24,
       "hard_news_candidates": 23,
-      "hard_news_scored": 16,
-      "post_score_filtered": 12,
+      "hard_news_scored": 14,
+      "post_score_filtered": 13,
       "detailed_candidates": 7,
       "headline_only": 3,
-      "rendered_detailed": 5,
+      "rendered_detailed": 7,
       "rendered_headline_only": 3
     },
     "global_affairs": {
       "prefiltered": 40,
       "hard_news_candidates": 40,
-      "hard_news_scored": 22,
-      "post_score_filtered": 15,
+      "hard_news_scored": 25,
+      "post_score_filtered": 22,
       "detailed_candidates": 12,
-      "headline_only": 3,
-      "rendered_detailed": 9,
-      "rendered_headline_only": 3
+      "headline_only": 8,
+      "rendered_detailed": 6,
+      "rendered_headline_only": 8
     },
     "technology": {
       "prefiltered": 24,
@@ -1468,17 +1468,17 @@
       "post_score_filtered": 10,
       "detailed_candidates": 7,
       "headline_only": 3,
-      "rendered_detailed": 6,
+      "rendered_detailed": 7,
       "rendered_headline_only": 3
     },
     "us_politics": {
       "prefiltered": 25,
-      "hard_news_candidates": 24,
+      "hard_news_candidates": 23,
       "hard_news_scored": 11,
-      "post_score_filtered": 5,
-      "detailed_candidates": 5,
+      "post_score_filtered": 11,
+      "detailed_candidates": 11,
       "headline_only": 0,
-      "rendered_detailed": 4,
+      "rendered_detailed": 10,
       "rendered_headline_only": 0
     }
   },
@@ -1487,8 +1487,8 @@
     "digest_failures": {}
   },
   "report": {
-    "title": "2026年6月20日 新闻",
+    "title": "2026年6月20日 日报",
     "published_at": "2026-06-20T07:45:00+08:00",
-    "duration_seconds": 113.8
+    "duration_seconds": 98.3
   }
 }
