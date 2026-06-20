@@ -15,9 +15,8 @@ import re
 import html
 from datetime import datetime
 from typing import TYPE_CHECKING
-from urllib.parse import urlparse
-
 import yaml
+from report_titles import build_report_title
 
 if TYPE_CHECKING:
     from publish_manifest import ReportManifest
@@ -43,12 +42,10 @@ def _html_text(text: object) -> str:
     return html.escape(_pangu(str(text)), quote=False)
 
 
-def _safe_http_url(url: object) -> str:
-    raw = str(url or "").strip()
-    parsed = urlparse(raw)
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+def _html_title_text(text: object) -> str:
+    if text is None:
         return ""
-    return html.escape(raw, quote=True)
+    return html.escape(str(text), quote=False)
 
 
 def _markdown_text(text: object) -> str:
@@ -57,9 +54,10 @@ def _markdown_text(text: object) -> str:
     return html.escape(_pangu(str(text)), quote=False)
 
 
-def _markdown_link_title(text: object) -> str:
-    escaped = _markdown_text(text)
-    return escaped.replace("[", "\\[").replace("]", "\\]")
+def _markdown_title_text(text: object) -> str:
+    if text is None:
+        return ""
+    return html.escape(str(text), quote=False)
 
 
 def _frontmatter(title: str, lead: str, highlights: list, date: str) -> str:
@@ -105,14 +103,6 @@ _COLUMN_NUM: dict[str, str] = {
 # 核心渲染：结构化 → HTML
 # ---------------------------------------------------------------------------
 
-# 报告类型 → 默认标题文案
-_REPORT_TYPE_TITLE: dict[str, str] = {
-    "daily": "每日新闻",
-    "weekly": "每周新闻",
-    "monthly": "每月新闻",
-}
-
-
 def render_structured_html(
     meta: dict,
     columns: dict[str, list[dict]],
@@ -129,11 +119,10 @@ def render_structured_html(
     """
     # meta.title 优先；否则根据 report_type 生成默认标题
     if meta.get("title"):
-        title = _html_text(meta["title"])
+        title = _html_title_text(meta["title"])
     else:
         date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
-        type_label = _REPORT_TYPE_TITLE.get(report_type, "每日新闻")
-        title = _html_text(f"{date} {type_label}")
+        title = _html_title_text(build_report_title(report_type, date))
     lead = _html_text(meta.get("lead", ""))
     highlights = meta.get("highlights", [])
     date = _html_text(meta.get("date", datetime.now().strftime("%Y-%m-%d")))
@@ -221,17 +210,6 @@ h2 {
     padding: 8px 12px;
     margin: 8px 0;
 }
-.links {
-    font-size: 0.85em;
-    color: #666;
-}
-.links a {
-    color: #1a6b3c;
-    text-decoration: none;
-}
-.links a:hover {
-    text-decoration: underline;
-}
 footer {
     margin-top: 48px;
     padding-top: 16px;
@@ -299,16 +277,6 @@ footer {
             if reader_body:
                 html.append(f"<p>{_html_text(reader_body)}</p>")
 
-            source_links = event.get("source_links", [])
-            if source_links:
-                html.append("<div class='links'>")
-                for link in source_links:
-                    link_title = _html_text(link.get("title", "原文"))
-                    link_url = _safe_http_url(link.get("url", ""))
-                    if link_url:
-                        html.append(f"<a href='{link_url}'>{link_title}</a> ")
-                html.append("</div>")
-
             html.append("</div>")
 
         # 无序条目：仅标题
@@ -355,14 +323,13 @@ def render_reader_content(
     """
     # manifest 提供时优先使用其标题
     if manifest:
-        title = _html_text(manifest.title)
+        title = _html_title_text(manifest.title)
     else:
         date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
         try:
-            dt = datetime.strptime(date, "%Y-%m-%d")
-            title = _html_text(f"{dt.year}年{dt.month}月{dt.day}日 新闻")
+            title = _html_title_text(build_report_title(report_type, date))
         except ValueError:
-            title = _html_text(meta.get("title", ""))
+            title = _html_title_text(meta.get("title", ""))
     highlights = meta.get("highlights", []) or []
 
     html: list[str] = ["<article>"]
@@ -433,11 +400,10 @@ def render_structured_markdown(
     """
     # meta.title 优先；否则根据 report_type 生成默认标题
     if meta.get("title"):
-        title = _markdown_text(meta["title"])
+        title = _markdown_title_text(meta["title"])
     else:
         date_raw = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
-        type_label = _REPORT_TYPE_TITLE.get(report_type, "每日新闻")
-        title = _markdown_text(f"{date_raw} {type_label}")
+        title = _markdown_title_text(build_report_title(report_type, date_raw))
     lead = _markdown_text(meta.get("lead", ""))
     highlights = [_markdown_text(h) for h in meta.get("highlights", [])]
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
@@ -474,15 +440,6 @@ def render_structured_markdown(
             reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
             if reader_body:
                 lines.append(_markdown_text(reader_body))
-                lines.append("")
-
-            source_links = event.get("source_links", [])
-            if source_links:
-                for link in source_links:
-                    link_title = _markdown_link_title(link.get("title", "原文"))
-                    link_url = _safe_http_url(link.get("url", ""))
-                    if link_url:
-                        lines.append(f"- [{link_title}]({link_url})")
                 lines.append("")
 
         # 无序条目：仅标题

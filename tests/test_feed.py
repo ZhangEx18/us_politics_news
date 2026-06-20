@@ -116,12 +116,13 @@ def test_save_feed_uses_reader_friendly_fragment():
         assert "原文链接" not in content
         assert "相关阅读" not in content
         assert "来源" not in content
-        assert "<h1>2026年6月18日 新闻</h1>" not in content
+        assert "<h1>2026年6月18日 日报</h1>" not in content
+        assert "<a href=" not in content
 
 
 def test_save_feed_uses_meta_pub_date_for_reeder_timestamp():
     meta = {
-        "title": "2026年6月19日 新闻",
+        "title": "2026年6月19日 日报",
         "lead": "",
         "highlights": [],
         "date": "2026-06-19",
@@ -246,17 +247,17 @@ def test_merge_items_same_report_type_replaces():
 
 def test_generate_title_daily():
     """daily 类型标题格式"""
-    assert _generate_title("daily", None, "2026-06-18") == "2026年6月18日日报"
+    assert _generate_title("daily", None, "2026-06-18") == "2026年6月18日 日报"
 
 
 def test_generate_title_weekly():
     """weekly 类型标题格式"""
-    assert _generate_title("weekly", "2026-W25", "2026-06-18") == "2026年第25周周报"
+    assert _generate_title("weekly", "2026-W25", "2026-06-18") == "2026年6月第3周 周报"
 
 
 def test_generate_title_monthly():
     """monthly 类型标题格式"""
-    assert _generate_title("monthly", "2026-06", "2026-06-01") == "2026年6月月报"
+    assert _generate_title("monthly", "2026-06", "2026-06-01") == "2026年6月 月报"
 
 
 def test_save_feed_weekly_type():
@@ -272,7 +273,7 @@ def test_save_feed_weekly_type():
         )
         content = open(path, encoding="utf-8").read()
         assert "weekly/2026-W25" in content
-        assert "2026年第25周周报" in content
+        assert "2026年6月第3周 周报" in content
 
 
 def test_guid_format_daily():
@@ -299,7 +300,7 @@ def test_guid_format_monthly():
 def test_save_feed_weekly_uses_weekly_highlights():
     """save_feed report_type=weekly 时 content:encoded 包含'本周要点'"""
     meta = {
-        "title": "2026年第25周周报",
+        "title": "2026年6月第3周 周报",
         "lead": "",
         "highlights": ["要点一", "要点二"],
         "date": "2026-06-19",
@@ -322,7 +323,7 @@ def test_save_feed_weekly_uses_weekly_highlights():
 def test_save_feed_monthly_uses_monthly_highlights():
     """save_feed report_type=monthly 时 content:encoded 包含'本月要点'"""
     meta = {
-        "title": "2026年6月月报",
+        "title": "2026年6月 月报",
         "lead": "",
         "highlights": ["要点一"],
         "date": "2026-06-19",
