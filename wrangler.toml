@@ -1,0 +1,6 @@
+name = "us-politics-news-daily-rss-trigger"
+main = "cloudflare/daily-rss-trigger.js"
+compatibility_date = "2026-06-20"
+
+[triggers]
+crons = ["30 23 * * *"]
