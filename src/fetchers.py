@@ -123,6 +123,8 @@ class RSSFetcher(BaseFetcher):
 
     async def fetch(self, since: datetime) -> List[ContentItem]:
         items = []
+        since_utc = since if since.tzinfo else since.replace(tzinfo=timezone.utc)
+        since_utc = since_utc.astimezone(timezone.utc)
         for feed_cfg in self.feeds:
             try:
                 feed_url = re.sub(
@@ -135,7 +137,7 @@ class RSSFetcher(BaseFetcher):
 
                 for entry in data.entries:
                     published = self._parse_date(entry)
-                    if published and published < since:
+                    if published and published < since_utc:
                         continue
 
                     title = entry.get("title", "").strip()

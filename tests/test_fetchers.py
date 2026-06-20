@@ -16,6 +16,34 @@ def test_rss_fetcher_accepts_rss_and_rsshub_modes():
     assert [item["name"] for item in fetcher.feeds] == ["Official RSS", "RSSHub Feed"]
 
 
+def test_rss_fetcher_compares_naive_since_with_aware_feed_dates(monkeypatch):
+    source = {
+        "name": "Official RSS",
+        "url": "https://example.com/feed.xml",
+        "fetch_mode": "rss",
+        "column": "us_politics",
+        "enabled": True,
+    }
+    rss_xml = """<?xml version="1.0" encoding="UTF-8"?>
+    <rss><channel>
+      <item>
+        <title>White House announces policy update</title>
+        <link>https://example.com/policy</link>
+        <description>Policy summary</description>
+        <pubDate>Sat, 20 Jun 2026 00:30:00 GMT</pubDate>
+      </item>
+    </channel></rss>"""
+    fetcher = RSSFetcher([source])
+
+    async def _fake_get(url: str, **kwargs) -> str:
+        return rss_xml
+
+    fetcher._get = _fake_get  # type: ignore[method-assign]
+    items = asyncio.run(fetcher.fetch(datetime(2026, 6, 19, 23, 0)))
+
+    assert [item.title for item in items] == ["White House announces policy update"]
+
+
 def test_google_news_fetcher_only_accepts_google_news_mode():
     sources = [
         {"name": "Google", "url": "https://news.google.com/rss/search?q=test", "fetch_mode": "google_news", "enabled": True},

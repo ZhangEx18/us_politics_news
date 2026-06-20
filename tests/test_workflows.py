@@ -27,6 +27,10 @@ def test_daily_rss_publish_keeps_manual_trigger_and_beijing_report_date_validati
 
     assert _workflow_triggers(workflow) == {"workflow_dispatch": None}
     assert workflow["concurrency"]["group"] == "daily-rss-publish"
+    step_names = [step.get("name") for step in workflow["jobs"]["publish"]["steps"]]
+    assert "Generate daily RSS" in step_names
+    assert "Fetch news" not in step_names
+    assert "Generate daily digest" not in step_names
     assert "REPORT_DATE=$(python3 scripts/report_date.py)" in validate_step["run"]
     assert '[ -f "$REPORT_FILE" ]' in validate_step["run"]
 
