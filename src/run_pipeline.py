@@ -44,6 +44,7 @@ from fetchers import (
 )
 from models import ContentItem
 from report_engine import ReportSpec, build_report
+from report_titles import build_daily_title
 
 
 DEFAULT_TZ = "Asia/Shanghai"
@@ -696,11 +697,10 @@ def _run_digest_phase(
     phase_metrics["cn_source_selected_by_column"] = cn_selected_by_column
 
     # === 7+. 构造 ReportSpec，委托 report_engine 完成后续阶段 ===
-    dt_val = datetime.strptime(report_date, "%Y-%m-%d")
     spec = ReportSpec(
         report_type=report_type,
         report_key=report_date,
-        title=f"{dt_val.year}年{dt_val.month}月{dt_val.day}日 新闻",
+        title=build_daily_title(report_date),
         since=window_since,
         until=window_until,
         output_dir=daily_dir,

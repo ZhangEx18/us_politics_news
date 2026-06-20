@@ -21,6 +21,7 @@ from database import NewsDatabase
 from ai_analyzer import _load_ai_config
 from config import load_config, augment_ai_config_with_runtime
 from report_engine import ReportSpec, build_report
+from report_titles import build_monthly_title
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 
@@ -125,7 +126,7 @@ def run_monthly() -> dict:
     spec = ReportSpec(
         report_type="monthly",
         report_key=report_key,
-        title=f"{year}年{month}月月报",
+        title=build_monthly_title(since),
         since=since,
         until=until,
         output_dir=output_cfg.get("monthly_dir", "docs/monthly"),

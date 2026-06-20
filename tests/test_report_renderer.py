@@ -49,7 +49,8 @@ def test_render_reader_content_is_plain_article_fragment():
     assert "相关阅读" not in html
     assert "原文链接" not in html
     assert "来源" not in html
-    assert "<h1>2026年6月18日 新闻</h1>" not in html
+    assert "<h1>2026年6月18日 日报</h1>" not in html
+    assert "<a href=" not in html
 
 
 def test_render_reader_content_weekly_highlights():
@@ -176,3 +177,5 @@ def test_renderers_escape_external_text_and_drop_unsafe_links():
         assert "&lt;script&gt;" in output
         assert "<img src=x" not in output
         assert "&lt;img src=x onerror=alert" in output
+    assert "<a href=" not in html
+    assert "](" not in markdown

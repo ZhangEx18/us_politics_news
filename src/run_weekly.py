@@ -23,6 +23,7 @@ from ai_analyzer import _load_ai_config
 from config import load_config, augment_ai_config_with_runtime
 from models import ContentItem
 from report_engine import ReportSpec, build_report
+from report_titles import build_weekly_title
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 
@@ -51,6 +52,11 @@ def _get_weekly_window() -> tuple[datetime, datetime, str]:
     week_num = since.isocalendar()[1]
     report_key = f"{since.year}-W{week_num:02d}"
     return since, until, report_key
+
+
+def _get_month_week_number(date: datetime) -> int:
+    month_start = date.replace(day=1)
+    return ((date.day + month_start.weekday() - 1) // 7) + 1
 
 
 def _build_weekly_scored_events(filtered_items: list[ContentItem], articles: list) -> tuple[list[dict], int]:
@@ -93,7 +99,7 @@ def run_weekly() -> dict:
 
     # === 1. 计算时间窗口 ===
     since, until, report_key = _get_weekly_window()
-    week_num = since.isocalendar()[1]
+    week_num = _get_month_week_number(since)
     print(f"[周报] 窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}  标识: {report_key}")
 
     # === 2. 从数据库读取文章 ===
@@ -140,7 +146,7 @@ def run_weekly() -> dict:
     spec = ReportSpec(
         report_type="weekly",
         report_key=report_key,
-        title=f"{since.year}年第{week_num}周周报",
+        title=build_weekly_title(since),
         since=since,
         until=until,
         output_dir=output_cfg.get("weekly_dir", "docs/weekly"),

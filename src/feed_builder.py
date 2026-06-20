@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from report_renderer import render_reader_content
+from report_titles import build_report_title
 
 from typing import TYPE_CHECKING
 
@@ -210,20 +211,8 @@ def build_feed(items: list[str], base_url: str = "") -> str:
 
 def _generate_title(report_type: str, report_key: str | None, date: str) -> str:
     """根据报告类型生成标题"""
-    if report_type == "weekly" and report_key:
-        # report_key 格式如 "2026-W25"
-        m = re.match(r"(\d{4})-W(\d+)", report_key)
-        if m:
-            return f"{m.group(1)}年第{int(m.group(2))}周周报"
-    elif report_type == "monthly" and report_key:
-        # report_key 格式如 "2026-06"
-        m = re.match(r"(\d{4})-(\d{2})", report_key)
-        if m:
-            return f"{m.group(1)}年{int(m.group(2))}月月报"
-    # daily 或 fallback：用 date 生成
     try:
-        dt = datetime.strptime(date, "%Y-%m-%d")
-        return f"{dt.year}年{dt.month}月{dt.day}日日报"
+        return build_report_title(report_type, date)
     except ValueError:
         return f"{date} 观察日报"
 

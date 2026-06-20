@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 
 from database import Article
 from models import ContentItem, SourceType
-from run_weekly import _build_weekly_scored_events
+from run_weekly import _build_weekly_scored_events, _get_month_week_number
+from report_titles import build_weekly_title
 
 
 def test_weekly_scored_events_use_llm_score_and_skip_unscored_articles():
@@ -70,3 +71,15 @@ def test_weekly_scored_events_use_llm_score_and_skip_unscored_articles():
     assert events[0]["score"] == 92
     assert events[0]["summary"] == "LLM 摘要"
     assert events[0]["tags"] == ["法院", "政策"]
+
+
+def test_month_week_number_counts_weeks_within_month():
+    assert _get_month_week_number(datetime(2026, 6, 1, 7, 0)) == 1
+    assert _get_month_week_number(datetime(2026, 6, 8, 7, 0)) == 2
+    assert _get_month_week_number(datetime(2026, 6, 18, 7, 0)) == 3
+
+
+def test_build_weekly_title_uses_month_week_number():
+    assert build_weekly_title("2026-06-01") == "2026年6月第1周 周报"
+    assert build_weekly_title("2026-06-08") == "2026年6月第2周 周报"
+    assert build_weekly_title("2026-06-18") == "2026年6月第3周 周报"
