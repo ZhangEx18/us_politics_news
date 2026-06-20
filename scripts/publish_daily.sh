@@ -40,7 +40,7 @@ if ! grep -q "content:encoded" "$WORK_DIR/docs/feed.xml"; then
 fi
 
 # 检查日报文件
-TODAY=$(date +%Y-%m-%d)
+TODAY=$(python3 "$WORK_DIR/scripts/report_date.py")
 if [ ! -f "$WORK_DIR/docs/daily/$TODAY.md" ]; then
     echo "[错误] 日报文件不存在: docs/daily/$TODAY.md"
     exit 1

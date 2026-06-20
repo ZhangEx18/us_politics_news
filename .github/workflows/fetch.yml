@@ -1,7 +1,5 @@
 name: Fetch News
 on:
-  schedule:
-    - cron: '0 23 * * *'
   workflow_dispatch:
 
 permissions:

@@ -1,7 +1,5 @@
 name: Daily Publish
 on:
-  schedule:
-    - cron: '45 23 * * *'
   workflow_dispatch:
 
 permissions:
@@ -53,7 +51,7 @@ jobs:
 
       - name: Validate output
         run: |
-          TODAY=$(date +%Y-%m-%d)
+          TODAY=$(python3 scripts/report_date.py)
           grep -q "content:encoded" docs/feed.xml || { echo "feed.xml 缺少 content:encoded"; exit 1; }
           [ -f "docs/daily/$TODAY.md" ] || { echo "日报不存在"; exit 1; }
           grep -q "一、美国政局" "docs/daily/$TODAY.md" || { echo "缺少美国政局栏目"; exit 1; }

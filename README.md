@@ -28,7 +28,7 @@ python3 src/run_pipeline.py
 
 ## 部署
 
-GitHub Actions 自动运行 `daily_run.sh`，产物推送到 `docs/` 分支，GitHub Pages 托管。
+主发布链路由 Cloudflare Workers Cron 在北京时间 07:30 触发 GitHub Actions 的 `Daily RSS Publish` workflow。该 workflow 会顺序执行抓取、生成日报、更新 RSS Feed，并发布到 GitHub Pages。
 
 Reader 订阅地址：
 
@@ -137,7 +137,7 @@ https://<username>.github.io/us_politics_news/feed.xml
 ## 定时运行
 
 ```bash
-# 本机 cron（每天 8:00 执行）
+# 本机 cron（每天 8:00 执行，作为本地备用方案）
 0 8 * * * /path/to/scripts/daily_run.sh
 ```
 
@@ -146,3 +146,21 @@ https://<username>.github.io/us_politics_news/feed.xml
 - 日报字数 > 5000（确保内容充实）
 
 校验失败会 `exit 1`，便于 CI 告警。
+
+## Cloudflare 定时触发
+
+1. 创建 GitHub fine-grained personal access token，仅授予本仓库 `Actions: write` 权限。
+2. 安装并登录 Wrangler。
+3. 写入 Worker Secret：
+
+```bash
+wrangler secret put GITHUB_TOKEN
+```
+
+4. 部署 Worker：
+
+```bash
+wrangler deploy
+```
+
+`wrangler.toml` 中的 `30 23 * * *` 使用 UTC，等价于北京时间 07:30。Worker 只负责触发 `.github/workflows/daily-rss-publish.yml`，不直接抓取、生成或发布日报。

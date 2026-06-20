@@ -1,0 +1,115 @@
+name: Daily RSS Publish
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-rss-publish
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore database from news-data branch
+        run: |
+          mkdir -p data
+          if git ls-remote --exit-code --heads origin news-data >/dev/null 2>&1; then
+            git fetch origin news-data
+            git show origin/news-data:data/news.db > data/news.db
+            test -s data/news.db || { echo "数据库恢复失败"; exit 1; }
+            echo "已从 news-data 分支恢复数据库"
+          else
+            echo "news-data 分支不存在，将创建新数据库"
+          fi
+
+      - name: Restore existing feed history from gh-pages
+        run: |
+          mkdir -p docs
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages
+            if git cat-file -e origin/gh-pages:feed.xml 2>/dev/null; then
+              git show origin/gh-pages:feed.xml > docs/feed.xml
+              echo "已恢复历史 feed.xml"
+            else
+              echo "gh-pages 尚无 feed.xml"
+            fi
+          fi
+
+      - name: Fetch news
+        run: python3 src/run_pipeline.py --fetch-only --hours 24
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          TIANAPI_KEY: ${{ secrets.TIANAPI_KEY }}
+
+      - name: Generate daily digest
+        run: python3 src/run_pipeline.py --digest-only --hours 24
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+
+      - name: Validate output
+        run: |
+          REPORT_DATE=$(python3 scripts/report_date.py)
+          REPORT_FILE="docs/daily/$REPORT_DATE.md"
+          echo "校验日报日期: $REPORT_DATE"
+          grep -q "content:encoded" docs/feed.xml || { echo "feed.xml 缺少 content:encoded"; exit 1; }
+          [ -f "$REPORT_FILE" ] || { echo "日报不存在: $REPORT_FILE"; exit 1; }
+          grep -q "一、美国政局" "$REPORT_FILE" || { echo "缺少美国政局栏目"; exit 1; }
+          grep -q "二、国际局势" "$REPORT_FILE" || { echo "缺少国际局势栏目"; exit 1; }
+          grep -q "三、科技前沿" "$REPORT_FILE" || { echo "缺少科技前沿栏目"; exit 1; }
+          grep -q "四、经济走势" "$REPORT_FILE" || { echo "缺少经济走势栏目"; exit 1; }
+          CHARS=$(wc -c < "$REPORT_FILE")
+          echo "日报字节: $CHARS"
+          [ "$CHARS" -gt 10000 ] || { echo "日报字数过少"; exit 1; }
+          python3 - <<'PY'
+          from pathlib import Path
+          feed = Path("docs/feed.xml").read_text(encoding="utf-8")
+          blocked = ["<!DOCTYPE html>", "<html", "<head>", "<style>", "相关阅读", "原文链接", "<strong>来源：</strong>", "来源："]
+          bad = [token for token in blocked if token in feed]
+          if bad:
+              raise SystemExit(f"Reader feed 仍含不应出现的内容: {bad}")
+          print("Reader feed 格式校验通过")
+          PY
+          echo "校验通过"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+
+      - name: Persist database to news-data branch
+        run: |
+          test -f data/news.db || { echo "数据库文件不存在"; exit 1; }
+          TMP_DIR=$(mktemp -d)
+          mkdir -p "$TMP_DIR/data"
+          cp data/news.db "$TMP_DIR/data/news.db"
+          printf "*.pyc\n__pycache__/\n.DS_Store\n" > "$TMP_DIR/.gitignore"
+          cd "$TMP_DIR"
+          git init
+          git checkout -b news-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/news.db .gitignore
+          git commit -m "Update news database"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin HEAD:news-data --force

@@ -19,16 +19,16 @@ else
     echo "请复制 .env.example 为 .env 并填入密钥"
 fi
 
-# 日期
-TODAY=$(date +%Y-%m-%d)
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
 cd "$WORK_DIR"
 
 # 激活虚拟环境（如果存在）
 if [ -d "$VENV" ]; then
     source "$VENV/bin/activate"
 fi
+
+# 日期
+TODAY=$(python "$WORK_DIR/scripts/report_date.py")
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 echo "========================================"
 echo "四维日报生成: $TODAY $(date +%H:%M:%S)"
