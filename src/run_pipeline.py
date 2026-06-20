@@ -528,8 +528,7 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
     """只执行 digest 流程（步骤 4-13），从数据库读取已有数据"""
     start_time = datetime.now()
     config = _load_config()
-    schedule_tz = _get_schedule_timezone(config)
-    since, until, report_date = _get_report_window(start_time.replace(tzinfo=schedule_tz), config=config)
+    since, until, report_date = _get_report_window(config=config)
     storage_cfg = config.get("storage", {})
     db_path = storage_cfg.get("db_path", "data/news.db")
 

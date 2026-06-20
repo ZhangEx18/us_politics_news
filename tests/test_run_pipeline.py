@@ -18,6 +18,7 @@ from run_pipeline import (
     _is_cn_source_item,
     _load_schedule_config,
     _is_hard_news_entry,
+    run_digest_only,
 )
 from report_engine import build_reader_highlights
 
@@ -171,6 +172,48 @@ def test_get_report_window_locks_to_beijing_7am_cutoff():
     assert since == datetime(2026, 6, 17, 7, 0, tzinfo=tz)
     assert until == datetime(2026, 6, 18, 7, 0, tzinfo=tz)
     assert report_date == "2026-06-18"
+
+
+def test_get_report_window_converts_github_runner_utc_time_to_beijing():
+    tz = ZoneInfo("Asia/Shanghai")
+    config = {"schedule": {"timezone": "Asia/Shanghai", "cutoff_hour": 7, "publish_at": "07:45"}}
+
+    now = datetime(2026, 6, 20, 1, 55, tzinfo=timezone.utc).astimezone(tz)
+    since, until, report_date = _get_report_window(now, config=config)
+
+    assert since == datetime(2026, 6, 19, 7, 0, tzinfo=tz)
+    assert until == datetime(2026, 6, 20, 7, 0, tzinfo=tz)
+    assert report_date == "2026-06-20"
+
+
+def test_digest_only_uses_converted_schedule_timezone_for_report_window(monkeypatch):
+    tz = ZoneInfo("Asia/Shanghai")
+
+    class FixedDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            utc_now = datetime(2026, 6, 20, 1, 55, tzinfo=timezone.utc)
+            if tz is None:
+                return utc_now.replace(tzinfo=None)
+            return utc_now.astimezone(tz)
+
+    class EmptyDatabase:
+        def __init__(self, db_path):
+            self.db_path = db_path
+
+        def fetch_since(self, since):
+            assert since == datetime(2026, 6, 18, 23, 0)
+            return []
+
+    monkeypatch.setattr("run_pipeline.datetime", FixedDatetime)
+    monkeypatch.setattr("run_pipeline._load_config", lambda: {"schedule": {"timezone": "Asia/Shanghai"}})
+    monkeypatch.setattr("run_pipeline._load_ai_config", lambda: {"api_key": "k"})
+    monkeypatch.setattr("run_pipeline._augment_ai_config_with_runtime", lambda ai_config, config: ai_config)
+    monkeypatch.setattr("run_pipeline.NewsDatabase", EmptyDatabase)
+
+    stats = run_digest_only()
+
+    assert stats == {"total_selected": 0}
 
 
 def test_get_report_publish_time_reads_schedule_publish_at():
