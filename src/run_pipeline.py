@@ -300,7 +300,7 @@ def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> di
         "title": item.title,
         "source": item.source_name,
         "score": score,
-        "summary": item.summary or "",
+        "summary": item.content or "",
         "content": item.content or "",
         "source_links": [{"title": item.source_name, "url": str(item.url)}] if item.url else [],
         "language": item.metadata.get("language", ""),
