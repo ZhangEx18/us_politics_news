@@ -60,6 +60,11 @@ def _markdown_title_text(text: object) -> str:
     return html.escape(str(text), quote=False)
 
 
+def _headline_only_title(event: dict) -> str:
+    """兼容 headline_only_events 里的 title_zh / title 两种字段。"""
+    return str(event.get("title_zh") or event.get("title") or "").strip()
+
+
 def _frontmatter(title: str, lead: str, highlights: list, date: str) -> str:
     payload = {
         "title": title,
@@ -283,7 +288,7 @@ footer {
         if headline_only:
             html.append("<ul>")
             for event in headline_only:
-                event_title = _html_text(event.get("title_zh", ""))
+                event_title = _html_text(_headline_only_title(event))
                 if event_title:
                     html.append(f"<li>{event_title}</li>")
             html.append("</ul>")
@@ -372,7 +377,7 @@ def render_reader_content(
         if headline_only:
             html.append("<ul>")
             for event in headline_only:
-                event_title = _html_text(event.get("title_zh", ""))
+                event_title = _html_text(_headline_only_title(event))
                 if event_title:
                     html.append(f"<li>{event_title}</li>")
             html.append("</ul>")
@@ -445,7 +450,7 @@ def render_structured_markdown(
         # 无序条目：仅标题
         if headline_only:
             for event in headline_only:
-                event_title = _markdown_text(event.get("title_zh", ""))
+                event_title = _markdown_text(_headline_only_title(event))
                 if event_title:
                     lines.append(f"- {event_title}")
             lines.append("")

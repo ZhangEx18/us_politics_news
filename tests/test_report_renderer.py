@@ -97,6 +97,32 @@ def test_render_reader_has_numbered_events_and_bullet_titles():
     assert "补充快讯" not in html
 
 
+def test_render_reader_headline_only_falls_back_to_title_field():
+    meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
+    columns = {
+        "us_politics": {
+            "detailed_events": [
+                {"title_zh": "重要事件A", "reader_body": "这是正文。第二句。"},
+            ],
+            "headline_only_events": [
+                {"title": "快讯C"},
+                {"title": "快讯D"},
+            ],
+        },
+        "global_affairs": {"detailed_events": [], "headline_only_events": []},
+        "technology": {"detailed_events": [], "headline_only_events": []},
+        "economy": {"detailed_events": [], "headline_only_events": []},
+    }
+
+    html = render_reader_content(meta, columns, report_type="daily")
+    structured_html = render_structured_html(meta, columns, report_type="daily")
+    markdown = render_structured_markdown(meta, columns, report_type="daily")
+
+    for output in (html, structured_html, markdown):
+        assert "快讯 C" in output
+        assert "快讯 D" in output
+
+
 def test_render_reader_skips_headline_only_column():
     """只有 headline_only_events 的栏目在 Reader 中不显示。"""
     meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}

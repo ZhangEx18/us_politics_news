@@ -149,12 +149,18 @@ https://<username>.github.io/us_politics_news/feed.xml
 
 ## Cloudflare 定时触发
 
-1. 创建 GitHub fine-grained personal access token，仅授予本仓库 `Actions: write` 权限。
+1. 创建 GitHub fine-grained personal access token，仅授予本仓库 `Actions: write` 权限。不要复用本机 `gh auth` 登录 token。
 2. 安装并登录 Wrangler。
-3. 写入 Worker Secret：
+3. 将该专用 token 写入 Worker Secret：
 
 ```bash
 wrangler secret put GITHUB_TOKEN
+```
+
+建议补一条校验，确认线上 Worker 已持有独立 secret：
+
+```bash
+wrangler secret list
 ```
 
 4. 部署 Worker：

@@ -3,7 +3,7 @@ import test from "node:test";
 
 import worker from "./daily-rss-trigger.js";
 
-test("fetch triggers the Daily RSS Publish workflow dispatch", async () => {
+test("scheduled triggers the Daily RSS Publish workflow dispatch", async () => {
   const calls = [];
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, options) => {
@@ -11,12 +11,18 @@ test("fetch triggers the Daily RSS Publish workflow dispatch", async () => {
     return new Response(null, { status: 204 });
   };
 
-  try {
-    const response = await worker.fetch(new Request("https://example.com"), {
-      GITHUB_TOKEN: "github_pat_test",
-    });
+  const waitUntilPromises = [];
+  const ctx = {
+    waitUntil(promise) {
+      waitUntilPromises.push(promise);
+    },
+  };
 
-    assert.equal(response.status, 202);
+  try {
+    await worker.scheduled({}, { GITHUB_TOKEN: "github_pat_test" }, ctx);
+    assert.equal(waitUntilPromises.length, 1);
+    await Promise.all(waitUntilPromises);
+
     assert.equal(calls.length, 1);
     assert.equal(
       calls[0].url,
@@ -30,13 +36,31 @@ test("fetch triggers the Daily RSS Publish workflow dispatch", async () => {
   }
 });
 
-test("fetch fails when GitHub rejects workflow dispatch", async () => {
+test("fetch endpoint is disabled", async () => {
+  const response = await worker.fetch(new Request("https://example.com"), {
+    GITHUB_TOKEN: "github_pat_test",
+  });
+
+  assert.equal(response.status, 404);
+  assert.equal(await response.text(), "Not Found\n");
+});
+
+test("scheduled fails when GitHub rejects workflow dispatch", async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response("bad credentials", { status: 401 });
 
+  const waitUntilPromises = [];
+  const ctx = {
+    waitUntil(promise) {
+      waitUntilPromises.push(promise);
+    },
+  };
+
   try {
+    await worker.scheduled({}, { GITHUB_TOKEN: "bad" }, ctx);
+    assert.equal(waitUntilPromises.length, 1);
     await assert.rejects(
-      () => worker.fetch(new Request("https://example.com"), { GITHUB_TOKEN: "bad" }),
+      () => Promise.all(waitUntilPromises),
       /GitHub workflow dispatch failed: 401 bad credentials/,
     );
   } finally {

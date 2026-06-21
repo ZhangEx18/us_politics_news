@@ -1,6 +1,12 @@
 name: Daily RSS Publish
 on:
   workflow_dispatch:
+    inputs:
+      digest_only:
+        description: '仅使用 news-data 数据库中的现有文章重生成日报，不重新抓取'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -14,11 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 70
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -51,7 +57,12 @@ jobs:
           fi
 
       - name: Generate daily RSS
-        run: python3 src/run_pipeline.py --hours 24
+        run: |
+          if [ "${{ inputs.digest_only }}" = "true" ]; then
+            python3 src/run_pipeline.py --digest-only --hours 24
+          else
+            python3 src/run_pipeline.py --hours 24
+          fi
         env:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
@@ -85,7 +96,7 @@ jobs:
           echo "校验通过"
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
