@@ -62,7 +62,7 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
     payload = {
         "model": config["model"],
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.3,
+        "temperature": float(config.get("temperature", 0.3)),
     }
     url = f"{config['base_url'].rstrip('/')}/chat/completions"
 
@@ -720,6 +720,27 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 """
 
 
+HEADLINE_TRANSLATION_PROMPT_TEMPLATE = """你是中文新闻编辑。请把输入的英文新闻标题翻译成简洁、准确、自然的中文标题。
+
+要求：
+1. 只翻译，不补充不存在的信息
+2. 不保留英文原题
+3. 每条输出一个中文标题
+4. 保持硬新闻风格，不写评论口吻
+5. 必须返回严格 JSON 对象
+
+输出格式：
+{{
+  "items": [
+    {{"title_zh": "中文标题"}}
+  ]
+}}
+
+输入标题：
+{titles_json}
+"""
+
+
 # 栏目定义映射
 _COLUMN_DEFINITIONS: dict[str, str] = {
     "us_politics": "只写美国国内权力结构、法院、国会、白宫、州政治、选举、调查、人事和联邦政策；不写以外交、战争、盟友关系、对华/对伊互动为主轴的事件。",
@@ -835,6 +856,52 @@ async def generate_column_digest(
     raise RuntimeError(
         f"generate_column_digest 响应中未找到 events 数组: {response[:300]}"
     )
+
+
+async def translate_headline_titles(
+    titles: list[str],
+    ai_config: dict,
+) -> list[str]:
+    """将次要新闻标题批量翻译为中文。"""
+    cleaned_titles = [str(title).strip() for title in titles if str(title).strip()]
+    if not cleaned_titles:
+        return []
+
+    prompt = HEADLINE_TRANSLATION_PROMPT_TEMPLATE.replace(
+        "{titles_json}",
+        json.dumps(cleaned_titles, ensure_ascii=False, indent=2),
+    )
+    response = await _call_llm(
+        prompt,
+        {**ai_config, "temperature": 0},
+        timeout=_timeout_for(ai_config, "meta", 120),
+    )
+
+    text = _strip_markdown_fence(response)
+    parsed = None
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            try:
+                parsed = json.loads(m.group())
+            except json.JSONDecodeError:
+                pass
+
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("items"), list):
+        raise RuntimeError(f"translate_headline_titles JSON 解析失败: {response[:300]}")
+
+    translated: list[str] = []
+    for item in parsed["items"]:
+        if not isinstance(item, dict):
+            translated.append("")
+            continue
+        translated.append(str(item.get("title_zh", "")).strip())
+
+    if len(translated) < len(cleaned_titles):
+        translated.extend([""] * (len(cleaned_titles) - len(translated)))
+    return translated[:len(cleaned_titles)]
 
 
 def has_ai_config() -> bool:

@@ -97,7 +97,7 @@ def test_render_reader_has_numbered_events_and_bullet_titles():
     assert "补充快讯" not in html
 
 
-def test_render_reader_headline_only_falls_back_to_title_field():
+def test_render_reader_headline_only_requires_chinese_title():
     meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
     columns = {
         "us_politics": {
@@ -119,8 +119,8 @@ def test_render_reader_headline_only_falls_back_to_title_field():
     markdown = render_structured_markdown(meta, columns, report_type="daily")
 
     for output in (html, structured_html, markdown):
-        assert "快讯 C" in output
-        assert "快讯 D" in output
+        assert "快讯 C" not in output
+        assert "快讯 D" not in output
 
 
 def test_render_reader_skips_headline_only_column():

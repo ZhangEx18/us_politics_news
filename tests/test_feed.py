@@ -120,6 +120,24 @@ def test_save_feed_uses_reader_friendly_fragment():
         assert "<a href=" not in content
 
 
+def test_save_feed_headline_only_requires_chinese_title():
+    meta = {"title": "测试标题", "lead": "", "highlights": [], "date": "2026-06-18"}
+    columns = {
+        "us_politics": {
+            "detailed_events": [{"title_zh": "测试事件", "reader_body": "测试事件的单段概述正文。"}],
+            "headline_only_events": [{"title": "English only"}],
+        },
+        "global_affairs": [],
+        "technology": [],
+        "economy": [],
+    }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = os.path.join(tmpdir, "feed.xml")
+        save_feed(meta=meta, columns=columns, output_path=path, base_url="https://example.com")
+        content = open(path, encoding="utf-8").read()
+    assert "English only" not in content
+
+
 def test_save_feed_uses_meta_pub_date_for_reeder_timestamp():
     meta = {
         "title": "2026年6月19日 日报",

@@ -57,34 +57,34 @@ def test_digest_targets_match_publish_constraints():
     assert llm.get("digest_timeout_seconds") == 240
     assert llm.get("digest_content_chars") == 1000
     assert llm.get("meta_timeout_seconds") == 120
-    assert digest.get("total_min_items") == 28
-    assert digest.get("total_target_items") == 60
-    assert digest.get("total_max_items") == 60
+    assert digest.get("total_min_items") == 34
+    assert digest.get("total_target_items") == 56
+    assert digest.get("total_max_items") == 56
     assert config.get("analysis", {}).get("freshness_hours") == 30
     assert schedule.get("timezone") == "Asia/Shanghai"
     assert schedule.get("cutoff_hour") == 7
     assert schedule.get("fetch_at") == "07:00"
     assert schedule.get("publish_at") == "07:45"
 
-    assert columns["us_politics"]["min_items"] == 8
-    assert columns["us_politics"]["target_items"] == 12
-    assert columns["us_politics"]["max_items"] == 12
+    assert columns["us_politics"]["min_items"] == 10
+    assert columns["us_politics"]["target_items"] == 10
+    assert columns["us_politics"]["max_items"] == 10
     assert columns["us_politics"]["headline_items"] == 8
     assert columns["us_politics"]["prefilter_items"] == 25
 
     assert columns["global_affairs"]["min_items"] == 10
-    assert columns["global_affairs"]["target_items"] == 12
-    assert columns["global_affairs"]["max_items"] == 12
+    assert columns["global_affairs"]["target_items"] == 10
+    assert columns["global_affairs"]["max_items"] == 10
     assert columns["global_affairs"]["headline_items"] == 8
     assert columns["global_affairs"]["prefilter_items"] == 40
 
-    assert columns["technology"]["min_items"] == 5
+    assert columns["technology"]["min_items"] == 7
     assert columns["technology"]["target_items"] == 7
     assert columns["technology"]["max_items"] == 7
     assert columns["technology"]["headline_items"] == 3
     assert columns["technology"]["prefilter_items"] == 24
 
-    assert columns["economy"]["min_items"] == 5
+    assert columns["economy"]["min_items"] == 7
     assert columns["economy"]["target_items"] == 7
     assert columns["economy"]["max_items"] == 7
     assert columns["economy"]["headline_items"] == 3

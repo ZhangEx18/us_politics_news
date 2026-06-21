@@ -61,8 +61,8 @@ def _markdown_title_text(text: object) -> str:
 
 
 def _headline_only_title(event: dict) -> str:
-    """兼容 headline_only_events 里的 title_zh / title 两种字段。"""
-    return str(event.get("title_zh") or event.get("title") or "").strip()
+    """headline_only_events 只消费中文标题，避免英文泄漏到正文。"""
+    return str(event.get("title_zh") or "").strip()
 
 
 def _frontmatter(title: str, lead: str, highlights: list, date: str) -> str:
