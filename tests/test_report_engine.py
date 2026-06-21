@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, patch
 from report_engine import (
     ReportSpec,
     _generate_all_column_digests,
+    _translate_headline_only_by_column,
     build_reader_highlights,
     build_report,
     sanitize_or_validate_events,
@@ -179,3 +180,102 @@ def test_build_report_tracks_cn_source_metrics(tmp_path):
     metrics = stats["metrics"]
     assert metrics["cn_source_selected"] == 1
     assert metrics["cn_source_selected_by_column"]["global_affairs"] == 1
+
+
+def test_translate_headline_only_by_column_drops_untranslated():
+    async def _fake_translate(titles, ai_config):
+        assert titles == ["English one", "English two"]
+        return ["中文一", ""]
+
+    with patch("report_engine.translate_headline_titles", new=AsyncMock(side_effect=_fake_translate)):
+        translated, metrics = __import__("asyncio").run(_translate_headline_only_by_column(
+            {"global_affairs": [{"title": "English one"}, {"title": "English two"}]},
+            {"api_key": "x", "base_url": "https://example.com", "model": "test"},
+        ))
+
+    assert translated["global_affairs"] == [{"title": "English one", "title_zh": "中文一"}]
+    assert metrics["global_affairs"]["headline_translated"] == 1
+    assert metrics["global_affairs"]["headline_translation_failed"] == 1
+
+
+def test_build_report_prefers_quantity_for_daily_fill(tmp_path):
+    spec = ReportSpec(
+        report_type="daily",
+        report_key="2026-06-19",
+        title="测试日报",
+        since=datetime(2026, 6, 18, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 19, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "daily"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 2, "max_items": 2, "headline_items": 2},
+            "global_affairs": {"label": "国际局势", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 0, "max_items": 0, "headline_items": 0},
+        },
+        fallback_candidates_by_column={
+            "us_politics": [
+                {"title": "Fallback C", "summary": "摘要 C", "content": "正文 C", "column": "us_politics"},
+                {"title": "Fallback D", "summary": "摘要 D", "content": "正文 D", "column": "us_politics"},
+            ]
+        },
+        min_llm_score=65,
+    )
+    scored_events = [
+        {
+            "title": "High A",
+            "source": "A",
+            "score": 90,
+            "summary": "摘要A",
+            "content": "正文A",
+            "column": "us_politics",
+            "event_key": "a",
+            "language": "en",
+            "tags": [],
+            "source_links": [{"title": "A", "url": "https://example.com/a"}],
+            "is_hard_news": True,
+        },
+        {
+            "title": "Low B",
+            "source": "B",
+            "score": 50,
+            "summary": "摘要B",
+            "content": "正文B",
+            "column": "us_politics",
+            "event_key": "b",
+            "language": "en",
+            "tags": [],
+            "source_links": [{"title": "B", "url": "https://example.com/b"}],
+            "is_hard_news": True,
+        },
+    ]
+    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        return [
+            {
+                "title_zh": event["title"],
+                "reader_body": f'{event["title"]} 正文。',
+                "core_facts": f'{event["title"]} 正文。',
+            }
+            for event in kwargs["events"]
+        ]
+
+    async def _fake_translate(titles, ai_config):
+        return [f"中文 {title}" for title in titles]
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.translate_headline_titles", new=AsyncMock(side_effect=_fake_translate)):
+        stats = build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    metrics = stats["metrics"]["columns"]["us_politics"]
+    assert metrics["detailed_filled"] == 2
+    assert metrics["headline_filled"] == 2
+    assert metrics["detailed_filled_from_low_score"] == 1
+    assert metrics["headline_filled_from_non_hard_news"] == 2
+    assert metrics["headline_translated"] == 2

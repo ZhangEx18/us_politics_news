@@ -295,6 +295,22 @@ def _build_scoring_entries_by_column(
     return all_entries, by_column_entries
 
 
+def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> dict:
+    return {
+        "title": item.title,
+        "source": item.source_name,
+        "score": score,
+        "summary": item.summary or "",
+        "content": item.content or "",
+        "source_links": [{"title": item.source_name, "url": str(item.url)}] if item.url else [],
+        "language": item.metadata.get("language", ""),
+        "tags": list(item.metadata.get("tags", [])),
+        "event_key": "",
+        "is_hard_news": False,
+        "column": item.column or "us_politics",
+    }
+
+
 def _get_report_window(now: datetime | None = None, config: dict | None = None) -> tuple[datetime, datetime, str]:
     """固定晨报窗口：配置时区下前一天 cutoff 到当天 cutoff。"""
     schedule_cfg = _load_schedule_config(config)
@@ -677,6 +693,12 @@ def _run_digest_phase(
     # === 6. 硬新闻过滤 ===
     print("\n[6/13] 硬新闻过滤...")
     hard_news_scored = [entry for entry in scored_dicts if _is_hard_news_entry(entry)]
+    fallback_candidates_by_column: dict[str, list[dict]] = {}
+    for col_key, items in prefiltered_by_column.items():
+        non_hard: list[dict] = []
+        for item in items:
+            non_hard.append(_content_item_to_report_candidate(item))
+        fallback_candidates_by_column[col_key] = non_hard
     # 按栏目统计
     _hard_by_col: dict[str, int] = {}
     for entry in hard_news_scored:
@@ -714,6 +736,7 @@ def _run_digest_phase(
         pub_date=_get_report_publish_time(report_date, config=config),
         history_days=history_days,
         min_llm_score=analysis_cfg.get("min_llm_score", 65),
+        fallback_candidates_by_column=fallback_candidates_by_column,
     )
 
     stats = build_report(spec, hard_news_scored, config, ai_config, db, phase_metrics=phase_metrics)

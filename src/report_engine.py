@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from ai_analyzer import generate_column_digest, merge_events
+from ai_analyzer import generate_column_digest, merge_events, translate_headline_titles
 from feed_builder import save_feed
 from publish_manifest import build_manifest
 from report_renderer import COLUMN_ORDER, save_daily_report
@@ -40,6 +40,7 @@ class ReportSpec:
     pub_date: datetime | None = None
     history_days: int = 3
     min_llm_score: float = 65
+    fallback_candidates_by_column: dict[str, list[dict]] = field(default_factory=dict)
 
 
 # ── 共享工具 ──
@@ -230,6 +231,125 @@ def sanitize_or_validate_events(
     return cleaned_events, all_issues
 
 
+def _to_candidate_dict(entry: dict) -> dict:
+    return {
+        "title": entry.get("title", ""),
+        "title_zh": entry.get("title_zh", ""),
+        "source": entry.get("source", ""),
+        "score": entry.get("score", 0),
+        "summary": entry.get("summary", ""),
+        "content": entry.get("content", ""),
+        "source_links": entry.get("source_links", []),
+        "language": entry.get("language", ""),
+        "tags": entry.get("tags", []),
+        "event_key": entry.get("event_key", ""),
+        "is_hard_news": entry.get("is_hard_news", False),
+    }
+
+
+def _event_identity(entry: dict) -> str:
+    return str(entry.get("title_zh") or entry.get("title") or entry.get("event_key") or "").strip()
+
+
+def _select_daily_column_items(
+    scored_items: list[dict],
+    fallback_items: list[dict],
+    target_items: int,
+    max_items: int,
+    headline_items: int,
+    min_score: float,
+) -> tuple[list[dict], list[dict], dict[str, int]]:
+    """日报按数量优先补足主新闻和次要新闻。"""
+    high_score = [item for item in scored_items if (item.get("score") or 0) >= min_score]
+    low_score = [item for item in scored_items if (item.get("score") or 0) < min_score]
+
+    detailed: list[dict] = []
+    used: set[str] = set()
+    metrics = {
+        "detailed_filled_from_low_score": 0,
+        "headline_filled_from_low_score": 0,
+        "headline_filled_from_non_hard_news": 0,
+    }
+
+    detailed_target = max_items if max_items > 0 else target_items
+    for pool_name, pool in (("high", high_score), ("low", low_score)):
+        for item in pool:
+            identity = _event_identity(item)
+            if not identity or identity in used:
+                continue
+            detailed.append(_to_candidate_dict(item))
+            used.add(identity)
+            if pool_name == "low":
+                metrics["detailed_filled_from_low_score"] += 1
+            if len(detailed) >= detailed_target:
+                break
+        if len(detailed) >= detailed_target:
+            break
+
+    headline: list[dict] = []
+    for pool_name, pool in (("high", high_score), ("low", low_score), ("non_hard", fallback_items)):
+        for item in pool:
+            identity = _event_identity(item)
+            if not identity or identity in used:
+                continue
+            headline.append(_to_candidate_dict(item))
+            used.add(identity)
+            if pool_name == "low":
+                metrics["headline_filled_from_low_score"] += 1
+            if pool_name == "non_hard":
+                metrics["headline_filled_from_non_hard_news"] += 1
+            if len(headline) >= headline_items:
+                break
+        if len(headline) >= headline_items:
+            break
+
+    metrics["detailed_filled"] = len(detailed)
+    metrics["headline_filled"] = len(headline)
+    return detailed, headline, metrics
+
+
+async def _translate_headline_only_by_column(
+    column_headline_only: dict[str, list[dict]],
+    ai_config: dict,
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
+    """将次要新闻标题批量翻译成中文。"""
+    translated_columns: dict[str, list[dict]] = {}
+    metrics: dict[str, dict[str, int]] = {}
+
+    for col_key, items in column_headline_only.items():
+        metrics[col_key] = {
+            "headline_translated": 0,
+            "headline_translation_failed": 0,
+        }
+        if not items:
+            translated_columns[col_key] = []
+            continue
+        titles = [str(item.get("title") or "").strip() for item in items if str(item.get("title") or "").strip()]
+        try:
+            translated_titles = await translate_headline_titles(titles, ai_config)
+        except Exception:
+            translated_titles = []
+
+        translated_events: list[dict] = []
+        for item, title_zh in zip(items, translated_titles):
+            clean_title = str(title_zh).strip()
+            if not clean_title:
+                metrics[col_key]["headline_translation_failed"] += 1
+                continue
+            translated_events.append({
+                **item,
+                "title_zh": clean_title,
+            })
+            metrics[col_key]["headline_translated"] += 1
+
+        dropped = len(items) - len(translated_events) - metrics[col_key]["headline_translation_failed"]
+        if dropped > 0:
+            metrics[col_key]["headline_translation_failed"] += dropped
+        translated_columns[col_key] = translated_events
+
+    return translated_columns, metrics
+
+
 # ── 核心编排 ──
 
 def build_report(
@@ -276,26 +396,17 @@ def build_report(
     for c in sorted(_by_col):
         print(f"     {c}: {_by_col[c]}")
 
-    # ── min_llm_score 过滤 ──
-    print(f"\n[过滤] min_llm_score (阈值={spec.min_llm_score})...")
-    filtered_events = [e for e in merged_events if (e.get("score") or 0) >= spec.min_llm_score]
-    print(f"   {len(merged_events)} → {len(filtered_events)} 条")
-
-    if not filtered_events:
-        print("\n[警告] 过滤后无事件")
-        return {"total_selected": 0}
-
     # ── 按栏目分桶 ──
     print(f"\n[分桶] 按栏目分桶...")
     by_column: dict[str, list[dict]] = {}
-    for e in filtered_events:
+    for e in merged_events:
         col = e.get("column", "us_politics")
         by_column.setdefault(col, []).append(e)
     for col in by_column:
         by_column[col].sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
     for col in sorted(by_column):
         print(f"   {col}: {len(by_column[col])} 条")
-        metrics["columns"].setdefault(col, {})["post_score_filtered"] = len(by_column[col])
+        metrics["columns"].setdefault(col, {})["post_merge_scored"] = len(by_column[col])
 
     cn_selected_by_column: dict[str, int] = {}
     for col_key, entries in by_column.items():
@@ -318,29 +429,35 @@ def build_report(
         detailed_n = col_cfg.get("target_items", 5)
         max_n = col_cfg.get("max_items", detailed_n)
         headline_n = col_cfg.get("headline_items", 0) if spec.allow_headline_only else 0
-
-        detailed_items = col_items[:min(len(col_items), max_n)]
-        remaining = col_items[len(detailed_items):]
-        headline_items = remaining[:headline_n]
-
-        column_candidates[col_key] = [
-            {
-                "title": e.get("title", ""), "source": e.get("source", ""),
-                "score": e.get("score", 0), "summary": e.get("summary", ""),
-                "content": e.get("content", ""),
-                "source_links": e.get("source_links", []),
-                "language": e.get("language", ""),
-                "tags": e.get("tags", []),
+        if spec.report_type == "daily":
+            fallback_items = spec.fallback_candidates_by_column.get(col_key, [])
+            detailed_items, headline_items, fill_metrics = _select_daily_column_items(
+                scored_items=col_items,
+                fallback_items=fallback_items,
+                target_items=detailed_n,
+                max_items=max_n,
+                headline_items=headline_n,
+                min_score=spec.min_llm_score,
+            )
+        else:
+            detailed_items = [_to_candidate_dict(e) for e in col_items[:min(len(col_items), max_n)]]
+            remaining = col_items[len(detailed_items):]
+            headline_items = [_to_candidate_dict(e) for e in remaining[:headline_n]]
+            fill_metrics = {
+                "detailed_filled": len(detailed_items),
+                "headline_filled": len(headline_items),
+                "detailed_filled_from_low_score": 0,
+                "headline_filled_from_low_score": 0,
+                "headline_filled_from_non_hard_news": 0,
             }
-            for e in detailed_items
-        ]
-        column_headline_only[col_key] = [
-            {"title": e.get("title", ""), "score": e.get("score", 0)}
-            for e in headline_items
-        ]
+
+        column_candidates[col_key] = detailed_items
+        column_headline_only[col_key] = headline_items
         print(f"   {col_key}: 编号 {len(detailed_items)} + 无序 {len(headline_items)}")
-        metrics["columns"].setdefault(col_key, {})["detailed_candidates"] = len(detailed_items)
-        metrics["columns"].setdefault(col_key, {})["headline_only"] = len(headline_items)
+        metrics["columns"].setdefault(col_key, {}).update(fill_metrics)
+        metrics["columns"].setdefault(col_key, {})["post_score_filtered"] = sum(
+            1 for item in col_items if (item.get("score") or 0) >= spec.min_llm_score
+        )
 
     # ── 历史上下文 ──
     history_context = _load_history_context(db, spec.history_days)
@@ -358,6 +475,13 @@ def build_report(
     metrics["ai"]["digest_failures"] = digest_failures
     for col_key, error in digest_failures.items():
         print(f"   [{col_key}] 栏目写作失败，已降级为候选摘要: {error}")
+
+    if spec.report_type == "daily":
+        column_headline_only, headline_metrics = asyncio.run(
+            _translate_headline_only_by_column(column_headline_only, ai_config)
+        )
+        for col_key, translated_metrics in headline_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(translated_metrics)
 
     # ── 提炼要点 ──
     print(f"\n[要点] 提炼要点...")
@@ -432,7 +556,7 @@ def build_report(
         "report_key": spec.report_key,
         "total_input": len(scored_events),
         "total_merged": len(merged_events),
-        "total_filtered": len(filtered_events),
+        "total_filtered": sum(len(v) for v in by_column.values()),
         "total_selected": total_events,
         "column_counts": col_counts,
         "outputs": {"markdown": md_path, "html": html_path, "feed": spec.feed_path},
