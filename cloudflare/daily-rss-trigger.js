@@ -34,8 +34,7 @@ export default {
     ctx.waitUntil(triggerDailyPublish(env));
   },
 
-  async fetch(_request, env) {
-    await triggerDailyPublish(env);
-    return new Response("Daily RSS publish triggered\n", { status: 202 });
+  async fetch() {
+    return new Response("Not Found\n", { status: 404 });
   },
 };
