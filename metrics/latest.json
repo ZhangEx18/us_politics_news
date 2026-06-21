@@ -1422,63 +1422,64 @@
     ],
     "freshness": {
       "freshness_hours": 30,
-      "dropped": 27,
-      "kept": 2097,
-      "dropped_us_politics": 6,
-      "dropped_global_affairs": 4,
-      "dropped_economy": 17
+      "dropped": 36,
+      "kept": 505,
+      "dropped_technology": 7,
+      "dropped_economy": 6,
+      "dropped_global_affairs": 15,
+      "dropped_us_politics": 8
     },
-    "raw_fetched": 2169,
-    "raw_merged": 2097
+    "raw_fetched": 2235,
+    "raw_merged": 505
   },
-  "cn_source_fetched": 12,
+  "cn_source_fetched": 0,
   "cn_source_selected": 0,
   "cn_source_selected_by_column": {
     "us_politics": 0,
+    "global_affairs": 0,
     "technology": 0,
-    "economy": 0,
-    "global_affairs": 0
+    "economy": 0
   },
   "columns": {
     "economy": {
       "prefiltered": 24,
-      "hard_news_candidates": 23,
-      "hard_news_scored": 8,
-      "post_score_filtered": 8,
-      "detailed_candidates": 7,
-      "headline_only": 1,
-      "rendered_detailed": 3,
-      "rendered_headline_only": 1
+      "hard_news_candidates": 24,
+      "hard_news_scored": 5,
+      "post_score_filtered": 5,
+      "detailed_candidates": 5,
+      "headline_only": 0,
+      "rendered_detailed": 4,
+      "rendered_headline_only": 0
     },
     "global_affairs": {
       "prefiltered": 40,
-      "hard_news_candidates": 39,
-      "hard_news_scored": 27,
-      "post_score_filtered": 19,
+      "hard_news_candidates": 40,
+      "hard_news_scored": 39,
+      "post_score_filtered": 30,
       "detailed_candidates": 12,
-      "headline_only": 7,
-      "rendered_detailed": 6,
-      "rendered_headline_only": 7
+      "headline_only": 8,
+      "rendered_detailed": 7,
+      "rendered_headline_only": 8
     },
     "technology": {
       "prefiltered": 24,
-      "hard_news_candidates": 23,
-      "hard_news_scored": 12,
-      "post_score_filtered": 12,
+      "hard_news_candidates": 22,
+      "hard_news_scored": 9,
+      "post_score_filtered": 9,
       "detailed_candidates": 7,
-      "headline_only": 3,
+      "headline_only": 2,
       "rendered_detailed": 6,
-      "rendered_headline_only": 3
+      "rendered_headline_only": 2
     },
     "us_politics": {
       "prefiltered": 25,
-      "hard_news_candidates": 22,
-      "hard_news_scored": 15,
-      "post_score_filtered": 15,
-      "detailed_candidates": 12,
-      "headline_only": 3,
-      "rendered_detailed": 9,
-      "rendered_headline_only": 3
+      "hard_news_candidates": 24,
+      "hard_news_scored": 12,
+      "post_score_filtered": 11,
+      "detailed_candidates": 11,
+      "headline_only": 0,
+      "rendered_detailed": 8,
+      "rendered_headline_only": 0
     }
   },
   "ai": {
@@ -1488,6 +1489,6 @@
   "report": {
     "title": "2026年6月21日 日报",
     "published_at": "2026-06-21T07:45:00+08:00",
-    "duration_seconds": 124.8
+    "duration_seconds": 103.7
   }
 }
