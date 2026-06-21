@@ -10,6 +10,7 @@ from run_pipeline import (
     main,
     _augment_ai_config_with_runtime,
     _count_scored_entries,
+    _content_item_to_report_candidate,
     _filter_articles_to_window,
     _filter_items_by_freshness,
     _get_report_publish_time,
@@ -109,6 +110,25 @@ def test_is_hard_news_entry_requires_true_flag():
     assert _is_hard_news_entry({"is_hard_news": True}) is True
     assert _is_hard_news_entry({"is_hard_news": False}) is False
     assert _is_hard_news_entry({}) is False
+
+
+def test_content_item_to_report_candidate_uses_content_as_summary():
+    item = ContentItem(
+        id="1",
+        source_type="rss",
+        title="英文标题",
+        url="https://example.com/item",
+        content="数据库摘要正文",
+        source_name="Example",
+        metadata={"language": "en", "tags": ["macro"]},
+        column="economy",
+    )
+
+    candidate = _content_item_to_report_candidate(item)
+
+    assert candidate["summary"] == "数据库摘要正文"
+    assert candidate["content"] == "数据库摘要正文"
+    assert candidate["source_links"][0]["url"] == "https://example.com/item"
 
 
 def test_cn_source_helpers_detect_language_and_tag():
