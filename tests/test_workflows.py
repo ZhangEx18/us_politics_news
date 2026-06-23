@@ -110,6 +110,22 @@ def test_publish_product_workflow_reads_config_dynamically():
     assert "state_branch" in config_step["run"]
 
 
+def test_publish_product_restore_state_uses_branch_ref_with_fallback_paths():
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+
+    restore_step = next(
+        step for step in publish_job["steps"]
+        if step.get("name") == "Restore state database"
+    )
+    run = restore_step["run"]
+
+    assert 'git show "origin/${STATE_BRANCH}:${ref_path}"' in run
+    assert 'restore_db_from_ref "$DB_PATH" "$DB_PATH"' in run
+    assert 'restore_db_from_ref "$LEGACY_DB_PATH" "$DB_PATH"' in run
+    assert 'ls -lh "$DB_PATH"' in run
+
+
 def test_publish_product_workflow_uses_run_product():
     workflow = _load_workflow("publish-product.yml")
     publish_job = workflow["jobs"]["publish"]
@@ -165,6 +181,21 @@ def test_publish_product_validate_checks_all_report_types():
     assert "四、经济走势" in run
     # 兼容 feed 校验
     assert "feed.xml" in run
+
+
+def test_publish_product_persist_state_keeps_legacy_news_db_alias():
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+
+    persist_step = next(
+        step for step in publish_job["steps"]
+        if step.get("name") == "Persist state database"
+    )
+    run = persist_step["run"]
+
+    assert 'LEGACY_DB_PATH="${{ steps.config.outputs.legacy_db_path }}"' in run
+    assert 'cp "$DB_PATH" "$TMP_DIR/$LEGACY_DB_PATH"' in run
+    assert 'git add "$LEGACY_DB_PATH"' in run
 
 
 # ── legacy fetch/publish 测试 ──
