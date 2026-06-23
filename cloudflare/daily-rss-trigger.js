@@ -68,7 +68,7 @@ function getBuiltinManifest() {
         product_key: "news",
         report_type: "weekly",
         workflow: "publish-product.yml",
-        cron: "35 23 * * 0",
+        cron: "35 23 * * 1",
         inputs: { product_key: "news", report_type: "weekly" },
       },
       {

@@ -30,9 +30,10 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     assert workflow["concurrency"]["group"] == "publish-news-daily"
 
     delegate_job = workflow["jobs"]["delegate"]
-    step = delegate_job["steps"][0]
-    assert step["uses"] == "benc-uk/workflow-dispatch@v1"
-    assert step["with"]["workflow"] == "publish-product.yml"
+    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
+    assert delegate_job["with"]["product_key"] == "news"
+    assert delegate_job["with"]["report_type"] == "daily"
+    assert delegate_job["secrets"] == "inherit"
 
 
 def test_weekly_publish_is_thin_wrapper_to_publish_product():
@@ -42,9 +43,10 @@ def test_weekly_publish_is_thin_wrapper_to_publish_product():
     assert workflow["concurrency"]["group"] == "publish-news-weekly"
 
     delegate_job = workflow["jobs"]["delegate"]
-    step = delegate_job["steps"][0]
-    assert step["uses"] == "benc-uk/workflow-dispatch@v1"
-    assert step["with"]["workflow"] == "publish-product.yml"
+    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
+    assert delegate_job["with"]["product_key"] == "news"
+    assert delegate_job["with"]["report_type"] == "weekly"
+    assert delegate_job["secrets"] == "inherit"
 
 
 def test_monthly_publish_is_thin_wrapper_to_publish_product():
@@ -54,9 +56,10 @@ def test_monthly_publish_is_thin_wrapper_to_publish_product():
     assert workflow["concurrency"]["group"] == "publish-news-monthly"
 
     delegate_job = workflow["jobs"]["delegate"]
-    step = delegate_job["steps"][0]
-    assert step["uses"] == "benc-uk/workflow-dispatch@v1"
-    assert step["with"]["workflow"] == "publish-product.yml"
+    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
+    assert delegate_job["with"]["product_key"] == "news"
+    assert delegate_job["with"]["report_type"] == "monthly"
+    assert delegate_job["secrets"] == "inherit"
 
 
 # ── publish-product.yml 测试 ──
@@ -65,11 +68,14 @@ def test_monthly_publish_is_thin_wrapper_to_publish_product():
 def test_publish_product_workflow_has_required_inputs():
     workflow = _load_workflow("publish-product.yml")
     dispatch = _workflow_triggers(workflow)["workflow_dispatch"]
+    workflow_call = _workflow_triggers(workflow)["workflow_call"]
 
     assert "product_key" in dispatch["inputs"]
     assert "report_type" in dispatch["inputs"]
     assert dispatch["inputs"]["report_type"]["type"] == "choice"
     assert set(dispatch["inputs"]["report_type"]["options"]) == {"daily", "weekly", "monthly"}
+    assert workflow_call["inputs"]["product_key"]["type"] == "string"
+    assert workflow_call["inputs"]["report_type"]["type"] == "string"
 
 
 def test_publish_product_workflow_concurrency():

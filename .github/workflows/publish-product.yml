@@ -19,6 +19,21 @@ on:
         required: false
         default: false
         type: boolean
+  workflow_call:
+    inputs:
+      product_key:
+        description: '产品标识（news / algorithms）'
+        required: true
+        type: string
+      report_type:
+        description: '报告类型（daily / weekly / monthly）'
+        required: true
+        type: string
+      digest_only:
+        description: '仅对 news/daily 有效：使用数据库现有文章重生成，不重新抓取'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write

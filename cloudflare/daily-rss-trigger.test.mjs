@@ -73,7 +73,7 @@ test("news weekly dispatches publish-product.yml with correct inputs", async () 
   const fetch = setupFetch();
   const { ctx, promises } = setupCtx();
   try {
-    await worker.scheduled({ cron: "35 23 * * 0" }, { GITHUB_TOKEN: "tok" }, ctx);
+    await worker.scheduled({ cron: "35 23 * * 1" }, { GITHUB_TOKEN: "tok" }, ctx);
     assert.equal(promises.length, 1);
     await Promise.all(promises);
 
@@ -176,6 +176,14 @@ test("resolveSchedules matches correct cron", () => {
   assert.equal(result.length, 1);
   assert.equal(result[0].product_key, "news");
   assert.equal(result[0].report_type, "daily");
+});
+
+test("resolveSchedules matches weekly cron", () => {
+  const manifest = getBuiltinManifest();
+  const result = resolveSchedules({ cron: "35 23 * * 1" }, manifest);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].product_key, "news");
+  assert.equal(result[0].report_type, "weekly");
 });
 
 test("resolveSchedules returns empty for unknown cron", () => {
