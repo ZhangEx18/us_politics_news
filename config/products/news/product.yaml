@@ -1,0 +1,90 @@
+product_key: news
+content_type: news_digest
+report_types:
+  - daily
+  - weekly
+  - monthly
+
+publish:
+  site_root: "docs/news"
+  feed_path: "docs/feeds/news.xml"
+  legacy_aliases: true
+  title: "观察日报"
+  base_url: ""
+
+storage:
+  db_path: "data/products/news/news.db"
+  retention_days: 30
+
+schedule:
+  timezone: "Asia/Shanghai"
+  cutoff_hour: 7
+  fetch_at: "07:00"
+  publish_at: "07:45"
+  daily:
+    workflow: "publish-product.yml"
+    cron: "30 23 * * *"
+    fetch_at: "07:00"
+    publish_at: "07:45"
+  weekly:
+    workflow: "publish-product.yml"
+    cron: "35 23 * * 0"
+    publish_at: "07:35"
+  monthly:
+    workflow: "publish-product.yml"
+    cron: "40 23 28-31 * *"
+    publish_at: "07:40"
+    beijing_month_start_only: true
+
+digest:
+  language: zh
+  column:
+    target_word_count_min: 2500
+    target_word_count: 3500
+    target_word_count_max: 5000
+  total:
+    target_word_count_min: 10000
+    target_word_count: 14000
+    target_word_count_max: 20000
+  columns:
+    us_politics:
+      label: "美国政局"
+      min_items: 10
+      target_items: 10
+      max_items: 10
+      headline_items: 8
+      prefilter_items: 25
+    global_affairs:
+      label: "国际局势"
+      min_items: 10
+      target_items: 10
+      max_items: 10
+      headline_items: 8
+      prefilter_items: 40
+    technology:
+      label: "科技前沿"
+      min_items: 7
+      target_items: 7
+      max_items: 7
+      headline_items: 3
+      prefilter_items: 24
+    economy:
+      label: "经济走势"
+      min_items: 7
+      target_items: 7
+      max_items: 7
+      headline_items: 3
+      prefilter_items: 24
+  total_min_items: 34
+  total_target_items: 56
+  total_max_items: 56
+  weekly:
+    target_word_count_min: 8000
+    target_word_count: 12000
+    target_word_count_max: 16000
+  monthly:
+    target_word_count_min: 15000
+    target_word_count: 20000
+    target_word_count_max: 30000
+
+sources_file: "config/products/news/sources.yaml"

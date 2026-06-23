@@ -160,7 +160,7 @@ def test_save_feed_uses_meta_pub_date_for_reeder_timestamp():
 
 def test_guid_based_on_date():
     item = _build_item_xml("2026-06-18", "Title", "Desc", "<p>Body</p>", "")
-    assert "daily/2026-06-18" in item
+    assert "news/daily/2026-06-18" in item
 
 
 def test_same_day_repeated_run_guid_unchanged():
@@ -208,8 +208,8 @@ def test_build_item_weekly_type():
         "https://example.com", report_type="weekly", report_key="2026-W25",
     )
     guid = re.search(r"<guid[^>]*>([^<]+)</guid>", item)
-    assert guid and guid.group(1) == "weekly/2026-W25"
-    assert "weekly/2026-W25.html" in item
+    assert guid and guid.group(1) == "news/weekly/2026-W25"
+    assert "news/weekly/2026-W25.html" in item
 
 
 def test_build_item_monthly_type():
@@ -219,20 +219,20 @@ def test_build_item_monthly_type():
         "", report_type="monthly", report_key="2026-06",
     )
     guid = re.search(r"<guid[^>]*>([^<]+)</guid>", item)
-    assert guid and guid.group(1) == "monthly/2026-06"
-    assert "monthly/2026-06.html" in item
+    assert guid and guid.group(1) == "news/monthly/2026-06"
+    assert "news/monthly/2026-06.html" in item
 
 
 def test_extract_item_guid_new_format():
     """_extract_item_guid 提取新格式 guid"""
-    assert _extract_item_guid('<item><guid>weekly/2026-W25</guid></item>') == "weekly/2026-W25"
-    assert _extract_item_guid('<item><guid>monthly/2026-06</guid></item>') == "monthly/2026-06"
-    assert _extract_item_guid('<item><guid>daily/2026-06-18</guid></item>') == "daily/2026-06-18"
+    assert _extract_item_guid('<item><guid>weekly/2026-W25</guid></item>') == "news/weekly/2026-W25"
+    assert _extract_item_guid('<item><guid>monthly/2026-06</guid></item>') == "news/monthly/2026-06"
+    assert _extract_item_guid('<item><guid>daily/2026-06-18</guid></item>') == "news/daily/2026-06-18"
 
 
 def test_extract_item_guid_old_format_compat():
     """_extract_item_guid 向后兼容旧格式（纯日期）"""
-    assert _extract_item_guid('<item><guid>2026-06-18</guid></item>') == "daily/2026-06-18"
+    assert _extract_item_guid('<item><guid>2026-06-18</guid></item>') == "news/daily/2026-06-18"
 
 
 def test_extract_item_guid_returns_none_for_missing():

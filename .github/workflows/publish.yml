@@ -29,18 +29,8 @@ jobs:
           git show origin/news-data:data/news.db > data/news.db
           test -s data/news.db || { echo "数据库恢复失败"; exit 1; }
 
-      - name: Restore existing feed history from gh-pages
-        run: |
-          mkdir -p docs
-          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
-            git fetch origin gh-pages
-            if git cat-file -e origin/gh-pages:feed.xml 2>/dev/null; then
-              git show origin/gh-pages:feed.xml > docs/feed.xml
-              echo "已恢复历史 feed.xml"
-            else
-              echo "gh-pages 尚无 feed.xml"
-            fi
-          fi
+      - name: Restore published pages state
+        run: python3 scripts/sync_pages_state.py restore
 
       - name: Generate daily digest
         run: python3 src/run_pipeline.py --digest-only --hours 24
@@ -48,6 +38,9 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
           AI_MODEL: ${{ secrets.AI_MODEL }}
+
+      - name: Build daily index
+        run: python3 scripts/sync_pages_state.py build-index
 
       - name: Validate output
         run: |

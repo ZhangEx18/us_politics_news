@@ -1,18 +1,12 @@
-name: Daily RSS Publish
+name: Weekly Publish
 on:
   workflow_dispatch:
-    inputs:
-      digest_only:
-        description: '仅使用数据库中的现有文章重生成日报，不重新抓取'
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: write
 
 concurrency:
-  group: publish-news-daily
+  group: publish-news-weekly
   cancel-in-progress: true
 
 jobs:
@@ -26,6 +20,5 @@ jobs:
           inputs: |
             {
               "product_key": "news",
-              "report_type": "daily",
-              "digest_only": "${{ inputs.digest_only || 'false' }}"
+              "report_type": "weekly"
             }
