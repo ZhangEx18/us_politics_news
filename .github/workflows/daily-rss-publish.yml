@@ -43,18 +43,8 @@ jobs:
             echo "news-data 分支不存在，将创建新数据库"
           fi
 
-      - name: Restore existing feed history from gh-pages
-        run: |
-          mkdir -p docs
-          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
-            git fetch origin gh-pages
-            if git cat-file -e origin/gh-pages:feed.xml 2>/dev/null; then
-              git show origin/gh-pages:feed.xml > docs/feed.xml
-              echo "已恢复历史 feed.xml"
-            else
-              echo "gh-pages 尚无 feed.xml"
-            fi
-          fi
+      - name: Restore published pages state
+        run: python3 scripts/sync_pages_state.py restore
 
       - name: Generate daily RSS
         run: |
@@ -69,6 +59,9 @@ jobs:
           AI_MODEL: ${{ secrets.AI_MODEL }}
           NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
           TIANAPI_KEY: ${{ secrets.TIANAPI_KEY }}
+
+      - name: Build daily index
+        run: python3 scripts/sync_pages_state.py build-index
 
       - name: Validate output
         run: |
