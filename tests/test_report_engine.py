@@ -473,3 +473,64 @@ def test_build_report_daily_skips_periodical_overview_generation(tmp_path):
         build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
 
     overview.assert_not_called()
+
+
+def test_build_report_periodical_overview_failure_falls_back_to_empty_payload(tmp_path):
+    spec = ReportSpec(
+        report_type="weekly",
+        report_key="2026-W25",
+        title="测试周报",
+        since=datetime(2026, 6, 15, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 22, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "weekly"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 1, "max_items": 1, "headline_items": 0},
+            "global_affairs": {"label": "国际局势", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 0, "max_items": 0, "headline_items": 0},
+        },
+        allow_headline_only=False,
+    )
+    scored_events = [{
+        "title": "美国事件",
+        "source": "Example",
+        "score": 90,
+        "summary": "摘要",
+        "content": "正文",
+        "column": "us_politics",
+        "event_key": "weekly-fallback",
+        "language": "zh",
+        "tags": [],
+        "source_links": [],
+        "is_hard_news": True,
+    }]
+    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        return [{
+            "title_zh": "美国事件",
+            "reader_body": "美国事件正文。",
+            "core_facts": "美国事件正文。",
+        }]
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.generate_periodical_overview", new=AsyncMock(side_effect=RuntimeError("overview timeout"))), \
+         patch("report_engine.save_daily_report", return_value=("weekly.md", "weekly.html")) as save_report, \
+         patch("report_engine.save_feed", return_value="feed.xml") as save_feed:
+        stats = build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    meta = save_report.call_args.args[0]
+    columns = save_report.call_args.args[1]
+    feed_meta = save_feed.call_args.args[0]
+
+    assert meta["lead"] == ""
+    assert meta["overview"] == {}
+    assert columns["us_politics"]["analysis"] == ""
+    assert feed_meta["overview"] == {}
+    assert stats["metrics"]["ai"]["overview_failure"] == "overview timeout"
