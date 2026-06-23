@@ -1,0 +1,24 @@
+name: Weekly Publish
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-news-weekly
+  cancel-in-progress: true
+
+jobs:
+  delegate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger publish-product workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: publish-product.yml
+          inputs: |
+            {
+              "product_key": "news",
+              "report_type": "weekly"
+            }

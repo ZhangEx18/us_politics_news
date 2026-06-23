@@ -16,6 +16,7 @@ BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 @dataclass
 class ReportManifest:
     """报告发布元数据，供渲染器和 Feed 生成器共用。"""
+    product_key: str
     report_type: str
     report_key: str
     title: str
@@ -39,6 +40,7 @@ _HIGHLIGHTS_HEADING: dict[str, str] = {
 
 
 def build_manifest(
+    product_key: str,
     report_type: str,
     report_key: str,
     title: str | None = None,
@@ -57,11 +59,12 @@ def build_manifest(
     if not pub_date:
         pub_date = datetime.now(BEIJING_TZ)
     return ReportManifest(
+        product_key=product_key,
         report_type=report_type,
         report_key=report_key,
         title=title,
         highlights_heading=_HIGHLIGHTS_HEADING.get(report_type, "今日要点"),
         pub_date=pub_date,
-        link_path=f"{report_type}/{report_key}.html",
-        guid=f"{report_type}/{report_key}",
+        link_path=f"{product_key}/{report_type}/{report_key}.html",
+        guid=f"{product_key}/{report_type}/{report_key}",
     )

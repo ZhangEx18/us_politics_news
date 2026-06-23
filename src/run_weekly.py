@@ -93,7 +93,7 @@ def run_weekly() -> dict:
     storage_cfg = config.get("storage", {})
     digest_cfg = config.get("digest", {})
     analysis_cfg = config.get("analysis", {})
-    output_cfg = config.get("output", {})
+    publish_cfg = config.get("publish", {})
 
     db_path = storage_cfg.get("db_path", "data/news.db")
 
@@ -144,14 +144,16 @@ def run_weekly() -> dict:
 
     # === 5. 构造 ReportSpec，调用 build_report() ===
     spec = ReportSpec(
+        product_key=config.get("product_key", "news"),
         report_type="weekly",
         report_key=report_key,
         title=build_weekly_title(since),
         since=since,
         until=until,
-        output_dir=output_cfg.get("weekly_dir", "docs/weekly"),
-        feed_path=output_cfg.get("feed_path", "docs/feed.xml"),
-        base_url=output_cfg.get("base_url", ""),
+        site_root=publish_cfg.get("site_root", "docs/news"),
+        output_dir=os.path.join(publish_cfg.get("site_root", "docs/news"), "weekly"),
+        feed_path=publish_cfg.get("feed_path", "docs/feeds/news.xml"),
+        base_url=publish_cfg.get("base_url", ""),
         column_quotas=digest_cfg.get("columns", {}),
         word_count_min=digest_cfg.get("weekly", {}).get("target_word_count_min", 8000),
         word_count_max=digest_cfg.get("weekly", {}).get("target_word_count_max", 16000),
