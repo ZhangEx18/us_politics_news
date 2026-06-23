@@ -90,11 +90,14 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
 def _build_periodical_overview_payload(overview: dict | None) -> dict:
     if not isinstance(overview, dict):
         return {}
-    return {
+    payload = {
         "summary": str(overview.get("summary", "") or "").strip(),
         "themes": [str(item).strip() for item in overview.get("themes", []) if str(item).strip()],
         "watchlist": [str(item).strip() for item in overview.get("watchlist", []) if str(item).strip()],
     }
+    if not payload["summary"] and not payload["themes"] and not payload["watchlist"]:
+        return {}
+    return payload
 
 
 async def _generate_all_column_digests(
@@ -529,13 +532,18 @@ def build_report(
 
     overview: dict = {}
     if spec.report_type in {"weekly", "monthly"}:
-        overview = asyncio.run(generate_periodical_overview(
-            report_type=spec.report_type,
-            title=spec.title,
-            highlights=highlights,
-            columns=columns,
-            ai_config=ai_config,
-        ))
+        try:
+            overview = asyncio.run(generate_periodical_overview(
+                report_type=spec.report_type,
+                title=spec.title,
+                highlights=highlights,
+                columns=columns,
+                ai_config=ai_config,
+            ))
+        except Exception as exc:
+            metrics["ai"]["overview_failure"] = str(exc)
+            print(f"   [overview] 生成失败，已降级为空总览: {exc}")
+            overview = {}
         for col_key, analysis in overview.get("column_analyses", {}).items():
             if col_key in columns:
                 columns[col_key]["analysis"] = analysis
