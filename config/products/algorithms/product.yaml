@@ -1,0 +1,40 @@
+product_key: algorithms
+content_type: topic_lesson
+report_types:
+  - daily
+
+publish:
+  site_root: "docs/algorithms"
+  feed_path: "docs/feeds/algorithms.xml"
+  legacy_aliases: false
+  title: "每日算法专题小报"
+  base_url: ""
+
+storage:
+  db_path: "data/products/algorithms/state.db"
+  retention_days: 120
+
+schedule:
+  timezone: "Asia/Shanghai"
+  daily:
+    workflow: "publish-product.yml"
+    cron: "45 23 * * *"
+    publish_at: "07:45"
+
+template:
+  template_key: "algorithm_lesson"
+  prompt_profile: "algorithm_lesson"
+
+digest:
+  language: zh
+  daily:
+    target_word_count_min: 2500
+    target_word_count: 4000
+    target_word_count_max: 6500
+
+topic_selection:
+  history_limit: 30
+  max_same_tag_gap: 7
+  preferred_difficulty_span: 1
+
+topics_file: "config/products/algorithms/topics.yaml"

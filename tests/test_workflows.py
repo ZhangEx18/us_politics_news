@@ -17,43 +17,135 @@ def _workflow_triggers(workflow: dict) -> dict:
     return workflow.get("on") or workflow[True]
 
 
-def test_daily_rss_publish_keeps_manual_trigger_and_beijing_report_date_validation():
+# ── thin wrapper 测试 ──
+
+
+def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     workflow = _load_workflow("daily-rss-publish.yml")
     dispatch = _workflow_triggers(workflow)["workflow_dispatch"]
-    validate_step = next(
-        step
-        for step in workflow["jobs"]["publish"]["steps"]
-        if step.get("name") == "Validate output"
-    )
 
     assert list(_workflow_triggers(workflow)) == ["workflow_dispatch"]
     assert "digest_only" in dispatch["inputs"]
     assert dispatch["inputs"]["digest_only"]["type"] == "boolean"
-    assert workflow["concurrency"]["group"] == "daily-rss-publish"
-    step_names = [step.get("name") for step in workflow["jobs"]["publish"]["steps"]]
-    assert "Generate daily RSS" in step_names
-    assert "Fetch news" not in step_names
-    assert "Generate daily digest" not in step_names
-    generate_step = next(
-        step
-        for step in workflow["jobs"]["publish"]["steps"]
-        if step.get("name") == "Generate daily RSS"
+    assert workflow["concurrency"]["group"] == "publish-news-daily"
+
+    delegate_job = workflow["jobs"]["delegate"]
+    step = delegate_job["steps"][0]
+    assert step["uses"] == "benc-uk/workflow-dispatch@v1"
+    assert step["with"]["workflow"] == "publish-product.yml"
+
+
+def test_weekly_publish_is_thin_wrapper_to_publish_product():
+    workflow = _load_workflow("weekly-publish.yml")
+
+    assert _workflow_triggers(workflow) == {"workflow_dispatch": None}
+    assert workflow["concurrency"]["group"] == "publish-news-weekly"
+
+    delegate_job = workflow["jobs"]["delegate"]
+    step = delegate_job["steps"][0]
+    assert step["uses"] == "benc-uk/workflow-dispatch@v1"
+    assert step["with"]["workflow"] == "publish-product.yml"
+
+
+def test_monthly_publish_is_thin_wrapper_to_publish_product():
+    workflow = _load_workflow("monthly-publish.yml")
+
+    assert _workflow_triggers(workflow) == {"workflow_dispatch": None}
+    assert workflow["concurrency"]["group"] == "publish-news-monthly"
+
+    delegate_job = workflow["jobs"]["delegate"]
+    step = delegate_job["steps"][0]
+    assert step["uses"] == "benc-uk/workflow-dispatch@v1"
+    assert step["with"]["workflow"] == "publish-product.yml"
+
+
+# ── publish-product.yml 测试 ──
+
+
+def test_publish_product_workflow_has_required_inputs():
+    workflow = _load_workflow("publish-product.yml")
+    dispatch = _workflow_triggers(workflow)["workflow_dispatch"]
+
+    assert "product_key" in dispatch["inputs"]
+    assert "report_type" in dispatch["inputs"]
+    assert dispatch["inputs"]["report_type"]["type"] == "choice"
+    assert set(dispatch["inputs"]["report_type"]["options"]) == {"daily", "weekly", "monthly"}
+
+
+def test_publish_product_workflow_concurrency():
+    workflow = _load_workflow("publish-product.yml")
+    assert "publish-" in workflow["concurrency"]["group"]
+
+
+def test_publish_product_workflow_steps():
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+    step_names = [step.get("name") for step in publish_job["steps"]]
+
+    assert "Read product config" in step_names
+    assert "Restore published pages state" in step_names
+    assert "Run product pipeline" in step_names
+    assert "Build site indexes" in step_names
+    assert "Validate output" in step_names
+    assert "Deploy to GitHub Pages" in step_names
+    assert "Persist state database" in step_names
+
+
+def test_publish_product_workflow_reads_config_dynamically():
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+
+    config_step = next(
+        step for step in publish_job["steps"]
+        if step.get("name") == "Read product config"
     )
-    restore_step = next(
-        step
-        for step in workflow["jobs"]["publish"]["steps"]
-        if step.get("name") == "Restore published pages state"
+    assert "load_product_config" in config_step["run"]
+    assert "db_path" in config_step["run"]
+    assert "state_branch" in config_step["run"]
+
+
+def test_publish_product_workflow_uses_run_product():
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+
+    run_step = next(
+        step for step in publish_job["steps"]
+        if step.get("name") == "Run product pipeline"
     )
-    index_step = next(
-        step
-        for step in workflow["jobs"]["publish"]["steps"]
-        if step.get("name") == "Build daily index"
+    assert "python3 src/run_product.py" in run_step["run"]
+    assert "--product" in run_step["run"]
+    assert "--report-type" in run_step["run"]
+
+
+def test_publish_product_validate_checks_all_report_types():
+    """validate step 对 news 四栏目校验覆盖 daily/weekly/monthly。"""
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+
+    validate_step = next(
+        step for step in publish_job["steps"]
+        if step.get("name") == "Validate output"
     )
-    assert '--digest-only --hours 24' in generate_step["run"]
-    assert "python3 scripts/sync_pages_state.py restore" in restore_step["run"]
-    assert "python3 scripts/sync_pages_state.py build-index" in index_step["run"]
-    assert "REPORT_DATE=$(python3 scripts/report_date.py)" in validate_step["run"]
-    assert '[ -f "$REPORT_FILE" ]' in validate_step["run"]
+    run = validate_step["run"]
+
+    # 校验 feed
+    assert "content:encoded" in run
+    # 校验报告存在
+    assert "REPORT_FILE" in run
+    # 校验字数（daily/weekly/monthly 都有）
+    assert "日报字数过少" in run
+    assert "周报字数过少" in run
+    assert "月报字数过少" in run
+    # news 四栏目校验
+    assert "一、美国政局" in run
+    assert "二、国际局势" in run
+    assert "三、科技前沿" in run
+    assert "四、经济走势" in run
+    # 兼容 feed 校验
+    assert "feed.xml" in run
+
+
+# ── legacy fetch/publish 测试 ──
 
 
 def test_legacy_fetch_and_publish_workflows_are_manual_only():
@@ -62,21 +154,3 @@ def test_legacy_fetch_and_publish_workflows_are_manual_only():
 
     assert _workflow_triggers(fetch_workflow) == {"workflow_dispatch": None}
     assert _workflow_triggers(publish_workflow) == {"workflow_dispatch": None}
-
-
-def test_publish_workflow_restores_history_and_rebuilds_index():
-    workflow = _load_workflow("publish.yml")
-
-    restore_step = next(
-        step
-        for step in workflow["jobs"]["publish"]["steps"]
-        if step.get("name") == "Restore published pages state"
-    )
-    index_step = next(
-        step
-        for step in workflow["jobs"]["publish"]["steps"]
-        if step.get("name") == "Build daily index"
-    )
-
-    assert "python3 scripts/sync_pages_state.py restore" in restore_step["run"]
-    assert "python3 scripts/sync_pages_state.py build-index" in index_step["run"]

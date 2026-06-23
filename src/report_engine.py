@@ -33,6 +33,8 @@ class ReportSpec:
     feed_path: str
     base_url: str
     column_quotas: dict[str, dict]
+    product_key: str = "news"
+    site_root: str = "docs/news"
     word_count_min: int = 2500
     word_count_max: int = 5000
     highlights_limit: int = 8
@@ -516,6 +518,7 @@ def build_report(
 
     # ── 构造统一发布元数据 ──
     manifest = build_manifest(
+        product_key=spec.product_key,
         report_type=spec.report_type,
         report_key=spec.report_key,
         title=spec.title,

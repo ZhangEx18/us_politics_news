@@ -1,0 +1,210 @@
+name: Publish Product
+on:
+  workflow_dispatch:
+    inputs:
+      product_key:
+        description: '产品标识（news / algorithms）'
+        required: true
+        type: string
+      report_type:
+        description: '报告类型（daily / weekly / monthly）'
+        required: true
+        type: choice
+        options:
+          - daily
+          - weekly
+          - monthly
+      digest_only:
+        description: '仅对 news/daily 有效：使用数据库现有文章重生成，不重新抓取'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-${{ inputs.product_key }}-${{ inputs.report_type }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Read product config
+        id: config
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          sys.path.insert(0, os.path.join(os.getcwd(), "src"))
+          from config import load_product_config
+
+          product_key = "${{ inputs.product_key }}"
+          config = load_product_config(product_key)
+          db_path = config.get("storage", {}).get("db_path", "")
+          site_root = config.get("publish", {}).get("site_root", "")
+          feed_path = config.get("publish", {}).get("feed_path", "")
+
+          # state branch: news 用 news-data 兼容，其他用 {product}-state
+          if product_key == "news":
+              state_branch = "news-data"
+          else:
+              state_branch = f"{product_key}-state"
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"db_path={db_path}\n")
+              f.write(f"state_branch={state_branch}\n")
+              f.write(f"site_root={site_root}\n")
+              f.write(f"feed_path={feed_path}\n")
+          print(f"db_path={db_path}")
+          print(f"state_branch={state_branch}")
+          print(f"site_root={site_root}")
+          print(f"feed_path={feed_path}")
+          PY
+
+      - name: Restore state database
+        run: |
+          DB_PATH="${{ steps.config.outputs.db_path }}"
+          STATE_BRANCH="${{ steps.config.outputs.state_branch }}"
+          mkdir -p "$(dirname "$DB_PATH")"
+          if git ls-remote --exit-code --heads origin "$STATE_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$STATE_BRANCH"
+            git show "origin:${STATE_BRANCH}:${DB_PATH}" > "$DB_PATH" 2>/dev/null || true
+            if [ -s "$DB_PATH" ]; then
+              echo "已从 ${STATE_BRANCH} 分支恢复数据库"
+            else
+              echo "分支存在但数据库为空，将创建新数据库"
+            fi
+          else
+            echo "${STATE_BRANCH} 分支不存在，将创建新数据库"
+          fi
+
+      - name: Restore published pages state
+        run: python3 scripts/sync_pages_state.py restore
+
+      - name: Run product pipeline
+        run: |
+          PRODUCT="${{ inputs.product_key }}"
+          REPORT_TYPE="${{ inputs.report_type }}"
+          DIGEST_ONLY="${{ inputs.digest_only }}"
+
+          ARGS="--product $PRODUCT --report-type $REPORT_TYPE"
+
+          if [ "$DIGEST_ONLY" = "true" ] && [ "$REPORT_TYPE" = "daily" ]; then
+            ARGS="$ARGS --digest-only"
+          fi
+
+          python3 src/run_product.py $ARGS
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          TIANAPI_KEY: ${{ secrets.TIANAPI_KEY }}
+
+      - name: Sync legacy aliases
+        if: inputs.product_key == 'news'
+        run: python3 -c "
+          import sys; sys.path.insert(0, 'scripts');
+          from sync_pages_state import _sync_legacy_news_aliases;
+          from pathlib import Path;
+          _sync_legacy_news_aliases(Path('docs'))
+          "
+
+      - name: Build site indexes
+        run: python3 scripts/sync_pages_state.py build-index
+
+      - name: Validate output
+        run: |
+          PRODUCT="${{ inputs.product_key }}"
+          REPORT_TYPE="${{ inputs.report_type }}"
+          SITE_ROOT="${{ steps.config.outputs.site_root }}"
+          FEED_PATH="${{ steps.config.outputs.feed_path }}"
+
+          # 校验 product feed 存在且含 content:encoded
+          [ -f "$FEED_PATH" ] || { echo "Feed 不存在: $FEED_PATH"; exit 1; }
+          grep -q "content:encoded" "$FEED_PATH" || { echo "$FEED_PATH 缺少 content:encoded"; exit 1; }
+
+          # 复用实际生成管线的 key 计算逻辑
+          REPORT_KEY=$(python3 scripts/report_key.py --product "$PRODUCT" --report-type "$REPORT_TYPE")
+          echo "报告 key: $REPORT_KEY"
+
+          REPORT_FILE="${SITE_ROOT}/${REPORT_TYPE}/${REPORT_KEY}.md"
+          [ -f "$REPORT_FILE" ] || { echo "报告不存在: $REPORT_FILE"; exit 1; }
+
+          # 字数校验
+          CHARS=$(wc -c < "$REPORT_FILE")
+          echo "报告字节: $CHARS"
+          if [ "$REPORT_TYPE" = "daily" ]; then
+            [ "$CHARS" -gt 5000 ] || { echo "日报字数过少"; exit 1; }
+          elif [ "$REPORT_TYPE" = "weekly" ]; then
+            [ "$CHARS" -gt 10000 ] || { echo "周报字数过少"; exit 1; }
+          elif [ "$REPORT_TYPE" = "monthly" ]; then
+            [ "$CHARS" -gt 15000 ] || { echo "月报字数过少"; exit 1; }
+          fi
+
+          # news 四栏目校验（daily/weekly/monthly）
+          if [ "$PRODUCT" = "news" ]; then
+            grep -q "一、美国政局" "$REPORT_FILE" || { echo "缺少美国政局栏目"; exit 1; }
+            grep -q "二、国际局势" "$REPORT_FILE" || { echo "缺少国际局势栏目"; exit 1; }
+            grep -q "三、科技前沿" "$REPORT_FILE" || { echo "缺少科技前沿栏目"; exit 1; }
+            grep -q "四、经济走势" "$REPORT_FILE" || { echo "缺少经济走势栏目"; exit 1; }
+          fi
+
+          # news 兼容 feed 同步校验
+          if [ "$PRODUCT" = "news" ] && [ -f "docs/feed.xml" ]; then
+            grep -q "content:encoded" docs/feed.xml || { echo "feed.xml 缺少 content:encoded"; exit 1; }
+          fi
+
+          # Reader feed 格式校验（所有 feed 文件）
+          for feed_file in docs/feeds/*.xml docs/feed.xml; do
+            [ -f "$feed_file" ] || continue
+            python3 - <<PYEOF
+          from pathlib import Path
+          feed = Path("${feed_file}").read_text(encoding="utf-8")
+          blocked = ["<!DOCTYPE html>", "<html", "<head>", "<style>", "相关阅读", "原文链接"]
+          bad = [token for token in blocked if token in feed]
+          if bad:
+              raise SystemExit(f"${feed_file} 仍含不应出现的内容: {bad}")
+          print("${feed_file} 格式校验通过")
+          PYEOF
+          done
+          echo "校验通过"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+
+      - name: Persist state database
+        run: |
+          DB_PATH="${{ steps.config.outputs.db_path }}"
+          STATE_BRANCH="${{ steps.config.outputs.state_branch }}"
+          test -f "$DB_PATH" || { echo "数据库文件不存在: $DB_PATH"; exit 1; }
+
+          TMP_DIR=$(mktemp -d)
+          mkdir -p "$TMP_DIR/$(dirname "$DB_PATH")"
+          cp "$DB_PATH" "$TMP_DIR/$DB_PATH"
+          printf "*.pyc\n__pycache__/\n.DS_Store\n" > "$TMP_DIR/.gitignore"
+          cd "$TMP_DIR"
+          git init
+          git checkout -b "$STATE_BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DB_PATH" .gitignore
+          git commit -m "Update ${STATE_BRANCH} database"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin "HEAD:${STATE_BRANCH}" --force

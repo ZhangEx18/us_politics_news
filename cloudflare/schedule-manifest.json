@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "schedules": [
+    {
+      "product_key": "algorithms",
+      "report_type": "daily",
+      "workflow": "publish-product.yml",
+      "cron": "45 23 * * *",
+      "inputs": {
+        "product_key": "algorithms",
+        "report_type": "daily"
+      }
+    },
+    {
+      "product_key": "news",
+      "report_type": "daily",
+      "workflow": "publish-product.yml",
+      "cron": "30 23 * * *",
+      "inputs": {
+        "product_key": "news",
+        "report_type": "daily",
+        "digest_only": false
+      }
+    },
+    {
+      "product_key": "news",
+      "report_type": "weekly",
+      "workflow": "publish-product.yml",
+      "cron": "35 23 * * 0",
+      "inputs": {
+        "product_key": "news",
+        "report_type": "weekly"
+      }
+    },
+    {
+      "product_key": "news",
+      "report_type": "monthly",
+      "workflow": "publish-product.yml",
+      "cron": "40 23 28-31 * *",
+      "inputs": {
+        "product_key": "news",
+        "report_type": "monthly"
+      }
+    }
+  ]
+}

@@ -28,7 +28,13 @@ python3 src/run_pipeline.py
 
 ## 部署
 
-主发布链路由 Cloudflare Workers Cron 在北京时间 07:30 触发 GitHub Actions 的 `Daily RSS Publish` workflow。该 workflow 会顺序执行抓取、生成日报、更新 RSS Feed，并发布到 GitHub Pages。
+主发布链路由 Cloudflare Workers Cron 触发 GitHub Actions：
+
+- 每天北京时间 07:30 触发 `Daily RSS Publish`，抓取并发布日报
+- 每周一北京时间 07:35 触发 `Weekly Publish`，基于数据库生成并发布周报
+- 每月 1 日北京时间 07:40 触发 `Monthly Publish`，基于数据库生成并发布月报
+
+两个 workflow 都会恢复已发布归档、更新 `feed.xml`、重建首页，然后发布到 GitHub Pages。
 
 Reader 订阅地址：
 
@@ -169,4 +175,10 @@ wrangler secret list
 wrangler deploy
 ```
 
-`wrangler.toml` 中的 `30 23 * * *` 使用 UTC，等价于北京时间 07:30。Worker 只负责触发 `.github/workflows/daily-rss-publish.yml`，不直接抓取、生成或发布日报。
+`wrangler.toml` 中的 cron 使用 UTC：
+
+- `30 23 * * *` 等价于北京时间每日 07:30，触发 `daily-rss-publish.yml`
+- `35 23 * * 0` 等价于北京时间每周一 07:35，触发 `weekly-publish.yml`
+- `40 23 28-31 * *` 在北京时间月初 07:40 命中时触发 `monthly-publish.yml`
+
+Worker 只负责触发 workflow，不直接抓取、生成或发布内容。
