@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   delegate:
-    uses: ./.github/workflows/publish-product.yml
+    uses: ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main
     with:
       product_key: news
       report_type: weekly
