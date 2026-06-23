@@ -1,0 +1,40 @@
+- slug: array-two-sum
+  title: 两数之和
+  tags: [数组, 哈希表]
+  difficulty: 1
+  summary: 从暴力枚举过渡到哈希表查找，理解“用空间换时间”的基本套路。
+  python_required: true
+  cpp_optional: true
+  related_topics: [哈希表, 枚举, 时间复杂度]
+- slug: binary-search-boundary
+  title: 二分查找边界问题
+  tags: [二分, 数组]
+  difficulty: 2
+  summary: 讲清闭区间、开区间和左右边界模板，避免死循环与越界。
+  python_required: true
+  cpp_optional: true
+  related_topics: [查找, 循环不变量, 边界条件]
+- slug: monotonic-stack-next-greater
+  title: 单调栈与下一个更大元素
+  tags: [栈, 单调栈, 数组]
+  difficulty: 2
+  summary: 通过维护单调性把暴力双循环优化到线性复杂度。
+  python_required: true
+  cpp_optional: true
+  related_topics: [栈, 复杂度优化]
+- slug: tree-dfs-traversal
+  title: 二叉树 DFS 遍历
+  tags: [树, DFS, 递归]
+  difficulty: 1
+  summary: 讲解前中后序遍历与递归框架，建立树题最基础的模板感。
+  python_required: true
+  cpp_optional: false
+  related_topics: [递归, 二叉树, 遍历]
+- slug: dp-climbing-stairs
+  title: 动态规划入门：爬楼梯
+  tags: [动态规划, 递推]
+  difficulty: 1
+  summary: 用最经典问题讲清状态、转移和滚动优化。
+  python_required: true
+  cpp_optional: true
+  related_topics: [递推, 状态定义, 空间优化]

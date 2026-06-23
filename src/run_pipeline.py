@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ai_analyzer import score_batch, _load_ai_config
 from config import (
     load_config,
+    load_product_config,
     augment_ai_config_with_runtime as _augment_real,
 )
 from database import NewsDatabase, article_to_content_item
@@ -57,8 +58,9 @@ def _load_config() -> dict:
     return load_config()
 
 
-def _load_sources() -> list[dict]:
-    path = os.path.join(_project_root, "config", "sources.yaml")
+def _load_sources(config: dict | None = None) -> list[dict]:
+    cfg = config or _load_config()
+    path = os.path.join(_project_root, cfg.get("sources_file", "config/products/news/sources.yaml"))
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f) or []
 
@@ -421,16 +423,16 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
     config = _load_config()
     since, until, report_date = _get_report_window(config=config)
     print(f"日报窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}")
-    output_cfg = config.get("output", {})
+    publish_cfg = config.get("publish", {})
     storage_cfg = config.get("storage", {})
     digest_cfg = config.get("digest", {})
     analysis_cfg = config.get("analysis", {})
     runtime_cfg = config.get("runtime", {})
 
-    db_path = storage_cfg.get("db_path", "data/news.db")
-    daily_dir = output_cfg.get("daily_dir", "docs/daily")
-    feed_path = output_cfg.get("feed_path", "docs/feed.xml")
-    base_url = output_cfg.get("base_url", "")
+    db_path = storage_cfg.get("db_path", "data/products/news/news.db")
+    site_root = publish_cfg.get("site_root", "docs/news")
+    feed_path = publish_cfg.get("feed_path", "docs/feeds/news.xml")
+    base_url = publish_cfg.get("base_url", "")
     history_days = analysis_cfg.get("history_context_days", 3)
 
     # 从环境变量加载 AI 配置
@@ -451,7 +453,7 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
 
     # === 1. 并发抓取 ===
     print("\n[1/13] 并发抓取所有数据源...")
-    sources = _load_sources()
+    sources = _load_sources(config)
     all_items = asyncio.run(fetch_all_sources(since, sources))
     print(f"   共抓取 {len(all_items)} 条")
 
@@ -484,6 +486,8 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
         until,
         report_date,
         report_type=report_type,
+        product_key=config.get("product_key", "news"),
+        site_root=site_root,
         pipeline_context={
             "sources": sources,
             "freshness": freshness_stats,
@@ -500,7 +504,7 @@ def run_fetch_only(hours: int = 24) -> dict:
 
     config = _load_config()
     storage_cfg = config.get("storage", {})
-    db_path = storage_cfg.get("db_path", "data/news.db")
+    db_path = storage_cfg.get("db_path", "data/products/news/news.db")
 
     print("=" * 60)
     print("观察日报 Pipeline — 抓取模式")
@@ -511,7 +515,7 @@ def run_fetch_only(hours: int = 24) -> dict:
 
     # 1. 并发抓取
     print("\n[1/3] 并发抓取所有数据源...")
-    sources = _load_sources()
+    sources = _load_sources(config)
     all_items = asyncio.run(fetch_all_sources(since, sources))
     print(f"   共抓取 {len(all_items)} 条")
 
@@ -547,7 +551,8 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
     config = _load_config()
     since, until, report_date = _get_report_window(config=config)
     storage_cfg = config.get("storage", {})
-    db_path = storage_cfg.get("db_path", "data/news.db")
+    publish_cfg = config.get("publish", {})
+    db_path = storage_cfg.get("db_path", "data/products/news/news.db")
 
     # 从环境变量加载 AI 配置
     ai_config = _augment_ai_config_with_runtime(_load_ai_config(), config)
@@ -572,7 +577,7 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
         for a in today_articles
     ]
 
-    sources = _load_sources()
+    sources = _load_sources(config)
     merged_items = _filter_articles_to_window(merged_items, since, until, config=config)
     merged_items, freshness_stats = _filter_items_by_freshness(merged_items, sources, config)
     print(f"固定窗口过滤后保留 {len(merged_items)} 条文章")
@@ -590,6 +595,8 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
         until,
         report_date,
         report_type=report_type,
+        product_key=config.get("product_key", "news"),
+        site_root=publish_cfg.get("site_root", "docs/news"),
         pipeline_context={
             "sources": sources,
             "freshness": freshness_stats,
@@ -609,17 +616,19 @@ def _run_digest_phase(
     window_until: datetime,
     report_date: str,
     report_type: str = "daily",
+    product_key: str = "news",
+    site_root: str = "docs/news",
     pipeline_context: dict | None = None,
 ) -> dict:
     """步骤 4-13：评分 + 分栏 digest + 输出"""
-    output_cfg = config.get("output", {})
+    publish_cfg = config.get("publish", {})
     digest_cfg = config.get("digest", {})
     analysis_cfg = config.get("analysis", {})
     runtime_cfg = config.get("runtime", {})
 
-    daily_dir = output_cfg.get("daily_dir", "docs/daily")
-    feed_path = output_cfg.get("feed_path", "docs/feed.xml")
-    base_url = output_cfg.get("base_url", "")
+    daily_dir = os.path.join(site_root, report_type)
+    feed_path = publish_cfg.get("feed_path", "docs/feeds/news.xml")
+    base_url = publish_cfg.get("base_url", "")
     history_days = analysis_cfg.get("history_context_days", 3)
     columns_cfg = digest_cfg.get("columns", {})
     schedule_cfg = _load_schedule_config(config)
@@ -720,11 +729,13 @@ def _run_digest_phase(
 
     # === 7+. 构造 ReportSpec，委托 report_engine 完成后续阶段 ===
     spec = ReportSpec(
+        product_key=product_key,
         report_type=report_type,
         report_key=report_date,
         title=build_daily_title(report_date),
         since=window_since,
         until=window_until,
+        site_root=site_root,
         output_dir=daily_dir,
         feed_path=feed_path,
         base_url=base_url,
@@ -743,7 +754,7 @@ def _run_digest_phase(
 
     # 补充 pipeline 阶段统计
     stats["total_fetched"] = len(merged_items)
-    output_root = os.path.dirname(output_cfg.get("daily_dir", "docs/daily")) or "."
+    output_root = site_root
     metrics_payload = stats.get("metrics") or {
         **phase_metrics,
         "report": {

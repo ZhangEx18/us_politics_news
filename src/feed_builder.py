@@ -68,6 +68,7 @@ def _build_item_xml(
     pub_date: datetime | None = None,
     report_type: str = "daily",
     report_key: str | None = None,
+    product_key: str = "news",
 ) -> str:
     """
     生成单个 RSS <item> XML 片段
@@ -83,8 +84,8 @@ def _build_item_xml(
         report_key: 报告标识，如 "2026-W25"、"2026-06"；默认用 date
     """
     guid_key = report_key or date
-    guid = f"{report_type}/{guid_key}"
-    link_path = f"{report_type}/{guid_key}.html"
+    guid = f"{product_key}/{report_type}/{guid_key}"
+    link_path = f"{product_key}/{report_type}/{guid_key}.html"
     link = f"{base_url}/{link_path}" if base_url else link_path
     pub_date_text = _rfc2822(pub_date or datetime.now(BEIJING_TZ))
 
@@ -129,14 +130,16 @@ def _parse_existing_items(feed_xml: str) -> list[str]:
 
 
 def _extract_item_guid(item_xml: str) -> str | None:
-    """从 item 片段中提取完整 guid（如 "daily/2026-06-19" 或 "weekly/2026-W25"）"""
+    """从 item 片段中提取完整 guid（如 "news/daily/2026-06-19"）。"""
     m = re.search(r"<guid[^>]*>([^<]+)</guid>", item_xml)
     if not m:
         return None
     guid = m.group(1)
-    # 向后兼容：旧格式只有日期，补全为 daily/ 前缀
+    # 向后兼容：旧格式只有日期，补全为 news/daily/ 前缀
     if re.match(r"^\d{4}-\d{2}-\d{2}$", guid):
-        return f"daily/{guid}"
+        return f"news/daily/{guid}"
+    if re.match(r"^(daily|weekly|monthly)/", guid):
+        return f"news/{guid}"
     return guid
 
 
@@ -145,7 +148,7 @@ def _extract_item_date(item_xml: str) -> str | None:
     guid = _extract_item_guid(item_xml)
     if not guid:
         return None
-    # 尝试从 guid 中提取日期（daily/YYYY-MM-DD 或纯日期）
+    # 尝试从 guid 中提取日期
     m = re.search(r"(\d{4}-\d{2}-\d{2})", guid)
     return m.group(1) if m else None
 

@@ -1,0 +1,116 @@
+# 通用默认配置
+
+analysis:
+  window_hours: 24
+  freshness_hours: 30
+  history_context_days: 3
+  min_llm_score: 65
+  important_score: 85
+
+llm:
+  provider: openai
+  model: mimo-v2.5-pro
+  base_url: "https://token-plan-cn.xiaomimimo.com/v1"
+  max_concurrent: 5
+  max_prompt_chars: 120000
+  timeout_seconds: 180
+  score_max_concurrent: 2
+  score_max_prompt_chars: 9000
+  score_timeout_seconds: 120
+  score_content_chars: 400
+  score_retry_split_depth: 3
+  digest_timeout_seconds: 240
+  digest_content_chars: 1000
+  meta_timeout_seconds: 120
+
+feed:
+  include_full_content: true
+  keep_days: 30
+  stable_daily_guid: true
+  description_max_chars: 300
+
+runtime:
+  require_ai: true
+  min_score_coverage: 0.7
+  proxy_from_env: true
+
+rules:
+  soft_news_keywords:
+    - "celebrity"
+    - "sports"
+    - "entertainment"
+    - "movie"
+    - "music"
+    - "lifestyle"
+    - "watchlist"
+    - "stock to watch"
+    - "buy rating"
+    - "price target"
+    - "opinion"
+    - "editorial"
+    - "column"
+    - "reaction"
+    - "mocked"
+    - "blasted"
+    - "viral"
+    - "awkward moment"
+    - "red carpet"
+    - "box office"
+    - "观察名单"
+    - "荐股"
+    - "买入评级"
+    - "目标价"
+    - "娱乐"
+    - "体育"
+    - "明星"
+    - "网友热议"
+    - "尴尬瞬间"
+    - "语无伦次"
+    - "直播中断"
+
+  hard_news_keywords:
+    - "court"
+    - "supreme court"
+    - "ruling"
+    - "lawsuit"
+    - "congress"
+    - "senate"
+    - "white house"
+    - "executive order"
+    - "regulation"
+    - "sanctions"
+    - "tariff"
+    - "fed"
+    - "federal reserve"
+    - "inflation"
+    - "jobs"
+    - "earnings"
+    - "revenue"
+    - "chip"
+    - "ai "
+    - "artificial intelligence"
+    - "semiconductor"
+    - "military"
+    - "ceasefire"
+    - "nato"
+    - "g7"
+    - "diplomacy"
+    - "treaty"
+    - "法院"
+    - "最高法院"
+    - "国会"
+    - "白宫"
+    - "行政命令"
+    - "制裁"
+    - "美联储"
+    - "通胀"
+    - "就业"
+    - "财报"
+    - "芯片"
+    - "半导体"
+
+  quality_gate:
+    min_chars: 80
+    max_chars: 260
+    min_sentences: 2
+    max_sentences: 4
