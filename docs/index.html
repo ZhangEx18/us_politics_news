@@ -19,6 +19,10 @@
       margin: 0 0 12px;
       font-size: 2rem;
     }
+    h2 {
+      margin: 36px 0 12px;
+      font-size: 1.2rem;
+    }
     p {
       margin: 0 0 16px;
       color: #444;
@@ -36,10 +40,20 @@
     a:hover {
       text-decoration: underline;
     }
+    .archive {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .archive li {
+      margin: 8px 0;
+    }
+    .meta,
+    .muted {
+      color: #666;
+    }
     .meta {
       margin-top: 36px;
       font-size: 0.95rem;
-      color: #666;
     }
   </style>
 </head>
@@ -49,9 +63,15 @@
     <p>每日聚合美国政局、国际局势、科技前沿、经济走势四大栏目，生成适合 Reader 订阅的长文日报。</p>
     <div class="links">
       <a href="./feed.xml">订阅 RSS Feed</a>
-      <a href="./daily/2026-06-18.html">查看最新日报</a>
+      <a href="./daily/2026-06-18.html">查看最新日报（2026-06-18）</a>
       <a href="https://github.com/ZhangEx18/us_politics_news">查看项目仓库</a>
     </div>
+    <section>
+      <h2>历史日报</h2>
+      <ul class="archive">
+        <li><a href="./daily/2026-06-18.html">2026-06-18 日报</a></li>
+      </ul>
+    </section>
     <p class="meta">如果 Reader 中还看不到最新内容，请先确认 <code>feed.xml</code> 可以在浏览器直接打开。</p>
   </main>
 </body>

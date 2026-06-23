@@ -39,7 +39,19 @@ def test_daily_rss_publish_keeps_manual_trigger_and_beijing_report_date_validati
         for step in workflow["jobs"]["publish"]["steps"]
         if step.get("name") == "Generate daily RSS"
     )
+    restore_step = next(
+        step
+        for step in workflow["jobs"]["publish"]["steps"]
+        if step.get("name") == "Restore published pages state"
+    )
+    index_step = next(
+        step
+        for step in workflow["jobs"]["publish"]["steps"]
+        if step.get("name") == "Build daily index"
+    )
     assert '--digest-only --hours 24' in generate_step["run"]
+    assert "python3 scripts/sync_pages_state.py restore" in restore_step["run"]
+    assert "python3 scripts/sync_pages_state.py build-index" in index_step["run"]
     assert "REPORT_DATE=$(python3 scripts/report_date.py)" in validate_step["run"]
     assert '[ -f "$REPORT_FILE" ]' in validate_step["run"]
 
@@ -50,3 +62,21 @@ def test_legacy_fetch_and_publish_workflows_are_manual_only():
 
     assert _workflow_triggers(fetch_workflow) == {"workflow_dispatch": None}
     assert _workflow_triggers(publish_workflow) == {"workflow_dispatch": None}
+
+
+def test_publish_workflow_restores_history_and_rebuilds_index():
+    workflow = _load_workflow("publish.yml")
+
+    restore_step = next(
+        step
+        for step in workflow["jobs"]["publish"]["steps"]
+        if step.get("name") == "Restore published pages state"
+    )
+    index_step = next(
+        step
+        for step in workflow["jobs"]["publish"]["steps"]
+        if step.get("name") == "Build daily index"
+    )
+
+    assert "python3 scripts/sync_pages_state.py restore" in restore_step["run"]
+    assert "python3 scripts/sync_pages_state.py build-index" in index_step["run"]
