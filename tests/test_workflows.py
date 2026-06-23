@@ -121,8 +121,12 @@ def test_publish_product_restore_state_uses_branch_ref_with_fallback_paths():
     run = restore_step["run"]
 
     assert 'git show "origin/${STATE_BRANCH}:${ref_path}"' in run
-    assert 'restore_db_from_ref "$DB_PATH" "$DB_PATH"' in run
-    assert 'restore_db_from_ref "$LEGACY_DB_PATH" "$DB_PATH"' in run
+    assert 'CANONICAL_CANDIDATE="$CANDIDATE_DIR/canonical.db"' in run
+    assert 'LEGACY_CANDIDATE="$CANDIDATE_DIR/legacy.db"' in run
+    assert 'restore_db_from_ref "$DB_PATH" "$CANONICAL_CANDIDATE"' in run
+    assert 'restore_db_from_ref "$LEGACY_DB_PATH" "$LEGACY_CANDIDATE"' in run
+    assert 'if [ "$CANONICAL_SIZE" -gt 0 ] && [ "$CANONICAL_SIZE" -ge "$LEGACY_SIZE" ]; then' in run
+    assert 'elif [ "$LEGACY_SIZE" -gt 0 ]; then' in run
     assert 'ls -lh "$DB_PATH"' in run
 
 
