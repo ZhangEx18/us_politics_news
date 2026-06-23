@@ -749,6 +749,64 @@ _COLUMN_DEFINITIONS: dict[str, str] = {
     "economy": "写利率、通胀、就业、贸易、关税、财报、商品价格、产业链和资本市场真实变化；不写荐股、观察名单和泛投资建议。",
 }
 
+_PERIODICAL_TYPE_LABELS: dict[str, str] = {
+    "weekly": "周报",
+    "monthly": "月报",
+}
+
+PERIODICAL_OVERVIEW_PROMPT_TEMPLATE = """你是一位资深中文新闻主编。请基于已经写好的栏目摘要，为一份{report_label}生成“先总览后分析”的结构化总览。
+
+## 任务目标
+
+你需要输出：
+1. **summary**：整份{report_label}开头使用的总述，120-180 字，先概括这段周期最重要的变化，再指出主线如何展开。
+2. **themes**：2-4 条核心主题，每条 8-20 字。
+3. **watchlist**：2-4 条接下来最值得观察的点，每条 8-24 字。
+4. **column_analyses**：四个栏目各 1 段前置分析，40-90 字，说明这一栏在本周期里的主线，而不是重复事件正文。
+
+## 事实边界（最高优先级）
+
+- 只能使用输入中的 highlights、栏目标题、reader_body。
+- 不得补写输入里没有出现的人名、机构、数字、票数、时间、地点、法律条款或市场变化。
+- 不得写泛泛空话，例如“形势复杂”“影响深远”“仍需观察”。
+- 如果某栏没有足够材料，可以把对应 column_analyses 设为空字符串，但不得编造。
+
+## 写作要求
+
+- summary 要有“本周期最重要变化 → 结构性主线 → 接下来关注点”的顺序。
+- themes 应提炼跨事件主线，不要直接复述栏目名。
+- watchlist 要具体指出后续观察对象或冲突延续点。
+- column_analyses 要解释“这一栏为什么值得看”，不能和 reader_body 逐句重复。
+- 保持新闻编辑口吻，克制、具体、无修辞堆砌。
+
+## 输出格式
+
+必须返回严格 JSON 对象：
+
+```json
+{{
+  "summary": "...",
+  "themes": ["..."],
+  "watchlist": ["..."],
+  "column_analyses": {{
+    "us_politics": "...",
+    "global_affairs": "...",
+    "technology": "...",
+    "economy": "..."
+  }}
+}}
+```
+
+## 输入数据
+
+标题：{title}
+已有要点：{highlights_json}
+栏目摘要：
+```json
+{columns_json}
+```
+"""
+
 
 async def generate_column_digest(
     column_key: str,
@@ -856,6 +914,79 @@ async def generate_column_digest(
     raise RuntimeError(
         f"generate_column_digest 响应中未找到 events 数组: {response[:300]}"
     )
+
+
+async def generate_periodical_overview(
+    report_type: str,
+    title: str,
+    highlights: list[str],
+    columns: dict[str, dict],
+    ai_config: dict,
+) -> dict:
+    """为周报/月报生成总览结构。"""
+    if report_type not in _PERIODICAL_TYPE_LABELS:
+        return {}
+
+    compact_columns: dict[str, dict] = {}
+    for col_key, col_data in columns.items():
+        if isinstance(col_data, dict):
+            detailed = col_data.get("detailed_events", [])
+            analysis = str(col_data.get("analysis", "") or "")
+        else:
+            detailed = col_data
+            analysis = ""
+        compact_columns[col_key] = {
+            "analysis": analysis,
+            "events": [
+                {
+                    "title_zh": event.get("title_zh", ""),
+                    "reader_body": event.get("reader_body", ""),
+                }
+                for event in detailed[:4]
+            ],
+        }
+
+    prompt = PERIODICAL_OVERVIEW_PROMPT_TEMPLATE
+    prompt = prompt.replace("{report_label}", _PERIODICAL_TYPE_LABELS[report_type])
+    prompt = prompt.replace("{title}", title)
+    prompt = prompt.replace("{highlights_json}", json.dumps(highlights, ensure_ascii=False))
+    prompt = prompt.replace("{columns_json}", json.dumps(compact_columns, ensure_ascii=False, indent=2))
+
+    response = await _call_llm(
+        prompt,
+        ai_config,
+        timeout=_timeout_for(ai_config, "digest", 180),
+    )
+    text = _strip_markdown_fence(response)
+    parsed = None
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            try:
+                parsed = json.loads(m.group())
+            except json.JSONDecodeError:
+                pass
+
+    if not isinstance(parsed, dict):
+        raise RuntimeError(f"generate_periodical_overview JSON 解析失败: {response[:300]}")
+
+    summary = str(parsed.get("summary", "") or "").strip()
+    themes = [str(item).strip() for item in parsed.get("themes", []) if str(item).strip()]
+    watchlist = [str(item).strip() for item in parsed.get("watchlist", []) if str(item).strip()]
+    raw_column_analyses = parsed.get("column_analyses", {})
+    column_analyses: dict[str, str] = {}
+    if isinstance(raw_column_analyses, dict):
+        for col_key in columns:
+            column_analyses[col_key] = str(raw_column_analyses.get(col_key, "") or "").strip()
+
+    return {
+        "summary": summary,
+        "themes": themes,
+        "watchlist": watchlist,
+        "column_analyses": column_analyses,
+    }
 
 
 async def translate_headline_titles(

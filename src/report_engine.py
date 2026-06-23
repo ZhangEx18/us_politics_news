@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from ai_analyzer import generate_column_digest, merge_events, translate_headline_titles
+from ai_analyzer import generate_column_digest, generate_periodical_overview, merge_events, translate_headline_titles
 from feed_builder import save_feed
 from publish_manifest import build_manifest
 from report_renderer import COLUMN_ORDER, save_daily_report
@@ -85,6 +85,16 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
             if len(highlights) >= limit:
                 return highlights
     return highlights
+
+
+def _build_periodical_overview_payload(overview: dict | None) -> dict:
+    if not isinstance(overview, dict):
+        return {}
+    return {
+        "summary": str(overview.get("summary", "") or "").strip(),
+        "themes": [str(item).strip() for item in overview.get("themes", []) if str(item).strip()],
+        "watchlist": [str(item).strip() for item in overview.get("watchlist", []) if str(item).strip()],
+    }
 
 
 async def _generate_all_column_digests(
@@ -507,14 +517,30 @@ def build_report(
     print(f"   {'全部通过' if not total_issues else f'{total_issues} 个质量问题（已清理）'}")
 
     # ── 组装 columns ──
-    columns: dict[str, dict[str, list[dict]]] = {}
+    columns: dict[str, dict[str, list[dict] | str]] = {}
     for col_key in COLUMN_ORDER:
         columns[col_key] = {
+            "analysis": "",
             "detailed_events": column_results.get(col_key, []),
             "headline_only_events": column_headline_only.get(col_key, []),
         }
         metrics["columns"].setdefault(col_key, {})["rendered_detailed"] = len(columns[col_key]["detailed_events"])
         metrics["columns"].setdefault(col_key, {})["rendered_headline_only"] = len(columns[col_key]["headline_only_events"])
+
+    overview: dict = {}
+    if spec.report_type in {"weekly", "monthly"}:
+        overview = asyncio.run(generate_periodical_overview(
+            report_type=spec.report_type,
+            title=spec.title,
+            highlights=highlights,
+            columns=columns,
+            ai_config=ai_config,
+        ))
+        for col_key, analysis in overview.get("column_analyses", {}).items():
+            if col_key in columns:
+                columns[col_key]["analysis"] = analysis
+
+    overview_payload = _build_periodical_overview_payload(overview)
 
     # ── 构造统一发布元数据 ──
     manifest = build_manifest(
@@ -530,9 +556,10 @@ def build_report(
     print(f"\n[保存] 生成文件...")
     meta = {
         "title": spec.title,
-        "lead": "",
+        "lead": overview_payload.get("summary", ""),
         "highlights": highlights,
         "date": spec.report_key,
+        "overview": overview_payload,
         "report_since": spec.since.isoformat(),
         "report_until": spec.until.isoformat(),
         "pub_date": manifest.pub_date.isoformat(),

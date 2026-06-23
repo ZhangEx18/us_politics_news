@@ -279,3 +279,197 @@ def test_build_report_prefers_quantity_for_daily_fill(tmp_path):
     assert metrics["detailed_filled_from_low_score"] == 1
     assert metrics["headline_filled_from_non_hard_news"] == 2
     assert metrics["headline_translated"] == 2
+
+
+def test_build_report_injects_weekly_overview_into_meta_and_columns(tmp_path):
+    spec = ReportSpec(
+        report_type="weekly",
+        report_key="2026-W25",
+        title="测试周报",
+        since=datetime(2026, 6, 15, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 22, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "weekly"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 2, "max_items": 2, "headline_items": 0},
+            "global_affairs": {"label": "国际局势", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 0, "max_items": 0, "headline_items": 0},
+        },
+        allow_headline_only=False,
+    )
+    scored_events = [{
+        "title": "美国事件",
+        "source": "Example",
+        "score": 90,
+        "summary": "摘要",
+        "content": "正文",
+        "column": "us_politics",
+        "event_key": "weekly-a",
+        "language": "zh",
+        "tags": [],
+        "source_links": [],
+        "is_hard_news": True,
+    }]
+    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        return [{
+            "title_zh": "美国事件",
+            "reader_body": "美国事件正文。",
+            "core_facts": "美国事件正文。",
+        }]
+
+    overview = {
+        "summary": "本周综述。",
+        "themes": ["主题甲", "主题乙"],
+        "watchlist": ["观察点一"],
+        "column_analyses": {"us_politics": "美国政局本周主线。"},
+    }
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.generate_periodical_overview", new=AsyncMock(return_value=overview)), \
+         patch("report_engine.save_daily_report", return_value=("weekly.md", "weekly.html")) as save_report, \
+         patch("report_engine.save_feed", return_value="feed.xml") as save_feed:
+        build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    meta = save_report.call_args.args[0]
+    columns = save_report.call_args.args[1]
+    feed_meta = save_feed.call_args.args[0]
+
+    assert meta["lead"] == "本周综述。"
+    assert meta["overview"] == {
+        "summary": "本周综述。",
+        "themes": ["主题甲", "主题乙"],
+        "watchlist": ["观察点一"],
+    }
+    assert columns["us_politics"]["analysis"] == "美国政局本周主线。"
+    assert feed_meta["overview"]["themes"] == ["主题甲", "主题乙"]
+
+
+def test_build_report_injects_monthly_overview_into_meta_and_columns(tmp_path):
+    spec = ReportSpec(
+        report_type="monthly",
+        report_key="2026-06",
+        title="测试月报",
+        since=datetime(2026, 6, 1, tzinfo=timezone.utc),
+        until=datetime(2026, 7, 1, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "monthly"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "global_affairs": {"label": "国际局势", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 2, "max_items": 2, "headline_items": 0},
+        },
+        allow_headline_only=False,
+    )
+    scored_events = [{
+        "title": "经济事件",
+        "source": "Example",
+        "score": 91,
+        "summary": "摘要",
+        "content": "正文",
+        "column": "economy",
+        "event_key": "monthly-a",
+        "language": "zh",
+        "tags": [],
+        "source_links": [],
+        "is_hard_news": True,
+    }]
+    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        return [{
+            "title_zh": "经济事件",
+            "reader_body": "经济事件正文。",
+            "core_facts": "经济事件正文。",
+        }]
+
+    overview = {
+        "summary": "本月综述。",
+        "themes": ["主题甲"],
+        "watchlist": ["观察点一"],
+        "column_analyses": {"economy": "经济走势本月主线。"},
+    }
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.generate_periodical_overview", new=AsyncMock(return_value=overview)), \
+         patch("report_engine.save_daily_report", return_value=("monthly.md", "monthly.html")) as save_report, \
+         patch("report_engine.save_feed", return_value="feed.xml") as save_feed:
+        build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    meta = save_report.call_args.args[0]
+    columns = save_report.call_args.args[1]
+    feed_meta = save_feed.call_args.args[0]
+
+    assert meta["lead"] == "本月综述。"
+    assert meta["overview"] == {
+        "summary": "本月综述。",
+        "themes": ["主题甲"],
+        "watchlist": ["观察点一"],
+    }
+    assert columns["economy"]["analysis"] == "经济走势本月主线。"
+    assert feed_meta["overview"]["watchlist"] == ["观察点一"]
+
+
+def test_build_report_daily_skips_periodical_overview_generation(tmp_path):
+    spec = ReportSpec(
+        report_type="daily",
+        report_key="2026-06-19",
+        title="测试日报",
+        since=datetime(2026, 6, 18, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 19, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "daily"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 1, "max_items": 1, "headline_items": 0},
+            "global_affairs": {"label": "国际局势", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 0, "max_items": 0, "headline_items": 0},
+        },
+    )
+    scored_events = [{
+        "title": "美国事件",
+        "source": "Example",
+        "score": 90,
+        "summary": "摘要",
+        "content": "正文",
+        "column": "us_politics",
+        "event_key": "daily-a",
+        "language": "zh",
+        "tags": [],
+        "source_links": [],
+        "is_hard_news": True,
+    }]
+    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        return [{
+            "title_zh": "美国事件",
+            "reader_body": "美国事件正文。",
+            "core_facts": "美国事件正文。",
+        }]
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.generate_periodical_overview", new=AsyncMock(return_value={})) as overview, \
+         patch("report_engine.save_daily_report", return_value=("daily.md", "daily.html")), \
+         patch("report_engine.save_feed", return_value="feed.xml"):
+        build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    overview.assert_not_called()
