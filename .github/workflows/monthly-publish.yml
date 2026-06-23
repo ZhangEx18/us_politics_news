@@ -11,14 +11,8 @@ concurrency:
 
 jobs:
   delegate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger publish-product workflow
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: publish-product.yml
-          inputs: |
-            {
-              "product_key": "news",
-              "report_type": "monthly"
-            }
+    uses: ./.github/workflows/publish-product.yml
+    with:
+      product_key: news
+      report_type: monthly
+    secrets: inherit

@@ -178,7 +178,7 @@ wrangler deploy
 `wrangler.toml` 中的 cron 使用 UTC：
 
 - `30 23 * * *` 等价于北京时间每日 07:30，触发 `daily-rss-publish.yml`
-- `35 23 * * 0` 等价于北京时间每周一 07:35，触发 `weekly-publish.yml`
+- `35 23 * * 1` 等价于北京时间每周一 07:35，触发 `weekly-publish.yml`
 - `40 23 28-31 * *` 在北京时间月初 07:40 命中时触发 `monthly-publish.yml`
 
 Worker 只负责触发 workflow，不直接抓取、生成或发布内容。

@@ -28,7 +28,7 @@ schedule:
     publish_at: "07:45"
   weekly:
     workflow: "publish-product.yml"
-    cron: "35 23 * * 0"
+    cron: "35 23 * * 1"
     publish_at: "07:35"
   monthly:
     workflow: "publish-product.yml"
