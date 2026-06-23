@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from database import Article
+from database import Article, article_to_content_item
 from models import ContentItem, SourceType
 from run_weekly import _build_weekly_scored_events, _get_month_week_number
 from report_titles import build_weekly_title
@@ -83,3 +83,21 @@ def test_build_weekly_title_uses_month_week_number():
     assert build_weekly_title("2026-06-01") == "2026年6月第1周 周报"
     assert build_weekly_title("2026-06-08") == "2026年6月第2周 周报"
     assert build_weekly_title("2026-06-18") == "2026年6月第3周 周报"
+
+
+def test_article_to_content_item_preserves_fetched_at_for_weekly_window_filter():
+    fetched_at = datetime(2026, 6, 21, 6, 41, tzinfo=timezone.utc)
+    article = Article(
+        url="https://example.com/fetched",
+        title="仅抓取时间存在",
+        summary="摘要",
+        source="Example",
+        source_type="rss",
+        published_at=None,
+        fetched_at=fetched_at,
+    )
+
+    item = article_to_content_item(article)
+
+    assert item.published_at is None
+    assert item.fetched_at == fetched_at

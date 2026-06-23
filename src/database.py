@@ -102,6 +102,7 @@ def article_to_content_item(article: "Article", url_hash_fn=None) -> "ContentIte
         content=article.summary or "",
         source_name=article.source,
         published_at=article.published_at,
+        fetched_at=article.fetched_at,
         column=article.column or "",
         source_tier=article.source_tier or 4,
         event_key=article.event_key or "",
