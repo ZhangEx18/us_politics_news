@@ -205,3 +205,91 @@ def test_renderers_escape_external_text_and_drop_unsafe_links():
         assert "&lt;img src=x onerror=alert" in output
     assert "<a href=" not in html
     assert "](" not in markdown
+
+
+def test_render_reader_content_weekly_overview_precedes_columns():
+    meta = {
+        "title": "测试周报",
+        "highlights": ["要点一", "要点二"],
+        "date": "2026-W25",
+        "overview": {
+            "summary": "本周综述段落。",
+            "themes": ["主题甲", "主题乙"],
+            "watchlist": ["观察点一", "观察点二"],
+        },
+    }
+    columns = {
+        "us_politics": {
+            "analysis": "美国政局本周主线。",
+            "detailed_events": [{"title_zh": "重点事件", "reader_body": "正文。"}],
+            "headline_only_events": [],
+        },
+        "global_affairs": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "technology": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "economy": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+    }
+
+    html = render_reader_content(meta, columns, report_type="weekly")
+
+    assert "<h2>本周综述</h2>" in html
+    assert "<p>本周综述段落。</p>" in html
+    assert "<h2>本周核心主题</h2>" in html
+    assert "<li>主题甲</li>" in html
+    assert "<h2>下周观察点</h2>" in html
+    assert "<li>观察点一</li>" in html
+    assert html.index("<h2>本周综述</h2>") < html.index("<h2>一、美国政局</h2>")
+    assert html.index("<p>美国政局本周主线。</p>") < html.index("<h3>1. 重点事件</h3>")
+
+
+def test_render_structured_markdown_monthly_overview_precedes_columns():
+    meta = {
+        "title": "测试月报",
+        "highlights": ["要点一"],
+        "date": "2026-06",
+        "overview": {
+            "summary": "本月综述段落。",
+            "themes": ["主题甲"],
+            "watchlist": ["观察点一"],
+        },
+    }
+    columns = {
+        "us_politics": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "global_affairs": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "technology": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "economy": {
+            "analysis": "经济走势本月主线。",
+            "detailed_events": [{"title_zh": "月度事件", "reader_body": "月度正文。"}],
+            "headline_only_events": [],
+        },
+    }
+
+    markdown = render_structured_markdown(meta, columns, report_type="monthly")
+
+    assert "## 本月综述" in markdown
+    assert "本月综述段落。" in markdown
+    assert "## 本月核心主题" in markdown
+    assert "- 主题甲" in markdown
+    assert "## 下月观察点" in markdown
+    assert "- 观察点一" in markdown
+    assert markdown.index("## 本月综述") < markdown.index("##  四、经济走势")
+    assert markdown.index("经济走势本月主线。") < markdown.index("### 1. 月度事件")
+
+
+def test_render_structured_markdown_escapes_overview_markdown_control_text():
+    meta = {
+        "title": "测试月报",
+        "highlights": [],
+        "date": "2026-06",
+        "overview": {
+            "summary": "## 伪标题\n[危险链接](javascript:alert(1))",
+            "themes": ["![图片](https://example.com/x.png)"],
+            "watchlist": ["> 引用"],
+        },
+    }
+
+    markdown = render_structured_markdown(meta, {"us_politics": [], "global_affairs": [], "technology": [], "economy": []}, report_type="monthly")
+
+    assert "[危险链接](javascript:alert(1))" not in markdown
+    assert "![图片](https://example.com/x.png)" not in markdown
+    assert "\n## 伪标题\n" not in markdown
+    assert "&gt; 引用" in markdown

@@ -51,7 +51,12 @@ def _html_title_text(text: object) -> str:
 def _markdown_text(text: object) -> str:
     if text is None:
         return ""
-    return html.escape(_pangu(str(text)), quote=False)
+    value = _pangu(str(text)).replace("\r\n", "\n").replace("\r", "\n")
+    value = re.sub(r"\n+", " ", value).strip()
+    value = html.escape(value, quote=False)
+    for token in ("[", "]", "(", ")", "`"):
+        value = value.replace(token, f"\\{token}")
+    return value
 
 
 def _markdown_title_text(text: object) -> str:
@@ -252,15 +257,12 @@ footer {
         html.append("</ul>")
         html.append("</div>")
 
+    _append_periodical_overview_html(html, meta, report_type)
+
     # 四大栏目
     for col_key in COLUMN_ORDER:
         col_data = columns.get(col_key, {})
-        if isinstance(col_data, list):
-            detailed = col_data
-            headline_only = []
-        else:
-            detailed = col_data.get("detailed_events", [])
-            headline_only = col_data.get("headline_only_events", [])
+        detailed, headline_only, analysis = _normalize_column_sections(col_data)
 
         if not detailed:
             continue
@@ -268,6 +270,8 @@ footer {
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
         num = _COLUMN_NUM.get(col_key, "")
         html.append(f"<h2>{meta_col['icon']} {num}、{meta_col['heading']}</h2>")
+        if analysis:
+            html.append(f"<p>{_html_text(analysis)}</p>")
 
         # 编号条目
         for idx, event in enumerate(detailed, 1):
@@ -305,6 +309,85 @@ _HIGHLIGHTS_HEADING: dict[str, str] = {
     "weekly": "本周要点",
     "monthly": "本月要点",
 }
+
+_PERIODICAL_OVERVIEW_HEADINGS: dict[str, dict[str, str]] = {
+    "weekly": {
+        "summary": "本周综述",
+        "themes": "本周核心主题",
+        "watchlist": "下周观察点",
+    },
+    "monthly": {
+        "summary": "本月综述",
+        "themes": "本月核心主题",
+        "watchlist": "下月观察点",
+    },
+}
+
+
+def _normalize_column_sections(col_data: dict | list) -> tuple[list[dict], list[dict], str]:
+    if isinstance(col_data, list):
+        return col_data, [], ""
+    return (
+        col_data.get("detailed_events", []),
+        col_data.get("headline_only_events", []),
+        str(col_data.get("analysis", "") or "").strip(),
+    )
+
+
+def _append_periodical_overview_html(html: list[str], meta: dict, report_type: str) -> None:
+    headings = _PERIODICAL_OVERVIEW_HEADINGS.get(report_type)
+    overview = meta.get("overview") if isinstance(meta.get("overview"), dict) else None
+    if not headings or not overview:
+        return
+
+    summary = str(overview.get("summary", "") or "").strip()
+    themes = [str(item).strip() for item in overview.get("themes", []) if str(item).strip()]
+    watchlist = [str(item).strip() for item in overview.get("watchlist", []) if str(item).strip()]
+
+    if summary:
+        html.append(f"<h2>{headings['summary']}</h2>")
+        html.append(f"<p>{_html_text(summary)}</p>")
+    if themes:
+        html.append(f"<h2>{headings['themes']}</h2>")
+        html.append("<ul>")
+        for item in themes:
+            html.append(f"<li>{_html_text(item)}</li>")
+        html.append("</ul>")
+    if watchlist:
+        html.append(f"<h2>{headings['watchlist']}</h2>")
+        html.append("<ul>")
+        for item in watchlist:
+            html.append(f"<li>{_html_text(item)}</li>")
+        html.append("</ul>")
+
+
+def _append_periodical_overview_markdown(lines: list[str], meta: dict, report_type: str) -> None:
+    headings = _PERIODICAL_OVERVIEW_HEADINGS.get(report_type)
+    overview = meta.get("overview") if isinstance(meta.get("overview"), dict) else None
+    if not headings or not overview:
+        return
+
+    summary = str(overview.get("summary", "") or "").strip()
+    themes = [str(item).strip() for item in overview.get("themes", []) if str(item).strip()]
+    watchlist = [str(item).strip() for item in overview.get("watchlist", []) if str(item).strip()]
+
+    if summary:
+        lines.append(f"## {headings['summary']}")
+        lines.append("")
+        lines.append(_markdown_text(summary))
+        lines.append("")
+    if themes:
+        lines.append(f"## {headings['themes']}")
+        lines.append("")
+        for item in themes:
+            lines.append(f"- {_markdown_text(item)}")
+        lines.append("")
+    if watchlist:
+        lines.append(f"## {headings['watchlist']}")
+        lines.append("")
+        for item in watchlist:
+            lines.append(f"- {_markdown_text(item)}")
+        lines.append("")
 
 
 def render_reader_content(
@@ -347,15 +430,11 @@ def render_reader_content(
             html.append(f"<li>{_html_text(item)}</li>")
         html.append("</ul>")
 
+    _append_periodical_overview_html(html, meta, report_type)
+
     for col_key in COLUMN_ORDER:
         col_data = columns.get(col_key, {})
-        # 兼容旧格式（纯列表）和新格式（dict with detailed_events + headline_only_events）
-        if isinstance(col_data, list):
-            detailed = col_data
-            headline_only = []
-        else:
-            detailed = col_data.get("detailed_events", [])
-            headline_only = col_data.get("headline_only_events", [])
+        detailed, headline_only, analysis = _normalize_column_sections(col_data)
 
         if not detailed:
             continue
@@ -363,6 +442,8 @@ def render_reader_content(
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
         num = _COLUMN_NUM.get(col_key, "")
         html.append(f"<h2>{num}、{meta_col['heading']}</h2>")
+        if analysis:
+            html.append(f"<p>{_html_text(analysis)}</p>")
 
         # 编号条目：带正文
         for idx, event in enumerate(detailed, 1):
@@ -415,15 +496,12 @@ def render_structured_markdown(
 
     lines: list[str] = [_frontmatter(title, lead, highlights, date), ""]
 
+    _append_periodical_overview_markdown(lines, meta, report_type)
+
     # 四大栏目
     for col_key in COLUMN_ORDER:
         col_data = columns.get(col_key, {})
-        if isinstance(col_data, list):
-            detailed = col_data
-            headline_only = []
-        else:
-            detailed = col_data.get("detailed_events", [])
-            headline_only = col_data.get("headline_only_events", [])
+        detailed, headline_only, analysis = _normalize_column_sections(col_data)
 
         if not detailed and not headline_only:
             continue
@@ -432,6 +510,9 @@ def render_structured_markdown(
         num = _COLUMN_NUM.get(col_key, "")
         lines.append(f"## {meta_col['icon']} {num}、{meta_col['heading']}")
         lines.append("")
+        if analysis:
+            lines.append(_markdown_text(analysis))
+            lines.append("")
 
         # 编号条目
         for idx, event in enumerate(detailed, 1):
