@@ -123,6 +123,22 @@ def test_publish_product_workflow_uses_run_product():
     assert "--report-type" in run_step["run"]
 
 
+def test_publish_product_sync_legacy_aliases_uses_heredoc_python():
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+
+    sync_step = next(
+        step for step in publish_job["steps"]
+        if step.get("name") == "Sync legacy aliases"
+    )
+    run = sync_step["run"]
+
+    assert sync_step["if"] == "inputs.product_key == 'news'"
+    assert "python3 - <<'PY'" in run
+    assert "_sync_legacy_news_aliases" in run
+    assert 'Path("docs")' in run
+
+
 def test_publish_product_validate_checks_all_report_types():
     """validate step 对 news 四栏目校验覆盖 daily/weekly/monthly。"""
     workflow = _load_workflow("publish-product.yml")
