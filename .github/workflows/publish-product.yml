@@ -139,12 +139,16 @@ jobs:
 
       - name: Sync legacy aliases
         if: inputs.product_key == 'news'
-        run: python3 -c "
-          import sys; sys.path.insert(0, 'scripts');
-          from sync_pages_state import _sync_legacy_news_aliases;
-          from pathlib import Path;
-          _sync_legacy_news_aliases(Path('docs'))
-          "
+        run: |
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+
+          sys.path.insert(0, "scripts")
+          from sync_pages_state import _sync_legacy_news_aliases
+
+          _sync_legacy_news_aliases(Path("docs"))
+          PY
 
       - name: Build site indexes
         run: python3 scripts/sync_pages_state.py build-index
