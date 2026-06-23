@@ -71,19 +71,23 @@ jobs:
           db_path = config.get("storage", {}).get("db_path", "")
           site_root = config.get("publish", {}).get("site_root", "")
           feed_path = config.get("publish", {}).get("feed_path", "")
+          legacy_db_path = ""
 
           # state branch: news 用 news-data 兼容，其他用 {product}-state
           if product_key == "news":
               state_branch = "news-data"
+              legacy_db_path = "data/news.db"
           else:
               state_branch = f"{product_key}-state"
 
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"db_path={db_path}\n")
+              f.write(f"legacy_db_path={legacy_db_path}\n")
               f.write(f"state_branch={state_branch}\n")
               f.write(f"site_root={site_root}\n")
               f.write(f"feed_path={feed_path}\n")
           print(f"db_path={db_path}")
+          print(f"legacy_db_path={legacy_db_path}")
           print(f"state_branch={state_branch}")
           print(f"site_root={site_root}")
           print(f"feed_path={feed_path}")
@@ -92,11 +96,15 @@ jobs:
       - name: Restore state database
         run: |
           DB_PATH="${{ steps.config.outputs.db_path }}"
+          LEGACY_DB_PATH="${{ steps.config.outputs.legacy_db_path }}"
           STATE_BRANCH="${{ steps.config.outputs.state_branch }}"
           mkdir -p "$(dirname "$DB_PATH")"
           if git ls-remote --exit-code --heads origin "$STATE_BRANCH" >/dev/null 2>&1; then
             git fetch origin "$STATE_BRANCH"
             git show "origin:${STATE_BRANCH}:${DB_PATH}" > "$DB_PATH" 2>/dev/null || true
+            if [ ! -s "$DB_PATH" ] && [ -n "$LEGACY_DB_PATH" ]; then
+              git show "origin:${STATE_BRANCH}:${LEGACY_DB_PATH}" > "$DB_PATH" 2>/dev/null || true
+            fi
             if [ -s "$DB_PATH" ]; then
               echo "已从 ${STATE_BRANCH} 分支恢复数据库"
             else
