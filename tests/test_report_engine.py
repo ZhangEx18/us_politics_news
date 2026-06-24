@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
 
 from report_engine import (
+    PeriodicalOverview,
     ReportSpec,
+    _build_periodical_overview_payload,
     _generate_all_column_digests,
     _translate_headline_only_by_column,
     build_reader_highlights,
@@ -84,6 +86,23 @@ def test_build_reader_highlights_empty():
     columns = {"us_politics": [], "global_affairs": []}
     highlights = build_reader_highlights(columns)
     assert highlights == []
+
+
+def test_build_periodical_overview_payload_from_dataclass():
+    overview = PeriodicalOverview(
+        summary="本周综述。",
+        themes=["主题甲", "", "主题乙"],
+        watchlist=["观察点一", ""],
+        column_analyses={"us_politics": "主线。"},
+    )
+
+    payload = _build_periodical_overview_payload(overview)
+
+    assert payload == {
+        "summary": "本周综述。",
+        "themes": ["主题甲", "主题乙"],
+        "watchlist": ["观察点一"],
+    }
 
 
 def test_generate_all_column_digests_falls_back_per_column():

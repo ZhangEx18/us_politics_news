@@ -45,6 +45,48 @@ class ReportSpec:
     fallback_candidates_by_column: dict[str, list[dict]] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class PeriodicalOverview:
+    summary: str = ""
+    themes: list[str] = field(default_factory=list)
+    watchlist: list[str] = field(default_factory=list)
+    column_analyses: dict[str, str] = field(default_factory=dict)
+
+    @classmethod
+    def from_raw(cls, overview: "PeriodicalOverview | dict | None", column_keys: list[str]) -> "PeriodicalOverview":
+        if isinstance(overview, cls):
+            return overview
+        if not isinstance(overview, dict):
+            return cls()
+
+        raw_column_analyses = overview.get("column_analyses", {})
+        column_analyses: dict[str, str] = {}
+        if isinstance(raw_column_analyses, dict):
+            for col_key in column_keys:
+                text = str(raw_column_analyses.get(col_key, "") or "").strip()
+                if text:
+                    column_analyses[col_key] = text
+
+        return cls(
+            summary=str(overview.get("summary", "") or "").strip(),
+            themes=[str(item).strip() for item in overview.get("themes", []) if str(item).strip()],
+            watchlist=[str(item).strip() for item in overview.get("watchlist", []) if str(item).strip()],
+            column_analyses=column_analyses,
+        )
+
+    def is_empty(self) -> bool:
+        return not self.summary and not self.themes and not self.watchlist and not self.column_analyses
+
+    def to_payload(self) -> dict:
+        if self.is_empty():
+            return {}
+        return {
+            "summary": self.summary,
+            "themes": [item for item in self.themes if str(item).strip()],
+            "watchlist": [item for item in self.watchlist if str(item).strip()],
+        }
+
+
 # ── 共享工具 ──
 
 def _load_history_context(db, days: int = 3) -> str:
@@ -87,17 +129,8 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
     return highlights
 
 
-def _build_periodical_overview_payload(overview: dict | None) -> dict:
-    if not isinstance(overview, dict):
-        return {}
-    payload = {
-        "summary": str(overview.get("summary", "") or "").strip(),
-        "themes": [str(item).strip() for item in overview.get("themes", []) if str(item).strip()],
-        "watchlist": [str(item).strip() for item in overview.get("watchlist", []) if str(item).strip()],
-    }
-    if not payload["summary"] and not payload["themes"] and not payload["watchlist"]:
-        return {}
-    return payload
+def _build_periodical_overview_payload(overview: PeriodicalOverview | dict | None) -> dict:
+    return PeriodicalOverview.from_raw(overview, []).to_payload()
 
 
 async def _generate_all_column_digests(
@@ -530,25 +563,26 @@ def build_report(
         metrics["columns"].setdefault(col_key, {})["rendered_detailed"] = len(columns[col_key]["detailed_events"])
         metrics["columns"].setdefault(col_key, {})["rendered_headline_only"] = len(columns[col_key]["headline_only_events"])
 
-    overview: dict = {}
+    overview = PeriodicalOverview()
     if spec.report_type in {"weekly", "monthly"}:
         try:
-            overview = asyncio.run(generate_periodical_overview(
+            raw_overview = asyncio.run(generate_periodical_overview(
                 report_type=spec.report_type,
                 title=spec.title,
                 highlights=highlights,
                 columns=columns,
                 ai_config=ai_config,
             ))
+            overview = PeriodicalOverview.from_raw(raw_overview, list(columns.keys()))
         except Exception as exc:
             metrics["ai"]["overview_failure"] = str(exc)
             print(f"   [overview] 生成失败，已降级为空总览: {exc}")
-            overview = {}
-        for col_key, analysis in overview.get("column_analyses", {}).items():
+            overview = PeriodicalOverview()
+        for col_key, analysis in overview.column_analyses.items():
             if col_key in columns:
                 columns[col_key]["analysis"] = analysis
 
-    overview_payload = _build_periodical_overview_payload(overview)
+    overview_payload = overview.to_payload()
 
     # ── 构造统一发布元数据 ──
     manifest = build_manifest(
