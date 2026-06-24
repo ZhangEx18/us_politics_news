@@ -5,9 +5,11 @@ from unittest.mock import AsyncMock, patch
 
 from report_engine import (
     PeriodicalOverview,
+    ReportPreparation,
     ReportSpec,
     _build_periodical_overview_payload,
     _generate_all_column_digests,
+    _prepare_report_inputs,
     _translate_headline_only_by_column,
     build_reader_highlights,
     build_report,
@@ -134,6 +136,71 @@ def test_generate_all_column_digests_falls_back_per_column():
     assert results["global_affairs"][0]["title_zh"] == "国际事件"
     assert "摘要" in results["global_affairs"][0]["reader_body"]
     assert failures == {"global_affairs": "llm timeout"}
+
+
+def test_prepare_report_inputs_extracts_shared_context():
+    spec = ReportSpec(
+        report_type="daily",
+        report_key="2026-06-19",
+        title="测试日报",
+        since=datetime(2026, 6, 18, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 19, tzinfo=timezone.utc),
+        output_dir="docs/daily",
+        feed_path="docs/feed.xml",
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 1, "max_items": 1, "headline_items": 1},
+            "global_affairs": {"label": "国际局势", "target_items": 0, "max_items": 0, "headline_items": 0},
+        },
+        fallback_candidates_by_column={
+            "us_politics": [{"title": "备用条目", "summary": "备用摘要", "content": "备用正文", "column": "us_politics"}],
+        },
+        min_llm_score=65,
+    )
+    scored_events = [
+        {
+            "title": "高分事件",
+            "source": "A",
+            "score": 90,
+            "summary": "摘要 A",
+            "content": "正文 A",
+            "column": "us_politics",
+            "event_key": "a",
+            "language": "zh",
+            "tags": ["cn_source"],
+            "source_links": [],
+            "is_hard_news": True,
+        },
+        {
+            "title": "低分事件",
+            "source": "B",
+            "score": 50,
+            "summary": "摘要 B",
+            "content": "正文 B",
+            "column": "us_politics",
+            "event_key": "b",
+            "language": "en",
+            "tags": [],
+            "source_links": [],
+            "is_hard_news": True,
+        },
+    ]
+    metrics = {"columns": {}, "ai": {}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    preparation = _prepare_report_inputs(spec, scored_events, _DummyDb(), metrics)
+
+    assert isinstance(preparation, ReportPreparation)
+    assert len(preparation.merged_events) == 2
+    assert preparation.by_column["us_politics"][0]["title"] == "高分事件"
+    assert preparation.column_candidates["us_politics"][0]["title"] == "高分事件"
+    assert preparation.column_headline_only["us_politics"][0]["title"] == "低分事件"
+    assert preparation.history_context == ""
+    assert preparation.metrics["cn_source_selected"] == 1
+    assert preparation.metrics["columns"]["us_politics"]["post_merge_scored"] == 2
 
 
 def test_build_report_tracks_cn_source_metrics(tmp_path):

@@ -87,6 +87,16 @@ class PeriodicalOverview:
         }
 
 
+@dataclass
+class ReportPreparation:
+    merged_events: list[dict]
+    by_column: dict[str, list[dict]]
+    column_candidates: dict[str, list[dict]]
+    column_headline_only: dict[str, list[dict]]
+    history_context: str
+    metrics: dict
+
+
 # ── 共享工具 ──
 
 def _load_history_context(db, days: int = 3) -> str:
@@ -398,6 +408,94 @@ async def _translate_headline_only_by_column(
     return translated_columns, metrics
 
 
+def _prepare_report_inputs(
+    spec: ReportSpec,
+    scored_events: list[dict],
+    db,
+    metrics: dict,
+) -> ReportPreparation:
+    print(f"\n[合并] 事件级合并...")
+    merged_events = merge_events(scored_events)
+    by_column_counts: dict[str, int] = {}
+    for event in merged_events:
+        column_key = event.get("column", "unknown")
+        by_column_counts[column_key] = by_column_counts.get(column_key, 0) + 1
+    print(f"   {len(scored_events)} 条 → {len(merged_events)} 个事件")
+    for column_key in sorted(by_column_counts):
+        print(f"     {column_key}: {by_column_counts[column_key]}")
+
+    print(f"\n[分桶] 按栏目分桶...")
+    by_column: dict[str, list[dict]] = {}
+    for event in merged_events:
+        column_key = event.get("column", "us_politics")
+        by_column.setdefault(column_key, []).append(event)
+    for column_key in by_column:
+        by_column[column_key].sort(key=lambda item: item.get("score", 0) or 0, reverse=True)
+    for column_key in sorted(by_column):
+        print(f"   {column_key}: {len(by_column[column_key])} 条")
+        metrics["columns"].setdefault(column_key, {})["post_merge_scored"] = len(by_column[column_key])
+
+    cn_selected_by_column: dict[str, int] = {}
+    for column_key, entries in by_column.items():
+        cn_selected_by_column[column_key] = sum(
+            1
+            for entry in entries
+            if str(entry.get("language", "")).lower().startswith("zh")
+            or "cn_source" in {str(tag).lower() for tag in entry.get("tags", [])}
+        )
+    if cn_selected_by_column:
+        metrics["cn_source_selected_by_column"] = cn_selected_by_column
+        metrics["cn_source_selected"] = sum(cn_selected_by_column.values())
+
+    print(f"\n[候选] 每栏按配额选择...")
+    column_candidates: dict[str, list[dict]] = {}
+    column_headline_only: dict[str, list[dict]] = {}
+    for column_key, column_cfg in spec.column_quotas.items():
+        column_items = by_column.get(column_key, [])
+        detailed_n = column_cfg.get("target_items", 5)
+        max_n = column_cfg.get("max_items", detailed_n)
+        headline_n = column_cfg.get("headline_items", 0) if spec.allow_headline_only else 0
+        if spec.report_type == "daily":
+            fallback_items = spec.fallback_candidates_by_column.get(column_key, [])
+            detailed_items, headline_items, fill_metrics = _select_daily_column_items(
+                scored_items=column_items,
+                fallback_items=fallback_items,
+                target_items=detailed_n,
+                max_items=max_n,
+                headline_items=headline_n,
+                min_score=spec.min_llm_score,
+            )
+        else:
+            detailed_items = [_to_candidate_dict(event) for event in column_items[:min(len(column_items), max_n)]]
+            remaining = column_items[len(detailed_items):]
+            headline_items = [_to_candidate_dict(event) for event in remaining[:headline_n]]
+            fill_metrics = {
+                "detailed_filled": len(detailed_items),
+                "headline_filled": len(headline_items),
+                "detailed_filled_from_low_score": 0,
+                "headline_filled_from_low_score": 0,
+                "headline_filled_from_non_hard_news": 0,
+            }
+
+        column_candidates[column_key] = detailed_items
+        column_headline_only[column_key] = headline_items
+        print(f"   {column_key}: 编号 {len(detailed_items)} + 无序 {len(headline_items)}")
+        metrics["columns"].setdefault(column_key, {}).update(fill_metrics)
+        metrics["columns"].setdefault(column_key, {})["post_score_filtered"] = sum(
+            1 for item in column_items if (item.get("score") or 0) >= spec.min_llm_score
+        )
+
+    history_context = _load_history_context(db, spec.history_days)
+    return ReportPreparation(
+        merged_events=merged_events,
+        by_column=by_column,
+        column_candidates=column_candidates,
+        column_headline_only=column_headline_only,
+        history_context=history_context,
+        metrics=metrics,
+    )
+
+
 # ── 核心编排 ──
 
 def build_report(
@@ -433,82 +531,13 @@ def build_report(
         print("\n[警告] 无候选事件")
         return {"total_selected": 0}
 
-    # ── 事件级合并 ──
-    print(f"\n[合并] 事件级合并...")
-    merged_events = merge_events(scored_events)
-    _by_col: dict[str, int] = {}
-    for e in merged_events:
-        c = e.get("column", "unknown")
-        _by_col[c] = _by_col.get(c, 0) + 1
-    print(f"   {len(scored_events)} 条 → {len(merged_events)} 个事件")
-    for c in sorted(_by_col):
-        print(f"     {c}: {_by_col[c]}")
-
-    # ── 按栏目分桶 ──
-    print(f"\n[分桶] 按栏目分桶...")
-    by_column: dict[str, list[dict]] = {}
-    for e in merged_events:
-        col = e.get("column", "us_politics")
-        by_column.setdefault(col, []).append(e)
-    for col in by_column:
-        by_column[col].sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
-    for col in sorted(by_column):
-        print(f"   {col}: {len(by_column[col])} 条")
-        metrics["columns"].setdefault(col, {})["post_merge_scored"] = len(by_column[col])
-
-    cn_selected_by_column: dict[str, int] = {}
-    for col_key, entries in by_column.items():
-        cn_selected_by_column[col_key] = sum(
-            1
-            for entry in entries
-            if str(entry.get("language", "")).lower().startswith("zh")
-            or "cn_source" in {str(tag).lower() for tag in entry.get("tags", [])}
-        )
-    if cn_selected_by_column:
-        metrics["cn_source_selected_by_column"] = cn_selected_by_column
-        metrics["cn_source_selected"] = sum(cn_selected_by_column.values())
-
-    # ── 每栏按配额选择候选（双样式） ──
-    print(f"\n[候选] 每栏按配额选择...")
-    column_candidates: dict[str, list[dict]] = {}
-    column_headline_only: dict[str, list[dict]] = {}
-    for col_key, col_cfg in columns_cfg.items():
-        col_items = by_column.get(col_key, [])
-        detailed_n = col_cfg.get("target_items", 5)
-        max_n = col_cfg.get("max_items", detailed_n)
-        headline_n = col_cfg.get("headline_items", 0) if spec.allow_headline_only else 0
-        if spec.report_type == "daily":
-            fallback_items = spec.fallback_candidates_by_column.get(col_key, [])
-            detailed_items, headline_items, fill_metrics = _select_daily_column_items(
-                scored_items=col_items,
-                fallback_items=fallback_items,
-                target_items=detailed_n,
-                max_items=max_n,
-                headline_items=headline_n,
-                min_score=spec.min_llm_score,
-            )
-        else:
-            detailed_items = [_to_candidate_dict(e) for e in col_items[:min(len(col_items), max_n)]]
-            remaining = col_items[len(detailed_items):]
-            headline_items = [_to_candidate_dict(e) for e in remaining[:headline_n]]
-            fill_metrics = {
-                "detailed_filled": len(detailed_items),
-                "headline_filled": len(headline_items),
-                "detailed_filled_from_low_score": 0,
-                "headline_filled_from_low_score": 0,
-                "headline_filled_from_non_hard_news": 0,
-            }
-
-        column_candidates[col_key] = detailed_items
-        column_headline_only[col_key] = headline_items
-        print(f"   {col_key}: 编号 {len(detailed_items)} + 无序 {len(headline_items)}")
-        metrics["columns"].setdefault(col_key, {}).update(fill_metrics)
-        metrics["columns"].setdefault(col_key, {})["post_score_filtered"] = sum(
-            1 for item in col_items if (item.get("score") or 0) >= spec.min_llm_score
-        )
-
-    # ── 历史上下文 ──
-    history_context = _load_history_context(db, spec.history_days)
+    preparation = _prepare_report_inputs(spec, scored_events, db, metrics)
+    merged_events = preparation.merged_events
+    by_column = preparation.by_column
+    column_candidates = preparation.column_candidates
+    column_headline_only = preparation.column_headline_only
+    history_context = preparation.history_context
+    metrics = preparation.metrics
 
     # ── 每栏生成 digest ──
     print(f"\n[写作] 每栏生成 digest...")
