@@ -6,9 +6,9 @@
     "publish_at": "07:45"
   },
   "window": {
-    "since": "2026-06-24T07:00:00+08:00",
-    "until": "2026-06-25T07:00:00+08:00",
-    "report_key": "2026-06-25"
+    "since": "2026-06-25T07:00:00+08:00",
+    "until": "2026-06-26T07:00:00+08:00",
+    "report_key": "2026-06-26"
   },
   "pipeline": {
     "sources": [
@@ -1423,82 +1423,90 @@
     "freshness": {
       "freshness_hours": 30,
       "dropped": 0,
-      "kept": 2484
+      "kept": 2369
     },
-    "raw_fetched": 2548,
-    "raw_merged": 2484
+    "raw_fetched": 2423,
+    "raw_merged": 2369
   },
   "cn_source_fetched": 12,
   "cn_source_selected": 0,
   "cn_source_selected_by_column": {
     "us_politics": 0,
-    "global_affairs": 0,
+    "economy": 0,
     "technology": 0,
-    "economy": 0
+    "global_affairs": 0
   },
   "columns": {
     "economy": {
       "prefiltered": 24,
       "hard_news_candidates": 24,
-      "hard_news_scored": 8,
-      "post_merge_scored": 8,
+      "hard_news_scored": 18,
+      "post_merge_scored": 17,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 2,
+      "headline_filled_from_non_hard_news": 0,
       "detailed_filled": 7,
       "headline_filled": 3,
-      "post_score_filtered": 8,
+      "post_score_filtered": 17,
       "headline_translated": 3,
       "headline_translation_failed": 0,
-      "rendered_detailed": 6,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 0,
+      "rendered_detailed": 5,
       "rendered_headline_only": 3
     },
     "global_affairs": {
       "prefiltered": 40,
-      "hard_news_candidates": 40,
-      "hard_news_scored": 23,
-      "post_merge_scored": 20,
+      "hard_news_candidates": 39,
+      "hard_news_scored": 16,
+      "post_merge_scored": 16,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 0,
+      "headline_filled_from_non_hard_news": 2,
       "detailed_filled": 10,
       "headline_filled": 8,
-      "post_score_filtered": 20,
+      "post_score_filtered": 16,
       "headline_translated": 8,
       "headline_translation_failed": 0,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 0,
       "rendered_detailed": 8,
       "rendered_headline_only": 8
     },
     "technology": {
       "prefiltered": 24,
       "hard_news_candidates": 24,
-      "hard_news_scored": 13,
-      "post_merge_scored": 11,
+      "hard_news_scored": 10,
+      "post_merge_scored": 9,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 0,
+      "headline_filled_from_non_hard_news": 1,
       "detailed_filled": 7,
       "headline_filled": 3,
-      "post_score_filtered": 11,
+      "post_score_filtered": 9,
       "headline_translated": 3,
       "headline_translation_failed": 0,
-      "rendered_detailed": 5,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 0,
+      "rendered_detailed": 6,
       "rendered_headline_only": 3
     },
     "us_politics": {
       "prefiltered": 25,
       "hard_news_candidates": 25,
-      "hard_news_scored": 23,
-      "post_merge_scored": 21,
+      "hard_news_scored": 16,
+      "post_merge_scored": 13,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 0,
+      "headline_filled_from_non_hard_news": 5,
       "detailed_filled": 10,
       "headline_filled": 8,
-      "post_score_filtered": 21,
+      "post_score_filtered": 13,
       "headline_translated": 8,
       "headline_translation_failed": 0,
-      "rendered_detailed": 8,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 0,
+      "rendered_detailed": 7,
       "rendered_headline_only": 8
     }
   },
@@ -1507,8 +1515,8 @@
     "digest_failures": {}
   },
   "report": {
-    "title": "2026年6月25日 日报",
-    "published_at": "2026-06-25T07:45:00+08:00",
-    "duration_seconds": 167.2
+    "title": "2026年6月26日 日报",
+    "published_at": "2026-06-26T07:45:00+08:00",
+    "duration_seconds": 196.2
   }
 }
