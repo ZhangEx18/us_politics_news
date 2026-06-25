@@ -5,8 +5,123 @@
     <link>.</link>
     <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 24 Jun 2026 07:47:19 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 26 Jun 2026 07:47:11 +0800</lastBuildDate>
     <item>
+      <title>2026-06-26 每日算法专题</title>
+      <link>algorithms/daily/2026-06-26.html</link>
+      <description><![CDATA[如何系统地理解和实现二叉树的前序、中序和后序深度优先遍历？]]></description>
+      <content:encoded><![CDATA[<article>
+<h2>如何系统地理解和实现二叉树的前序、中序和后序深度优先遍历？</h2>
+<h3>直觉理解</h3>
+<p>想象你闭上眼睛，用手去“触摸”一棵二叉树。你的手指需要制定一个移动规则，确保不重不漏地摸过所有节点。前序遍历，就像“先摸树干，再摸左边枝叶，最后摸右边枝叶”；中序遍历，是“先摸左边枝叶，再摸树干，最后摸右边枝叶”；后序遍历，是“先摸左边枝叶，再摸右边枝叶，最后摸树干”。这里的“树干”就是当前节点，“枝叶”是它的左右子树。DFS（深度优先搜索）的核心思想就是“一条路走到黑”，对于树来说，就是递归地深入一条分支到底，再返回来探索其他分支。我们只需要记住三种顺序中“树干”的位置，整个遍历框架就清晰了。</p>
+<h3>算法思路</h3>
+<p>实现二叉树的DFS遍历，关键是掌握递归的“三要素”，并以此构建一个通用模板。
+
+1.  **递归函数的定义**：首先明确你的递归函数要做什么。例如，我们定义一个函数 `traverse(node)`，它的作用是“以某种顺序（前/中/后）访问以 `node` 为根的整棵子树的所有节点”。
+
+2.  **递归的终止条件**：当节点为空（`node is None`）时，说明走到了“死胡同”，不需要做任何事，直接返回。这是防止无限递归的刹车键。
+
+3.  **递归的拆解与合并**：这是核心。对于一个非空的节点 `node`，我们按照选定的顺序（前/中/后）来安排三件事：**访问当前节点**、**递归调用左子树**、**递归调用右子树**。关键在于这三者的先后顺序。
+    - **前序 (Preorder)**：先处理当前节点（如打印），再递归左子树，最后递归右子树。
+    - **中序 (Inorder)**：先递归左子树，再处理当前节点，最后递归右子树。
+    - **后序 (Postorder)**：先递归左子树，再递归右子树，最后处理当前节点。
+
+这个框架是解决绝大多数二叉树问题的基础。很多问题，如求树的高度、判断平衡、序列化等，都可以在这个框架上，通过调整“处理当前节点”和“合并子树结果”的方式来完成。</p>
+<h3>Python 示例</h3>
+<pre><code># 定义二叉树节点结构
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+# 以下是三种遍历的递归实现，使用了同一个模板
+
+def preorder_traversal(root: TreeNode) -&gt; list:
+    """前序遍历：根 -&gt; 左 -&gt; 右"""
+    result = []
+    def traverse(node):
+        if not node:  # 终止条件：节点为空
+            return
+        # 前序：先访问根节点
+        result.append(node.val)
+        # 再递归左子树
+        traverse(node.left)
+        # 最后递归右子树
+        traverse(node.right)
+    traverse(root)
+    return result
+
+
+def inorder_traversal(root: TreeNode) -&gt; list:
+    """中序遍历：左 -&gt; 根 -&gt; 右"""
+    result = []
+    def traverse(node):
+        if not node:  # 终止条件
+            return
+        # 中序：先递归左子树
+        traverse(node.left)
+        # 再访问根节点
+        result.append(node.val)
+        # 最后递归右子树
+        traverse(node.right)
+    traverse(root)
+    return result
+
+
+def postorder_traversal(root: TreeNode) -&gt; list:
+    """后序遍历：左 -&gt; 右 -&gt; 根"""
+    result = []
+    def traverse(node):
+        if not node:  # 终止条件
+            return
+        # 后序：先递归左子树
+        traverse(node.left)
+        # 再递归右子树
+        traverse(node.right)
+        # 最后访问根节点
+        result.append(node.val)
+    traverse(root)
+    return result
+
+# 测试用例
+def test_traversals():
+    # 构建一个示例二叉树
+    #        1
+    #       / \
+    #      2   3
+    #     / \
+    #    4   5
+    root = TreeNode(1)
+    root.left = TreeNode(2)
+    root.right = TreeNode(3)
+    root.left.left = TreeNode(4)
+    root.left.right = TreeNode(5)
+    
+    print("前序遍历结果:", preorder_traversal(root))  # 预期: [1, 2, 4, 5, 3]
+    print("中序遍历结果:", inorder_traversal(root))   # 预期: [4, 2, 5, 1, 3]
+    print("后序遍历结果:", postorder_traversal(root)) # 预期: [4, 5, 2, 3, 1]
+
+    # 测试空树
+    print("空树前序:", preorder_traversal(None))  # 预期: []
+
+if __name__ == "__main__":
+    test_traversals()</code></pre>
+<h3>复杂度分析</h3>
+<p>**时间复杂度：O(n)**。其中 n 是二叉树中节点的个数。在遍历过程中，每个节点都会被访问且仅被访问一次，因此总操作次数与节点数成正比。
+
+**空间复杂度：O(h)**。其中 h 是二叉树的高度。这部分空间主要由递归调用栈的深度决定。在最坏情况下（树退化成一条链表），空间复杂度为 O(n)；在平衡二叉树的情况下，空间复杂度为 O(log n)。</p>
+<h3>易错点</h3>
+<ol>
+<li>**递归终止条件判断错误**。常见的错误写法是 `if not node.left and not node.right: return`，这会导致无法处理叶子节点的父节点为空子树的情况。正确的终止条件应始终是 `if not node: return`，即检查当前节点本身是否为空。</li>
+<li>**混淆“访问”与“遍历”的时机**。在中序遍历中，初学者常犯的错误是在 `traverse(node.left)` 之前就执行了 `result.append(node.val)`，这实际上变成了前序遍历。一定要牢记：“访问”（如添加到结果列表）这个动作，必须严格夹在两次递归调用之间，其具体位置决定了遍历的顺序。</li>
+<li>**忘记在递归函数内收集结果**。递归函数的返回值通常是用于传递“子问题”的解（例如子树的深度）。对于纯粹的遍历，我们通常需要一个外部列表（如代码中的 `result`）来收集所有节点的值。如果错误地试图通过返回值拼接结果，逻辑会变得复杂且容易出错。</li>
+</ol>
+</article>]]></content:encoded>
+      <pubDate>Fri, 26 Jun 2026 07:46:14 +0800</pubDate>
+      <guid isPermaLink="false">algorithms/daily/2026-06-26</guid>
+    </item>
+<item>
       <title>2026-06-24 每日算法专题</title>
       <link>algorithms/daily/2026-06-24.html</link>
       <description><![CDATA[如何高效地找到数组中每个元素右侧第一个比它大的元素（下一个更大元素）？]]></description>
