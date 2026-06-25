@@ -11,7 +11,13 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from ai_analyzer import generate_column_digest, generate_periodical_overview, merge_events, translate_headline_titles
+from ai_analyzer import (
+    generate_column_digest,
+    generate_daily_overview,
+    generate_periodical_overview,
+    merge_events,
+    translate_headline_titles,
+)
 from feed_builder import save_feed
 from publish_manifest import build_manifest
 from report_renderer import COLUMN_ORDER, save_daily_report
@@ -366,6 +372,84 @@ def _select_daily_column_items(
     return detailed, headline, metrics
 
 
+def _is_cryptic_headline_only_title(title: str) -> bool:
+    text = re.sub(r"\s+", " ", str(title or "")).strip()
+    if not text:
+        return True
+
+    compact = re.sub(r"[\s\-_/,.():;]", "", text)
+    compact_lower = compact.lower()
+
+    if re.fullmatch(r"[A-Z]{2,8}", text):
+        return True
+    if re.fullmatch(r"[A-Z0-9.\-]{2,12}", text):
+        return True
+    if re.fullmatch(r"(第?\s*\d+\s*(号|項|案|法案|决议|決議))", text):
+        return True
+    if re.fullmatch(r"(法案|决议|決議|修正案|草案)\s*[A-Z0-9.\-]{1,16}", text):
+        return True
+    if re.fullmatch(r"[a-z]{2,10}", compact_lower):
+        return True
+
+    has_cjk = bool(re.search(r"[\u4e00-\u9fff]", text))
+    has_action = bool(re.search(r"(通过|否决|签署|起诉|调查|裁定|宣布|推进|施压|会晤|达成|反对|批准|要求|发布|警告|计划|暂停|扩大|收紧|下调|上调)", text))
+    if has_cjk and not has_action and len(re.findall(r"[\u4e00-\u9fffA-Za-z0-9]", text)) <= 8:
+        return True
+
+    return False
+
+
+def _build_headline_only_reader_body(item: dict) -> str:
+    for field in ("summary", "content"):
+        text = re.sub(r"\s+", " ", str(item.get(field, "") or "")).strip()
+        if not text:
+            continue
+        sentence_match = re.match(r"(.+?[。！？!?])", text)
+        sentence = sentence_match.group(1).strip() if sentence_match else text[:80].rstrip(" ，,。；;:：")
+        if sentence and sentence[-1] not in "。！？!?":
+            sentence += "。"
+        if sentence:
+            return sentence
+    return ""
+
+
+def _normalize_headline_only_by_column(
+    column_headline_only: dict[str, list[dict]],
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
+    normalized_columns: dict[str, list[dict]] = {}
+    metrics: dict[str, dict[str, int]] = {}
+
+    for col_key, items in column_headline_only.items():
+        kept: list[dict] = []
+        cryptic_dropped = 0
+        unreadable_dropped = 0
+
+        for item in items:
+            title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
+            if _is_cryptic_headline_only_title(title_zh):
+                cryptic_dropped += 1
+                continue
+
+            reader_body = _build_headline_only_reader_body(item)
+            if not reader_body:
+                unreadable_dropped += 1
+                continue
+
+            kept.append({
+                **item,
+                "title_zh": title_zh,
+                "reader_body": reader_body,
+            })
+
+        normalized_columns[col_key] = kept
+        metrics[col_key] = {
+            "headline_cryptic_dropped": cryptic_dropped,
+            "headline_reader_body_missing": unreadable_dropped,
+        }
+
+    return normalized_columns, metrics
+
+
 async def _translate_headline_only_by_column(
     column_headline_only: dict[str, list[dict]],
     ai_config: dict,
@@ -559,6 +643,9 @@ def build_report(
         )
         for col_key, translated_metrics in headline_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(translated_metrics)
+        column_headline_only, normalized_metrics = _normalize_headline_only_by_column(column_headline_only)
+        for col_key, column_metrics in normalized_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
 
     # ── 提炼要点 ──
     print(f"\n[要点] 提炼要点...")
@@ -593,6 +680,18 @@ def build_report(
         metrics["columns"].setdefault(col_key, {})["rendered_headline_only"] = len(columns[col_key]["headline_only_events"])
 
     overview = PeriodicalOverview()
+    daily_overview = ""
+    if spec.report_type == "daily":
+        try:
+            daily_overview = asyncio.run(generate_daily_overview(
+                title=spec.title,
+                columns=columns,
+                ai_config=ai_config,
+            ))
+        except Exception as exc:
+            metrics["ai"]["daily_overview_failure"] = str(exc)
+            print(f"   [daily overview] 生成失败，已降级为空导语: {exc}")
+            daily_overview = ""
     if spec.report_type in {"weekly", "monthly"}:
         try:
             raw_overview = asyncio.run(generate_periodical_overview(
@@ -627,7 +726,7 @@ def build_report(
     print(f"\n[保存] 生成文件...")
     meta = {
         "title": spec.title,
-        "lead": overview_payload.get("summary", ""),
+        "lead": daily_overview if spec.report_type == "daily" else overview_payload.get("summary", ""),
         "highlights": highlights,
         "date": spec.report_key,
         "overview": overview_payload,

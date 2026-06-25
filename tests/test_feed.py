@@ -97,8 +97,7 @@ def test_save_feed_uses_reader_friendly_fragment():
             content = f.read()
 
         assert "<article>" in content
-        assert "<h2>今日要点</h2>" in content
-        assert "<li>重点 1</li>" in content
+        assert "<p>这是一段导语</p>" in content
         assert "<h2>一、美国政局</h2>" in content
         assert "<h2>二、国际局势</h2>" in content
         assert "<h3>1. 测试事件</h3>" in content
@@ -120,12 +119,12 @@ def test_save_feed_uses_reader_friendly_fragment():
         assert "<a href=" not in content
 
 
-def test_save_feed_headline_only_requires_chinese_title():
+def test_save_feed_headline_only_prefers_reader_body():
     meta = {"title": "测试标题", "lead": "", "highlights": [], "date": "2026-06-18"}
     columns = {
         "us_politics": {
             "detailed_events": [{"title_zh": "测试事件", "reader_body": "测试事件的单段概述正文。"}],
-            "headline_only_events": [{"title": "English only"}],
+            "headline_only_events": [{"title_zh": "英文标题", "reader_body": "白宫要求国会重启谈判。"}],
         },
         "global_affairs": [],
         "technology": [],
@@ -135,7 +134,8 @@ def test_save_feed_headline_only_requires_chinese_title():
         path = os.path.join(tmpdir, "feed.xml")
         save_feed(meta=meta, columns=columns, output_path=path, base_url="https://example.com")
         content = open(path, encoding="utf-8").read()
-    assert "English only" not in content
+    assert "英文标题" not in content
+    assert "白宫要求国会重启谈判。" in content
 
 
 def test_save_feed_uses_meta_pub_date_for_reeder_timestamp():
@@ -315,13 +315,18 @@ def test_guid_format_monthly():
     assert guid and "monthly/" in guid.group(1)
 
 
-def test_save_feed_weekly_uses_weekly_highlights():
-    """save_feed report_type=weekly 时 content:encoded 包含'本周要点'"""
+def test_save_feed_weekly_uses_periodical_overview():
+    """save_feed report_type=weekly 时 content:encoded 使用周报总览块。"""
     meta = {
         "title": "2026年6月第3周 周报",
         "lead": "",
         "highlights": ["要点一", "要点二"],
         "date": "2026-06-19",
+        "overview": {
+            "summary": "本周综述段落。",
+            "themes": ["主题甲"],
+            "watchlist": ["观察点一"],
+        },
     }
     columns = {
         "us_politics": [{"title_zh": "事件", "reader_body": "正文。"}],
@@ -334,17 +339,24 @@ def test_save_feed_weekly_uses_weekly_highlights():
         save_feed(meta=meta, columns=columns, output_path=path, base_url="",
                   report_type="weekly", report_key="2026-W25")
         content = open(path, encoding="utf-8").read()
-        assert "本周要点" in content
+        assert "本周综述" in content
+        assert "本周核心主题" in content
+        assert "下周观察点" in content
         assert "今日要点" not in content
 
 
-def test_save_feed_monthly_uses_monthly_highlights():
-    """save_feed report_type=monthly 时 content:encoded 包含'本月要点'"""
+def test_save_feed_monthly_uses_periodical_overview():
+    """save_feed report_type=monthly 时 content:encoded 使用月报总览块。"""
     meta = {
         "title": "2026年6月 月报",
         "lead": "",
         "highlights": ["要点一"],
         "date": "2026-06-19",
+        "overview": {
+            "summary": "本月综述段落。",
+            "themes": ["主题甲"],
+            "watchlist": ["观察点一"],
+        },
     }
     columns = {
         "us_politics": [],
@@ -357,5 +369,7 @@ def test_save_feed_monthly_uses_monthly_highlights():
         save_feed(meta=meta, columns=columns, output_path=path, base_url="",
                   report_type="monthly", report_key="2026-06")
         content = open(path, encoding="utf-8").read()
-        assert "本月要点" in content
+        assert "本月综述" in content
+        assert "本月核心主题" in content
+        assert "下月观察点" in content
         assert "今日要点" not in content

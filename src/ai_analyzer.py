@@ -754,6 +754,66 @@ _PERIODICAL_TYPE_LABELS: dict[str, str] = {
     "monthly": "月报",
 }
 
+
+_PERIODICAL_OVERVIEW_BANNED_PHRASES = (
+    "形势复杂",
+    "影响深远",
+    "仍需观察",
+    "值得关注",
+    "可以看出",
+    "总体来看",
+    "整体来看",
+    "可以认为",
+    "不难看出",
+    "需要注意的是",
+    "值得注意的是",
+)
+
+
+def _build_periodical_overview_columns(columns: dict[str, dict]) -> dict[str, dict]:
+    compact_columns: dict[str, dict] = {}
+    for col_key, col_data in columns.items():
+        if isinstance(col_data, dict):
+            detailed = col_data.get("detailed_events", [])
+            analysis = str(col_data.get("analysis", "") or "").strip()
+        else:
+            detailed = col_data
+            analysis = ""
+
+        events = []
+        top_titles = []
+        for event in detailed[:4]:
+            title_zh = str(event.get("title_zh") or event.get("title") or "").strip()
+            reader_body = str(event.get("reader_body", "") or "").strip()
+            if title_zh and title_zh not in top_titles:
+                top_titles.append(title_zh)
+            events.append({
+                "title_zh": title_zh,
+                "reader_body": reader_body,
+            })
+
+        compact_columns[col_key] = {
+            "analysis": analysis,
+            "count": len(detailed),
+            "top_titles": top_titles,
+            "events": events,
+        }
+    return compact_columns
+
+
+def _clean_periodical_overview_text(text: object, limit: int | None = None) -> str:
+    cleaned = re.sub(r"\s+", " ", str(text or "")).strip()
+    for phrase in _PERIODICAL_OVERVIEW_BANNED_PHRASES:
+        cleaned = cleaned.replace(phrase, "")
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    cleaned = re.sub(r"\s*([，,。．;；:：])\s*", r"\1", cleaned)
+    cleaned = re.sub(r"([，,。．;；:：]){2,}", r"\1", cleaned)
+    cleaned = cleaned.strip(" ，,。．;；:：")
+    if limit is not None and len(cleaned) > limit:
+        cleaned = cleaned[:limit].rstrip(" ，,。．;；:：")
+    return cleaned
+
+
 PERIODICAL_OVERVIEW_PROMPT_TEMPLATE = """你是一位资深中文新闻主编。请基于已经写好的栏目摘要，为一份{report_label}生成“先总览后分析”的结构化总览。
 
 ## 任务目标
@@ -766,17 +826,19 @@ PERIODICAL_OVERVIEW_PROMPT_TEMPLATE = """你是一位资深中文新闻主编。
 
 ## 事实边界（最高优先级）
 
-- 只能使用输入中的 highlights、栏目标题、reader_body。
+- 只能使用输入中的 highlights、栏目标题、top_titles、count、analysis、reader_body。
 - 不得补写输入里没有出现的人名、机构、数字、票数、时间、地点、法律条款或市场变化。
-- 不得写泛泛空话，例如“形势复杂”“影响深远”“仍需观察”。
+- 不得写泛泛空话或编辑腔套话，例如“形势复杂”“影响深远”“仍需观察”“值得关注”“可以看出”“总体来看”。
+- summary/themes/watchlist 必须优先引用输入里明确出现的主题、事件或栏目主线，不允许只抽象概括。
 - 如果某栏没有足够材料，可以把对应 column_analyses 设为空字符串，但不得编造。
 
 ## 写作要求
 
-- summary 要有“本周期最重要变化 → 结构性主线 → 接下来关注点”的顺序。
-- themes 应提炼跨事件主线，不要直接复述栏目名。
-- watchlist 要具体指出后续观察对象或冲突延续点。
+- summary 要有“本周期最重要变化 → 结构性主线 → 接下来关注点”的顺序，必须尽量点到具体主题。
+- themes 应提炼跨事件主线，不要直接复述栏目名，优先使用输入里出现过的名词短语。
+- watchlist 要具体指出后续观察对象或冲突延续点，最好可对应到某一栏或某个事件。
 - column_analyses 要解释“这一栏为什么值得看”，不能和 reader_body 逐句重复。
+- 每段都要避免空话：能写具体对象就不要写抽象判断，能写方向就不要写笼统评价。
 - 保持新闻编辑口吻，克制、具体、无修辞堆砌。
 
 ## 输出格式
@@ -801,6 +863,47 @@ PERIODICAL_OVERVIEW_PROMPT_TEMPLATE = """你是一位资深中文新闻主编。
 
 标题：{title}
 已有要点：{highlights_json}
+栏目摘要：
+```json
+{columns_json}
+```
+"""
+
+
+DAILY_OVERVIEW_PROMPT_TEMPLATE = """你是一位资深中文新闻主编。请基于已经写好的日报栏目内容，为整篇日报生成一段开头总览。
+
+## 任务目标
+
+- 只输出一段 **summary**，120-180 字。
+- 这段 summary 用在整份日报最顶部，必须先交代当天最重要的变化，再串联主要主线，最后点出接下来值得继续观察的方向。
+
+## 事实边界（最高优先级）
+
+- 只能使用输入中的栏目标题、top_titles、count、analysis、reader_body。
+- 不得补写输入里没有出现的人名、机构、数字、票数、时间、地点、法律条款或市场变化。
+- 不得写泛泛空话或编辑腔套话，例如“形势复杂”“影响深远”“仍需观察”“值得关注”“可以看出”“总体来看”。
+- 不得把法案编号、缩写、技术代号或纯标题翻译当作叙述主角；要写“谁做了什么、局势怎么变了”。
+
+## 写作要求
+
+- 必须写成**整篇总览**，不要按栏目顺序依次点名罗列。
+- 必须优先提炼跨栏目主线，说明这些事件如何共同构成当天的政治/外交/科技/经济画面。
+- 能写具体动作就不要写抽象判断，能写具体对象就不要写空泛概括。
+- 保持中文硬新闻口吻，克制、具体、连贯。
+
+## 输出格式
+
+必须返回严格 JSON 对象：
+
+```json
+{{
+  "summary": "..."
+}}
+```
+
+## 输入数据
+
+标题：{title}
 栏目摘要：
 ```json
 {columns_json}
@@ -927,24 +1030,7 @@ async def generate_periodical_overview(
     if report_type not in _PERIODICAL_TYPE_LABELS:
         return {}
 
-    compact_columns: dict[str, dict] = {}
-    for col_key, col_data in columns.items():
-        if isinstance(col_data, dict):
-            detailed = col_data.get("detailed_events", [])
-            analysis = str(col_data.get("analysis", "") or "")
-        else:
-            detailed = col_data
-            analysis = ""
-        compact_columns[col_key] = {
-            "analysis": analysis,
-            "events": [
-                {
-                    "title_zh": event.get("title_zh", ""),
-                    "reader_body": event.get("reader_body", ""),
-                }
-                for event in detailed[:4]
-            ],
-        }
+    compact_columns = _build_periodical_overview_columns(columns)
 
     prompt = PERIODICAL_OVERVIEW_PROMPT_TEMPLATE
     prompt = prompt.replace("{report_label}", _PERIODICAL_TYPE_LABELS[report_type])
@@ -972,14 +1058,33 @@ async def generate_periodical_overview(
     if not isinstance(parsed, dict):
         raise RuntimeError(f"generate_periodical_overview JSON 解析失败: {response[:300]}")
 
-    summary = str(parsed.get("summary", "") or "").strip()
-    themes = [str(item).strip() for item in parsed.get("themes", []) if str(item).strip()]
-    watchlist = [str(item).strip() for item in parsed.get("watchlist", []) if str(item).strip()]
+    summary = _clean_periodical_overview_text(parsed.get("summary", ""), limit=220)
+
+    themes = []
+    for item in parsed.get("themes", []):
+        text = _clean_periodical_overview_text(item, limit=24)
+        if not text:
+            continue
+        if text not in themes:
+            themes.append(text)
+        if len(themes) >= 4:
+            break
+
+    watchlist = []
+    for item in parsed.get("watchlist", []):
+        text = _clean_periodical_overview_text(item, limit=32)
+        if not text:
+            continue
+        if text not in watchlist:
+            watchlist.append(text)
+        if len(watchlist) >= 4:
+            break
+
     raw_column_analyses = parsed.get("column_analyses", {})
     column_analyses: dict[str, str] = {}
     if isinstance(raw_column_analyses, dict):
         for col_key in columns:
-            column_analyses[col_key] = str(raw_column_analyses.get(col_key, "") or "").strip()
+            column_analyses[col_key] = _clean_periodical_overview_text(raw_column_analyses.get(col_key, ""), limit=110)
 
     return {
         "summary": summary,
@@ -987,6 +1092,41 @@ async def generate_periodical_overview(
         "watchlist": watchlist,
         "column_analyses": column_analyses,
     }
+
+
+async def generate_daily_overview(
+    title: str,
+    columns: dict[str, dict],
+    ai_config: dict,
+) -> str:
+    """为日报生成整篇总览导语。"""
+    compact_columns = _build_periodical_overview_columns(columns)
+
+    prompt = DAILY_OVERVIEW_PROMPT_TEMPLATE
+    prompt = prompt.replace("{title}", title)
+    prompt = prompt.replace("{columns_json}", json.dumps(compact_columns, ensure_ascii=False, indent=2))
+
+    response = await _call_llm(
+        prompt,
+        ai_config,
+        timeout=_timeout_for(ai_config, "digest", 180),
+    )
+    text = _strip_markdown_fence(response)
+    parsed = None
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            try:
+                parsed = json.loads(m.group())
+            except json.JSONDecodeError:
+                pass
+
+    if not isinstance(parsed, dict):
+        raise RuntimeError(f"generate_daily_overview JSON 解析失败: {response[:300]}")
+
+    return _clean_periodical_overview_text(parsed.get("summary", ""), limit=220)
 
 
 async def translate_headline_titles(
