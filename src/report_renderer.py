@@ -65,9 +65,9 @@ def _markdown_title_text(text: object) -> str:
     return html.escape(str(text), quote=False)
 
 
-def _headline_only_title(event: dict) -> str:
-    """headline_only_events 只消费中文标题，避免英文泄漏到正文。"""
-    return str(event.get("title_zh") or "").strip()
+def _headline_only_text(event: dict) -> str:
+    """headline_only_events 优先使用可读短句，缺失时回退中文标题。"""
+    return str(event.get("reader_body") or event.get("title_zh") or "").strip()
 
 
 def _frontmatter(title: str, lead: str, highlights: list, date: str) -> str:
@@ -134,7 +134,6 @@ def render_structured_html(
         date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
         title = _html_title_text(build_report_title(report_type, date))
     lead = _html_text(meta.get("lead", ""))
-    highlights = meta.get("highlights", [])
     date = _html_text(meta.get("date", datetime.now().strftime("%Y-%m-%d")))
 
     css = """
@@ -168,21 +167,6 @@ header .lead {
     font-size: 0.95em;
     margin-top: 12px;
     line-height: 1.6;
-}
-.highlights {
-    background: #f5f5f5;
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin: 16px 0;
-}
-.highlights ul {
-    margin: 0;
-    padding-left: 20px;
-}
-.highlights li {
-    font-size: 0.9em;
-    color: #333;
-    margin: 4px 0;
 }
 h2 {
     font-size: 1.3em;
@@ -248,15 +232,6 @@ footer {
         "</header>",
     ]
 
-    # highlights
-    if highlights:
-        html.append("<div class='highlights'>")
-        html.append("<ul>")
-        for h in highlights:
-            html.append(f"<li>{_html_text(h)}</li>")
-        html.append("</ul>")
-        html.append("</div>")
-
     _append_periodical_overview_html(html, meta, report_type)
 
     # 四大栏目
@@ -292,7 +267,7 @@ footer {
         if headline_only:
             html.append("<ul>")
             for event in headline_only:
-                event_title = _html_text(_headline_only_title(event))
+                event_title = _html_text(_headline_only_text(event))
                 if event_title:
                     html.append(f"<li>{event_title}</li>")
             html.append("</ul>")
@@ -302,13 +277,6 @@ footer {
 
     return "\n".join(html)
 
-
-# 报告类型 → 要点标题
-_HIGHLIGHTS_HEADING: dict[str, str] = {
-    "daily": "今日要点",
-    "weekly": "本周要点",
-    "monthly": "本月要点",
-}
 
 _PERIODICAL_OVERVIEW_HEADINGS: dict[str, dict[str, str]] = {
     "weekly": {
@@ -418,17 +386,12 @@ def render_reader_content(
             title = _html_title_text(build_report_title(report_type, date))
         except ValueError:
             title = _html_title_text(meta.get("title", ""))
-    highlights = meta.get("highlights", []) or []
+    lead = str(meta.get("lead", "") or "").strip()
 
     html: list[str] = ["<article>"]
 
-    if highlights:
-        heading = manifest.highlights_heading if manifest else _HIGHLIGHTS_HEADING.get(report_type, "今日要点")
-        html.append(f"<h2>{heading}</h2>")
-        html.append("<ul>")
-        for item in highlights:
-            html.append(f"<li>{_html_text(item)}</li>")
-        html.append("</ul>")
+    if lead:
+        html.append(f"<p>{_html_text(lead)}</p>")
 
     _append_periodical_overview_html(html, meta, report_type)
 
@@ -458,7 +421,7 @@ def render_reader_content(
         if headline_only:
             html.append("<ul>")
             for event in headline_only:
-                event_title = _html_text(_headline_only_title(event))
+                event_title = _html_text(_headline_only_text(event))
                 if event_title:
                     html.append(f"<li>{event_title}</li>")
             html.append("</ul>")
@@ -531,7 +494,7 @@ def render_structured_markdown(
         # 无序条目：仅标题
         if headline_only:
             for event in headline_only:
-                event_title = _markdown_text(_headline_only_title(event))
+                event_title = _markdown_text(_headline_only_text(event))
                 if event_title:
                     lines.append(f"- {event_title}")
             lines.append("")

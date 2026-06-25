@@ -28,9 +28,7 @@ def test_render_reader_content_is_plain_article_fragment():
 
     assert html.startswith("<article>")
     assert html.endswith("</article>")
-    assert "<h2>今日要点</h2>" in html
-    assert "<li>要点一</li>" in html
-    assert "<li>要点二</li>" in html
+    assert "<p>这是一段导语</p>" in html
     assert "<h2>一、美国政局</h2>" in html
     assert "<h2>二、国际局势</h2>" in html
     assert "<h3>1. 美国事件</h3>" in html
@@ -45,33 +43,15 @@ def test_render_reader_content_is_plain_article_fragment():
     assert "<html" not in html
     assert "<head>" not in html
     assert "<style>" not in html
-    assert "这是一段导语" not in html
     assert "相关阅读" not in html
     assert "原文链接" not in html
     assert "来源" not in html
     assert "<h1>2026年6月18日 日报</h1>" not in html
     assert "<a href=" not in html
 
-
-def test_render_reader_content_weekly_highlights():
-    """weekly 类型显示"本周要点"标题"""
-    meta = {"title": "测试周报", "highlights": ["要点一"], "date": "2026-06-19"}
-    columns = {"us_politics": [], "global_affairs": [], "technology": [], "economy": []}
-    html = render_reader_content(meta, columns, report_type="weekly")
-    assert "本周要点" in html
-
-
-def test_render_reader_content_monthly_highlights():
-    """monthly 类型显示"本月要点"标题"""
-    meta = {"title": "测试月报", "highlights": ["要点一"], "date": "2026-06-19"}
-    columns = {"us_politics": [], "global_affairs": [], "technology": [], "economy": []}
-    html = render_reader_content(meta, columns, report_type="monthly")
-    assert "本月要点" in html
-
-
 def test_render_reader_has_numbered_events_and_bullet_titles():
-    """Reader 栏目内先显示编号正文，再显示次要 bullet 标题。"""
-    meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
+    """Reader 栏目内先显示编号正文，再显示次要 bullet 短句。"""
+    meta = {"title": "测试", "highlights": [], "lead": "日报总览。", "date": "2026-06-19"}
     columns = {
         "us_politics": {
             "detailed_events": [
@@ -79,8 +59,8 @@ def test_render_reader_has_numbered_events_and_bullet_titles():
                 {"title_zh": "重要事件B", "reader_body": "另一条正文。"},
             ],
             "headline_only_events": [
-                {"title_zh": "快讯C"},
-                {"title_zh": "快讯D"},
+                {"title_zh": "快讯C", "reader_body": "白宫要求国会尽快表决。"},
+                {"title_zh": "快讯D", "reader_body": "州政府扩大边境部署。"},
             ],
         },
         "global_affairs": {"detailed_events": [], "headline_only_events": []},
@@ -91,13 +71,13 @@ def test_render_reader_has_numbered_events_and_bullet_titles():
     assert "<h3>1. 重要事件 A</h3>" in html
     assert "<h3>2. 重要事件 B</h3>" in html
     assert "<p>这是正文。第二句。</p>" in html
-    assert "<li>快讯 C</li>" in html
-    assert "<li>快讯 D</li>" in html
+    assert "<li>白宫要求国会尽快表决。</li>" in html
+    assert "<li>州政府扩大边境部署。</li>" in html
     assert "其他要闻" not in html
     assert "补充快讯" not in html
 
 
-def test_render_reader_headline_only_requires_chinese_title():
+def test_render_reader_headline_only_prefers_reader_body():
     meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
     columns = {
         "us_politics": {
@@ -105,8 +85,8 @@ def test_render_reader_headline_only_requires_chinese_title():
                 {"title_zh": "重要事件A", "reader_body": "这是正文。第二句。"},
             ],
             "headline_only_events": [
-                {"title": "快讯C"},
-                {"title": "快讯D"},
+                {"title_zh": "快讯C", "reader_body": "白宫与州长公开交锋。"},
+                {"title_zh": "快讯D", "reader_body": "国会两院继续拉锯。"},
             ],
         },
         "global_affairs": {"detailed_events": [], "headline_only_events": []},
@@ -121,6 +101,8 @@ def test_render_reader_headline_only_requires_chinese_title():
     for output in (html, structured_html, markdown):
         assert "快讯 C" not in output
         assert "快讯 D" not in output
+        assert "白宫与州长公开交锋。" in output
+        assert "国会两院继续拉锯。" in output
 
 
 def test_render_reader_skips_headline_only_column():

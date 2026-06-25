@@ -1,5 +1,6 @@
 """报告编排器测试 — ReportSpec、质量门禁、要点提炼、栏级降级"""
 
+import json
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
 
@@ -7,6 +8,7 @@ from report_engine import (
     PeriodicalOverview,
     ReportPreparation,
     ReportSpec,
+    _normalize_headline_only_by_column,
     _build_periodical_overview_payload,
     _generate_all_column_digests,
     _prepare_report_inputs,
@@ -15,6 +17,8 @@ from report_engine import (
     build_report,
     sanitize_or_validate_events,
 )
+
+from ai_analyzer import generate_daily_overview, generate_periodical_overview
 
 
 # ── ReportSpec 默认值 ──
@@ -105,6 +109,86 @@ def test_build_periodical_overview_payload_from_dataclass():
         "themes": ["主题甲", "主题乙"],
         "watchlist": ["观察点一"],
     }
+
+
+def test_generate_periodical_overview_cleans_and_limits_output():
+    columns = {
+        "us_politics": {
+            "analysis": "美国政局本周主线。",
+            "detailed_events": [
+                {"title_zh": "长标题一长标题一长标题一", "reader_body": "正文一。"},
+                {"title_zh": "事件二", "reader_body": "正文二。"},
+            ],
+            "headline_only_events": [],
+        },
+        "global_affairs": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "technology": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "economy": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+    }
+    ai_config = {"base_url": "https://example.com", "api_key": "x", "model": "test"}
+    raw = {
+        "summary": "  本周综述。\n\n可以看出 形势复杂，总体来看 经济与政治联动。  " + "长" * 260,
+        "themes": ["主题甲", "主题甲", "", "主题乙" * 20, "主题丙"],
+        "watchlist": ["观察点一", "", "观察点二" * 20, "观察点三"],
+        "column_analyses": {
+            "us_politics": "  美国政局本周主线。\n可以看出。  " + "长" * 150,
+            "global_affairs": "",
+            "technology": "技术栏主线。",
+            "economy": "经济栏主线。",
+        },
+    }
+
+    class _DummyCall:
+        async def __call__(self, *args, **kwargs):
+            return json.dumps(raw, ensure_ascii=False)
+
+    with patch("ai_analyzer._call_llm", new=_DummyCall()):
+        overview = __import__("asyncio").run(generate_periodical_overview(
+            report_type="weekly",
+            title="测试周报",
+            highlights=["要点一", "要点二"],
+            columns=columns,
+            ai_config=ai_config,
+        ))
+
+    assert overview["summary"].startswith("本周综述，经济与政治联动。")
+    assert len(overview["summary"]) == 220
+    assert overview["themes"] == ["主题甲", "主题乙主题乙主题乙主题乙主题乙主题乙主题乙主题乙", "主题丙"]
+    assert overview["watchlist"] == ["观察点一", "观察点二观察点二观察点二观察点二观察点二观察点二观察点二观察点二", "观察点三"]
+    assert overview["column_analyses"]["us_politics"].startswith("美国政局本周主线。")
+    assert len(overview["column_analyses"]["us_politics"]) == 110
+    assert overview["column_analyses"]["global_affairs"] == ""
+
+
+def test_generate_daily_overview_cleans_summary():
+    columns = {
+        "us_politics": {
+            "analysis": "",
+            "detailed_events": [
+                {"title_zh": "白宫推动新措施", "reader_body": "白宫推动新措施并与国会协调推进。"},
+            ],
+            "headline_only_events": [],
+        },
+        "global_affairs": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "technology": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+        "economy": {"analysis": "", "detailed_events": [], "headline_only_events": []},
+    }
+    ai_config = {"base_url": "https://example.com", "api_key": "x", "model": "test"}
+
+    class _DummyCall:
+        async def __call__(self, *args, **kwargs):
+            return json.dumps({
+                "summary": "  可以看出 白宫与国会围绕政策推进重新拉开拉锯，整体来看 市场与政治议程重新联动。  "
+            }, ensure_ascii=False)
+
+    with patch("ai_analyzer._call_llm", new=_DummyCall()):
+        summary = __import__("asyncio").run(generate_daily_overview(
+            title="测试日报",
+            columns=columns,
+            ai_config=ai_config,
+        ))
+
+    assert summary == "白宫与国会围绕政策推进重新拉开拉锯，市场与政治议程重新联动"
 
 
 def test_generate_all_column_digests_falls_back_per_column():
@@ -282,6 +366,23 @@ def test_translate_headline_only_by_column_drops_untranslated():
     assert translated["global_affairs"] == [{"title": "English one", "title_zh": "中文一"}]
     assert metrics["global_affairs"]["headline_translated"] == 1
     assert metrics["global_affairs"]["headline_translation_failed"] == 1
+
+
+def test_normalize_headline_only_by_column_filters_cryptic_titles():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "us_politics": [
+            {"title_zh": "法案 4238 号", "summary": "众议院推进法案。"},
+            {"title_zh": "白宫要求国会加快表决", "summary": "白宫要求国会尽快推进相关表决。第二句。"},
+        ]
+    })
+
+    assert normalized["us_politics"] == [{
+        "title_zh": "白宫要求国会加快表决",
+        "summary": "白宫要求国会尽快推进相关表决。第二句。",
+        "reader_body": "白宫要求国会尽快推进相关表决。",
+    }]
+    assert metrics["us_politics"]["headline_cryptic_dropped"] == 1
+    assert metrics["us_politics"]["headline_reader_body_missing"] == 0
 
 
 def test_build_report_prefers_quantity_for_daily_fill(tmp_path):
@@ -509,7 +610,7 @@ def test_build_report_injects_monthly_overview_into_meta_and_columns(tmp_path):
     assert feed_meta["overview"]["watchlist"] == ["观察点一"]
 
 
-def test_build_report_daily_skips_periodical_overview_generation(tmp_path):
+def test_build_report_daily_uses_daily_overview_generation(tmp_path):
     spec = ReportSpec(
         report_type="daily",
         report_key="2026-06-19",
@@ -553,12 +654,70 @@ def test_build_report_daily_skips_periodical_overview_generation(tmp_path):
         }]
 
     with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.generate_daily_overview", new=AsyncMock(return_value="日报总览导语")) as daily_overview, \
          patch("report_engine.generate_periodical_overview", new=AsyncMock(return_value={})) as overview, \
-         patch("report_engine.save_daily_report", return_value=("daily.md", "daily.html")), \
+         patch("report_engine.save_daily_report", return_value=("daily.md", "daily.html")) as save_report, \
          patch("report_engine.save_feed", return_value="feed.xml"):
         build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
 
+    meta = save_report.call_args.args[0]
+    assert meta["lead"] == "日报总览导语"
+    daily_overview.assert_called_once()
     overview.assert_not_called()
+
+
+def test_build_report_daily_overview_failure_falls_back_to_empty_lead(tmp_path):
+    spec = ReportSpec(
+        report_type="daily",
+        report_key="2026-06-19",
+        title="测试日报",
+        since=datetime(2026, 6, 18, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 19, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "daily"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 1, "max_items": 1, "headline_items": 0},
+            "global_affairs": {"label": "国际局势", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 0, "max_items": 0, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 0, "max_items": 0, "headline_items": 0},
+        },
+    )
+    scored_events = [{
+        "title": "美国事件",
+        "source": "Example",
+        "score": 90,
+        "summary": "摘要",
+        "content": "正文",
+        "column": "us_politics",
+        "event_key": "daily-overview-fallback",
+        "language": "zh",
+        "tags": [],
+        "source_links": [],
+        "is_hard_news": True,
+    }]
+    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        return [{
+            "title_zh": "美国事件",
+            "reader_body": "美国事件正文。",
+            "core_facts": "美国事件正文。",
+        }]
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.generate_daily_overview", new=AsyncMock(side_effect=RuntimeError("daily overview timeout"))), \
+         patch("report_engine.save_daily_report", return_value=("daily.md", "daily.html")) as save_report, \
+         patch("report_engine.save_feed", return_value="feed.xml"):
+        stats = build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    meta = save_report.call_args.args[0]
+    assert meta["lead"] == ""
+    assert stats["metrics"]["ai"]["daily_overview_failure"] == "daily overview timeout"
 
 
 def test_build_report_periodical_overview_failure_falls_back_to_empty_payload(tmp_path):
