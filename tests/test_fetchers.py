@@ -3,7 +3,7 @@
 import asyncio
 from datetime import datetime, timezone
 
-from fetchers import CustomFeedFetcher, GoogleNewsFetcher, RSSFetcher, fetch_all_sources
+from fetchers import CustomFeedFetcher, GoogleNewsFetcher, RSSFetcher, fetch_all_sources, _build_contextual_snippet
 
 
 def test_rss_fetcher_accepts_rss_and_rsshub_modes():
@@ -84,6 +84,132 @@ def test_custom_fetcher_can_build_content_item_from_cn_media_page():
     assert item.column == "global_affairs"
     assert item.metadata["language"] == "zh"
     assert "cn_source" in item.metadata["tags"]
+
+
+def test_build_contextual_snippet_prefers_title_neighborhood():
+    page_text = "前言无关内容。美国国会提出《大街竞争法案》，旨在支持中小企业发展，并调整市场准入规则。后文继续解释实施范围。"
+
+    snippet = _build_contextual_snippet(page_text, "《大街竞争法案》", 60)
+
+    assert "大街竞争法案" in snippet
+    assert "旨在支持中小企业发展" in snippet
+
+
+def test_custom_fetcher_legislative_records_prefers_detail_page_context():
+    source = {
+        "name": "GovTrack",
+        "url": "https://www.govtrack.us/congress/bills",
+        "fetch_mode": "custom",
+        "fetcher_key": "legislative_or_public_records",
+        "column": "us_politics",
+        "source_tier": 1,
+        "language": "en",
+        "custom": {
+            "item_patterns": [r'<a[^>]+href="(?P<href>/congress/bills/119/hr999)"[^>]*>(?P<title>[^<]+)</a>'],
+            "summary_chars": 90,
+        },
+        "enabled": True,
+    }
+    list_html = '<html><body><a href="/congress/bills/119/hr999">Main Street Competition Act</a> 列表页只有名称</body></html>'
+    detail_html = "<html><body>Main Street Competition Act This bill would support small businesses and revise market access requirements.</body></html>"
+    fetcher = CustomFeedFetcher([source])
+
+    async def _fake_get(url: str, **kwargs) -> str:
+        if url.endswith("/congress/bills"):
+            return list_html
+        return detail_html
+
+    fetcher._get = _fake_get  # type: ignore[method-assign]
+    items = asyncio.run(fetcher.fetch(datetime(2026, 6, 19, tzinfo=timezone.utc)))
+
+    assert len(items) == 1
+    assert "support small businesses" in (items[0].content or "")
+
+
+def test_custom_fetcher_can_build_official_press_release_item():
+    source = {
+        "name": "USTR Press Releases",
+        "url": "https://ustr.gov/about-us/policy-offices/press-office/press-releases",
+        "fetch_mode": "custom",
+        "fetcher_key": "intl_org_feed",
+        "column": "economy",
+        "source_tier": 1,
+        "language": "en",
+        "tags": ["official", "trade", "policy"],
+        "custom": {
+            "item_patterns": [
+                r'<a[^>]+href="(?P<href>/about-us/policy-offices/press-office/press-releases/2025/march/statement-section-301)"[^>]*>(?P<title>[^<]+)</a>'
+            ],
+            "summary_chars": 100,
+        },
+        "enabled": True,
+    }
+    html = """
+    <html><body>
+      <a href="/about-us/policy-offices/press-office/press-releases/2025/march/statement-section-301">
+        Ambassador Issues Statement on Section 301 Tariff Action
+      </a>
+    </body></html>
+    """
+    fetcher = CustomFeedFetcher([source])
+
+    async def _fake_get(url: str, **kwargs) -> str:
+        return html
+
+    fetcher._get = _fake_get  # type: ignore[method-assign]
+    items = asyncio.run(fetcher.fetch(datetime(2026, 6, 19, tzinfo=timezone.utc)))
+
+    assert len(items) == 1
+    item = items[0]
+    assert item.title.strip() == "Ambassador Issues Statement on Section 301 Tariff Action"
+    assert item.column == "economy"
+    assert item.metadata["fetch_mode"] == "custom"
+    assert "trade" in item.metadata["tags"]
+
+
+def test_intl_org_feed_prefers_detail_page_context():
+    source = {
+        "name": "FTC Press Releases",
+        "url": "https://www.ftc.gov/news-events/news/press-releases",
+        "fetch_mode": "custom",
+        "fetcher_key": "intl_org_feed",
+        "column": "technology",
+        "source_tier": 1,
+        "language": "en",
+        "tags": ["official", "regulation", "antitrust"],
+        "custom": {
+            "item_patterns": [
+                r'<a[^>]+href="(?P<href>/news-events/news/press-releases/2026/06/sample-antitrust-release)"[^>]*>(?P<title>[^<]+)</a>'
+            ],
+            "summary_chars": 100,
+        },
+        "enabled": True,
+    }
+    list_html = """
+    <html><body>
+      <a href="/news-events/news/press-releases/2026/06/sample-antitrust-release">
+        FTC Announces Antitrust Action
+      </a>
+    </body></html>
+    """
+    detail_html = """
+    <html><body>
+      FTC Announces Antitrust Action The commission filed a complaint to block anti-competitive
+      conduct in the AI infrastructure market.
+    </body></html>
+    """
+    fetcher = CustomFeedFetcher([source])
+
+    async def _fake_get(url: str, **kwargs) -> str:
+        if url == source["url"]:
+            return list_html
+        return detail_html
+
+    fetcher._get = _fake_get  # type: ignore[method-assign]
+    items = asyncio.run(fetcher.fetch(datetime(2026, 6, 19, tzinfo=timezone.utc)))
+
+    assert len(items) == 1
+    assert "The commission filed a complaint" in (items[0].content or "")
 
 
 def test_fetch_all_sources_routes_custom_and_rsshub(monkeypatch):
