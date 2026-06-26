@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026-06-27 每日算法专题</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+                 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    line-height: 1.8;
+    color: #1a1a1a;
+    background: #fafafa;
+}
+header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 16px;
+    margin-bottom: 32px;
+}
+header h1 {
+    font-size: 1.6em;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+header .meta {
+    color: #666;
+    font-size: 0.9em;
+}
+header .question {
+    color: #444;
+    font-size: 1em;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border-left: 3px solid #0f5e3a;
+}
+h2 {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e0e0e0;
+}
+pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+p code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+ol, ul {
+    padding-left: 24px;
+}
+li {
+    margin: 6px 0;
+}
+.tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+.tag {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+.difficulty {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+.diff-1 { background: #e8f5e9; color: #2e7d32; }
+.diff-2 { background: #fff3e0; color: #e65100; }
+.diff-3 { background: #fce4ec; color: #c62828; }
+footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    color: #999;
+    font-size: 0.8em;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<header>
+<h1>动态规划入门：爬楼梯问题详解</h1>
+<div class="meta">
+  <span class="difficulty diff-1">入门</span>
+  <div class="tags"><span class="tag">动态规划</span><span class="tag">递推</span></div>
+</div>
+<div class="question">如何用动态规划解决爬楼梯问题，并理解状态定义、转移方程和空间优化？</div>
+</header>
+<main>
+<h2>直觉理解</h2>
+<p>爬楼梯问题就像你站在楼梯底部，每一步只能走1阶或2阶，想知道有多少种不同方式到达顶端。这本质上是一个路径计数问题：当你站在第i阶时，最后一步必然是从第i-1阶（走1步）或第i-2阶（走2步）来的，所以到达第i阶的方式数就是这两种情况之和。这种“当前状态由之前状态决定”的思维，正是动态规划的核心——它把大问题分解成重叠子问题，通过记录子问题的解来避免重复计算。想象一下，如果你用递归暴力枚举，会重复计算很多中间状态；而动态规划用一张表格（数组）存下每个子问题的答案，像填表格一样逐步推导出最终结果。爬楼梯问题之所以经典，是因为它直观展示了动态规划的三个关键：定义状态（如dp[i]表示到第i阶的方式）、状态转移（dp[i] = dp[i-1] + dp[i-2]）、以及初始化（起点的设置）。更进阶地，我们发现计算dp[i]只依赖前两个状态，所以可以用两个变量滚动更新，实现空间优化，这就像你只需要记住最近两步的结果，而不需要保存整个路径历史。</p>
+<h2>算法思路</h2>
+<p>解题框架分四步：
+1. **状态定义**：设dp[i]表示爬到第i阶楼梯的总方式数。这里i从0开始，dp[0]表示地面（起点），通常设为1（空操作的一种方式）。
+2. **状态转移方程**：由于最后一步只能是1阶或2阶，所以dp[i] = dp[i-1] + dp[i-2]。这个方程体现了问题的最优子结构——当前解由子问题解组合而成。
+3. **初始化**：确定边界条件。当n=0时，只有一种方式（不动），所以dp[0]=1；当n=1时，只有一种方式（走1步），所以dp[1]=1。注意，有些定义会从n=1开始，但统一从0开始更利于代码处理。
+4. **计算顺序与优化**：基础版本从i=2到n顺序计算dp数组，时间O(n)，空间O(n)。但观察转移方程，dp[i]只依赖dp[i-1]和dp[i-2]，因此可以用两个变量滚动更新：设a表示dp[i-2]，b表示dp[i-1]，每次计算新值c = a + b，然后更新a, b = b, c。这降空间到O(1)，像斐波那契数列的迭代解法。
+实现时，先写基础版本验证正确性，再优化空间。关键是确保循环范围正确：从2开始迭代到n，因为前两个状态已初始化。如果n较小（如0或1），直接返回初始值，避免数组越界。</p>
+<h2>Python 示例</h2>
+<pre><code># 爬楼梯问题的动态规划解法
+# 基础版本：使用数组记录所有状态
+
+def climb_stairs(n: int) -&gt; int:
+    """
+    计算爬到第n阶楼梯的方式数（每次可爬1或2阶）
+    :param n: 楼梯总阶数
+    :return: 方式数
+    """
+    if n &lt;= 1:
+        return 1  # 边界条件：0或1阶时只有一种方式
+    # 初始化dp数组，dp[i]表示到第i阶的方式数
+    dp = [0] * (n + 1)
+    dp[0] = 1  # 地面，一种方式（不动）
+    dp[1] = 1  # 第一阶，一种方式（走1步）
+    # 从第2阶开始递推
+    for i in range(2, n + 1):
+        dp[i] = dp[i-1] + dp[i-2]  # 状态转移：从i-1或i-2阶过来
+    return dp[n]
+
+# 空间优化版本：使用两个变量滚动更新
+
+def climb_stairs_optimized(n: int) -&gt; int:
+    """
+    空间优化版本，时间复杂度O(n)，空间复杂度O(1)
+    """
+    if n &lt;= 1:
+        return 1
+    a, b = 1, 1  # a表示dp[i-2]，b表示dp[i-1]
+    for i in range(2, n + 1):
+        # 计算当前值，并更新状态
+        a, b = b, a + b  # 滚动：新a是旧b，新b是旧a+旧b
+    return b  # 循环结束后b即为dp[n]
+
+# 测试用例
+if __name__ == "__main__":
+    test_cases = [0, 1, 2, 3, 5, 10]
+    for n in test_cases:
+        result1 = climb_stairs(n)
+        result2 = climb_stairs_optimized(n)
+        print(f"n={n}: 基础版本={result1}, 优化版本={result2}")
+    # 预期输出：
+    # n=0: 1, 1
+    # n=1: 1, 1
+    # n=2: 2, 2
+    # n=3: 3, 3
+    # n=5: 8, 8
+    # n=10: 89, 89</code></pre>
+<h2>C++ 对照</h2>
+<pre><code>// 爬楼梯问题的C++对照代码
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+// 基础版本：动态规划数组解法
+int climb_stairs(int n) {
+    if (n &lt;= 1) return 1;
+    vector&lt;int&gt; dp(n + 1, 0);
+    dp[0] = 1;  // 地面
+    dp[1] = 1;  // 第一阶
+    for (int i = 2; i &lt;= n; i++) {
+        dp[i] = dp[i-1] + dp[i-2];  // 状态转移
+    }
+    return dp[n];
+}
+
+// 空间优化版本：滚动变量解法
+int climb_stairs_optimized(int n) {
+    if (n &lt;= 1) return 1;
+    int a = 1, b = 1;  // a表示dp[i-2], b表示dp[i-1]
+    for (int i = 2; i &lt;= n; i++) {
+        int c = a + b;  // 计算当前值
+        a = b;          // 更新a为上一个b
+        b = c;          // 更新b为当前值
+    }
+    return b;
+}
+
+// 主函数测试
+int main() {
+    int test_cases[] = {0, 1, 2, 3, 5, 10};
+    for (int n : test_cases) {
+        int res1 = climb_stairs(n);
+        int res2 = climb_stairs_optimized(n);
+        cout &lt;&lt; "n=" &lt;&lt; n &lt;&lt; ": 基础版本=" &lt;&lt; res1 &lt;&lt; ", 优化版本=" &lt;&lt; res2 &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre>
+<h2>复杂度分析</h2>
+<p>基础版本：时间复杂度为O(n)，因为需要从2到n遍历一次计算每个状态；空间复杂度为O(n)，使用了长度为n+1的数组存储所有状态。优化版本：时间复杂度保持O(n)，循环次数不变；空间复杂度降为O(1)，只用两个变量滚动更新，无需数组。这种优化基于状态转移的局部性——每个状态只依赖前两个历史状态，类似斐波那契数列的迭代解法，是动态规划中常见的空间优化技巧。</p>
+<h2>易错点</h2>
+<ol>
+<li>边界条件处理错误：当n=0或1时，应返回1，但有些人误认为地面没有方式而返回0。修复方法：在代码开头显式判断n&lt;=1并返回1，或确保dp[0]和dp[1]正确初始化。</li>
+<li>状态定义混淆：dp[i]的含义不清晰，例如误以为dp[i]表示从第i阶出发的方式数。修复方法：在注释中明确“dp[i]表示到达第i阶的总方式数”，并在转移方程中保持一致。</li>
+<li>空间优化时变量更新顺序错误：在滚动更新中，直接写a = b; b = a + b; 会导致a被提前覆盖，计算错误。修复方法：使用临时变量或Python的元组赋值（a, b = b, a + b）确保同时更新。</li>
+</ol>
+<h2>延伸练习</h2>
+<ol>
+<li>基础巩固：修改爬楼梯问题，每次可以爬1、2或3阶，请用动态规划求解爬到第n阶的方式数。提示：状态转移方程变为dp[i] = dp[i-1] + dp[i-2] + dp[i-3]，初始化dp[0]=1, dp[1]=1, dp[2]=2。</li>
+<li>适度拓展：解决最小成本爬楼梯问题（LeetCode 746）：给定一个数组cost，其中cost[i]是从第i阶起步的成本，每次可以爬1或2阶，求到达顶端（超过数组长度）的最小成本。提示：定义dp[i]为到达第i阶的最小成本，转移时考虑从i-1或i-2阶过来，加上当前阶的成本。</li>
+</ol>
+</main>
+<footer>
+<p>每日算法专题 · 2026-06-27</p>
+</footer>
+</body>
+</html>
