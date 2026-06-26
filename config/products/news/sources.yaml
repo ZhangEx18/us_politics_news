@@ -10,14 +10,20 @@
   column: us_politics
   source_tier: 1
   language: en
-  enabled: false
+  tags:
+  - official_wire
+  - policy
+  enabled: true
 - name: Reuters Politics
   url: https://www.reutersagency.com/feed/?best-topics=politicalgeneral&post_type=reuters-best
   fetch_mode: rss
   column: us_politics
   source_tier: 1
   language: en
-  enabled: false
+  tags:
+  - official_wire
+  - policy
+  enabled: true
 - name: NPR Politics
   url: https://feeds.npr.org/1014/rss.xml
   fetch_mode: rss
@@ -143,6 +149,9 @@
   column: us_politics
   source_tier: 3
   language: en
+  tags:
+  - analysis
+  - policy
   enabled: true
 - name: Council on Foreign Relations
   url: https://www.cfr.org/rss/analysis
@@ -150,6 +159,9 @@
   column: global_affairs
   source_tier: 3
   language: en
+  tags:
+  - analysis
+  - geopolitics
   enabled: true
 - name: Foreign Affairs
   url: https://www.foreignaffairs.com/rss.xml
@@ -157,7 +169,10 @@
   column: global_affairs
   source_tier: 3
   language: en
-  enabled: true
+  tags:
+  - analysis
+  - geopolitics
+  enabled: false
 - name: C-SPAN
   url: https://www.c-span.org/feeds/rss/all
   fetch_mode: rss
@@ -234,14 +249,20 @@
   column: global_affairs
   source_tier: 1
   language: en
-  enabled: false
+  tags:
+  - official_wire
+  - geopolitics
+  enabled: true
 - name: AP News - World
   url: https://rsshub.app/apnews/topics/world-news
   fetch_mode: rsshub
   column: global_affairs
   source_tier: 1
   language: en
-  enabled: false
+  tags:
+  - official_wire
+  - geopolitics
+  enabled: true
 - name: Al Jazeera
   url: https://www.aljazeera.com/xml/rss/all.xml
   fetch_mode: rss
@@ -339,7 +360,10 @@
   column: global_affairs
   source_tier: 3
   language: en
-  enabled: true
+  tags:
+  - analysis
+  - geopolitics
+  enabled: false
 - name: Carnegie Endowment
   url: https://carnegieendowment.org/publications/rss
   fetch_mode: rss
@@ -374,6 +398,9 @@
   column: global_affairs
   source_tier: 3
   language: en
+  tags:
+  - analysis
+  - geopolitics
   enabled: true
 - name: War on the Rocks
   url: https://warontherocks.com/feed/
@@ -381,6 +408,9 @@
   column: global_affairs
   source_tier: 3
   language: en
+  tags:
+  - analysis
+  - defense
   enabled: true
 - name: The Intercept
   url: https://theintercept.com/feed/
@@ -549,14 +579,20 @@
   column: technology
   source_tier: 3
   language: en
-  enabled: true
+  tags:
+  - analysis
+  - startup
+  enabled: false
 - name: Hacker News - Best
   url: https://hnrss.org/best
   fetch_mode: hacker_news
   column: technology
   source_tier: 3
   language: en
-  enabled: true
+  tags:
+  - analysis
+  - startup
+  enabled: false
 - name: SemiAnalysis
   url: https://www.semianalysis.com/feed
   fetch_mode: rss
@@ -577,6 +613,9 @@
   column: technology
   source_tier: 3
   language: en
+  tags:
+  - analysis
+  - ai_policy
   enabled: true
 - name: Stratechery
   url: https://stratechery.com/feed/
@@ -584,6 +623,9 @@
   column: technology
   source_tier: 3
   language: en
+  tags:
+  - analysis
+  - platform
   enabled: true
 - name: IEEE Spectrum
   url: https://spectrum.ieee.org/feeds/feed.rss
@@ -745,7 +787,10 @@
   column: economy
   source_tier: 3
   language: en
-  enabled: true
+  tags:
+  - analysis
+  - market
+  enabled: false
 - name: Calculated Risk
   url: https://www.calculatedriskblog.com/feeds/posts/default
   fetch_mode: rss
@@ -822,7 +867,10 @@
   column: economy
   source_tier: 2
   language: en
-  enabled: true
+  tags:
+  - analysis
+  - market
+  enabled: false
 - name: Tax Foundation
   url: https://taxfoundation.org/feed/
   fetch_mode: rss
@@ -878,7 +926,7 @@
   language: en
   tags:
   - analysis
-  enabled: true
+  enabled: false
 - name: The Atlantic
   url: https://www.theatlantic.com/feed/all/
   fetch_mode: rss
@@ -887,6 +935,96 @@
   language: en
   tags:
   - analysis
+  enabled: false
+- name: FEC Updates
+  url: https://www.fec.gov/updates/
+  fetch_mode: custom
+  fetcher_key: intl_org_feed
+  column: us_politics
+  source_tier: 1
+  language: en
+  tags:
+  - official
+  - election
+  - regulation
+  custom:
+    item_patterns:
+    - <a[^>]+href="(?P<href>/updates/[^\"]+)"[^>]*>(?P<title>[^<]{8,180})</a>
+    max_items: 12
+    summary_chars: 220
+  enabled: true
+- name: European Commission Press Corner
+  url: https://ec.europa.eu/commission/presscorner/api/rss?language=en
+  fetch_mode: rss
+  column: global_affairs
+  source_tier: 1
+  language: en
+  tags:
+  - official
+  - diplomacy
+  - regulation
+  enabled: true
+- name: NIST News
+  url: https://www.nist.gov/news-events/news/rss.xml
+  fetch_mode: rss
+  column: technology
+  source_tier: 1
+  language: en
+  tags:
+  - official
+  - regulation
+  - ai_policy
+  enabled: true
+- name: FTC Press Releases
+  url: https://www.ftc.gov/news-events/news/press-releases
+  fetch_mode: custom
+  fetcher_key: intl_org_feed
+  column: technology
+  source_tier: 1
+  language: en
+  tags:
+  - official
+  - regulation
+  - antitrust
+  custom:
+    item_patterns:
+    - <a[^>]+href="(?P<href>/news-events/news/press-releases/[^\"]+)"[^>]*>(?P<title>[^<]{8,180})</a>
+    max_items: 12
+    summary_chars: 220
+  enabled: true
+- name: USTR Press Releases
+  url: https://ustr.gov/about-us/policy-offices/press-office/press-releases
+  fetch_mode: custom
+  fetcher_key: intl_org_feed
+  column: economy
+  source_tier: 1
+  language: en
+  tags:
+  - official
+  - trade
+  - policy
+  custom:
+    item_patterns:
+    - <a[^>]+href="(?P<href>/about-us/policy-offices/press-office/press-releases/[^\"]+)"[^>]*>(?P<title>[^<]{8,180})</a>
+    max_items: 12
+    summary_chars: 220
+  enabled: true
+- name: EIA Today in Energy
+  url: https://www.eia.gov/todayinenergy/
+  fetch_mode: custom
+  fetcher_key: intl_org_feed
+  column: economy
+  source_tier: 1
+  language: en
+  tags:
+  - official
+  - macro_data
+  - energy
+  custom:
+    item_patterns:
+    - <a[^>]+href="(?P<href>/todayinenergy/detail.php\\?id=[^\"]+)"[^>]*>(?P<title>[^<]{8,180})</a>
+    max_items: 12
+    summary_chars: 220
   enabled: true
 - name: The Record
   url: https://therecord.media/feed
@@ -937,7 +1075,7 @@
   url: https://www.ftchinese.com/channel/world.html
   fetch_mode: custom
   fetcher_key: china_media_article_list
-  column: us_politics
+  column: global_affairs
   source_tier: 2
   language: zh
   tags:

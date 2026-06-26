@@ -184,6 +184,60 @@ def test_global_affairs_contains_cfr_and_foreign_affairs():
     assert by_name["Foreign Affairs"]["column"] == "global_affairs"
 
 
+def test_official_first_batch_sources_exist_with_expected_columns():
+    sources = _load_yaml(NEWS_SOURCES_PATH)
+    by_name = {s["name"]: s for s in sources}
+    expected = {
+        "FEC Updates": "us_politics",
+        "European Commission Press Corner": "global_affairs",
+        "NIST News": "technology",
+        "FTC Press Releases": "technology",
+        "USTR Press Releases": "economy",
+        "EIA Today in Energy": "economy",
+    }
+    for name, column in expected.items():
+        assert name in by_name, f"缺少第一批官方源: {name}"
+        assert by_name[name]["column"] == column
+        assert by_name[name]["source_tier"] == 1
+        assert "official" in by_name[name].get("tags", [])
+        assert by_name[name]["enabled"] is True
+
+
+def test_noise_sources_are_disabled_and_observed_sources_tagged():
+    sources = _load_yaml(NEWS_SOURCES_PATH)
+    by_name = {s["name"]: s for s in sources}
+
+    disabled = [
+        "Foreign Affairs",
+        "Foreign Affairs - Analysis",
+        "Vox",
+        "The Atlantic",
+        "Zero Hedge",
+        "Seeking Alpha",
+        "Hacker News - Top",
+        "Hacker News - Best",
+    ]
+    for name in disabled:
+        assert by_name[name]["enabled"] is False, f"高噪音源应停用: {name}"
+
+    observed = [
+        "Brookings - Governance",
+        "Council on Foreign Relations",
+        "CSIS",
+        "War on the Rocks",
+        "Import AI",
+        "Stratechery",
+    ]
+    for name in observed:
+        assert "analysis" in by_name[name].get("tags", []), f"观察源应显式标记 analysis: {name}"
+
+
+def test_ft_chinese_world_moves_to_global_affairs():
+    sources = _load_yaml(NEWS_SOURCES_PATH)
+    by_name = {s["name"]: s for s in sources}
+    assert by_name["FT 中文网 - 国际政治"]["column"] == "global_affairs"
+
+
 # ── rules 配置 ──
 
 

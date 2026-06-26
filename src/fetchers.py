@@ -90,6 +90,22 @@ def _extract_html_text(raw_html: str) -> str:
     return text
 
 
+def _build_contextual_snippet(page_text: str, title: str, limit: int) -> str:
+    text = re.sub(r"\s+", " ", str(page_text or "")).strip()
+    if not text:
+        return ""
+    title_text = re.sub(r"\s+", " ", str(title or "")).strip()
+    if title_text:
+        pos = text.find(title_text)
+        if pos >= 0:
+            start = max(0, pos - 80)
+            end = min(len(text), pos + len(title_text) + max(limit, 120))
+            snippet = text[start:end].strip()
+            if snippet:
+                return snippet[:limit]
+    return text[:limit]
+
+
 # ── RSS 抓取器（从 sources.yaml 读取）──
 
 class RSSFetcher(BaseFetcher):
@@ -344,6 +360,28 @@ class CustomFeedFetcher(BaseFetcher):
         """对公告/记录类页面做保守解析，优先抓取带链接标题的块。"""
         return await self._fetch_china_media_article_list(source_cfg, since)
 
+    async def _build_custom_item_content(
+        self,
+        source_cfg: dict,
+        link: str,
+        title: str,
+        page_text: str,
+        summary_limit: int,
+    ) -> str:
+        snippet = _build_contextual_snippet(page_text, title, summary_limit)
+        fetcher_key = str(source_cfg.get("fetcher_key", "")).strip()
+        if fetcher_key not in {"legislative_or_public_records", "intl_org_feed"}:
+            return snippet
+
+        try:
+            detail_html = await self._get(link, timeout=aiohttp.ClientTimeout(total=30))
+        except Exception:
+            return snippet
+
+        detail_text = _extract_html_text(detail_html)
+        detail_snippet = _build_contextual_snippet(detail_text, title, summary_limit)
+        return detail_snippet or snippet
+
     async def _fetch_china_media_article_list(self, source_cfg: dict, since: datetime) -> List[ContentItem]:
         html = await self._get(source_cfg["url"], timeout=aiohttp.ClientTimeout(total=30))
         selectors = source_cfg.get("custom", {}).get("item_patterns") or [
@@ -367,12 +405,19 @@ class CustomFeedFetcher(BaseFetcher):
                     continue
                 seen_links.add(normalized_link)
                 native_id = self._hash_id(link)
+                snippet = await self._build_custom_item_content(
+                    source_cfg=source_cfg,
+                    link=link,
+                    title=title,
+                    page_text=page_text,
+                    summary_limit=summary_limit,
+                )
                 extracted.append(ContentItem(
                     id=self._generate_id("custom", source_cfg["name"].replace(" ", "_"), native_id),
                     source_type=SourceType.CUSTOM,
                     title=title[:180],
                     url=link,
-                    content=page_text[:summary_limit],
+                    content=snippet,
                     source_name=source_cfg["name"],
                     published_at=None,
                     column=source_cfg.get("column", ""),
