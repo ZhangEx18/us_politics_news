@@ -8,6 +8,7 @@ from report_engine import (
     PeriodicalOverview,
     ReportPreparation,
     ReportSpec,
+    _normalize_detailed_events_to_chinese,
     _normalize_headline_only_by_column,
     _build_periodical_overview_payload,
     _generate_all_column_digests,
@@ -92,6 +93,18 @@ def test_build_reader_highlights_empty():
     columns = {"us_politics": [], "global_affairs": []}
     highlights = build_reader_highlights(columns)
     assert highlights == []
+
+
+def test_build_reader_highlights_round_robin_across_columns():
+    columns = {
+        "us_politics": [{"title_zh": "美国一"}, {"title_zh": "美国二"}],
+        "global_affairs": [{"title_zh": "国际一"}, {"title_zh": "国际二"}],
+        "technology": [{"title_zh": "科技一"}],
+    }
+
+    highlights = build_reader_highlights(columns, limit=4)
+
+    assert highlights == ["美国一", "国际一", "科技一", "美国二"]
 
 
 def test_build_periodical_overview_payload_from_dataclass():
@@ -385,6 +398,72 @@ def test_normalize_headline_only_by_column_filters_cryptic_titles():
     assert metrics["us_politics"]["headline_reader_body_missing"] == 0
 
 
+def test_normalize_headline_only_by_column_drops_english_fragments():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "us_politics": [
+            {"title_zh": "President Trump will welcome a group of American farmers", "summary": "President Trump will welcome a group of American farmers from across the U.S. to"},
+            {"title_zh": "白宫要求国会尽快表决", "summary": "白宫要求国会尽快推进相关表决。"},
+        ]
+    })
+
+    assert normalized["us_politics"] == [{
+        "title_zh": "白宫要求国会尽快表决",
+        "summary": "白宫要求国会尽快推进相关表决。",
+        "reader_body": "白宫要求国会尽快推进相关表决。",
+    }]
+    assert metrics["us_politics"]["headline_reader_body_missing"] == 1
+
+
+def test_normalize_headline_only_by_column_drops_uninformative_bill_items():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "us_politics": [
+            {"title_zh": "《2025 年防止金融剥削法案》", "summary": "《2025 年防止金融剥削法案》（H.R. 2478）被提交至国会审议。"},
+        ]
+    })
+
+    assert normalized["us_politics"] == []
+    assert metrics["us_politics"]["headline_reader_body_missing"] == 1
+
+
+def test_normalize_detailed_events_to_chinese_drops_english_items():
+    normalized, metrics = _normalize_detailed_events_to_chinese({
+        "technology": [
+            {
+                "title_zh": "FTC 对 AI 基础设施市场提起反垄断诉讼",
+                "reader_body": "FTC 对 AI 基础设施市场提起反垄断诉讼，并指控相关企业限制竞争。",
+                "core_facts": "FTC 对 AI 基础设施市场提起反垄断诉讼，并指控相关企业限制竞争。",
+            },
+            {
+                "title_zh": "FTC files antitrust complaint",
+                "reader_body": "The commission filed a complaint in federal court.",
+                "core_facts": "The commission filed a complaint in federal court.",
+            },
+        ]
+    })
+
+    assert normalized["technology"] == [{
+        "title_zh": "FTC 对 AI 基础设施市场提起反垄断诉讼",
+        "reader_body": "FTC 对 AI 基础设施市场提起反垄断诉讼，并指控相关企业限制竞争。",
+        "core_facts": "FTC 对 AI 基础设施市场提起反垄断诉讼，并指控相关企业限制竞争。",
+    }]
+    assert metrics["technology"]["detailed_translation_failed"] == 1
+
+
+def test_normalize_headline_only_by_column_keeps_bill_items_with_clear_summary():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "us_politics": [
+            {"title_zh": "《大街竞争法案》", "summary": "美国国会提出《大街竞争法案》，旨在支持中小企业发展。第二句。"},
+        ]
+    })
+
+    assert normalized["us_politics"] == [{
+        "title_zh": "《大街竞争法案》",
+        "summary": "美国国会提出《大街竞争法案》，旨在支持中小企业发展。第二句。",
+        "reader_body": "美国国会提出《大街竞争法案》，旨在支持中小企业发展。",
+    }]
+    assert metrics["us_politics"]["headline_reader_body_missing"] == 0
+
+
 def test_build_report_prefers_quantity_for_daily_fill(tmp_path):
     spec = ReportSpec(
         report_type="daily",
@@ -661,7 +740,7 @@ def test_build_report_daily_uses_daily_overview_generation(tmp_path):
         build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
 
     meta = save_report.call_args.args[0]
-    assert meta["lead"] == "日报总览导语"
+    assert meta["lead"] == ""
     daily_overview.assert_called_once()
     overview.assert_not_called()
 

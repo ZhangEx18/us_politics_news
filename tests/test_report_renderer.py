@@ -28,9 +28,12 @@ def test_render_reader_content_is_plain_article_fragment():
 
     assert html.startswith("<article>")
     assert html.endswith("</article>")
-    assert "<p>这是一段导语</p>" in html
+    assert "<h2>今日要点</h2>" in html
+    assert "<li>要点一</li>" in html
+    assert "<p>这是一段导语</p>" not in html
     assert "<h2>一、美国政局</h2>" in html
     assert "<h2>二、国际局势</h2>" in html
+    assert "<h3>重点解析</h3>" in html
     assert "<h3>1. 美国事件</h3>" in html
     assert "<h3>1. 国际事件</h3>" in html
     assert "<p>美国事件概述正文</p>" in html
@@ -70,10 +73,11 @@ def test_render_reader_has_numbered_events_and_bullet_titles():
     html = render_reader_content(meta, columns, report_type="daily")
     assert "<h3>1. 重要事件 A</h3>" in html
     assert "<h3>2. 重要事件 B</h3>" in html
+    assert "<h3>重点解析</h3>" in html
+    assert "<h3>其他要闻</h3>" in html
     assert "<p>这是正文。第二句。</p>" in html
     assert "<li>白宫要求国会尽快表决。</li>" in html
     assert "<li>州政府扩大边境部署。</li>" in html
-    assert "其他要闻" not in html
     assert "补充快讯" not in html
 
 
@@ -138,6 +142,44 @@ def test_render_weekly_no_headline_only():
     html = render_reader_content(meta, columns, report_type="weekly")
     assert "<h3>1. 事件</h3>" in html
     assert "<ul>" not in html  # 无序条目为空时不渲染 <ul>
+
+
+def test_render_daily_markdown_uses_today_highlights_and_daily_section_labels():
+    meta = {"title": "测试", "highlights": ["要点甲", "要点乙"], "lead": "长导语", "date": "2026-06-19"}
+    columns = {
+        "us_politics": {
+            "detailed_events": [{"title_zh": "重点事件", "reader_body": "正文。"}],
+            "headline_only_events": [{"title_zh": "快讯", "reader_body": "补充短句。"}],
+        },
+        "global_affairs": {"detailed_events": [], "headline_only_events": []},
+        "technology": {"detailed_events": [], "headline_only_events": []},
+        "economy": {"detailed_events": [], "headline_only_events": []},
+    }
+
+    markdown = render_structured_markdown(meta, columns, report_type="daily")
+
+    assert "## 今日要点" in markdown
+    assert "- 要点甲" in markdown
+    assert "### 重点解析" in markdown
+    assert "### 其他要闻" in markdown
+
+
+def test_render_daily_reader_omits_other_news_heading_when_empty():
+    meta = {"title": "测试", "highlights": ["要点甲"], "date": "2026-06-19"}
+    columns = {
+        "us_politics": {
+            "detailed_events": [{"title_zh": "重点事件", "reader_body": "正文。"}],
+            "headline_only_events": [],
+        },
+        "global_affairs": {"detailed_events": [], "headline_only_events": []},
+        "technology": {"detailed_events": [], "headline_only_events": []},
+        "economy": {"detailed_events": [], "headline_only_events": []},
+    }
+
+    html = render_reader_content(meta, columns, report_type="daily")
+
+    assert "<h3>重点解析</h3>" in html
+    assert "<h3>其他要闻</h3>" not in html
 
 
 def test_render_old_list_format_still_works():

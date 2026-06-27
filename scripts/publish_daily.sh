@@ -27,27 +27,27 @@ echo "出刊任务: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "========================================"
 
 # 运行 digest 流程
-python3 "$WORK_DIR/src/run_pipeline.py" --digest-only --hours 24
+python3 "$WORK_DIR/src/run_product.py" --product news --report-type daily --digest-only --hours 24
 
 # 发布后校验
 echo ""
 echo "[校验] 检查输出..."
 
 # 检查 feed.xml
-if ! grep -q "content:encoded" "$WORK_DIR/docs/feed.xml"; then
+if ! grep -q "content:encoded" "$WORK_DIR/docs/feeds/news.xml"; then
     echo "[错误] feed.xml 缺少 content:encoded"
     exit 1
 fi
 
 # 检查日报文件
 TODAY=$(python3 "$WORK_DIR/scripts/report_date.py")
-if [ ! -f "$WORK_DIR/docs/daily/$TODAY.md" ]; then
-    echo "[错误] 日报文件不存在: docs/daily/$TODAY.md"
+if [ ! -f "$WORK_DIR/docs/news/daily/$TODAY.md" ]; then
+    echo "[错误] 日报文件不存在: docs/news/daily/$TODAY.md"
     exit 1
 fi
 
 # 检查字数
-CHAR_COUNT=$(wc -c < "$WORK_DIR/docs/daily/$TODAY.md")
+CHAR_COUNT=$(wc -c < "$WORK_DIR/docs/news/daily/$TODAY.md")
 if [ "$CHAR_COUNT" -lt 10000 ]; then
     echo "[警告] 日报字数偏少: $CHAR_COUNT 字节"
 fi

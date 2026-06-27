@@ -5,8 +5,9 @@
 set -e
 
 WORK_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-DATA_DIR="$WORK_DIR/data"
-OUTPUT_DIR="$WORK_DIR/docs"
+OUTPUT_ROOT="$WORK_DIR/docs"
+PRODUCT_ROOT="$OUTPUT_ROOT/news"
+FEED_FILE="$OUTPUT_ROOT/feeds/news.xml"
 VENV="$WORK_DIR/venv"
 
 # 加载环境变量（从 .env 文件）
@@ -34,23 +35,22 @@ echo "========================================"
 echo "四维日报生成: $TODAY $(date +%H:%M:%S)"
 echo "========================================"
 
-# 运行统一 pipeline
-python "$WORK_DIR/src/run_pipeline.py"
+# 运行 news/daily
+python "$WORK_DIR/src/run_product.py" --product news --report-type daily
 
 # ── 运行后校验 ──
 
 # 1. 检查 feed.xml 包含 content:encoded
-FEED_FILE="$OUTPUT_DIR/feed.xml"
 if [ ! -f "$FEED_FILE" ] || ! grep -q "content:encoded" "$FEED_FILE"; then
     echo "[错误] feed.xml 缺少 content:encoded，Feed 不含全文"
     exit 1
 fi
 
 # 2. 检查日报字数 > 5000
-DAILY_FILE=$(find "$OUTPUT_DIR/daily" -name "*.md" -newer "$WORK_DIR/scripts/daily_run.sh" -print -quit 2>/dev/null)
+DAILY_FILE=$(find "$PRODUCT_ROOT/daily" -name "*.md" -newer "$WORK_DIR/scripts/daily_run.sh" -print -quit 2>/dev/null)
 if [ -z "$DAILY_FILE" ]; then
     # 回退：找今天日期的文件
-    DAILY_FILE="$OUTPUT_DIR/daily/${TODAY}.md"
+    DAILY_FILE="$PRODUCT_ROOT/daily/${TODAY}.md"
 fi
 if [ ! -f "$DAILY_FILE" ]; then
     echo "[错误] 未找到今日日报文件"

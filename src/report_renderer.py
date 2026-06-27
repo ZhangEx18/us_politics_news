@@ -70,6 +70,10 @@ def _headline_only_text(event: dict) -> str:
     return str(event.get("reader_body") or event.get("title_zh") or "").strip()
 
 
+def _daily_highlights(meta: dict) -> list[str]:
+    return [str(item).strip() for item in meta.get("highlights", []) if str(item).strip()]
+
+
 def _frontmatter(title: str, lead: str, highlights: list, date: str) -> str:
     payload = {
         "title": title,
@@ -134,6 +138,7 @@ def render_structured_html(
         date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
         title = _html_title_text(build_report_title(report_type, date))
     lead = _html_text(meta.get("lead", ""))
+    highlights = _daily_highlights(meta) if report_type == "daily" else []
     date = _html_text(meta.get("date", datetime.now().strftime("%Y-%m-%d")))
 
     css = """
@@ -228,9 +233,16 @@ footer {
         "<header>",
         f"<h1>{title}</h1>",
         f"<div class='date'>{date}</div>",
-        f"<div class='lead'>{lead}</div>",
+        *( [f"<div class='lead'>{lead}</div>"] if lead and report_type != "daily" else [] ),
         "</header>",
     ]
+
+    if highlights:
+        html.append("<h2>今日要点</h2>")
+        html.append("<ul>")
+        for item in highlights:
+            html.append(f"<li>{_html_text(item)}</li>")
+        html.append("</ul>")
 
     _append_periodical_overview_html(html, meta, report_type)
 
@@ -247,6 +259,9 @@ footer {
         html.append(f"<h2>{meta_col['icon']} {num}、{meta_col['heading']}</h2>")
         if analysis:
             html.append(f"<p>{_html_text(analysis)}</p>")
+
+        if detailed and report_type == "daily":
+            html.append("<h3>重点解析</h3>")
 
         # 编号条目
         for idx, event in enumerate(detailed, 1):
@@ -265,6 +280,8 @@ footer {
 
         # 无序条目：仅标题
         if headline_only:
+            if report_type == "daily":
+                html.append("<h3>其他要闻</h3>")
             html.append("<ul>")
             for event in headline_only:
                 event_title = _html_text(_headline_only_text(event))
@@ -387,11 +404,18 @@ def render_reader_content(
         except ValueError:
             title = _html_title_text(meta.get("title", ""))
     lead = str(meta.get("lead", "") or "").strip()
+    highlights = _daily_highlights(meta) if report_type == "daily" else []
 
     html: list[str] = ["<article>"]
 
-    if lead:
+    if lead and report_type != "daily":
         html.append(f"<p>{_html_text(lead)}</p>")
+    if highlights:
+        html.append("<h2>今日要点</h2>")
+        html.append("<ul>")
+        for item in highlights:
+            html.append(f"<li>{_html_text(item)}</li>")
+        html.append("</ul>")
 
     _append_periodical_overview_html(html, meta, report_type)
 
@@ -408,6 +432,9 @@ def render_reader_content(
         if analysis:
             html.append(f"<p>{_html_text(analysis)}</p>")
 
+        if detailed and report_type == "daily":
+            html.append("<h3>重点解析</h3>")
+
         # 编号条目：带正文
         for idx, event in enumerate(detailed, 1):
             event_title = _html_text(event.get("title_zh", ""))
@@ -419,6 +446,8 @@ def render_reader_content(
                 html.append(f"<p>{_html_text(reader_body)}</p>")
 
         if headline_only:
+            if report_type == "daily":
+                html.append("<h3>其他要闻</h3>")
             html.append("<ul>")
             for event in headline_only:
                 event_title = _html_text(_headline_only_text(event))
@@ -459,6 +488,13 @@ def render_structured_markdown(
 
     lines: list[str] = [_frontmatter(title, lead, highlights, date), ""]
 
+    if report_type == "daily" and highlights:
+        lines.append("## 今日要点")
+        lines.append("")
+        for item in highlights:
+            lines.append(f"- {_markdown_text(item)}")
+        lines.append("")
+
     _append_periodical_overview_markdown(lines, meta, report_type)
 
     # 四大栏目
@@ -477,6 +513,10 @@ def render_structured_markdown(
             lines.append(_markdown_text(analysis))
             lines.append("")
 
+        if detailed and report_type == "daily":
+            lines.append("### 重点解析")
+            lines.append("")
+
         # 编号条目
         for idx, event in enumerate(detailed, 1):
             event_title = _markdown_text(event.get("title_zh", ""))
@@ -493,6 +533,9 @@ def render_structured_markdown(
 
         # 无序条目：仅标题
         if headline_only:
+            if report_type == "daily":
+                lines.append("### 其他要闻")
+                lines.append("")
             for event in headline_only:
                 event_title = _markdown_text(_headline_only_text(event))
                 if event_title:

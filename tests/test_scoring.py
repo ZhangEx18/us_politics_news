@@ -167,6 +167,9 @@ def test_build_digest_evidence_excludes_raw_article_content():
     event = {
         "summary": "监管机构宣布新规。",
         "content": "这是一段不应直接进入写作模型的原文长片段。",
+        "language": "en",
+        "source": "Example Source",
+        "source_tier": 3,
         "source_links": [
             {"title": "Agency announces rule", "url": "https://example.com/a"},
             {"title": "Agency announces rule", "url": "https://example.com/b"},
@@ -177,5 +180,8 @@ def test_build_digest_evidence_excludes_raw_article_content():
     evidence = _build_digest_evidence(event)
 
     assert "摘要：监管机构宣布新规。" in evidence
+    assert "语言：en" in evidence
+    assert "主来源：Example Source" in evidence
+    assert "来源层级：3" in evidence
     assert "来源标题：Agency announces rule；Companies face compliance deadline" in evidence
     assert "原文长片段" not in evidence

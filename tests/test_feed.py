@@ -97,7 +97,9 @@ def test_save_feed_uses_reader_friendly_fragment():
             content = f.read()
 
         assert "<article>" in content
-        assert "<p>这是一段导语</p>" in content
+        assert "<p>这是一段导语</p>" not in content
+        assert "<h2>今日要点</h2>" in content
+        assert "<li>重点 1</li>" in content
         assert "<h2>一、美国政局</h2>" in content
         assert "<h2>二、国际局势</h2>" in content
         assert "<h3>1. 测试事件</h3>" in content
