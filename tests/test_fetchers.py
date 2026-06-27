@@ -3,7 +3,14 @@
 import asyncio
 from datetime import datetime, timezone
 
-from fetchers import CustomFeedFetcher, GoogleNewsFetcher, RSSFetcher, fetch_all_sources, _build_contextual_snippet
+from fetchers import (
+    CustomFeedFetcher,
+    GDELTFetcher,
+    GoogleNewsFetcher,
+    RSSFetcher,
+    fetch_all_sources,
+    _build_contextual_snippet,
+)
 
 
 def test_rss_fetcher_accepts_rss_and_rsshub_modes():
@@ -51,6 +58,28 @@ def test_google_news_fetcher_only_accepts_google_news_mode():
     ]
     fetcher = GoogleNewsFetcher(sources)
     assert [item["name"] for item in fetcher.feeds] == ["Google"]
+
+
+def test_gdelt_fetcher_parses_seendate_as_published_at():
+    fetcher = GDELTFetcher()
+
+    async def _fake_get_json(url: str, **kwargs) -> dict:
+        return {
+            "articles": [
+                {
+                    "url": "https://example.com/gdelt-story",
+                    "title": "Fed signals policy shift",
+                    "domain": "example.com",
+                    "seendate": "20260626213000",
+                }
+            ]
+        }
+
+    fetcher._get_json = _fake_get_json  # type: ignore[method-assign]
+    items = asyncio.run(fetcher.fetch(datetime(2026, 6, 25, tzinfo=timezone.utc)))
+
+    assert items
+    assert items[0].published_at == datetime(2026, 6, 26, 21, 30, tzinfo=timezone.utc)
 
 
 def test_custom_fetcher_can_build_content_item_from_cn_media_page():

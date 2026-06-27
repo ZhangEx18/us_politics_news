@@ -831,6 +831,9 @@ def build_report(
         "lead": "" if spec.report_type == "daily" else overview_payload.get("summary", ""),
         "highlights": highlights,
         "date": spec.report_key,
+        "require_non_empty_columns": bool(
+            config.get("format_contract", {}).get("require_non_empty_columns", False)
+        ),
         "overview": overview_payload,
         "report_since": spec.since.isoformat(),
         "report_until": spec.until.isoformat(),

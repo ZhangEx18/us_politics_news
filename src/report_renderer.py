@@ -13,6 +13,7 @@
 import os
 import re
 import html
+import shutil
 from datetime import datetime
 from typing import TYPE_CHECKING
 import yaml
@@ -68,6 +69,49 @@ def _markdown_title_text(text: object) -> str:
 def _headline_only_text(event: dict) -> str:
     """headline_only_events 优先使用可读短句，缺失时回退中文标题。"""
     return str(event.get("reader_body") or event.get("title_zh") or "").strip()
+
+
+def _has_cjk(text: object) -> bool:
+    return bool(re.search(r"[\u4e00-\u9fff]{2,}", str(text or "")))
+
+
+def _looks_like_english_title(text: object) -> bool:
+    value = re.sub(r"\s+", " ", str(text or "")).strip()
+    if not value or _has_cjk(value):
+        return False
+    letters = re.findall(r"[A-Za-z]", value)
+    return len(letters) >= 12
+
+
+def validate_report_format(meta: dict, columns: dict, report_type: str = "daily") -> list[str]:
+    issues: list[str] = []
+    require_non_empty_columns = bool(meta.get("require_non_empty_columns"))
+    for col_key in COLUMN_ORDER:
+        if col_key not in columns:
+            issues.append(f"缺少栏目: {col_key}")
+            continue
+        detailed, headline_only, _ = _normalize_column_sections(columns.get(col_key, {}))
+        if report_type == "daily" and require_non_empty_columns and not detailed and not headline_only:
+            issues.append(f"栏目为空: {col_key}")
+        for event in detailed:
+            title = event.get("title_zh", "")
+            body = event.get("reader_body") or event.get("core_facts") or ""
+            if not _has_cjk(title) or _looks_like_english_title(title):
+                issues.append(f"{col_key} 标题未中文化: {title}")
+            if not _has_cjk(body):
+                issues.append(f"{col_key} 正文未中文化: {title}")
+    return issues
+
+
+def _sync_news_legacy_aliases(output_dir: str, md_path: str, html_path: str, report_type: str) -> None:
+    normalized = os.path.normpath(output_dir)
+    canonical_suffix = os.path.normpath(os.path.join("docs", "news", report_type))
+    if not normalized.endswith(canonical_suffix):
+        return
+    legacy_dir = os.path.join("docs", report_type)
+    os.makedirs(legacy_dir, exist_ok=True)
+    shutil.copy2(md_path, os.path.join(legacy_dir, os.path.basename(md_path)))
+    shutil.copy2(html_path, os.path.join(legacy_dir, os.path.basename(html_path)))
 
 
 def _daily_highlights(meta: dict) -> list[str]:
@@ -577,6 +621,11 @@ def save_daily_report(
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
     os.makedirs(output_dir, exist_ok=True)
 
+    issues = validate_report_format(meta, columns, report_type=report_type)
+    if issues:
+        preview = "; ".join(issues[:5])
+        raise ValueError(f"报告格式校验失败: {preview}")
+
     md_content = render_structured_markdown(meta, columns, report_type=report_type)
     html_content = render_structured_html(meta, columns, report_type=report_type)
 
@@ -587,5 +636,7 @@ def save_daily_report(
     html_path = os.path.join(output_dir, f"{date}.html")
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html_content)
+
+    _sync_news_legacy_aliases(output_dir, md_path, html_path, report_type)
 
     return md_path, html_path

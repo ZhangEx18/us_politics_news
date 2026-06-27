@@ -23,8 +23,10 @@ def _workflow_triggers(workflow: dict) -> dict:
 def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     workflow = _load_workflow("daily-rss-publish.yml")
     dispatch = _workflow_triggers(workflow)["workflow_dispatch"]
+    schedule = _workflow_triggers(workflow)["schedule"]
 
-    assert list(_workflow_triggers(workflow)) == ["workflow_dispatch"]
+    assert list(_workflow_triggers(workflow)) == ["schedule", "workflow_dispatch"]
+    assert schedule == [{"cron": "30 23 * * *"}]
     assert "digest_only" in dispatch["inputs"]
     assert dispatch["inputs"]["digest_only"]["type"] == "boolean"
     assert workflow["concurrency"]["group"] == "publish-news-daily"
@@ -39,7 +41,10 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
 def test_weekly_publish_is_thin_wrapper_to_publish_product():
     workflow = _load_workflow("weekly-publish.yml")
 
-    assert _workflow_triggers(workflow) == {"workflow_dispatch": None}
+    assert _workflow_triggers(workflow) == {
+        "schedule": [{"cron": "35 23 * * 1"}],
+        "workflow_dispatch": None,
+    }
     assert workflow["concurrency"]["group"] == "publish-news-weekly"
 
     delegate_job = workflow["jobs"]["delegate"]
@@ -52,7 +57,10 @@ def test_weekly_publish_is_thin_wrapper_to_publish_product():
 def test_monthly_publish_is_thin_wrapper_to_publish_product():
     workflow = _load_workflow("monthly-publish.yml")
 
-    assert _workflow_triggers(workflow) == {"workflow_dispatch": None}
+    assert _workflow_triggers(workflow) == {
+        "schedule": [{"cron": "40 23 28-31 * *"}],
+        "workflow_dispatch": None,
+    }
     assert workflow["concurrency"]["group"] == "publish-news-monthly"
 
     delegate_job = workflow["jobs"]["delegate"]

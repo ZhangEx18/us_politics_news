@@ -2,6 +2,7 @@
 """SQLite 存储层：去重、增量更新、查询、幂等迁移"""
 
 import hashlib
+import json
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -36,6 +37,39 @@ class Article:
     llm_summary: str = ""
     llm_tags: str = ""  # 逗号分隔
     llm_reason: str = ""
+
+
+@dataclass
+class ArticleCandidate:
+    report_key: str
+    report_type: str
+    url: str
+    title: str
+    source: str
+    column: str
+    candidate_score: float
+    source_tier: int
+    reason: str = ""
+    status: str = "pending"
+    event_key: str = ""
+    published_at: Optional[datetime] = None
+    fetched_at: Optional[datetime] = None
+    source_url_normalized: str = ""
+
+
+@dataclass
+class ReportEvent:
+    report_key: str
+    report_type: str
+    event_key: str
+    column: str
+    title_zh: str
+    summary_zh: str
+    score: float
+    source_links: list[dict]
+    quality_status: str = "ok"
+    tags: str = ""
+    published_at: Optional[datetime] = None
 
 
 # v2 新增列列表（用于幂等迁移）
@@ -165,6 +199,65 @@ class NewsDatabase:
                     count INTEGER DEFAULT 0,
                     status TEXT DEFAULT 'ok'
                 );
+                CREATE TABLE IF NOT EXISTS article_candidates (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    report_key TEXT NOT NULL,
+                    report_type TEXT NOT NULL,
+                    url_hash TEXT NOT NULL,
+                    url TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    "column" TEXT DEFAULT '',
+                    candidate_score REAL DEFAULT 0.0,
+                    source_tier INTEGER DEFAULT 4,
+                    reason TEXT DEFAULT '',
+                    status TEXT DEFAULT 'pending',
+                    event_key TEXT DEFAULT '',
+                    published_at TEXT,
+                    fetched_at TEXT,
+                    source_url_normalized TEXT DEFAULT '',
+                    created_at TEXT NOT NULL,
+                    UNIQUE(report_key, report_type, url_hash)
+                );
+                CREATE INDEX IF NOT EXISTS idx_candidates_report
+                    ON article_candidates(report_type, report_key, "column", candidate_score);
+                CREATE TABLE IF NOT EXISTS report_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    report_key TEXT NOT NULL,
+                    report_type TEXT NOT NULL,
+                    event_key TEXT NOT NULL,
+                    "column" TEXT DEFAULT '',
+                    title_zh TEXT NOT NULL,
+                    summary_zh TEXT DEFAULT '',
+                    score REAL DEFAULT 0.0,
+                    source_links_json TEXT DEFAULT '[]',
+                    quality_status TEXT DEFAULT 'ok',
+                    tags TEXT DEFAULT '',
+                    published_at TEXT,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(report_key, report_type, event_key, "column")
+                );
+                CREATE INDEX IF NOT EXISTS idx_report_events_window
+                    ON report_events(report_type, report_key, "column", score);
+                CREATE TABLE IF NOT EXISTS report_runs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    report_key TEXT NOT NULL,
+                    report_type TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    window_since TEXT,
+                    window_until TEXT,
+                    input_count INTEGER DEFAULT 0,
+                    candidate_count INTEGER DEFAULT 0,
+                    selected_count INTEGER DEFAULT 0,
+                    ai_duration_seconds REAL DEFAULT 0.0,
+                    error_count INTEGER DEFAULT 0,
+                    output_md_path TEXT DEFAULT '',
+                    output_html_path TEXT DEFAULT '',
+                    metrics_json TEXT DEFAULT '{}',
+                    created_at TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_report_runs
+                    ON report_runs(report_type, report_key, created_at);
             """)
 
     def _migrate_v2(self):
@@ -401,6 +494,214 @@ class NewsDatabase:
                 )
                 count += cursor.rowcount
         return count
+
+    def upsert_article_candidates(self, candidates: list[ArticleCandidate]) -> int:
+        if not candidates:
+            return 0
+        now = _to_utc_storage(datetime.now(timezone.utc))
+        rows = []
+        for candidate in candidates:
+            normalized = candidate.source_url_normalized or normalize_url(candidate.url)
+            rows.append((
+                candidate.report_key,
+                candidate.report_type,
+                self.url_hash(normalized),
+                candidate.url,
+                candidate.title,
+                candidate.source,
+                candidate.column,
+                candidate.candidate_score,
+                candidate.source_tier,
+                candidate.reason,
+                candidate.status,
+                candidate.event_key,
+                _to_utc_storage(candidate.published_at),
+                _to_utc_storage(candidate.fetched_at),
+                normalized,
+                now,
+            ))
+        with self._connect() as conn:
+            before = conn.total_changes
+            conn.executemany(
+                """INSERT INTO article_candidates
+                (report_key, report_type, url_hash, url, title, source, "column",
+                 candidate_score, source_tier, reason, status, event_key,
+                 published_at, fetched_at, source_url_normalized, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(report_key, report_type, url_hash) DO UPDATE SET
+                    title = excluded.title,
+                    source = excluded.source,
+                    "column" = excluded."column",
+                    candidate_score = excluded.candidate_score,
+                    source_tier = excluded.source_tier,
+                    reason = excluded.reason,
+                    status = excluded.status,
+                    event_key = excluded.event_key,
+                    published_at = excluded.published_at,
+                    fetched_at = excluded.fetched_at,
+                    source_url_normalized = excluded.source_url_normalized""",
+                rows,
+            )
+            return conn.total_changes - before
+
+    def fetch_article_candidates(
+        self,
+        report_key: str,
+        report_type: str = "daily",
+        status: str | None = None,
+    ) -> list[ArticleCandidate]:
+        sql = """SELECT * FROM article_candidates
+                 WHERE report_key = ? AND report_type = ?"""
+        params: list[object] = [report_key, report_type]
+        if status is not None:
+            sql += " AND status = ?"
+            params.append(status)
+        sql += ' ORDER BY "column", candidate_score DESC, source_tier ASC'
+        with self._connect() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [
+            ArticleCandidate(
+                report_key=row["report_key"],
+                report_type=row["report_type"],
+                url=row["url"],
+                title=row["title"],
+                source=row["source"],
+                column=row["column"] or "",
+                candidate_score=row["candidate_score"] or 0.0,
+                source_tier=row["source_tier"] or 4,
+                reason=row["reason"] or "",
+                status=row["status"] or "pending",
+                event_key=row["event_key"] or "",
+                published_at=_from_utc_storage(row["published_at"]),
+                fetched_at=_from_utc_storage(row["fetched_at"]),
+                source_url_normalized=row["source_url_normalized"] or "",
+            )
+            for row in rows
+        ]
+
+    def upsert_report_events(self, events: list[ReportEvent]) -> int:
+        if not events:
+            return 0
+        now = _to_utc_storage(datetime.now(timezone.utc))
+        rows = [
+            (
+                event.report_key,
+                event.report_type,
+                event.event_key,
+                event.column,
+                event.title_zh,
+                event.summary_zh,
+                event.score,
+                json.dumps(event.source_links, ensure_ascii=False),
+                event.quality_status,
+                event.tags,
+                _to_utc_storage(event.published_at),
+                now,
+            )
+            for event in events
+            if event.event_key and event.title_zh
+        ]
+        with self._connect() as conn:
+            before = conn.total_changes
+            conn.executemany(
+                """INSERT INTO report_events
+                (report_key, report_type, event_key, "column", title_zh, summary_zh,
+                 score, source_links_json, quality_status, tags, published_at, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(report_key, report_type, event_key, "column") DO UPDATE SET
+                    title_zh = excluded.title_zh,
+                    summary_zh = excluded.summary_zh,
+                    score = excluded.score,
+                    source_links_json = excluded.source_links_json,
+                    quality_status = excluded.quality_status,
+                    tags = excluded.tags,
+                    published_at = excluded.published_at""",
+                rows,
+            )
+            return conn.total_changes - before
+
+    def fetch_report_events(
+        self,
+        since_key: str,
+        until_key: str | None = None,
+        report_type: str = "daily",
+        quality_status: str = "ok",
+    ) -> list[ReportEvent]:
+        sql = """SELECT * FROM report_events
+                 WHERE report_type = ? AND report_key >= ?"""
+        params: list[object] = [report_type, since_key]
+        if until_key is not None:
+            sql += " AND report_key < ?"
+            params.append(until_key)
+        if quality_status:
+            sql += " AND quality_status = ?"
+            params.append(quality_status)
+        sql += ' ORDER BY report_key DESC, "column", score DESC'
+        with self._connect() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        events: list[ReportEvent] = []
+        for row in rows:
+            try:
+                source_links = json.loads(row["source_links_json"] or "[]")
+            except json.JSONDecodeError:
+                source_links = []
+            events.append(ReportEvent(
+                report_key=row["report_key"],
+                report_type=row["report_type"],
+                event_key=row["event_key"],
+                column=row["column"] or "",
+                title_zh=row["title_zh"],
+                summary_zh=row["summary_zh"] or "",
+                score=row["score"] or 0.0,
+                source_links=source_links if isinstance(source_links, list) else [],
+                quality_status=row["quality_status"] or "ok",
+                tags=row["tags"] or "",
+                published_at=_from_utc_storage(row["published_at"]),
+            ))
+        return events
+
+    def log_report_run(
+        self,
+        report_key: str,
+        report_type: str,
+        status: str,
+        *,
+        window_since: datetime | None = None,
+        window_until: datetime | None = None,
+        input_count: int = 0,
+        candidate_count: int = 0,
+        selected_count: int = 0,
+        ai_duration_seconds: float = 0.0,
+        error_count: int = 0,
+        output_md_path: str = "",
+        output_html_path: str = "",
+        metrics: dict | None = None,
+    ) -> int:
+        with self._connect() as conn:
+            cursor = conn.execute(
+                """INSERT INTO report_runs
+                (report_key, report_type, status, window_since, window_until,
+                 input_count, candidate_count, selected_count, ai_duration_seconds,
+                 error_count, output_md_path, output_html_path, metrics_json, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    report_key,
+                    report_type,
+                    status,
+                    _to_utc_storage(window_since),
+                    _to_utc_storage(window_until),
+                    input_count,
+                    candidate_count,
+                    selected_count,
+                    ai_duration_seconds,
+                    error_count,
+                    output_md_path,
+                    output_html_path,
+                    json.dumps(metrics or {}, ensure_ascii=False),
+                    _to_utc_storage(datetime.now(timezone.utc)),
+                ),
+            )
+            return int(cursor.lastrowid)
 
     @staticmethod
     def _row_to_article(row: sqlite3.Row) -> Article:

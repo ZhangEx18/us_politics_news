@@ -16,6 +16,9 @@ storage:
   db_path: "data/products/news/news.db"
   retention_days: 30
 
+format_contract:
+  require_non_empty_columns: true
+
 schedule:
   timezone: "Asia/Shanghai"
   cutoff_hour: 7

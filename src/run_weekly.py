@@ -87,6 +87,23 @@ def _build_weekly_scored_events(filtered_items: list[ContentItem], articles: lis
     return event_dicts, skipped
 
 
+def _report_event_to_scored_dict(event) -> dict:
+    return {
+        "link": event.source_links[0].get("url", "") if event.source_links else "",
+        "title": event.title_zh,
+        "source": event.source_links[0].get("title", "") if event.source_links else "",
+        "score": event.score,
+        "summary": event.summary_zh,
+        "content": event.summary_zh,
+        "tags": [t.strip() for t in (event.tags or "").split(",") if t.strip()],
+        "event_key": event.event_key,
+        "column": event.column,
+        "source_tier": 2,
+        "is_hard_news": True,
+        "source_links": event.source_links,
+    }
+
+
 def run_weekly() -> dict:
     """生成周报：计算窗口 → 读取 DB → 构建事件列表 → build_report()"""
     start_time = datetime.now()
@@ -103,40 +120,54 @@ def run_weekly() -> dict:
     week_num = _get_month_week_number(since)
     print(f"[周报] 窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}  标识: {report_key}")
 
-    # === 2. 从数据库读取文章 ===
-    articles = db.fetch_since(since.replace(tzinfo=None))
-    print(f"[周报] 数据库加载 {len(articles)} 条文章")
+    # 优先复用日报沉淀事件，避免周报重新处理大量原始文章。
+    since_key = since.strftime("%Y-%m-%d")
+    until_key = until.strftime("%Y-%m-%d")
+    stored_events = db.fetch_report_events(since_key, until_key, report_type="daily")
+    if stored_events:
+        event_dicts = [_report_event_to_scored_dict(event) for event in stored_events]
+        print(f"[周报] 复用日报事件 {len(event_dicts)} 条")
+        skipped = 0
+        filtered_items = []
+    else:
+        event_dicts = []
+        skipped = 0
 
-    if not articles:
-        print("[警告] 数据库中无最近文章，无法生成周报")
-        return {"total_selected": 0}
+    if not event_dicts:
+        # === 2. 从数据库读取文章 ===
+        articles = db.fetch_since(since.replace(tzinfo=None))
+        print(f"[周报] 数据库加载 {len(articles)} 条文章")
 
-    # === 3. 转为 ContentItem 并过滤到窗口内 ===
-    merged_items = [
-        article_to_content_item(a, url_hash_fn=db.url_hash)
-        for a in articles
-    ]
+        if not articles:
+            print("[警告] 数据库中无最近文章，无法生成周报")
+            return {"total_selected": 0}
 
-    # 过滤到周报窗口
-    filtered_items: list[ContentItem] = []
-    for item in merged_items:
-        ref = item.published_at or item.fetched_at
-        if ref is None:
-            continue
-        if ref.tzinfo is None:
-            ref = ref.replace(tzinfo=timezone.utc)
-        ref_local = ref.astimezone(BEIJING_TZ)
-        if since <= ref_local < until:
-            filtered_items.append(item)
+        # === 3. 转为 ContentItem 并过滤到窗口内 ===
+        merged_items = [
+            article_to_content_item(a, url_hash_fn=db.url_hash)
+            for a in articles
+        ]
 
-    print(f"[周报] 窗口过滤后保留 {len(filtered_items)} 条文章")
-    if not filtered_items:
-        print("[警告] 周报窗口内无文章，无法生成周报")
-        return {"total_selected": 0}
+        # 过滤到周报窗口
+        filtered_items = []
+        for item in merged_items:
+            ref = item.published_at or item.fetched_at
+            if ref is None:
+                continue
+            if ref.tzinfo is None:
+                ref = ref.replace(tzinfo=timezone.utc)
+            ref_local = ref.astimezone(BEIJING_TZ)
+            if since <= ref_local < until:
+                filtered_items.append(item)
 
-    # === 4. 构建 scored_events dict 列表（跳过未评分） ===
-    event_dicts, skipped = _build_weekly_scored_events(filtered_items, articles)
-    print(f"[周报] 已评分 {len(event_dicts)} 条（跳过 {skipped} 条未评分）")
+        print(f"[周报] 窗口过滤后保留 {len(filtered_items)} 条文章")
+        if not filtered_items:
+            print("[警告] 周报窗口内无文章，无法生成周报")
+            return {"total_selected": 0}
+
+        # === 4. 构建 scored_events dict 列表（跳过未评分） ===
+        event_dicts, skipped = _build_weekly_scored_events(filtered_items, articles)
+        print(f"[周报] 已评分 {len(event_dicts)} 条（跳过 {skipped} 条未评分）")
 
     if not event_dicts:
         print("[警告] 无已评分文章")
@@ -169,7 +200,8 @@ def run_weekly() -> dict:
 
     # 补充周报特有统计
     stats["duration_seconds"] = round((datetime.now() - start_time).total_seconds(), 1)
-    stats["total_articles"] = len(filtered_items)
+    stats["total_articles"] = len(filtered_items) if "filtered_items" in locals() else len(event_dicts)
+    stats["reused_report_events"] = len(stored_events)
 
     return stats
 

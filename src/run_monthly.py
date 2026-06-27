@@ -50,6 +50,23 @@ def _get_monthly_window() -> tuple[datetime, datetime, str]:
     return since, until, report_key
 
 
+def _report_event_to_scored_dict(event) -> dict:
+    return {
+        "link": event.source_links[0].get("url", "") if event.source_links else "",
+        "title": event.title_zh,
+        "source": event.source_links[0].get("title", "") if event.source_links else "",
+        "score": event.score,
+        "summary": event.summary_zh,
+        "content": event.summary_zh,
+        "tags": [t.strip() for t in (event.tags or "").split(",") if t.strip()],
+        "column": event.column,
+        "event_key": event.event_key,
+        "source_tier": 2,
+        "is_hard_news": True,
+        "source_links": event.source_links,
+    }
+
+
 def run_monthly() -> dict:
     """月报生成管线：计算窗口 → 读取 DB → 构建事件列表 → build_report()"""
     start_time = datetime.now()
@@ -66,55 +83,68 @@ def run_monthly() -> dict:
     year, month = since.year, since.month
     print(f"[月报] 窗口: {since.strftime('%Y-%m-%d %H:%M')} → {until.strftime('%Y-%m-%d %H:%M')}  标识: {report_key}")
 
-    # === 2. 从数据库读取文章 ===
-    since_utc = since.astimezone(tz=None).replace(tzinfo=None)
-    all_articles = db.fetch_since(since_utc)
-    print(f"[月报] 数据库返回 {len(all_articles)} 条")
+    since_key = since.strftime("%Y-%m-%d")
+    until_key = until.strftime("%Y-%m-%d")
+    stored_events = db.fetch_report_events(since_key, until_key, report_type="daily")
+    if stored_events:
+        event_dicts = [_report_event_to_scored_dict(event) for event in stored_events]
+        windowed = []
+        skipped = 0
+        print(f"[月报] 复用日报事件 {len(event_dicts)} 条")
+    else:
+        event_dicts = []
+        skipped = 0
 
-    if not all_articles:
-        print("[警告] 数据库中无文章，无法生成月报")
-        return {"total_selected": 0}
+    if not event_dicts:
+        # === 2. 从数据库读取文章 ===
+        since_utc = since.astimezone(tz=None).replace(tzinfo=None)
+        all_articles = db.fetch_since(since_utc)
+        print(f"[月报] 数据库返回 {len(all_articles)} 条")
 
-    # === 3. 过滤到月报窗口 ===
-    windowed: list = []
-    for a in all_articles:
-        ref = a.published_at or a.fetched_at
-        if ref is None:
-            continue
-        if ref.tzinfo is None:
-            ref = ref.replace(tzinfo=BEIJING_TZ)
-        ref_local = ref.astimezone(BEIJING_TZ)
-        if since <= ref_local < until:
-            windowed.append(a)
-    print(f"[月报] 窗口内 {len(windowed)} 条")
+        if not all_articles:
+            print("[警告] 数据库中无文章，无法生成月报")
+            return {"total_selected": 0}
 
-    if not windowed:
-        print("[警告] 月报窗口内无文章")
-        return {"total_selected": 0}
+        # === 3. 过滤到月报窗口 ===
+        windowed = []
+        for a in all_articles:
+            ref = a.published_at or a.fetched_at
+            if ref is None:
+                continue
+            if ref.tzinfo is None:
+                ref = ref.replace(tzinfo=BEIJING_TZ)
+            ref_local = ref.astimezone(BEIJING_TZ)
+            if since <= ref_local < until:
+                windowed.append(a)
+        print(f"[月报] 窗口内 {len(windowed)} 条")
 
-    # === 4. 构建 scored_events dict 列表（跳过未评分） ===
-    event_dicts: list[dict] = []
-    skipped = 0
-    for a in windowed:
-        if a.llm_score is None:
-            skipped += 1
-            continue
-        tags = [t.strip() for t in (a.llm_tags or "").split(",") if t.strip()]
-        event_dicts.append({
-            "link": a.url,
-            "title": a.title,
-            "source": a.source,
-            "score": a.llm_score,
-            "summary": a.llm_summary or a.summary or "",
-            "content": a.summary or "",
-            "tags": tags,
-            "column": a.column or "",
-            "event_key": a.event_key or "",
-            "source_tier": a.source_tier or 4,
-            "is_hard_news": True,
-            "source_links": [],
-        })
-    print(f"[月报] 已评分 {len(event_dicts)} 条（跳过 {skipped} 条未评分）")
+        if not windowed:
+            print("[警告] 月报窗口内无文章")
+            return {"total_selected": 0}
+
+        # === 4. 构建 scored_events dict 列表（跳过未评分） ===
+        event_dicts = []
+        skipped = 0
+        for a in windowed:
+            if a.llm_score is None:
+                skipped += 1
+                continue
+            tags = [t.strip() for t in (a.llm_tags or "").split(",") if t.strip()]
+            event_dicts.append({
+                "link": a.url,
+                "title": a.title,
+                "source": a.source,
+                "score": a.llm_score,
+                "summary": a.llm_summary or a.summary or "",
+                "content": a.summary or "",
+                "tags": tags,
+                "column": a.column or "",
+                "event_key": a.event_key or "",
+                "source_tier": a.source_tier or 4,
+                "is_hard_news": True,
+                "source_links": [],
+            })
+        print(f"[月报] 已评分 {len(event_dicts)} 条（跳过 {skipped} 条未评分）")
 
     if not event_dicts:
         print("[警告] 无已评分文章")
@@ -151,6 +181,7 @@ def run_monthly() -> dict:
     stats["duration_seconds"] = round((datetime.now() - start_time).total_seconds(), 1)
     stats["total_articles_in_window"] = len(windowed)
     stats["total_scored"] = len(event_dicts)
+    stats["reused_report_events"] = len(stored_events)
 
     return stats
 

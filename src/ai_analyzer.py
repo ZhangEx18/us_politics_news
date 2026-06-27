@@ -361,10 +361,10 @@ async def _score_single_batch(
 
 
 def _is_retryable_score_error(errors: list[str]) -> bool:
-    """只有超时或结果不完整才值得拆小重试。"""
+    """超时、结果不完整或风控拒绝时，值得拆小重试。"""
     if not errors:
         return False
-    retryable_tokens = ("TimeoutError", "结果不完整")
+    retryable_tokens = ("TimeoutError", "结果不完整", "high risk")
     return any(token in err for err in errors for token in retryable_tokens)
 
 

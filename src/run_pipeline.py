@@ -37,7 +37,15 @@ from config import (
     load_product_config,
     augment_ai_config_with_runtime as _augment_real,
 )
-from database import NewsDatabase, article_to_content_item, migrate_legacy_news_db, db_health_check, format_health_report
+from database import (
+    ArticleCandidate,
+    NewsDatabase,
+    ReportEvent,
+    article_to_content_item,
+    migrate_legacy_news_db,
+    db_health_check,
+    format_health_report,
+)
 from fetchers import (
     fetch_all_sources,
     merge_cross_source_duplicates,
@@ -265,6 +273,46 @@ def _prefilter_signal(item: ContentItem, now: datetime) -> float:
     return (item.score or 0) + tier_bonus + recency_bonus + content_bonus + _keyword_bonus(item)
 
 
+def _candidate_reason(item: ContentItem, now: datetime) -> str:
+    parts = [
+        f"tier={item.source_tier or 4}",
+        f"recency_hours={_item_recency_hours(item, now):.1f}",
+    ]
+    bonus = _keyword_bonus(item)
+    if bonus:
+        parts.append(f"keyword_bonus={bonus}")
+    return ",".join(parts)
+
+
+def _content_items_to_candidates(
+    items_by_column: dict[str, list[ContentItem]],
+    report_key: str,
+    report_type: str,
+    now: datetime | None = None,
+) -> list[ArticleCandidate]:
+    now = now or datetime.now(timezone.utc)
+    candidates: list[ArticleCandidate] = []
+    for col_key, items in items_by_column.items():
+        for item in items:
+            candidates.append(ArticleCandidate(
+                report_key=report_key,
+                report_type=report_type,
+                url=str(item.url),
+                title=item.title,
+                source=item.source_name,
+                column=item.column or col_key,
+                candidate_score=_prefilter_signal(item, now),
+                source_tier=item.source_tier or 4,
+                reason=_candidate_reason(item, now),
+                status="candidate",
+                event_key=item.event_key or "",
+                published_at=item.published_at,
+                fetched_at=item.fetched_at,
+                source_url_normalized=item.source_url_normalized or normalize_url(str(item.url)),
+            ))
+    return candidates
+
+
 def _prefilter_items_for_scoring(
     items: list[ContentItem],
     columns_cfg: dict[str, dict],
@@ -344,6 +392,75 @@ def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> di
         "is_hard_news": False,
         "column": item.column or "us_politics",
     }
+
+
+def _scored_entries_to_report_events(
+    scored_entries: list[dict],
+    report_key: str,
+    report_type: str,
+) -> list[ReportEvent]:
+    events: list[ReportEvent] = []
+    for entry in scored_entries:
+        event_key = str(entry.get("event_key") or entry.get("link") or "").strip()
+        title_zh = str(entry.get("title_zh") or entry.get("title") or "").strip()
+        summary_zh = str(entry.get("summary") or entry.get("content") or "").strip()
+        if not event_key or not title_zh:
+            continue
+        source_links = entry.get("source_links")
+        if not isinstance(source_links, list) or not source_links:
+            source_links = [{
+                "title": entry.get("source", ""),
+                "url": entry.get("link", ""),
+            }]
+        tags = entry.get("tags", [])
+        tags_str = ",".join(tags) if isinstance(tags, list) else str(tags or "")
+        events.append(ReportEvent(
+            report_key=report_key,
+            report_type=report_type,
+            event_key=event_key,
+            column=str(entry.get("column") or ""),
+            title_zh=title_zh,
+            summary_zh=summary_zh,
+            score=float(entry.get("score") or 0),
+            source_links=source_links,
+            quality_status="ok" if _is_hard_news_entry(entry) else "candidate",
+            tags=tags_str,
+        ))
+    return events
+
+
+def _log_digest_run(
+    db: NewsDatabase,
+    *,
+    report_key: str,
+    report_type: str,
+    status: str,
+    window_since: datetime,
+    window_until: datetime,
+    input_count: int,
+    candidate_count: int,
+    selected_count: int = 0,
+    ai_duration_seconds: float = 0.0,
+    error_count: int = 0,
+    output_md_path: str = "",
+    output_html_path: str = "",
+    metrics: dict | None = None,
+) -> None:
+    db.log_report_run(
+        report_key=report_key,
+        report_type=report_type,
+        status=status,
+        window_since=window_since,
+        window_until=window_until,
+        input_count=input_count,
+        candidate_count=candidate_count,
+        selected_count=selected_count,
+        ai_duration_seconds=ai_duration_seconds,
+        error_count=error_count,
+        output_md_path=output_md_path,
+        output_html_path=output_html_path,
+        metrics=metrics or {},
+    )
 
 
 def _get_report_window(now: datetime | None = None, config: dict | None = None) -> tuple[datetime, datetime, str]:
@@ -688,6 +805,7 @@ def _run_digest_phase(
     pipeline_context: dict | None = None,
 ) -> dict:
     """步骤 4-13：评分 + 分栏 digest + 输出"""
+    phase_start = datetime.now()
     publish_cfg = config.get("publish", {})
     digest_cfg = config.get("digest", {})
     analysis_cfg = config.get("analysis", {})
@@ -733,11 +851,26 @@ def _run_digest_phase(
         print(f"   送评 {col_key}: {len(items)} 条")
         phase_metrics["columns"].setdefault(col_key, {})["hard_news_candidates"] = len(items)
 
+    candidates = _content_items_to_candidates(
+        prefiltered_by_column,
+        report_key=report_date,
+        report_type=report_type,
+    )
+    candidate_upserts = db.upsert_article_candidates(candidates)
+    phase_metrics["candidate_pool"] = {
+        "upserted": candidate_upserts,
+        "total": len(candidates),
+    }
+    print(f"   候选池记录: {len(candidates)} 条")
+
     entries_for_scoring, _ = _build_scoring_entries_by_column(prefiltered_by_column)
     print(f"   送评总数: {len(entries_for_scoring)} 条")
+    score_start = datetime.now()
     scored_dicts, score_errors = asyncio.run(score_batch(entries_for_scoring, ai_config))
+    ai_duration = (datetime.now() - score_start).total_seconds()
     print(f"   完成 {len(scored_dicts)} 条评分")
     phase_metrics["ai"]["score_errors"] = len(score_errors)
+    phase_metrics["ai"]["score_duration_seconds"] = round(ai_duration, 1)
 
     # require_ai 时，评分失败必须退出
     require_ai = runtime_cfg.get("require_ai", True)
@@ -753,6 +886,19 @@ def _run_digest_phase(
                   f"coverage={coverage:.0%}, required>={min_coverage:.0%}")
             for err in score_errors[:3]:
                 print(f"   - {err}")
+            _log_digest_run(
+                db,
+                report_key=report_date,
+                report_type=report_type,
+                status="ai_failed",
+                window_since=window_since,
+                window_until=window_until,
+                input_count=len(merged_items),
+                candidate_count=len(candidates),
+                ai_duration_seconds=ai_duration,
+                error_count=len(score_errors),
+                metrics={**phase_metrics, "ai_coverage": coverage},
+            )
             sys.exit(1)
         if score_errors:
             print(f"\n[警告] AI 评分存在部分批次异常，但覆盖率达标: "
@@ -769,6 +915,13 @@ def _run_digest_phase(
     # === 6. 硬新闻过滤 ===
     print("\n[6/13] 硬新闻过滤...")
     hard_news_scored = [entry for entry in scored_dicts if _is_hard_news_entry(entry)]
+    event_upserts = db.upsert_report_events(
+        _scored_entries_to_report_events(hard_news_scored, report_date, report_type)
+    )
+    phase_metrics["report_events"] = {
+        "upserted": event_upserts,
+        "hard_news": len(hard_news_scored),
+    }
     fallback_candidates_by_column: dict[str, list[dict]] = {}
     for col_key, items in prefiltered_by_column.items():
         non_hard: list[dict] = []
@@ -817,7 +970,24 @@ def _run_digest_phase(
         fallback_candidates_by_column=fallback_candidates_by_column,
     )
 
-    stats = build_report(spec, hard_news_scored, config, ai_config, db, phase_metrics=phase_metrics)
+    try:
+        stats = build_report(spec, hard_news_scored, config, ai_config, db, phase_metrics=phase_metrics)
+    except Exception as exc:
+        _log_digest_run(
+            db,
+            report_key=report_date,
+            report_type=report_type,
+            status="render_failed",
+            window_since=window_since,
+            window_until=window_until,
+            input_count=len(merged_items),
+            candidate_count=len(candidates),
+            selected_count=len(hard_news_scored),
+            ai_duration_seconds=ai_duration,
+            error_count=len(score_errors) + 1,
+            metrics={**phase_metrics, "render_error": str(exc)},
+        )
+        raise
 
     # 补充 pipeline 阶段统计
     stats["total_fetched"] = len(merged_items)
@@ -833,6 +1003,26 @@ def _run_digest_phase(
     metrics_path = _write_metrics_file(output_root, metrics_payload)
     stats.setdefault("outputs", {})["metrics"] = metrics_path
     stats["metrics"] = metrics_payload
+    outputs = stats.get("outputs", {})
+    _log_digest_run(
+        db,
+        report_key=report_date,
+        report_type=report_type,
+        status="ok" if stats.get("total_selected", 0) else "empty",
+        window_since=window_since,
+        window_until=window_until,
+        input_count=len(merged_items),
+        candidate_count=len(candidates),
+        selected_count=stats.get("total_selected", 0),
+        ai_duration_seconds=ai_duration,
+        error_count=len(score_errors),
+        output_md_path=str(outputs.get("markdown", "")),
+        output_html_path=str(outputs.get("html", "")),
+        metrics={
+            **metrics_payload,
+            "duration_seconds": round((datetime.now() - phase_start).total_seconds(), 1),
+        },
+    )
     return stats
 
 

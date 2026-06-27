@@ -3,7 +3,14 @@
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from database import Article, NewsDatabase, _to_utc_storage, migrate_legacy_news_db
+from database import (
+    Article,
+    ArticleCandidate,
+    NewsDatabase,
+    ReportEvent,
+    _to_utc_storage,
+    migrate_legacy_news_db,
+)
 
 
 def test_to_utc_storage_writes_explicit_utc_offset():
@@ -101,3 +108,66 @@ def test_migrate_legacy_news_db_moves_articles_and_fetch_log(tmp_path):
 
     second = migrate_legacy_news_db(str(target_path), str(legacy_path))
     assert second["migrated_articles"] == 0
+
+
+def test_database_candidate_event_and_run_layers_are_idempotent(tmp_path):
+    db = NewsDatabase(str(tmp_path / "news.db"))
+    published = datetime(2026, 6, 27, 0, 30, tzinfo=timezone.utc)
+
+    candidate = ArticleCandidate(
+        report_key="2026-06-27",
+        report_type="daily",
+        url="https://example.com/a?utm_source=x",
+        title="White House announces policy update",
+        source="Example",
+        column="us_politics",
+        candidate_score=92,
+        source_tier=1,
+        reason="official source",
+        status="selected",
+        event_key="white_house_policy_20260627",
+        published_at=published,
+        fetched_at=published,
+    )
+
+    assert db.upsert_article_candidates([candidate]) == 1
+    assert db.upsert_article_candidates([candidate]) >= 1
+
+    candidates = db.fetch_article_candidates("2026-06-27", status="selected")
+    assert len(candidates) == 1
+    assert candidates[0].event_key == "white_house_policy_20260627"
+
+    event = ReportEvent(
+        report_key="2026-06-27",
+        report_type="daily",
+        event_key="white_house_policy_20260627",
+        column="us_politics",
+        title_zh="白宫宣布政策更新",
+        summary_zh="白宫发布新的政策安排。",
+        score=91,
+        source_links=[{"title": "Example", "url": "https://example.com/a"}],
+        tags="official,policy",
+        published_at=published,
+    )
+
+    assert db.upsert_report_events([event]) == 1
+    assert db.upsert_report_events([event]) >= 1
+
+    events = db.fetch_report_events("2026-06-27", report_type="daily")
+    assert len(events) == 1
+    assert events[0].title_zh == "白宫宣布政策更新"
+    assert events[0].source_links[0]["url"] == "https://example.com/a"
+
+    run_id = db.log_report_run(
+        "2026-06-27",
+        "daily",
+        "ok",
+        window_since=published,
+        window_until=published,
+        input_count=10,
+        candidate_count=1,
+        selected_count=1,
+        output_md_path="docs/news/daily/2026-06-27.md",
+        metrics={"ok": True},
+    )
+    assert run_id > 0
