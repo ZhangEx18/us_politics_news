@@ -1,6 +1,6 @@
 # 观察日报 -- AI 驱动的每日国际新闻长文日报
 
-每天自动生成 5000-10000 字中文日报，覆盖美国政局、国际局势、科技前沿、经济走势四大维度。100+ 多接入方式新闻源并发抓取，AI 评分筛选、事件合并、AI 写作，输出 Markdown + HTML + RSS 全文 Feed，部署在 GitHub Pages，Reader 订阅即读。
+每天自动生成中文新闻日报，覆盖美国政局、国际局势、科技前沿、经济走势四大维度。多接入方式新闻源并发抓取，AI 评分筛选、事件合并、AI 写作，输出 Markdown + HTML + RSS 全文 Feed，部署在 GitHub Pages，Reader 订阅即读。
 
 ## 快速开始
 
@@ -17,14 +17,20 @@ pip install -r requirements.txt
 cp .env.example .env
 # 编辑 .env，填入 AI_API_KEY（必需）、NEWSAPI_KEY / TIANAPI_KEY（可选）
 
-# 运行
-python3 src/run_pipeline.py
+# 抓取 + 生成 news/daily
+python3 src/run_product.py --product news --report-type daily
+
+# 只用数据库已有内容补跑当天日报
+python3 src/run_product.py --product news --report-type daily --digest-only
 ```
 
 生成产物：
-- `docs/daily/YYYY-MM-DD.md` -- 当日日报（Markdown）
-- `docs/daily/YYYY-MM-DD.html` -- 当日日报（HTML）
-- `docs/feed.xml` -- RSS 全文 Feed
+- `docs/news/daily/YYYY-MM-DD.md` -- news 产品当日日报（Markdown）
+- `docs/news/daily/YYYY-MM-DD.html` -- news 产品当日日报（HTML）
+- `docs/feeds/news.xml` -- news 产品 RSS 全文 Feed
+
+兼容别名：
+- 若 `config/products/news/product.yaml` 中 `publish.legacy_aliases` 为 `true`，发布流程会同步维护根目录别名，如 `docs/daily/YYYY-MM-DD.html` 与 `docs/feed.xml`
 
 ## 部署
 
@@ -34,18 +40,18 @@ python3 src/run_pipeline.py
 - 每周一北京时间 07:35 触发 `Weekly Publish`，基于数据库生成并发布周报
 - 每月 1 日北京时间 07:40 触发 `Monthly Publish`，基于数据库生成并发布月报
 
-两个 workflow 都会恢复已发布归档、更新 `feed.xml`、重建首页，然后发布到 GitHub Pages。
+这些 workflow 会恢复已发布归档、更新产品 feed、重建首页，然后发布到 GitHub Pages。
 
 Reader 订阅地址：
 
 ```
-https://<username>.github.io/us_politics_news/feed.xml
+https://<username>.github.io/us_politics_news/feeds/news.xml
 ```
 
 ## Pipeline 流程
 
 ```
-并发抓取 -> 跨源去重 -> AI 评分 -> 事件合并 -> AI 写作 -> 生成日报 -> 生成 Feed
+并发抓取 -> 跨源去重 -> AI 评分 -> 事件合并 -> AI 写作 -> 渲染日报 -> 生成 Feed
 ```
 
 | 步骤 | 说明 |
@@ -54,9 +60,49 @@ https://<username>.github.io/us_politics_news/feed.xml
 | 跨源 URL 去重 | 同一 URL 多源 -> 保留内容最丰富的，合并 metadata |
 | AI 评分 | 来源权重 + 主题优先级 + 关键词命中 + AI 深度分析 |
 | 事件合并 | 语义相似度识别同一事件的不同报道 |
-| AI 写作 | 生成 5000-10000 字中文长文日报 |
-| 生成日报 | Markdown + HTML，含目录、锚点、评分 |
+| AI 写作 | 生成中文栏目正文、要点与周期性总览 |
+| 渲染日报 | Markdown + HTML + Reader 友好 HTML 片段 |
 | 生成 Feed | RSS 2.0 全文，Reader 订阅 |
+
+## 输出文章结构
+
+### 日报结构
+
+日报最终输出按下面的顺序组织：
+
+```text
+今日要点
+- 要点 1
+- 要点 2
+- ...
+
+一、美国政局
+### 重点解析
+1. 事件标题
+   事件单段正文
+2. 事件标题
+   事件单段正文
+
+### 其他要闻
+- 简短补充要闻
+- 简短补充要闻
+
+二、国际局势
+三、科技前沿
+四、经济走势
+```
+
+约束：
+- 日报顶部不再输出一段总导语，首页和 Reader 都以 `今日要点` 开头
+- `重点解析` 只放带单段正文的主事件
+- `其他要闻` 只放简短补充条目；如果该栏没有补充条目，就不显示这一小节
+- 面向读者的日报输出要求中文可读；明显未翻译的英文标题或英文正文不会进入最终日报
+
+### 周报 / 月报结构
+
+- 周报、月报会保留顶部总览
+- 总览结构为：综述段落 + 核心主题列表 + 观察点列表
+- 四个栏目仍按 `美国政局 / 国际局势 / 科技前沿 / 经济走势` 顺序展开
 
 ## 四大维度
 
@@ -77,7 +123,8 @@ https://<username>.github.io/us_politics_news/feed.xml
 ```
 ├── src/
 │   ├── __init__.py
-│   ├── run_pipeline.py       # 统一入口
+│   ├── run_product.py        # 多 product 统一入口（推荐）
+│   ├── run_pipeline.py       # news/daily pipeline
 │   ├── models.py             # Pydantic 数据模型
 │   ├── database.py           # SQLite 存储层
 │   ├── fetchers.py           # 异步并发抓取 + 去重
@@ -87,13 +134,16 @@ https://<username>.github.io/us_politics_news/feed.xml
 │   ├── report_renderer.py    # 日报渲染（Markdown + HTML）
 │   └── feed_builder.py       # RSS Feed 生成
 ├── config/
-│   ├── config.yaml           # 主配置
-│   └── sources.yaml          # 100+ 新闻源配置
+│   ├── config.yaml           # 默认指向 news product 的兼容入口
+│   ├── base.yaml             # 共享基础配置
+│   └── products/news/sources.yaml  # news 产品新闻源配置
 ├── scripts/
-│   └── daily_run.sh          # 定时任务脚本（含运行后校验）
+│   ├── daily_run.sh          # 本地定时脚本（旧入口）
+│   └── publish_daily.sh      # 仅用数据库补跑日报并可推送
 ├── docs/
-│   ├── daily/                # 日报输出（运行后生成）
-│   └── feed.xml              # RSS Feed（运行后生成）
+│   ├── news/daily/           # news/daily 输出（运行后生成）
+│   ├── feeds/news.xml        # news 产品 Feed（运行后生成）
+│   └── ...                   # 兼容别名、weekly/monthly、algorithms 等
 ├── data/                     # SQLite 数据库 + 历史抓取数据
 ├── .env.example              # 环境变量模板
 └── requirements.txt
@@ -103,17 +153,31 @@ https://<username>.github.io/us_politics_news/feed.xml
 
 ### config/config.yaml
 
-主配置文件，控制 Pipeline 行为：
+兼容入口，默认指向 `news` product。
+
+### config/products/news/product.yaml
+
+news 产品主配置，控制发布路径、定时配置、数据库位置和四栏配额：
+
+- `publish.site_root` -- 站点输出根目录，默认 `docs/news`
+- `publish.feed_path` -- feed 输出路径，默认 `docs/feeds/news.xml`
+- `publish.legacy_aliases` -- 是否同步维护根目录兼容别名
+- `storage.db_path` -- 数据库路径，默认 `data/products/news/news.db`
+- `digest.columns` -- 四个栏目各自的主事件/补充要闻配额
+
+### config/base.yaml
+
+基础配置文件，控制共享行为：
 
 - `sources` -- 数据源开关和参数
 - `scoring` -- 评分权重和阈值
 - `ai` -- AI 写作 provider 和 prompt 配置
-- `output` -- 输出目录和 Feed 路径
-- `storage` -- 数据库路径和保留天数
+- `analysis` -- 历史上下文和分析相关配置
+- `runtime` -- 并发和运行时参数
 
-### config/sources.yaml
+### config/products/news/sources.yaml
 
-100+ 多接入方式新闻源，按四大维度分类，每个源包含：
+news 产品新闻源配置，按四大维度分类，每个源包含：
 
 ```yaml
 - name: "源名称"
@@ -148,8 +212,8 @@ https://<username>.github.io/us_politics_news/feed.xml
 ```
 
 脚本会在运行后自动校验：
-- `docs/feed.xml` 包含 `content:encoded`（确保全文 Feed）
-- 日报字数 > 5000（确保内容充实）
+- `docs/feeds/news.xml` 包含 `content:encoded`（确保全文 Feed）
+- 当日日报文件存在（默认 `docs/news/daily/YYYY-MM-DD.md`）
 
 校验失败会 `exit 1`，便于 CI 告警。
 

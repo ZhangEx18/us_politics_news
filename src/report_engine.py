@@ -124,25 +124,100 @@ def _load_history_context(db, days: int = 3) -> str:
 
 def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> list[str]:
     """从最终入选事件提炼要点。"""
+    def _highlight_text(event: dict) -> str:
+        title = str(event.get("title_zh", "")).strip()
+        core = event.get("core_facts", "")
+        if isinstance(core, list):
+            core = " ".join(str(part).strip() for part in core if str(part).strip())
+        core = str(core).strip()
+        text = title if title else core[:45]
+        text = re.sub(r"\s+", " ", text).strip("：:，,。. ")
+        if not text:
+            return ""
+        if len(text) > 45:
+            text = text[:45].rstrip() + "…"
+        return text
+
     highlights: list[str] = []
-    for events in columns.values():
-        for event in events:
-            title = str(event.get("title_zh", "")).strip()
-            core = event.get("core_facts", "")
-            if isinstance(core, list):
-                core = " ".join(str(part).strip() for part in core if str(part).strip())
-            core = str(core).strip()
-            text = title if title else core[:45]
-            text = re.sub(r"\s+", " ", text).strip("：:，,。. ")
-            if not text:
+    column_keys = [key for key in columns if columns.get(key)]
+    if not column_keys:
+        return highlights
+
+    max_len = max(len(columns.get(key, [])) for key in column_keys)
+    for idx in range(max_len):
+        for col_key in column_keys:
+            events = columns.get(col_key, [])
+            if idx >= len(events):
                 continue
-            if len(text) > 45:
-                text = text[:45].rstrip() + "…"
-            if text not in highlights:
-                highlights.append(text)
+            text = _highlight_text(events[idx])
+            if not text or text in highlights:
+                continue
+            highlights.append(text)
             if len(highlights) >= limit:
                 return highlights
     return highlights
+
+
+def _looks_like_english_fragment(text: str) -> bool:
+    compact = re.sub(r"\s+", " ", str(text or "")).strip()
+    if not compact:
+        return False
+    if re.search(r"[\u4e00-\u9fff]", compact):
+        return False
+    letters = re.findall(r"[A-Za-z]", compact)
+    if len(letters) < 6:
+        return False
+    if compact.endswith((" to", " a", " an", " the", " of", " on", " in", " for", " with", " from")):
+        return True
+    if compact.endswith("。") and re.search(r"[A-Za-z]", compact):
+        return True
+    return bool(re.fullmatch(r"[A-Za-z0-9 ,.'()&/\-]{12,}", compact))
+
+
+def _contains_meaningful_cjk(text: str) -> bool:
+    return bool(re.search(r"[\u4e00-\u9fff]{2,}", str(text or "")))
+
+
+def _normalize_detailed_events_to_chinese(
+    column_results: dict[str, list[dict]],
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
+    """正文事件必须对读者呈现为中文；疑似英文残片的条目直接丢弃。"""
+    normalized_columns: dict[str, list[dict]] = {}
+    metrics: dict[str, dict[str, int]] = {}
+
+    for col_key, items in column_results.items():
+        kept: list[dict] = []
+        dropped_english = 0
+        for item in items:
+            title_zh = str(item.get("title_zh") or "").strip()
+            reader_body = str(item.get("reader_body") or item.get("core_facts") or "").strip()
+
+            title_ok = _contains_meaningful_cjk(title_zh) and not _looks_like_english_fragment(title_zh)
+            body_ok = _contains_meaningful_cjk(reader_body) and not _looks_like_english_fragment(reader_body)
+            if not title_ok or not body_ok:
+                dropped_english += 1
+                continue
+            kept.append(item)
+
+        normalized_columns[col_key] = kept
+        metrics[col_key] = {
+            "detailed_translation_failed": dropped_english,
+        }
+
+    return normalized_columns, metrics
+
+
+def _is_uninformative_bill_sentence(text: str) -> bool:
+    compact = re.sub(r"\s+", " ", str(text or "")).strip()
+    if not compact:
+        return True
+    if not re.search(r"(法案|决议|修正案|草案|bill|resolution)", compact, re.IGNORECASE):
+        return False
+    if re.search(r"(旨在|将|要求|用于|以|内容包括|围绕|推动|限制|扩大|改善|支持|评估)", compact):
+        return False
+    if re.search(r"(被提交至国会审议|处于立法进程介绍阶段|被提出)", compact):
+        return True
+    return bool(re.fullmatch(r".*([A-Z]\.[RSC]\.?\s*\d+|H\.R\.\s*\d+|S\.\s*\d+).*", compact))
 
 
 def _build_periodical_overview_payload(overview: PeriodicalOverview | dict | None) -> dict:
@@ -377,6 +452,9 @@ def _is_cryptic_headline_only_title(title: str) -> bool:
     if not text:
         return True
 
+    if re.search(r"[《》]", text) and re.search(r"(法案|决议|決議|修正案|草案)", text):
+        return False
+
     compact = re.sub(r"[\s\-_/,.():;]", "", text)
     compact_lower = compact.lower()
 
@@ -404,10 +482,16 @@ def _build_headline_only_reader_body(item: dict) -> str:
         text = re.sub(r"\s+", " ", str(item.get(field, "") or "")).strip()
         if not text:
             continue
+        if _looks_like_english_fragment(text):
+            continue
         sentence_match = re.match(r"(.+?[。！？!?])", text)
         sentence = sentence_match.group(1).strip() if sentence_match else text[:80].rstrip(" ，,。；;:：")
         if sentence and sentence[-1] not in "。！？!?":
             sentence += "。"
+        if _looks_like_english_fragment(sentence):
+            continue
+        if _is_uninformative_bill_sentence(sentence):
+            continue
         if sentence:
             return sentence
     return ""
@@ -426,12 +510,18 @@ def _normalize_headline_only_by_column(
 
         for item in items:
             title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
+            if _looks_like_english_fragment(title_zh):
+                unreadable_dropped += 1
+                continue
             if _is_cryptic_headline_only_title(title_zh):
                 cryptic_dropped += 1
                 continue
 
             reader_body = _build_headline_only_reader_body(item)
             if not reader_body:
+                unreadable_dropped += 1
+                continue
+            if not re.search(r"[\u4e00-\u9fff]", reader_body):
                 unreadable_dropped += 1
                 continue
 
@@ -475,7 +565,16 @@ async def _translate_headline_only_by_column(
         translated_events: list[dict] = []
         for item, title_zh in zip(items, translated_titles):
             clean_title = str(title_zh).strip()
-            if not clean_title:
+            fallback_reader_body = _build_headline_only_reader_body(item)
+            if not clean_title and fallback_reader_body:
+                translated_events.append({
+                    **item,
+                    "title_zh": fallback_reader_body,
+                    "reader_body": fallback_reader_body,
+                })
+                metrics[col_key]["headline_translated"] += 1
+                continue
+            if not clean_title or _looks_like_english_fragment(clean_title):
                 metrics[col_key]["headline_translation_failed"] += 1
                 continue
             translated_events.append({
@@ -646,6 +745,9 @@ def build_report(
         column_headline_only, normalized_metrics = _normalize_headline_only_by_column(column_headline_only)
         for col_key, column_metrics in normalized_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        column_results, detailed_metrics = _normalize_detailed_events_to_chinese(column_results)
+        for col_key, column_metrics in detailed_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
 
     # ── 提炼要点 ──
     print(f"\n[要点] 提炼要点...")
@@ -726,7 +828,7 @@ def build_report(
     print(f"\n[保存] 生成文件...")
     meta = {
         "title": spec.title,
-        "lead": daily_overview if spec.report_type == "daily" else overview_payload.get("summary", ""),
+        "lead": "" if spec.report_type == "daily" else overview_payload.get("summary", ""),
         "highlights": highlights,
         "date": spec.report_key,
         "overview": overview_payload,

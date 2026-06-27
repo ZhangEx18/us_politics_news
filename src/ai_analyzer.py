@@ -200,6 +200,8 @@ def _merge_scores(entries: list[dict], scores: list[dict]) -> list[dict]:
             "tags": s.get("tags", entry.get("tags", [])),
             "summary": s.get("summary", entry.get("summary", "")),
             "event_key": s.get("event_key", entry.get("event_key", "")),
+            "source_tier": entry.get("source_tier", s.get("source_tier", 4)),
+            "language": entry.get("language", s.get("language", "")),
         })
     return merged
 
@@ -593,6 +595,15 @@ def _build_digest_evidence(event: dict) -> str:
     summary = str(event.get("summary") or "").strip()
     if summary:
         evidence_lines.append(f"摘要：{summary}")
+    language = str(event.get("language") or "").strip()
+    if language:
+        evidence_lines.append(f"语言：{language}")
+    source = str(event.get("source") or "").strip()
+    if source:
+        evidence_lines.append(f"主来源：{source}")
+    source_tier = event.get("source_tier")
+    if source_tier is not None:
+        evidence_lines.append(f"来源层级：{source_tier}")
     source_titles = []
     for source_link in event.get("source_links", []):
         if not isinstance(source_link, dict):
@@ -614,6 +625,9 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 - 不得把示例、历史常识、模型记忆或推断当作当天事实写入正文。
 - 如果输入信息不足，只写可证实的“发生了什么”，不要扩展成政策结论或市场结论。
 - 如果一个事件缺少足够事实支撑，必须从 events 中丢弃，不要为了凑数生成。
+- 如果输入主要来自媒体转述、聚合页面、法案列表页或标题摘录，必须显式收缩表述力度，只写“文件显示 / 页面列出 / 报道称 / 公开材料显示”等可归因句式。
+- 任何未经官方确认、仅由媒体报道的说法，不得写成既定事实；必须保留“据某媒体报道”或“报道显示”这类归因。
+- 对法案、决议、行政文件类条目，如果输入没有提供法案内容、推进动作或影响对象，只能丢弃，不能靠编号或名称扩写。
 
 ## 栏目定义
 
@@ -636,6 +650,7 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 - 直接陈述主体、动作、结果
 - 只使用输入中已有的具体数字、机构、人名、金额、比例、时间、地点；输入没有就不要补
 - 禁止用”据报道””据悉””有消息称”开头
+- 如果 evidence 中显示来源层级较低、标题为英文、或只有页面摘录，首句必须带归因而不是下定论
 
 **第 3 句：这改变了什么（变化）**
 - 说清”以前怎样，现在怎样”
@@ -664,6 +679,7 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 **禁止的收尾**：引发了讨论、增添了变数、存在不确定性、产生深远影响、仍需观察
 **禁止的套话**：对于读者来说、值得关注的是
 **禁止的标签**：核心事实：、背景脉络：、背景与影响：、可能影响：、为什么值得关注：
+**禁止的事实升级**：把“报道显示 / 页面列出 / 文件写明 / 草案提出”直接改写成“已经实施 / 已经生效 / 已被证实”
 
 ## 本栏总字数目标
 
@@ -711,6 +727,7 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 8. 每句一个事实，不堆砌；同一主语不连续出现超过 2 次
 9. 不得复用抽象示例中的实体、数字或表述；示例不是新闻素材
 10. 对经济走势栏目尤其严格：只有输入明确给出市场价格、政策动作或财报事实时，才可写市场影响
+11. 对存在争议、未确认或媒体独家报道的内容，必须保留归因，不得用陈述句包装为已确认事实
 
 ## 输入数据（共 {count} 条候选事件）
 
