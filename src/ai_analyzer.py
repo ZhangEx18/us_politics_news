@@ -10,6 +10,7 @@ import asyncio
 import json
 import os
 import re
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -82,6 +83,11 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
 def _timeout_for(config: dict, scope: str, default: int) -> int:
     """按调用场景读取超时配置。"""
     return int(config.get(f"{scope}_timeout_seconds") or config.get("timeout_seconds") or default)
+
+
+def _ai_log(message: str) -> None:
+    """统一 AI 阶段日志，确保长任务在本地和 CI 都能及时看到进度。"""
+    print(f"  [AI] {message}", flush=True)
 
 
 # ── JSON 解析工具 ──
@@ -348,7 +354,7 @@ async def _score_single_batch(
             missing = sorted(entry_links - {r.get("link") for r in matched})
             msg = (f"批次{batch_index + 1} 结果不完整: "
                    f"输入{len(entries)}, 匹配{len(matched)}, 缺失{missing}")
-            print(f"  [AI] {msg}")
+            _ai_log(msg)
             errors.append(msg)
 
         return matched, errors
@@ -356,7 +362,7 @@ async def _score_single_batch(
     except Exception as e:
         detail = str(e).strip() or repr(e)
         msg = f"批次{batch_index + 1} 评分失败: {type(e).__name__}: {detail}"
-        print(f"  [AI] {msg}")
+        _ai_log(msg)
         return [], [msg]
 
 
@@ -375,7 +381,15 @@ async def _score_batch_with_retry(
     depth: int = 0,
 ) -> tuple[list[dict], list[str]]:
     """对单批执行评分；失败时拆分重试，尽量恢复覆盖率。"""
+    start = time.monotonic()
+    depth_suffix = f", depth={depth}" if depth else ""
+    _ai_log(f"批次{batch_index + 1} 开始: {len(entries)} 条{depth_suffix}")
     scores, errors = await _score_single_batch(entries, config, batch_index)
+    elapsed = time.monotonic() - start
+    _ai_log(
+        f"批次{batch_index + 1} 完成: 输入{len(entries)}, "
+        f"匹配{len(scores)}, 耗时{elapsed:.1f}s{depth_suffix}"
+    )
     if not entries:
         return scores, errors
 
@@ -397,8 +411,8 @@ async def _score_batch_with_retry(
     ):
         return scores, errors
 
-    print(
-        f"  [AI] 批次{batch_index + 1} 拆分重试: "
+    _ai_log(
+        f"批次{batch_index + 1} 拆分重试: "
         f"{len(missing_entries)} 条, depth={depth + 1}/{retry_depth}"
     )
 
@@ -478,12 +492,24 @@ async def score_batch(
 
     max_prompt_chars = int(config.get("score_max_prompt_chars", max_prompt_chars))
     max_concurrent = int(config.get("score_max_concurrent", max_concurrent))
+    wall_timeout = float(config.get("score_wall_timeout_seconds", 0) or 0)
 
     batches = _split_entries_for_batch(entries, max_prompt_chars)
-    print(f"  [AI] 评分: {len(entries)} 条 -> {len(batches)} 批")
+    _ai_log(f"评分: {len(entries)} 条 -> {len(batches)} 批")
 
     if len(batches) == 1:
-        scores, errors = await _score_batch_with_retry(batches[0], config, 0)
+        if wall_timeout > 0:
+            try:
+                scores, errors = await asyncio.wait_for(
+                    _score_batch_with_retry(batches[0], config, 0),
+                    timeout=wall_timeout,
+                )
+            except asyncio.TimeoutError:
+                errors = [f"评分总耗时超过 {wall_timeout}s，已取消单批任务"]
+                _ai_log(errors[0])
+                return _merge_scores(entries, []), errors
+        else:
+            scores, errors = await _score_batch_with_retry(batches[0], config, 0)
         return _merge_scores(entries, scores), errors
 
     semaphore = asyncio.Semaphore(max_concurrent)
@@ -492,12 +518,32 @@ async def score_batch(
         async with semaphore:
             return await _score_batch_with_retry(batch, config, idx)
 
-    results = await asyncio.gather(*[_limited(i, b) for i, b in enumerate(batches)])
+    tasks = [
+        asyncio.create_task(_limited(i, b), name=f"score-batch-{i + 1}")
+        for i, b in enumerate(batches)
+    ]
+    done, pending = await asyncio.wait(tasks, timeout=wall_timeout or None)
+    if pending:
+        for task in pending:
+            task.cancel()
+        await asyncio.gather(*pending, return_exceptions=True)
+        _ai_log(f"评分总耗时超过 {wall_timeout}s，取消 {len(pending)} 个未完成批次")
+
+    results = []
+    for task in done:
+        try:
+            results.append(task.result())
+        except Exception as exc:
+            results.append(([], [f"{task.get_name()} 评分失败: {type(exc).__name__}: {exc}"]))
 
     all_scores, all_errors = [], []
     for scores, errors in results:
         all_scores.extend(scores)
         all_errors.extend(errors)
+    if pending:
+        all_errors.append(
+            f"评分总耗时超过 {wall_timeout}s，已取消 {len(pending)} 个未完成批次"
+        )
 
     return _merge_scores(entries, all_scores), all_errors
 
