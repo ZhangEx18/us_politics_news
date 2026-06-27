@@ -160,6 +160,19 @@ def test_save_feed_uses_meta_pub_date_for_reeder_timestamp():
     assert pub_date.group(1) == "Fri, 19 Jun 2026 08:00:00 +0800"
 
 
+def test_save_feed_syncs_legacy_news_alias(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    meta = {"title": "2026年6月27日 日报", "lead": "", "highlights": [], "date": "2026-06-27"}
+    columns = {"us_politics": [], "global_affairs": [], "technology": [], "economy": []}
+
+    path = os.path.join("docs", "feeds", "news.xml")
+    save_feed(meta=meta, columns=columns, output_path=path, base_url="https://example.com")
+
+    news_feed = (tmp_path / "docs" / "feeds" / "news.xml").read_text(encoding="utf-8")
+    legacy_feed = (tmp_path / "docs" / "feed.xml").read_text(encoding="utf-8")
+    assert news_feed == legacy_feed
+
+
 def test_guid_based_on_date():
     item = _build_item_xml("2026-06-18", "Title", "Desc", "<p>Body</p>", "")
     assert "news/daily/2026-06-18" in item

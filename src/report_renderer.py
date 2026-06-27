@@ -307,9 +307,6 @@ footer {
         if analysis:
             html.append(f"<p>{_html_text(analysis)}</p>")
 
-        if detailed and report_type == "daily":
-            html.append("<h3>重点解析</h3>")
-
         # 编号条目
         for idx, event in enumerate(detailed, 1):
             event_title = _html_text(event.get("title_zh", ""))
@@ -327,8 +324,6 @@ footer {
 
         # 无序条目：仅标题
         if headline_only:
-            if report_type == "daily":
-                html.append("<h3>其他要闻</h3>")
             html.append("<ul>")
             for event in headline_only:
                 event_title = _html_text(_headline_only_text(event))
@@ -479,9 +474,6 @@ def render_reader_content(
         if analysis:
             html.append(f"<p>{_html_text(analysis)}</p>")
 
-        if detailed and report_type == "daily":
-            html.append("<h3>重点解析</h3>")
-
         # 编号条目：带正文
         for idx, event in enumerate(detailed, 1):
             event_title = _html_text(event.get("title_zh", ""))
@@ -493,8 +485,6 @@ def render_reader_content(
                 html.append(f"<p>{_html_text(reader_body)}</p>")
 
         if headline_only:
-            if report_type == "daily":
-                html.append("<h3>其他要闻</h3>")
             html.append("<ul>")
             for event in headline_only:
                 event_title = _html_text(_headline_only_text(event))
@@ -560,10 +550,6 @@ def render_structured_markdown(
             lines.append(_markdown_text(analysis))
             lines.append("")
 
-        if detailed and report_type == "daily":
-            lines.append("### 重点解析")
-            lines.append("")
-
         # 编号条目
         for idx, event in enumerate(detailed, 1):
             event_title = _markdown_text(event.get("title_zh", ""))
@@ -580,9 +566,6 @@ def render_structured_markdown(
 
         # 无序条目：仅标题
         if headline_only:
-            if report_type == "daily":
-                lines.append("### 其他要闻")
-                lines.append("")
             for event in headline_only:
                 event_title = _markdown_text(_headline_only_text(event))
                 if event_title:
