@@ -12,6 +12,7 @@
 
 import os
 import re
+import shutil
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -299,5 +300,11 @@ def save_feed(
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(feed_xml)
+
+    normalized = os.path.normpath(output_path)
+    if normalized.endswith(os.path.normpath(os.path.join("docs", "feeds", "news.xml"))):
+        legacy_feed_path = os.path.join("docs", "feed.xml")
+        os.makedirs(os.path.dirname(legacy_feed_path) or ".", exist_ok=True)
+        shutil.copy2(output_path, legacy_feed_path)
 
     return output_path
