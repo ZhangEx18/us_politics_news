@@ -36,7 +36,7 @@ from config import (
     load_product_config,
     augment_ai_config_with_runtime as _augment_real,
 )
-from database import NewsDatabase, article_to_content_item
+from database import NewsDatabase, article_to_content_item, migrate_legacy_news_db, db_health_check, format_health_report
 from fetchers import (
     fetch_all_sources,
     merge_cross_source_duplicates,
@@ -94,6 +94,18 @@ def _parse_schedule_time(value: str, fallback: str) -> tuple[int, int]:
 
 def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
     return _augment_real(ai_config, config)
+
+
+def _open_news_db(config: dict) -> NewsDatabase:
+    storage_cfg = config.get("storage", {})
+    db_path = storage_cfg.get("db_path", "data/products/news/news.db")
+    migration = migrate_legacy_news_db(db_path)
+    if migration["legacy_exists"] and (migration["migrated_articles"] or migration["migrated_fetch_logs"]):
+        print(
+            f"[数据库] 已从旧库迁移到正式库: "
+            f"{migration['migrated_articles']} 篇文章, {migration['migrated_fetch_logs']} 条抓取日志"
+        )
+    return NewsDatabase(db_path)
 
 
 def _get_source_max_age_hours(source_name: str, sources: list[dict], default_hours: int) -> int:
@@ -429,7 +441,6 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
     analysis_cfg = config.get("analysis", {})
     runtime_cfg = config.get("runtime", {})
 
-    db_path = storage_cfg.get("db_path", "data/products/news/news.db")
     site_root = publish_cfg.get("site_root", "docs/news")
     feed_path = publish_cfg.get("feed_path", "docs/feeds/news.xml")
     base_url = publish_cfg.get("base_url", "")
@@ -449,7 +460,14 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
         print("\n[错误] 未配置 AI_API_KEY，无法运行 pipeline")
         sys.exit(1)
 
-    db = NewsDatabase(db_path)
+    db = _open_news_db(config)
+
+    # 前置健康检查（可观测性）
+    health = db_health_check(
+        storage_cfg.get("db_path", "data/products/news/news.db"),
+        window_since=since.astimezone(timezone.utc).replace(tzinfo=None),
+    )
+    print(f"\n[数据库状态]\n{format_health_report(health)}")
 
     # === 1. 并发抓取 ===
     print("\n[1/13] 并发抓取所有数据源...")
@@ -473,7 +491,16 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
     # === 3. 入库 ===
     print("\n[3/13] 入库...")
     fetch_stats = save_to_db(merged_items, db)
-    print(f"   新增 {sum(fetch_stats.values())} 条")
+    new_count = sum(fetch_stats.values())
+    print(f"   新增 {new_count} 条")
+
+    # 抓取可观测性日志
+    post_fetch_health = db_health_check(
+        storage_cfg.get("db_path", "data/products/news/news.db"),
+    )
+    print(f"   [可观测] 入库后文章总数: {post_fetch_health['article_count']}")
+    print(f"   [可观测] 最晚抓取时间: {post_fetch_health.get('latest_fetched_at', '未知')}")
+    print(f"   [可观测] 目标数据库: {post_fetch_health['db_path']}")
 
     # === 4-13: digest 流程 ===
     return _run_digest_phase(
@@ -504,14 +531,16 @@ def run_fetch_only(hours: int = 24) -> dict:
 
     config = _load_config()
     storage_cfg = config.get("storage", {})
-    db_path = storage_cfg.get("db_path", "data/products/news/news.db")
-
     print("=" * 60)
     print("观察日报 Pipeline — 抓取模式")
     print(f"时间窗口: 最近 {hours} 小时")
     print("=" * 60)
 
-    db = NewsDatabase(db_path)
+    db = _open_news_db(config)
+
+    # 前置健康检查（可观测性）
+    health = db_health_check(storage_cfg.get("db_path", "data/products/news/news.db"))
+    print(f"\n[数据库状态]\n{format_health_report(health)}")
 
     # 1. 并发抓取
     print("\n[1/3] 并发抓取所有数据源...")
@@ -552,8 +581,6 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
     since, until, report_date = _get_report_window(config=config)
     storage_cfg = config.get("storage", {})
     publish_cfg = config.get("publish", {})
-    db_path = storage_cfg.get("db_path", "data/products/news/news.db")
-
     # 从环境变量加载 AI 配置
     ai_config = _augment_ai_config_with_runtime(_load_ai_config(), config)
 
@@ -561,12 +588,31 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
     print("观察日报 Pipeline — Digest 模式")
     print("=" * 60)
 
-    db = NewsDatabase(db_path)
+    db = _open_news_db(config)
+
+    # 健康检查：在查询前打印数据库状态
+    window_since_utc = since.astimezone(timezone.utc).replace(tzinfo=None)
+    health = db_health_check(
+        storage_cfg.get("db_path", "data/products/news/news.db"),
+        window_since=window_since_utc,
+    )
+    print(f"\n[数据库状态]\n{format_health_report(health)}")
 
     # 从数据库读取固定晨报窗口文章，补跑不改变窗口
-    today_articles = db.fetch_since(since.astimezone(timezone.utc).replace(tzinfo=None))
+    today_articles = db.fetch_since(window_since_utc)
     if not today_articles:
-        print("\n[警告] 数据库中无最近文章，无法生成 digest")
+        if not health["db_exists"]:
+            print("\n[错误] 正式库不存在，请先执行: python3 scripts/sync_state_db.py")
+        elif health["article_count"] == 0:
+            print("\n[错误] 正式库为空，请先执行抓取或同步远端状态: python3 scripts/sync_state_db.py")
+        elif health["window_count"] == 0:
+            print(f"\n[错误] 有历史数据 ({health['article_count']} 条) 但当前窗口内无文章")
+            print(f"  最晚抓取时间: {health.get('latest_fetched_at', '未知')}")
+            print(f"  窗口起始: {health.get('window_since', '未知')}")
+            print("  可能原因: 本地数据库已停更，需要先同步远端状态或执行抓取")
+            print("  同步命令: python3 scripts/sync_state_db.py")
+        else:
+            print("\n[警告] 数据库中无最近文章，无法生成 digest")
         return {"total_selected": 0}
 
     print(f"\n从数据库加载 {len(today_articles)} 条文章")

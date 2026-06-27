@@ -35,6 +35,11 @@ echo "========================================"
 echo "四维日报生成: $TODAY $(date +%H:%M:%S)"
 echo "========================================"
 
+# 同步远端状态数据库（如果存在 news-data 分支）
+echo ""
+echo "[状态同步] 从远端恢复数据库..."
+python "$WORK_DIR/scripts/sync_state_db.py" --product news || echo "[警告] 状态同步失败，将使用本地数据库继续"
+
 # 运行 news/daily
 python "$WORK_DIR/src/run_product.py" --product news --report-type daily
 
