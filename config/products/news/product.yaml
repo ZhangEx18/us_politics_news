@@ -19,6 +19,7 @@ storage:
 format_contract:
   require_non_empty_columns: true
   require_detailed_events: true
+  require_date_in_body: true
 
 schedule:
   timezone: "Asia/Shanghai"

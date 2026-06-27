@@ -83,10 +83,21 @@ def _looks_like_english_title(text: object) -> bool:
     return len(letters) >= 12
 
 
+def _has_explicit_date_expression(text: object) -> bool:
+    value = str(text or "")
+    patterns = (
+        r"\d{1,2}\s*月\s*\d{1,2}\s*日",
+        r"20\d{2}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日",
+        r"20\d{2}-\d{1,2}-\d{1,2}",
+    )
+    return any(re.search(pattern, value) for pattern in patterns)
+
+
 def validate_report_format(meta: dict, columns: dict, report_type: str = "daily") -> list[str]:
     issues: list[str] = []
     require_non_empty_columns = bool(meta.get("require_non_empty_columns"))
     require_detailed_events = bool(meta.get("require_detailed_events"))
+    require_date_in_body = bool(meta.get("require_date_in_body"))
     for col_key in COLUMN_ORDER:
         if col_key not in columns:
             issues.append(f"缺少栏目: {col_key}")
@@ -103,6 +114,8 @@ def validate_report_format(meta: dict, columns: dict, report_type: str = "daily"
                 issues.append(f"{col_key} 标题未中文化: {title}")
             if not _has_cjk(body):
                 issues.append(f"{col_key} 正文未中文化: {title}")
+            if require_date_in_body and not _has_explicit_date_expression(body):
+                issues.append(f"{col_key} 正文缺少明确日期: {title}")
     return issues
 
 

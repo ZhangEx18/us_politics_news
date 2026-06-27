@@ -5,6 +5,7 @@ import asyncio
 from models import ScoredArticle
 from ai_analyzer import (
     _build_digest_evidence,
+    _merge_scores,
     _parse_jsonish_object,
     _score_batch_with_retry,
     merge_events,
@@ -102,6 +103,35 @@ def test_score_batch_with_retry_recovers_missing_entries(monkeypatch):
 
     assert len(scores) == 2
     assert errors == []
+
+
+def test_merge_scores_preserves_freshness_fields():
+    entries = [
+        {
+            "link": "https://example.com/1",
+            "title": "A",
+            "freshness_date": "2026-06-27",
+            "event_date": "2026-06-27",
+            "freshness_status": "today",
+        }
+    ]
+    scores = [
+        {
+            "link": "https://example.com/1",
+            "score": 90,
+            "column": "us_politics",
+            "summary": "摘要",
+            "event_key": "a_20260627",
+            "event_date": "2026-06-27",
+            "freshness_status": "recent_followup",
+        }
+    ]
+
+    merged = _merge_scores(entries, scores)
+
+    assert merged[0]["freshness_date"] == "2026-06-27"
+    assert merged[0]["event_date"] == "2026-06-27"
+    assert merged[0]["freshness_status"] == "recent_followup"
 
 
 def test_score_batch_with_retry_keeps_unresolved_errors(monkeypatch):

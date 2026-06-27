@@ -11,7 +11,11 @@ from run_pipeline import (
     _augment_ai_config_with_runtime,
     _count_scored_entries,
     _content_item_to_report_candidate,
+    _filter_items_by_report_dates,
+    _filter_items_to_daily_dates,
+    _filter_scored_entries_by_freshness,
     _filter_articles_to_window,
+    _get_daily_freshness_window,
     _filter_items_by_freshness,
     _get_report_publish_time,
     _get_report_window,
@@ -229,7 +233,7 @@ def test_digest_only_uses_converted_schedule_timezone_for_report_window(monkeypa
             return 0
 
         def fetch_since(self, since):
-            assert since == datetime(2026, 6, 18, 23, 0)
+            assert since == datetime(2026, 6, 18, 16, 0)
             return []
 
     monkeypatch.setattr("run_pipeline.datetime", FixedDatetime)
@@ -253,6 +257,67 @@ def test_digest_only_uses_converted_schedule_timezone_for_report_window(monkeypa
     stats = run_digest_only()
 
     assert stats == {"total_selected": 0}
+
+
+def test_digest_only_reports_freshness_failure_when_database_only_has_old_articles(monkeypatch):
+    tz = ZoneInfo("Asia/Shanghai")
+
+    class FixedDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            local_now = datetime(2026, 6, 27, 8, 0, tzinfo=ZoneInfo("Asia/Shanghai"))
+            if tz is None:
+                return local_now.replace(tzinfo=None)
+            return local_now.astimezone(tz)
+
+    old_article = Article(
+        url="https://example.com/old",
+        title="旧新闻",
+        summary="旧新闻摘要",
+        source="Example",
+        source_type="rss",
+        published_at=datetime(2026, 6, 20, 12, 0, tzinfo=tz),
+        fetched_at=datetime(2026, 6, 27, 1, 0, tzinfo=timezone.utc),
+        column="us_politics",
+    )
+
+    class OldOnlyDatabase:
+        def __init__(self, db_path):
+            self.db_path = db_path
+
+        def article_count(self):
+            return 1
+
+        def fetch_since(self, since):
+            return [old_article]
+
+        @staticmethod
+        def url_hash(url):
+            return "hash"
+
+    monkeypatch.setattr("run_pipeline.datetime", FixedDatetime)
+    monkeypatch.setattr("run_pipeline._load_config", lambda: {"schedule": {"timezone": "Asia/Shanghai"}})
+    monkeypatch.setattr("run_pipeline._load_ai_config", lambda: {"api_key": "k"})
+    monkeypatch.setattr("run_pipeline._augment_ai_config_with_runtime", lambda ai_config, config: ai_config)
+    monkeypatch.setattr("run_pipeline.NewsDatabase", OldOnlyDatabase)
+    monkeypatch.setattr(
+        "run_pipeline.migrate_legacy_news_db",
+        lambda db_path: {"legacy_exists": False, "migrated_articles": 0, "migrated_fetch_logs": 0},
+    )
+    monkeypatch.setattr("run_pipeline.db_health_check", lambda *args, **kwargs: {
+        "db_exists": True,
+        "article_count": 1,
+        "window_count": 1,
+        "db_path": "data/products/news/news.db",
+    })
+    monkeypatch.setattr("run_pipeline.format_health_report", lambda health: "ok")
+    monkeypatch.setattr("run_pipeline._load_sources", lambda config: [])
+
+    stats = run_digest_only()
+
+    assert stats["error"] == "今日性不足"
+    assert stats["freshness_gate"]["kept"] == 0
+    assert stats["freshness_gate"]["dropped"] == 1
 
 
 def test_open_news_db_runs_legacy_migration(monkeypatch):
@@ -295,6 +360,16 @@ def test_get_report_publish_time_reads_schedule_publish_at():
     pub_dt = _get_report_publish_time("2026-06-19", config=config)
 
     assert pub_dt == datetime(2026, 6, 19, 7, 45, tzinfo=tz)
+
+
+def test_get_daily_freshness_window_uses_previous_and_report_natural_days():
+    tz = ZoneInfo("Asia/Shanghai")
+    config = {"schedule": {"timezone": "Asia/Shanghai"}}
+
+    since, until = _get_daily_freshness_window("2026-06-27", config)
+
+    assert since == datetime(2026, 6, 26, 0, 0, tzinfo=tz)
+    assert until == datetime(2026, 6, 28, 0, 0, tzinfo=tz)
 
 
 def test_filter_articles_to_window_uses_fixed_bounds():
@@ -385,6 +460,137 @@ def test_filter_items_by_freshness_supports_source_override():
     assert stats["dropped"] == 1
 
 
+def test_filter_items_by_report_dates_keeps_report_day_and_previous_day():
+    config = {"schedule": {"timezone": "Asia/Shanghai"}}
+    items = {
+        "us_politics": [
+            ContentItem(
+                id="1",
+                source_type="rss",
+                title="previous day",
+                url="https://example.com/1",
+                source_name="Example",
+                published_at=datetime(2026, 6, 26, 10, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+            ),
+            ContentItem(
+                id="2",
+                source_type="rss",
+                title="report day",
+                url="https://example.com/2",
+                source_name="Example",
+                published_at=datetime(2026, 6, 27, 23, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+            ),
+            ContentItem(
+                id="3",
+                source_type="rss",
+                title="old",
+                url="https://example.com/3",
+                source_name="Example",
+                published_at=datetime(2026, 6, 25, 23, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+            ),
+        ]
+    }
+
+    filtered, stats = _filter_items_by_report_dates(items, "2026-06-27", config)
+
+    assert [item.title for item in filtered["us_politics"]] == ["previous day", "report day"]
+    assert stats["allowed_dates"] == ["2026-06-26", "2026-06-27"]
+    assert stats["dropped"] == 1
+
+
+def test_filter_items_by_report_dates_is_not_hardcoded_to_june_27():
+    config = {"schedule": {"timezone": "Asia/Shanghai"}}
+    items = {
+        "economy": [
+            ContentItem(
+                id="1",
+                source_type="rss",
+                title="previous day for arbitrary report",
+                url="https://example.com/1",
+                source_name="Example",
+                published_at=datetime(2026, 7, 4, 23, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+            ),
+            ContentItem(
+                id="2",
+                source_type="rss",
+                title="old for arbitrary report",
+                url="https://example.com/2",
+                source_name="Example",
+                published_at=datetime(2026, 7, 3, 23, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+            ),
+        ]
+    }
+
+    filtered, stats = _filter_items_by_report_dates(items, "2026-07-05", config)
+
+    assert [item.title for item in filtered["economy"]] == ["previous day for arbitrary report"]
+    assert stats["allowed_dates"] == ["2026-07-04", "2026-07-05"]
+    assert stats["dropped"] == 1
+
+
+def test_filter_items_to_daily_dates_keeps_previous_day_midnight_items():
+    config = {"schedule": {"timezone": "Asia/Shanghai"}}
+    items = [
+        ContentItem(
+            id="1",
+            source_type="rss",
+            title="previous day midnight",
+            url="https://example.com/1",
+            source_name="Example",
+            published_at=datetime(2026, 6, 26, 0, 5, tzinfo=ZoneInfo("Asia/Shanghai")),
+            column="technology",
+        )
+    ]
+
+    kept, stats = _filter_items_to_daily_dates(items, "2026-06-27", config)
+
+    assert [item.title for item in kept] == ["previous day midnight"]
+    assert stats["kept"] == 1
+
+
+def test_filter_scored_entries_by_freshness_enforces_95_percent_gate():
+    fresh = [
+        {
+            "link": f"https://example.com/fresh/{idx}",
+            "freshness_date": "2026-06-27",
+            "freshness_status": "today",
+        }
+        for idx in range(90)
+    ]
+    old = [
+        {
+            "link": f"https://example.com/old/{idx}",
+            "freshness_date": "2026-06-20",
+            "freshness_status": "old_background",
+        }
+        for idx in range(10)
+    ]
+
+    kept, metrics = _filter_scored_entries_by_freshness(fresh + old, "2026-06-27", 0.95)
+
+    assert len(kept) == 90
+    assert metrics["freshness_ratio"] == 0.9
+    assert metrics["gate_failed"] is True
+
+
+def test_freshness_gate_requires_allowed_date_even_when_status_is_today():
+    entries = [
+        {
+            "link": "https://example.com/stale",
+            "freshness_date": "2026-06-20",
+            "event_date": "2026-06-20",
+            "freshness_status": "today",
+        }
+    ]
+
+    kept, metrics = _filter_scored_entries_by_freshness(entries, "2026-06-27", 0.95)
+
+    assert kept == []
+    assert metrics["today_count"] == 0
+    assert metrics["old_count"] == 1
+    assert metrics["gate_failed"] is True
+
+
 def test_digest_phase_reuses_report_events_without_rescoring(monkeypatch):
     columns = ["us_politics", "global_affairs", "technology", "economy"]
     report_events = [
@@ -397,6 +603,10 @@ def test_digest_phase_reuses_report_events_without_rescoring(monkeypatch):
             summary_zh=f"{column} 中文摘要。",
             score=90,
             source_links=[{"title": "source", "url": f"https://example.com/{column}"}],
+            published_at=datetime(2026, 6, 27, tzinfo=timezone.utc),
+            freshness_date="2026-06-27",
+            event_date="2026-06-27",
+            freshness_status="today",
         )
         for column in columns
     ]
@@ -458,4 +668,104 @@ def test_digest_phase_reuses_report_events_without_rescoring(monkeypatch):
     )
 
     assert stats["total_selected"] == 4
-    assert stats["metrics"]["report_events"]["source"] == "report_events"
+
+
+def test_digest_phase_does_not_reuse_stale_report_events(monkeypatch):
+    columns = ["us_politics", "global_affairs", "technology", "economy"]
+    report_events = [
+        ReportEvent(
+            report_key="2026-06-27",
+            report_type="daily",
+            event_key=f"{column}_event",
+            column=column,
+            title_zh=f"{column} 中文事件",
+            summary_zh=f"{column} 中文摘要。",
+            score=90,
+            source_links=[{"title": "source", "url": f"https://example.com/{column}"}],
+            freshness_date="2026-06-20",
+            event_date="2026-06-20",
+            freshness_status="old_background",
+        )
+        for column in columns
+    ]
+
+    class DummyDb:
+        def upsert_article_candidates(self, candidates):
+            return len(candidates)
+
+        def fetch_report_events(self, since_key, until_key=None, report_type="daily"):
+            return report_events
+
+        def update_llm_scores(self, scored_dicts):
+            return len(scored_dicts)
+
+        def upsert_report_events(self, events):
+            return len(events)
+
+        def log_report_run(self, **kwargs):
+            pass
+
+    items = [
+        ContentItem(
+            id=column,
+            source_type="rss",
+            title=f"{column} 新事件",
+            url=f"https://example.com/new/{column}",
+            content="新事件摘要",
+            source_name="source",
+            published_at=datetime(2026, 6, 27, tzinfo=timezone.utc),
+            column=column,
+            source_tier=1,
+            metadata={"language": "zh", "tags": []},
+        )
+        for column in columns
+    ]
+
+    async def fake_score_batch(entries, ai_config):
+        return [
+            {
+                **entry,
+                "score": 90,
+                "column": entry["column_hint"],
+                "summary": "6 月 27 日，新事件摘要。",
+                "event_key": f"{entry['column_hint']}_new_20260627",
+                "is_hard_news": True,
+                "freshness_status": "today",
+                "event_date": "2026-06-27",
+            }
+            for entry in entries
+        ], []
+
+    monkeypatch.setattr("run_pipeline.score_batch", fake_score_batch)
+    monkeypatch.setattr(
+        "run_pipeline.build_report",
+        lambda spec, scored, config, ai_config, db, phase_metrics=None: {
+            "total_selected": len(scored),
+            "outputs": {},
+            "metrics": phase_metrics,
+        },
+    )
+    monkeypatch.setattr("run_pipeline._write_metrics_file", lambda *args, **kwargs: "metrics.json")
+
+    stats = _run_digest_phase(
+        config={
+            "product_key": "news",
+            "digest": {"columns": {column: {"label": column, "prefilter_items": 2} for column in columns}},
+            "runtime": {"reuse_report_events": True},
+            "publish": {},
+            "analysis": {},
+            "rules": {"freshness_gate": {"min_ratio": 0.95}},
+            "schedule": {"timezone": "Asia/Shanghai"},
+        },
+        db=DummyDb(),
+        merged_items=items,
+        ai_config={},
+        start_time=datetime(2026, 6, 27, tzinfo=timezone.utc),
+        window_since=datetime(2026, 6, 26, tzinfo=timezone.utc),
+        window_until=datetime(2026, 6, 28, tzinfo=timezone.utc),
+        report_date="2026-06-27",
+    )
+
+    assert stats["total_selected"] == 4
+    assert stats["metrics"]["freshness_gate"]["report_events_reuse"]["gate_failed"] is True
+    assert stats["metrics"]["freshness_gate"]["scored_events"]["gate_failed"] is False

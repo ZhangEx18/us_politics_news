@@ -13,6 +13,7 @@
 import os
 import re
 import shutil
+import hashlib
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -107,16 +108,19 @@ def _build_item_xml_from_manifest(
     link: str,
     pub_date: datetime,
     guid: str,
+    revision: str | None = None,
 ) -> str:
     """从 manifest 字段直接构建 RSS <item> XML 片段。"""
     pub_date_text = _rfc2822(pub_date)
+    item_guid = f"{guid}?v={revision}" if revision else guid
+    item_link = f"{link}?v={revision}" if revision and "?" not in link else link
     return f"""    <item>
       <title>{_escape_xml(title)}</title>
-      <link>{_escape_xml(link)}</link>
+      <link>{_escape_xml(item_link)}</link>
       <description><![CDATA[{_escape_cdata(short_description)}]]></description>
       <content:encoded><![CDATA[{_escape_cdata(html_body)}]]></content:encoded>
       <pubDate>{pub_date_text}</pubDate>
-      <guid isPermaLink="false">{_escape_xml(guid)}</guid>
+      <guid isPermaLink="false">{_escape_xml(item_guid)}</guid>
     </item>"""
 
 
@@ -144,6 +148,17 @@ def _extract_item_guid(item_xml: str) -> str | None:
     return guid
 
 
+def _report_identity_from_guid(guid: str | None) -> str | None:
+    """用于 feed 内去重：同一报告的不同内容修订仍只保留一条 item。"""
+    if not guid:
+        return None
+    return guid.split("?v=", 1)[0]
+
+
+def _extract_item_identity(item_xml: str) -> str | None:
+    return _report_identity_from_guid(_extract_item_guid(item_xml))
+
+
 def _extract_item_date(item_xml: str) -> str | None:
     """向后兼容：从 item 片段中提取日期部分（YYYY-MM-DD）"""
     guid = _extract_item_guid(item_xml)
@@ -161,15 +176,15 @@ def _merge_items(new_item: str, existing_items: list[str], max_days: int = 30) -
     同 guid 替换，不同 guid 共存。超出 max_days 的旧 daily item 被裁剪。
     """
     cutoff = (datetime.now() - timedelta(days=max_days)).strftime("%Y-%m-%d")
-    new_guid = _extract_item_guid(new_item)
+    new_identity = _extract_item_identity(new_item)
 
     merged: list[str] = [new_item]
     for item in existing_items:
-        item_guid = _extract_item_guid(item)
-        if item_guid is None:
+        item_identity = _extract_item_identity(item)
+        if item_identity is None:
             continue
-        # 同 guid 的旧 item 跳过（已被新 item 替换）
-        if new_guid and item_guid == new_guid:
+        # 同一报告的旧 item 跳过（已被新 item 替换）
+        if new_identity and item_identity == new_identity:
             continue
         # 裁剪超出保留天数的 daily 类型 item
         item_date = _extract_item_date(item)
@@ -183,6 +198,11 @@ def _merge_items(new_item: str, existing_items: list[str], max_days: int = 30) -
 
     merged.sort(key=_sort_key, reverse=True)
     return merged
+
+
+def _feed_revision(title: str, short_description: str, html_body: str) -> str:
+    payload = "\n".join([title, short_description, html_body])
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
 
 
 def build_feed(items: list[str], base_url: str = "") -> str:
@@ -283,7 +303,16 @@ def save_feed(
 
     # 构建今天的 item
     link = f"{base_url}/{link_path}" if base_url else link_path
-    new_item = _build_item_xml_from_manifest(title, short_description, html_body, link, pub_date, guid)
+    revision = _feed_revision(title, short_description, html_body)
+    new_item = _build_item_xml_from_manifest(
+        title,
+        short_description,
+        html_body,
+        link,
+        pub_date,
+        guid,
+        revision=revision,
+    )
 
     # 读取已有 feed，合并历史 items
     existing_items: list[str] = []

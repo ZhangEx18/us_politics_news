@@ -355,6 +355,24 @@ def test_validate_report_format_requires_detailed_events_when_configured():
     assert "栏目缺少重点解析: us_politics" in issues
 
 
+def test_validate_report_format_requires_date_expression_when_configured():
+    meta = {
+        "date": "2026-06-27",
+        "title": "观察日报",
+        "require_date_in_body": True,
+    }
+    columns = {
+        "us_politics": {"detailed_events": [{"title_zh": "美国事件", "reader_body": "白宫发布政策正文。"}]},
+        "global_affairs": {"detailed_events": [{"title_zh": "国际事件", "reader_body": "6 月 27 日，国际事件正文。"}]},
+        "technology": {"detailed_events": [{"title_zh": "科技事件", "reader_body": "6 月 26 日，科技事件正文。"}]},
+        "economy": {"detailed_events": [{"title_zh": "经济事件", "reader_body": "2026-06-27，经济事件正文。"}]},
+    }
+
+    issues = validate_report_format(meta, columns, report_type="daily")
+
+    assert any("正文缺少明确日期" in issue for issue in issues)
+
+
 def test_save_daily_report_syncs_news_legacy_aliases(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     meta = {"date": "2026-06-27", "title": "观察日报", "highlights": ["要点"]}

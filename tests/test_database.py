@@ -128,6 +128,9 @@ def test_database_candidate_event_and_run_layers_are_idempotent(tmp_path):
         event_key="white_house_policy_20260627",
         published_at=published,
         fetched_at=published,
+        freshness_date="2026-06-27",
+        event_date="2026-06-27",
+        freshness_status="today",
     )
 
     assert db.upsert_article_candidates([candidate]) == 1
@@ -136,6 +139,8 @@ def test_database_candidate_event_and_run_layers_are_idempotent(tmp_path):
     candidates = db.fetch_article_candidates("2026-06-27", status="selected")
     assert len(candidates) == 1
     assert candidates[0].event_key == "white_house_policy_20260627"
+    assert candidates[0].freshness_date == "2026-06-27"
+    assert candidates[0].freshness_status == "today"
 
     event = ReportEvent(
         report_key="2026-06-27",
@@ -148,6 +153,9 @@ def test_database_candidate_event_and_run_layers_are_idempotent(tmp_path):
         source_links=[{"title": "Example", "url": "https://example.com/a"}],
         tags="official,policy",
         published_at=published,
+        freshness_date="2026-06-27",
+        event_date="2026-06-27",
+        freshness_status="today",
     )
 
     assert db.upsert_report_events([event]) == 1
@@ -157,6 +165,8 @@ def test_database_candidate_event_and_run_layers_are_idempotent(tmp_path):
     assert len(events) == 1
     assert events[0].title_zh == "白宫宣布政策更新"
     assert events[0].source_links[0]["url"] == "https://example.com/a"
+    assert events[0].freshness_date == "2026-06-27"
+    assert events[0].freshness_status == "today"
 
     run_id = db.log_report_run(
         "2026-06-27",

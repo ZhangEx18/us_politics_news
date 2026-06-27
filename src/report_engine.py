@@ -323,6 +323,7 @@ def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
     max_chars = cfg.get("max_chars", 260)
     min_sentences = cfg.get("min_sentences", 2)
     max_sentences = cfg.get("max_sentences", 4)
+    require_date_in_body = bool(cfg.get("require_date_in_body", False))
 
     issues: list[str] = []
     body = str(event.get("reader_body", "")).strip()
@@ -340,6 +341,11 @@ def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
         issues.append(f"字数过少: {char_count} 字（要求 {min_chars}-{max_chars} 字）")
     elif char_count > max_chars:
         issues.append(f"字数过多: {char_count} 字（要求 {min_chars}-{max_chars} 字）")
+    if require_date_in_body and not re.search(
+        r"(\d{1,2}\s*月\s*\d{1,2}\s*日|20\d{2}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日|20\d{2}-\d{1,2}-\d{1,2})",
+        body,
+    ):
+        issues.append("缺少明确日期表达")
     return issues
 
 
@@ -756,7 +762,11 @@ def build_report(
 
     # ── 质量门禁 ──
     print(f"\n[门禁] 质量检查...")
-    gate_config = config.get("rules", {}).get("quality_gate")
+    gate_config = dict(config.get("rules", {}).get("quality_gate") or {})
+    if spec.report_type == "daily":
+        gate_config["require_date_in_body"] = bool(
+            config.get("format_contract", {}).get("require_date_in_body", False)
+        )
     total_issues = 0
     for col_key in list(column_results.keys()):
         events = column_results[col_key]
@@ -836,6 +846,9 @@ def build_report(
         ),
         "require_detailed_events": bool(
             config.get("format_contract", {}).get("require_detailed_events", False)
+        ),
+        "require_date_in_body": bool(
+            config.get("format_contract", {}).get("require_date_in_body", False)
         ),
         "overview": overview_payload,
         "report_since": spec.since.isoformat(),

@@ -160,6 +160,41 @@ def test_save_feed_uses_meta_pub_date_for_reeder_timestamp():
     assert pub_date.group(1) == "Fri, 19 Jun 2026 08:00:00 +0800"
 
 
+def test_save_feed_changes_guid_revision_when_same_day_content_changes():
+    meta = {"title": "2026年6月19日 日报", "lead": "", "highlights": [], "date": "2026-06-19"}
+    columns_v1 = {
+        "us_politics": [{"title_zh": "事件一", "reader_body": "6 月 19 日，第一版正文。"}],
+        "global_affairs": [],
+        "technology": [],
+        "economy": [],
+    }
+    columns_v2 = {
+        "us_politics": [{"title_zh": "事件一", "reader_body": "6 月 19 日，第二版正文。"}],
+        "global_affairs": [],
+        "technology": [],
+        "economy": [],
+    }
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = os.path.join(tmpdir, "feed.xml")
+        save_feed(meta=meta, columns=columns_v1, output_path=path, base_url="https://example.com")
+        first = open(path, encoding="utf-8").read()
+        first_guid = re.search(r"<guid[^>]*>([^<]+)</guid>", first).group(1)
+
+        save_feed(meta=meta, columns=columns_v2, output_path=path, base_url="https://example.com")
+        second = open(path, encoding="utf-8").read()
+        second_guid = re.search(r"<guid[^>]*>([^<]+)</guid>", second).group(1)
+        second_link = re.findall(r"<link>([^<]+)</link>", second)[-1]
+
+    assert first_guid.startswith("daily/2026-06-19?v=")
+    assert second_guid.startswith("daily/2026-06-19?v=")
+    assert first_guid != second_guid
+    assert second.count("<item>") == 1
+    assert "第二版正文" in second
+    assert "第一版正文" not in second
+    assert "daily/2026-06-19.html?v=" in second_link
+
+
 def test_save_feed_syncs_legacy_news_alias(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     meta = {"title": "2026年6月27日 日报", "lead": "", "highlights": [], "date": "2026-06-27"}
