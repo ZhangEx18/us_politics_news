@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from database import Article
+from database import Article, ReportEvent
 from models import ContentItem
 from run_pipeline import (
     main,
@@ -19,6 +19,7 @@ from run_pipeline import (
     _is_cn_source_item,
     _load_schedule_config,
     _open_news_db,
+    _run_digest_phase,
     _is_hard_news_entry,
     run_digest_only,
 )
@@ -382,3 +383,79 @@ def test_filter_items_by_freshness_supports_source_override():
 
     assert [item.title for item in kept] == ["fresh enough", "allowed for slow feed"]
     assert stats["dropped"] == 1
+
+
+def test_digest_phase_reuses_report_events_without_rescoring(monkeypatch):
+    columns = ["us_politics", "global_affairs", "technology", "economy"]
+    report_events = [
+        ReportEvent(
+            report_key="2026-06-27",
+            report_type="daily",
+            event_key=f"{column}_event",
+            column=column,
+            title_zh=f"{column} 中文事件",
+            summary_zh=f"{column} 中文摘要。",
+            score=90,
+            source_links=[{"title": "source", "url": f"https://example.com/{column}"}],
+        )
+        for column in columns
+    ]
+
+    class DummyDb:
+        def upsert_article_candidates(self, candidates):
+            return len(candidates)
+
+        def fetch_report_events(self, since_key, until_key=None, report_type="daily"):
+            assert since_key == "2026-06-27"
+            assert until_key == "2026-06-28"
+            return report_events
+
+        def log_report_run(self, **kwargs):
+            pass
+
+    item = ContentItem(
+        id="1",
+        source_type="rss",
+        title="事件标题",
+        url="https://example.com/a",
+        content="事件摘要",
+        source_name="source",
+        published_at=datetime(2026, 6, 27, tzinfo=timezone.utc),
+        column="us_politics",
+        source_tier=1,
+        metadata={"language": "zh", "tags": []},
+    )
+
+    monkeypatch.setattr(
+        "run_pipeline.score_batch",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("不应重新评分")),
+    )
+    monkeypatch.setattr(
+        "run_pipeline.build_report",
+        lambda spec, scored, config, ai_config, db, phase_metrics=None: {
+            "total_selected": len(scored),
+            "outputs": {},
+            "metrics": phase_metrics,
+        },
+    )
+    monkeypatch.setattr("run_pipeline._write_metrics_file", lambda *args, **kwargs: "metrics.json")
+
+    stats = _run_digest_phase(
+        config={
+            "product_key": "news",
+            "digest": {"columns": {column: {"label": column, "prefilter_items": 1} for column in columns}},
+            "runtime": {"reuse_report_events": True},
+            "publish": {},
+            "analysis": {},
+        },
+        db=DummyDb(),
+        merged_items=[item],
+        ai_config={},
+        start_time=datetime(2026, 6, 27, tzinfo=timezone.utc),
+        window_since=datetime(2026, 6, 26, tzinfo=timezone.utc),
+        window_until=datetime(2026, 6, 27, tzinfo=timezone.utc),
+        report_date="2026-06-27",
+    )
+
+    assert stats["total_selected"] == 4
+    assert stats["metrics"]["report_events"]["source"] == "report_events"
