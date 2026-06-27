@@ -115,7 +115,7 @@ def article_to_content_item(article: "Article", url_hash_fn=None) -> "ContentIte
 
 
 class NewsDatabase:
-    def __init__(self, db_path: str = "data/news.db"):
+    def __init__(self, db_path: str = "data/products/news/news.db"):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_tables()
