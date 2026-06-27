@@ -2,6 +2,10 @@ name: Daily Publish
 on:
   workflow_dispatch:
 
+# ⚠️ 此 workflow 已废弃，请使用 publish-product.yml 替代。
+# 保留此文件仅为历史兼容，所有新逻辑请走 publish-product workflow。
+# 本文件已统一到正式路径 data/products/news/news.db，不再写入旧路径。
+
 permissions:
   contents: write
 
@@ -23,11 +27,41 @@ jobs:
 
       - name: Restore database from news-data branch
         run: |
-          mkdir -p data
-          git ls-remote --exit-code --heads origin news-data >/dev/null 2>&1 || { echo "news-data 分支不存在"; exit 1; }
-          git fetch origin news-data
-          git show origin/news-data:data/news.db > data/news.db
-          test -s data/news.db || { echo "数据库恢复失败"; exit 1; }
+          DB_PATH="data/products/news/news.db"
+          LEGACY_DB_PATH="data/news.db"
+          STATE_BRANCH="news-data"
+          CANDIDATE_DIR=$(mktemp -d)
+
+          mkdir -p "$(dirname "$DB_PATH")"
+          if git ls-remote --exit-code --heads origin "$STATE_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$STATE_BRANCH"
+            CANONICAL_CANDIDATE="$CANDIDATE_DIR/canonical.db"
+            LEGACY_CANDIDATE="$CANDIDATE_DIR/legacy.db"
+            CANONICAL_SIZE=0
+            LEGACY_SIZE=0
+
+            if git show "origin/${STATE_BRANCH}:${DB_PATH}" > "$CANONICAL_CANDIDATE" 2>/dev/null; then
+              CANONICAL_SIZE=$(wc -c < "$CANONICAL_CANDIDATE")
+            fi
+            if git show "origin/${STATE_BRANCH}:${LEGACY_DB_PATH}" > "$LEGACY_CANDIDATE" 2>/dev/null; then
+              LEGACY_SIZE=$(wc -c < "$LEGACY_CANDIDATE")
+            fi
+
+            if [ "$CANONICAL_SIZE" -gt 0 ] && [ "$CANONICAL_SIZE" -ge "$LEGACY_SIZE" ]; then
+              cp "$CANONICAL_CANDIDATE" "$DB_PATH"
+            elif [ "$LEGACY_SIZE" -gt 0 ]; then
+              cp "$LEGACY_CANDIDATE" "$DB_PATH"
+            fi
+
+            if [ -s "$DB_PATH" ]; then
+              echo "已从 origin/${STATE_BRANCH} 恢复数据库到 ${DB_PATH}"
+              ls -lh "$DB_PATH"
+            else
+              echo "分支存在但数据库为空，将创建新数据库"
+            fi
+          else
+            echo "${STATE_BRANCH} 分支不存在，将创建新数据库"
+          fi
 
       - name: Restore published pages state
         run: python3 scripts/sync_pages_state.py restore
@@ -73,17 +107,19 @@ jobs:
 
       - name: Persist database to news-data branch
         run: |
-          test -f data/news.db || { echo "数据库文件不存在"; exit 1; }
+          DB_PATH="data/products/news/news.db"
+          STATE_BRANCH="news-data"
+          test -f "$DB_PATH" || { echo "数据库文件不存在: $DB_PATH"; exit 1; }
           TMP_DIR=$(mktemp -d)
-          mkdir -p "$TMP_DIR/data"
-          cp data/news.db "$TMP_DIR/data/news.db"
+          mkdir -p "$TMP_DIR/$(dirname "$DB_PATH")"
+          cp "$DB_PATH" "$TMP_DIR/$DB_PATH"
           printf "*.pyc\n__pycache__/\n.DS_Store\n" > "$TMP_DIR/.gitignore"
           cd "$TMP_DIR"
           git init
-          git checkout -b news-data
+          git checkout -b "$STATE_BRANCH"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/news.db .gitignore
+          git add "$DB_PATH" .gitignore
           git commit -m "Update news database"
           git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git push origin HEAD:news-data --force
+          git push origin "HEAD:${STATE_BRANCH}" --force

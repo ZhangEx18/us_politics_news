@@ -29,6 +29,7 @@ import yaml
 _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(_project_root)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(_project_root, "scripts"))
 
 from ai_analyzer import score_batch, _load_ai_config
 from config import (
@@ -97,15 +98,35 @@ def _augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
 
 
 def _open_news_db(config: dict) -> NewsDatabase:
+    """打开正式数据库，自动执行：旧库迁移 → 远端状态同步（空库时）→ 返回实例。"""
+    from sync_state_db import sync_product_db
+
     storage_cfg = config.get("storage", {})
     db_path = storage_cfg.get("db_path", "data/products/news/news.db")
+    product_key = config.get("product_key", "news")
+
+    # 1. 旧库迁移
     migration = migrate_legacy_news_db(db_path)
     if migration["legacy_exists"] and (migration["migrated_articles"] or migration["migrated_fetch_logs"]):
         print(
             f"[数据库] 已从旧库迁移到正式库: "
             f"{migration['migrated_articles']} 篇文章, {migration['migrated_fetch_logs']} 条抓取日志"
         )
-    return NewsDatabase(db_path)
+
+    # 2. 空库或不存在时，自动从远端 state branch 同步
+    db = NewsDatabase(db_path)
+    if db.article_count() == 0:
+        print(f"[数据库] 本地库为空，尝试从远端 {product_key} 状态分支同步...")
+        result = sync_product_db(product_key)
+        if result["restored"]:
+            print(f"[数据库] 已从 {result['source_ref']} 恢复: {result['article_count']} 条文章")
+            if result.get("latest_fetched_at"):
+                print(f"[数据库] 最晚抓取时间: {result['latest_fetched_at']}")
+            db = NewsDatabase(db_path)
+        elif result.get("error"):
+            print(f"[数据库] 远端同步未成功: {result['error']}")
+
+    return db
 
 
 def _get_source_max_age_hours(source_name: str, sources: list[dict], default_hours: int) -> int:

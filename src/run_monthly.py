@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from database import NewsDatabase
 from ai_analyzer import _load_ai_config
 from config import load_config, augment_ai_config_with_runtime
+from run_pipeline import _open_news_db
 from report_engine import ReportSpec, build_report
 from report_titles import build_monthly_title
 
@@ -58,7 +59,7 @@ def run_monthly() -> dict:
     analysis_cfg = config.get("analysis", {})
     publish_cfg = config.get("publish", {})
 
-    db_path = storage_cfg.get("db_path", "data/news.db")
+    db = _open_news_db(config)
 
     # === 1. 计算时间窗口 ===
     since, until, report_key = _get_monthly_window()
@@ -66,7 +67,6 @@ def run_monthly() -> dict:
     print(f"[月报] 窗口: {since.strftime('%Y-%m-%d %H:%M')} → {until.strftime('%Y-%m-%d %H:%M')}  标识: {report_key}")
 
     # === 2. 从数据库读取文章 ===
-    db = NewsDatabase(db_path)
     since_utc = since.astimezone(tz=None).replace(tzinfo=None)
     all_articles = db.fetch_since(since_utc)
     print(f"[月报] 数据库返回 {len(all_articles)} 条")

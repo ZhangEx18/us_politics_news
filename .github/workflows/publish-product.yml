@@ -245,17 +245,12 @@ jobs:
       - name: Persist state database
         run: |
           DB_PATH="${{ steps.config.outputs.db_path }}"
-          LEGACY_DB_PATH="${{ steps.config.outputs.legacy_db_path }}"
           STATE_BRANCH="${{ steps.config.outputs.state_branch }}"
           test -f "$DB_PATH" || { echo "数据库文件不存在: $DB_PATH"; exit 1; }
 
           TMP_DIR=$(mktemp -d)
           mkdir -p "$TMP_DIR/$(dirname "$DB_PATH")"
           cp "$DB_PATH" "$TMP_DIR/$DB_PATH"
-          if [ -n "$LEGACY_DB_PATH" ] && [ "$LEGACY_DB_PATH" != "$DB_PATH" ]; then
-            mkdir -p "$TMP_DIR/$(dirname "$LEGACY_DB_PATH")"
-            cp "$DB_PATH" "$TMP_DIR/$LEGACY_DB_PATH"
-          fi
           printf "*.pyc\n__pycache__/\n.DS_Store\n" > "$TMP_DIR/.gitignore"
           cd "$TMP_DIR"
           git init
@@ -263,9 +258,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$DB_PATH" .gitignore
-          if [ -n "$LEGACY_DB_PATH" ] && [ "$LEGACY_DB_PATH" != "$DB_PATH" ]; then
-            git add "$LEGACY_DB_PATH"
-          fi
           git commit -m "Update ${STATE_BRANCH} database"
           git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
           git push origin "HEAD:${STATE_BRANCH}" --force
