@@ -68,6 +68,7 @@ def augment_ai_config_with_runtime(ai_config: dict, config: dict) -> dict:
         "score_max_prompt_chars": llm_cfg.get("score_max_prompt_chars", llm_cfg.get("max_prompt_chars", 12000)),
         "score_max_concurrent": llm_cfg.get("score_max_concurrent", max(1, min(llm_cfg.get("max_concurrent", 3), 2))),
         "score_timeout_seconds": llm_cfg.get("score_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),
+        "score_wall_timeout_seconds": llm_cfg.get("score_wall_timeout_seconds", 0),
         "score_content_chars": llm_cfg.get("score_content_chars", 400),
         "score_retry_split_depth": llm_cfg.get("score_retry_split_depth", 3),
         "digest_timeout_seconds": llm_cfg.get("digest_timeout_seconds", llm_cfg.get("timeout_seconds", 180)),

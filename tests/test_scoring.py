@@ -3,7 +3,7 @@
 import asyncio
 
 from models import ScoredArticle
-from ai_analyzer import _build_digest_evidence, _score_batch_with_retry, merge_events
+from ai_analyzer import _build_digest_evidence, _score_batch_with_retry, merge_events, score_batch
 
 
 # ── ScoredArticle 默认值 ──
@@ -156,6 +156,49 @@ def test_score_batch_with_retry_splits_on_high_risk_rejection(monkeypatch):
 
     assert len(scores) == 2
     assert errors == []
+
+
+def test_score_batch_wall_timeout_keeps_finished_batches(monkeypatch):
+    entries = [
+        {
+            "link": "https://example.com/1",
+            "title": "A",
+            "content": "a" * 50,
+            "source": "test",
+        },
+        {
+            "link": "https://example.com/2",
+            "title": "B",
+            "content": "b" * 50,
+            "source": "test",
+        },
+    ]
+
+    async def fake_score_batch_with_retry(batch, config, batch_index=0, depth=0):
+        if batch_index == 0:
+            return (
+                [{"link": batch[0]["link"], "score": 90, "column": "us_politics", "summary": "ok", "event_key": "a_20260627"}],
+                [],
+            )
+        await asyncio.sleep(1)
+        return [], []
+
+    monkeypatch.setattr("ai_analyzer._score_batch_with_retry", fake_score_batch_with_retry)
+
+    scores, errors = asyncio.run(
+        score_batch(
+            entries,
+            {
+                "score_max_prompt_chars": 40,
+                "score_max_concurrent": 2,
+                "score_wall_timeout_seconds": 0.05,
+            },
+        )
+    )
+
+    scored = [item for item in scores if item.get("score")]
+    assert len(scored) == 1
+    assert any("评分总耗时超过" in err for err in errors)
 
 
 def test_merge_events_preserves_source_evidence_for_writer():

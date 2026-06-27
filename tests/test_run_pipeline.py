@@ -157,6 +157,7 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
             "score_max_concurrent": 2,
             "score_max_prompt_chars": 9000,
             "score_timeout_seconds": 120,
+            "score_wall_timeout_seconds": 420,
             "score_content_chars": 400,
             "score_retry_split_depth": 3,
             "digest_timeout_seconds": 240,
@@ -173,6 +174,7 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
     assert ai_config["score_max_concurrent"] == 2
     assert ai_config["score_max_prompt_chars"] == 9000
     assert ai_config["score_timeout_seconds"] == 120
+    assert ai_config["score_wall_timeout_seconds"] == 420
     assert ai_config["score_content_chars"] == 400
     assert ai_config["score_retry_split_depth"] == 3
     assert ai_config["digest_timeout_seconds"] == 240
