@@ -30,11 +30,14 @@ from config import load_product_config
 
 
 def _run_git(args: list[str], cwd: Path = _project_root) -> subprocess.CompletedProcess[str]:
+    env = os.environ.copy()
+    env.setdefault("GIT_TERMINAL_PROMPT", "0")
     return subprocess.run(
         ["git", *args],
         cwd=cwd,
         capture_output=True,
         text=True,
+        env=env,
         check=False,
     )
 
@@ -46,19 +49,15 @@ def _resolve_state_branch(product_key: str) -> str:
     return f"{product_key}-state"
 
 
-def _resolve_db_paths(config: dict) -> tuple[str, str | None]:
-    """返回 (canonical_db_path, legacy_db_path | None)。"""
+def _resolve_db_path(config: dict) -> str:
+    """返回正式数据库路径。"""
     db_path = config.get("storage", {}).get("db_path", "data/products/news/news.db")
-    legacy_db_path = None
-    if config.get("product_key") == "news":
-        legacy_db_path = "data/news.db"
-    return db_path, legacy_db_path
+    return db_path
 
 
 def _restore_db_from_branch(
     state_branch: str,
     db_path: str,
-    legacy_db_path: str | None,
     dry_run: bool = False,
 ) -> dict:
     """从远端 state 分支恢复数据库。返回恢复结果 dict。"""
@@ -89,44 +88,25 @@ def _restore_db_from_branch(
         result["error"] = f"拉取 origin/{state_branch} 失败: {fetch_result.stderr.strip()}"
         return result
 
-    # 尝试恢复：优先 canonical 路径，其次 legacy 路径
+    # 只恢复正式路径
     tmp_dir = tempfile.mkdtemp()
     try:
         canonical_candidate = os.path.join(tmp_dir, "canonical.db")
-        legacy_candidate = os.path.join(tmp_dir, "legacy.db")
         canonical_size = 0
-        legacy_size = 0
 
-        # 尝试 canonical 路径
         cat_result = _run_git(["show", f"origin/{state_branch}:{db_path}"])
         if cat_result.returncode == 0:
             Path(canonical_candidate).write_bytes(cat_result.stdout.encode("latin-1"))
             canonical_size = Path(canonical_candidate).stat().st_size
 
-        # 尝试 legacy 路径
-        if legacy_db_path:
-            cat_result = _run_git(["show", f"origin/{state_branch}:{legacy_db_path}"])
-            if cat_result.returncode == 0:
-                Path(legacy_candidate).write_bytes(cat_result.stdout.encode("latin-1"))
-                legacy_size = Path(legacy_candidate).stat().st_size
-
-        # 选择更大的那个
-        source = None
-        if canonical_size > 0 and canonical_size >= legacy_size:
-            source = canonical_candidate
-            result["source_ref"] = f"origin/{state_branch}:{db_path}"
-        elif legacy_size > 0:
-            source = legacy_candidate
-            result["source_ref"] = f"origin/{state_branch}:{legacy_db_path}"
-
-        if source is None:
+        if canonical_size <= 0:
             result["error"] = f"分支存在但数据库文件为空"
             return result
+        result["source_ref"] = f"origin/{state_branch}:{db_path}"
 
-        # 写入目标路径
         target = Path(db_path)
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        shutil.copy2(canonical_candidate, target)
         result["restored"] = True
 
         # 读取恢复后的数据库状态
@@ -154,9 +134,9 @@ def _restore_db_from_branch(
 def sync_product_db(product_key: str = "news", dry_run: bool = False) -> dict:
     """同步指定产品的数据库状态。"""
     config = load_product_config(product_key)
-    db_path, legacy_db_path = _resolve_db_paths(config)
+    db_path = _resolve_db_path(config)
     state_branch = _resolve_state_branch(product_key)
-    return _restore_db_from_branch(state_branch, db_path, legacy_db_path, dry_run=dry_run)
+    return _restore_db_from_branch(state_branch, db_path, dry_run=dry_run)
 
 
 def main() -> None:

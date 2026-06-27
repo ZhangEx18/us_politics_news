@@ -110,7 +110,7 @@ def test_publish_product_workflow_reads_config_dynamically():
     assert "state_branch" in config_step["run"]
 
 
-def test_publish_product_restore_state_uses_branch_ref_with_fallback_paths():
+def test_publish_product_restore_state_only_uses_canonical_path():
     workflow = _load_workflow("publish-product.yml")
     publish_job = workflow["jobs"]["publish"]
 
@@ -120,13 +120,9 @@ def test_publish_product_restore_state_uses_branch_ref_with_fallback_paths():
     )
     run = restore_step["run"]
 
-    assert 'git show "origin/${STATE_BRANCH}:${ref_path}"' in run
-    assert 'CANONICAL_CANDIDATE="$CANDIDATE_DIR/canonical.db"' in run
-    assert 'LEGACY_CANDIDATE="$CANDIDATE_DIR/legacy.db"' in run
-    assert 'restore_db_from_ref "$DB_PATH" "$CANONICAL_CANDIDATE"' in run
-    assert 'restore_db_from_ref "$LEGACY_DB_PATH" "$LEGACY_CANDIDATE"' in run
-    assert 'if [ "$CANONICAL_SIZE" -gt 0 ] && [ "$CANONICAL_SIZE" -ge "$LEGACY_SIZE" ]; then' in run
-    assert 'elif [ "$LEGACY_SIZE" -gt 0 ]; then' in run
+    assert 'git show "origin/${STATE_BRANCH}:${DB_PATH}" > "$DB_PATH"' in run
+    assert "LEGACY_DB_PATH" not in run
+    assert "restore_db_from_ref" not in run
     assert 'ls -lh "$DB_PATH"' in run
 
 
@@ -212,3 +208,25 @@ def test_legacy_fetch_and_publish_workflows_are_manual_only():
 
     assert _workflow_triggers(fetch_workflow) == {"workflow_dispatch": None}
     assert _workflow_triggers(publish_workflow) == {"workflow_dispatch": None}
+
+
+def test_fetch_workflow_only_reads_and_writes_canonical_news_db():
+    workflow = _load_workflow("fetch.yml")
+    fetch_job = workflow["jobs"]["fetch"]
+
+    restore_step = next(
+        step for step in fetch_job["steps"]
+        if step.get("name") == "Restore database from news-data branch"
+    )
+    persist_step = next(
+        step for step in fetch_job["steps"]
+        if step.get("name") == "Persist database to news-data branch"
+    )
+
+    assert 'DB_PATH="data/products/news/news.db"' in restore_step["run"]
+    assert "LEGACY_DB_PATH" not in restore_step["run"]
+    assert 'git show "origin/${STATE_BRANCH}:${DB_PATH}" > "$DB_PATH"' in restore_step["run"]
+
+    assert 'DB_PATH="data/products/news/news.db"' in persist_step["run"]
+    assert "LEGACY_DB_PATH" not in persist_step["run"]
+    assert 'git add "$DB_PATH" .gitignore' in persist_step["run"]
