@@ -429,6 +429,31 @@ def _scored_entries_to_report_events(
     return events
 
 
+def _report_event_to_scored_dict(event: ReportEvent) -> dict:
+    primary_link = event.source_links[0] if event.source_links else {}
+    return {
+        "link": primary_link.get("url", ""),
+        "title": event.title_zh,
+        "title_zh": event.title_zh,
+        "source": primary_link.get("title", ""),
+        "score": event.score,
+        "summary": event.summary_zh,
+        "content": event.summary_zh,
+        "tags": [t.strip() for t in (event.tags or "").split(",") if t.strip()],
+        "event_key": event.event_key,
+        "column": event.column,
+        "source_tier": 2,
+        "is_hard_news": True,
+        "source_links": event.source_links,
+    }
+
+
+def _has_events_for_required_columns(events: list[ReportEvent], columns_cfg: dict) -> bool:
+    expected = set(columns_cfg.keys()) or {"us_politics", "global_affairs", "technology", "economy"}
+    covered = {event.column for event in events if event.column}
+    return expected.issubset(covered)
+
+
 def _log_digest_run(
     db: NewsDatabase,
     *,
@@ -790,6 +815,111 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
     )
 
 
+def _build_and_log_digest_report(
+    *,
+    config: dict,
+    db: NewsDatabase,
+    hard_news_scored: list[dict],
+    fallback_candidates_by_column: dict[str, list[dict]],
+    phase_metrics: dict,
+    start_time: datetime,
+    phase_start: datetime,
+    window_since: datetime,
+    window_until: datetime,
+    report_date: str,
+    report_type: str,
+    product_key: str,
+    site_root: str,
+    daily_dir: str,
+    feed_path: str,
+    base_url: str,
+    history_days: int,
+    columns_cfg: dict,
+    digest_cfg: dict,
+    analysis_cfg: dict,
+    ai_config: dict,
+    merged_count: int,
+    candidate_count: int,
+    ai_duration: float,
+    score_errors: list[str],
+) -> dict:
+    """构造并保存日报，供新评分路径和事件库复用路径共享。"""
+    spec = ReportSpec(
+        product_key=product_key,
+        report_type=report_type,
+        report_key=report_date,
+        title=build_daily_title(report_date),
+        since=window_since,
+        until=window_until,
+        site_root=site_root,
+        output_dir=daily_dir,
+        feed_path=feed_path,
+        base_url=base_url,
+        column_quotas=columns_cfg,
+        word_count_min=digest_cfg.get("column", {}).get("target_word_count_min", 2500),
+        word_count_max=digest_cfg.get("column", {}).get("target_word_count_max", 5000),
+        highlights_limit=8,
+        allow_headline_only=True,
+        pub_date=_get_report_publish_time(report_date, config=config),
+        history_days=history_days,
+        min_llm_score=analysis_cfg.get("min_llm_score", 65),
+        fallback_candidates_by_column=fallback_candidates_by_column,
+    )
+
+    try:
+        stats = build_report(spec, hard_news_scored, config, ai_config, db, phase_metrics=phase_metrics)
+    except Exception as exc:
+        _log_digest_run(
+            db,
+            report_key=report_date,
+            report_type=report_type,
+            status="render_failed",
+            window_since=window_since,
+            window_until=window_until,
+            input_count=merged_count,
+            candidate_count=candidate_count,
+            selected_count=len(hard_news_scored),
+            ai_duration_seconds=ai_duration,
+            error_count=len(score_errors) + 1,
+            metrics={**phase_metrics, "render_error": str(exc)},
+        )
+        raise
+
+    stats["total_fetched"] = merged_count
+    metrics_payload = stats.get("metrics") or {
+        **phase_metrics,
+        "report": {
+            "title": spec.title,
+            "published_at": spec.pub_date.isoformat() if spec.pub_date else "",
+            "duration_seconds": round((datetime.now() - start_time).total_seconds(), 1),
+        },
+    }
+    metrics_path = _write_metrics_file(site_root, metrics_payload)
+    stats.setdefault("outputs", {})["metrics"] = metrics_path
+    stats["metrics"] = metrics_payload
+    outputs = stats.get("outputs", {})
+    _log_digest_run(
+        db,
+        report_key=report_date,
+        report_type=report_type,
+        status="ok" if stats.get("total_selected", 0) else "empty",
+        window_since=window_since,
+        window_until=window_until,
+        input_count=merged_count,
+        candidate_count=candidate_count,
+        selected_count=stats.get("total_selected", 0),
+        ai_duration_seconds=ai_duration,
+        error_count=len(score_errors),
+        output_md_path=str(outputs.get("markdown", "")),
+        output_html_path=str(outputs.get("html", "")),
+        metrics={
+            **metrics_payload,
+            "duration_seconds": round((datetime.now() - phase_start).total_seconds(), 1),
+        },
+    )
+    return stats
+
+
 def _run_digest_phase(
     config: dict,
     db: NewsDatabase,
@@ -862,6 +992,54 @@ def _run_digest_phase(
         "total": len(candidates),
     }
     print(f"   候选池记录: {len(candidates)} 条")
+
+    reuse_events_cfg = runtime_cfg.get("reuse_report_events", True)
+    next_report_date = (datetime.strptime(report_date, "%Y-%m-%d") + timedelta(days=1)).date().isoformat()
+    stored_events = (
+        db.fetch_report_events(report_date, next_report_date, report_type=report_type)
+        if reuse_events_cfg and report_type == "daily"
+        else []
+    )
+    if stored_events and _has_events_for_required_columns(stored_events, columns_cfg):
+        print(f"   复用事件库: {len(stored_events)} 条，跳过 AI 评分")
+        hard_news_scored = [_report_event_to_scored_dict(event) for event in stored_events]
+        phase_metrics["report_events"] = {
+            "reused": len(stored_events),
+            "source": "report_events",
+        }
+        phase_metrics["ai"]["score_errors"] = 0
+        phase_metrics["ai"]["score_duration_seconds"] = 0
+        fallback_candidates_by_column = {
+            col_key: [_content_item_to_report_candidate(item) for item in items]
+            for col_key, items in prefiltered_by_column.items()
+        }
+        return _build_and_log_digest_report(
+            config=config,
+            db=db,
+            hard_news_scored=hard_news_scored,
+            fallback_candidates_by_column=fallback_candidates_by_column,
+            phase_metrics=phase_metrics,
+            start_time=start_time,
+            phase_start=phase_start,
+            window_since=window_since,
+            window_until=window_until,
+            report_date=report_date,
+            report_type=report_type,
+            product_key=product_key,
+            site_root=site_root,
+            daily_dir=daily_dir,
+            feed_path=feed_path,
+            base_url=base_url,
+            history_days=history_days,
+            columns_cfg=columns_cfg,
+            digest_cfg=digest_cfg,
+            analysis_cfg=analysis_cfg,
+            ai_config=ai_config,
+            merged_count=len(merged_items),
+            candidate_count=len(candidates),
+            ai_duration=0.0,
+            score_errors=[],
+        )
 
     entries_for_scoring, _ = _build_scoring_entries_by_column(prefiltered_by_column)
     print(f"   送评总数: {len(entries_for_scoring)} 条")
@@ -948,82 +1126,33 @@ def _run_digest_phase(
     phase_metrics["cn_source_selected_by_column"] = cn_selected_by_column
 
     # === 7+. 构造 ReportSpec，委托 report_engine 完成后续阶段 ===
-    spec = ReportSpec(
-        product_key=product_key,
-        report_type=report_type,
-        report_key=report_date,
-        title=build_daily_title(report_date),
-        since=window_since,
-        until=window_until,
-        site_root=site_root,
-        output_dir=daily_dir,
-        feed_path=feed_path,
-        base_url=base_url,
-        column_quotas=columns_cfg,
-        word_count_min=digest_cfg.get("column", {}).get("target_word_count_min", 2500),
-        word_count_max=digest_cfg.get("column", {}).get("target_word_count_max", 5000),
-        highlights_limit=8,
-        allow_headline_only=True,
-        pub_date=_get_report_publish_time(report_date, config=config),
-        history_days=history_days,
-        min_llm_score=analysis_cfg.get("min_llm_score", 65),
+    return _build_and_log_digest_report(
+        config=config,
+        db=db,
+        hard_news_scored=hard_news_scored,
         fallback_candidates_by_column=fallback_candidates_by_column,
-    )
-
-    try:
-        stats = build_report(spec, hard_news_scored, config, ai_config, db, phase_metrics=phase_metrics)
-    except Exception as exc:
-        _log_digest_run(
-            db,
-            report_key=report_date,
-            report_type=report_type,
-            status="render_failed",
-            window_since=window_since,
-            window_until=window_until,
-            input_count=len(merged_items),
-            candidate_count=len(candidates),
-            selected_count=len(hard_news_scored),
-            ai_duration_seconds=ai_duration,
-            error_count=len(score_errors) + 1,
-            metrics={**phase_metrics, "render_error": str(exc)},
-        )
-        raise
-
-    # 补充 pipeline 阶段统计
-    stats["total_fetched"] = len(merged_items)
-    output_root = site_root
-    metrics_payload = stats.get("metrics") or {
-        **phase_metrics,
-        "report": {
-            "title": spec.title,
-            "published_at": spec.pub_date.isoformat() if spec.pub_date else "",
-            "duration_seconds": round((datetime.now() - start_time).total_seconds(), 1),
-        },
-    }
-    metrics_path = _write_metrics_file(output_root, metrics_payload)
-    stats.setdefault("outputs", {})["metrics"] = metrics_path
-    stats["metrics"] = metrics_payload
-    outputs = stats.get("outputs", {})
-    _log_digest_run(
-        db,
-        report_key=report_date,
-        report_type=report_type,
-        status="ok" if stats.get("total_selected", 0) else "empty",
+        phase_metrics=phase_metrics,
+        start_time=start_time,
+        phase_start=phase_start,
         window_since=window_since,
         window_until=window_until,
-        input_count=len(merged_items),
+        report_date=report_date,
+        report_type=report_type,
+        product_key=product_key,
+        site_root=site_root,
+        daily_dir=daily_dir,
+        feed_path=feed_path,
+        base_url=base_url,
+        history_days=history_days,
+        columns_cfg=columns_cfg,
+        digest_cfg=digest_cfg,
+        analysis_cfg=analysis_cfg,
+        ai_config=ai_config,
+        merged_count=len(merged_items),
         candidate_count=len(candidates),
-        selected_count=stats.get("total_selected", 0),
-        ai_duration_seconds=ai_duration,
-        error_count=len(score_errors),
-        output_md_path=str(outputs.get("markdown", "")),
-        output_html_path=str(outputs.get("html", "")),
-        metrics={
-            **metrics_payload,
-            "duration_seconds": round((datetime.now() - phase_start).total_seconds(), 1),
-        },
+        ai_duration=ai_duration,
+        score_errors=score_errors,
     )
-    return stats
 
 
 def main():
