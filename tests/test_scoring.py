@@ -129,6 +129,35 @@ def test_score_batch_with_retry_keeps_unresolved_errors(monkeypatch):
     assert any("拆分后仍缺失" in err for err in errors)
 
 
+def test_score_batch_with_retry_splits_on_high_risk_rejection(monkeypatch):
+    entries = [
+        {"link": "https://example.com/1", "title": "A"},
+        {"link": "https://example.com/2", "title": "B"},
+    ]
+
+    async def fake_score_single_batch(batch, config, batch_index=0):
+        if len(batch) == 2:
+            return [], ["批次1 评分失败: ValueError: high risk"]
+        item = batch[0]
+        return (
+            [{"link": item["link"], "score": 90, "column": "us_politics", "summary": "ok", "event_key": "x_20260627"}],
+            [],
+        )
+
+    monkeypatch.setattr("ai_analyzer._score_single_batch", fake_score_single_batch)
+
+    scores, errors = asyncio.run(
+        _score_batch_with_retry(
+            entries,
+            {"score_retry_split_depth": 2},
+            batch_index=0,
+        )
+    )
+
+    assert len(scores) == 2
+    assert errors == []
+
+
 def test_merge_events_preserves_source_evidence_for_writer():
     items = [
         {

@@ -1,6 +1,12 @@
 """日报渲染测试 — Reader 专用输出"""
 
-from report_renderer import render_reader_content, render_structured_html, render_structured_markdown
+from report_renderer import (
+    render_reader_content,
+    render_structured_html,
+    render_structured_markdown,
+    save_daily_report,
+    validate_report_format,
+)
 
 
 def test_render_reader_content_is_plain_article_fragment():
@@ -317,3 +323,35 @@ def test_render_structured_markdown_escapes_overview_markdown_control_text():
     assert "![图片](https://example.com/x.png)" not in markdown
     assert "\n## 伪标题\n" not in markdown
     assert "&gt; 引用" in markdown
+
+
+def test_validate_report_format_rejects_english_detailed_title():
+    meta = {"date": "2026-06-27", "title": "观察日报"}
+    columns = {
+        "us_politics": {"detailed_events": [{"title_zh": "White House announces policy update", "reader_body": "白宫发布政策。"}]},
+        "global_affairs": {"detailed_events": [{"title_zh": "国际事件", "reader_body": "国际事件正文。"}]},
+        "technology": {"detailed_events": [{"title_zh": "科技事件", "reader_body": "科技事件正文。"}]},
+        "economy": {"detailed_events": [{"title_zh": "经济事件", "reader_body": "经济事件正文。"}]},
+    }
+
+    issues = validate_report_format(meta, columns, report_type="daily")
+
+    assert any("标题未中文化" in issue for issue in issues)
+
+
+def test_save_daily_report_syncs_news_legacy_aliases(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    meta = {"date": "2026-06-27", "title": "观察日报", "highlights": ["要点"]}
+    columns = {
+        "us_politics": {"detailed_events": [{"title_zh": "美国事件", "reader_body": "美国事件正文。"}]},
+        "global_affairs": {"detailed_events": [{"title_zh": "国际事件", "reader_body": "国际事件正文。"}]},
+        "technology": {"detailed_events": [{"title_zh": "科技事件", "reader_body": "科技事件正文。"}]},
+        "economy": {"detailed_events": [{"title_zh": "经济事件", "reader_body": "经济事件正文。"}]},
+    }
+
+    md_path, html_path = save_daily_report(meta, columns, "docs/news/daily", report_type="daily")
+
+    assert (tmp_path / md_path).exists()
+    assert (tmp_path / html_path).exists()
+    assert (tmp_path / "docs" / "daily" / "2026-06-27.md").exists()
+    assert (tmp_path / "docs" / "daily" / "2026-06-27.html").exists()

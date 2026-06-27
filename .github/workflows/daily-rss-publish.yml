@@ -1,5 +1,7 @@
 name: Daily RSS Publish
 on:
+  schedule:
+    - cron: '30 23 * * *'
   workflow_dispatch:
     inputs:
       digest_only:

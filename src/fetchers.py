@@ -45,6 +45,13 @@ class BaseFetcher:
             return await resp.json()
 
 
+def _format_fetch_error(exc: Exception) -> str:
+    detail = str(exc).strip()
+    if detail:
+        return f"{type(exc).__name__}: {detail}"
+    return type(exc).__name__
+
+
 def _resolve_fetch_mode(source: dict) -> str:
     """向后兼容旧配置，同时允许新配置显式指定抓取模式。"""
     explicit = str(source.get("fetch_mode", "")).strip().lower()
@@ -181,7 +188,7 @@ class RSSFetcher(BaseFetcher):
                         ),
                     ))
             except Exception as e:
-                print(f"  [RSS] {feed_cfg['name']} 失败: {e}")
+                print(f"  [RSS] {feed_cfg['name']} 失败: {_format_fetch_error(e)}")
         return items
 
 
@@ -201,6 +208,21 @@ class GDELTFetcher(BaseFetcher):
             {"name": "economy_fed", "query": "Federal Reserve OR inflation OR interest rate", "column": "economy"},
             {"name": "economy_trade", "query": "tariff OR trade war OR supply chain", "column": "economy"},
         ]
+
+    @staticmethod
+    def _parse_article_datetime(article: dict) -> Optional[datetime]:
+        for field in ("seendate", "socialimage_timestamp"):
+            raw = article.get(field)
+            if not raw or not isinstance(raw, str):
+                continue
+            value = raw.strip()
+            try:
+                if len(value) == 14 and value.isdigit():
+                    return datetime.strptime(value, "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
+                return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
+            except ValueError:
+                continue
+        return None
 
     async def fetch(self, since: datetime) -> List[ContentItem]:
         items = []
@@ -222,6 +244,7 @@ class GDELTFetcher(BaseFetcher):
                 )
                 for a in data.get("articles", []):
                     url_hash = self._hash_id(a.get("url", ""))
+                    published_at = self._parse_article_datetime(a)
                     items.append(ContentItem(
                         id=self._generate_id("gdelt", q["name"], url_hash),
                         source_type=SourceType.GDELT,
@@ -229,13 +252,13 @@ class GDELTFetcher(BaseFetcher):
                         url=a.get("url", ""),
                         content="",
                         source_name=a.get("domain", "GDELT"),
-                        published_at=None,
+                        published_at=published_at,
                         column=q["column"],
                         source_tier=4,
                         source_url_normalized=normalize_url(a.get("url", "")),
                     ))
             except Exception as e:
-                print(f"  [GDELT] '{q['name']}' 失败: {e}")
+                print(f"  [GDELT] '{q['name']}' 失败: {_format_fetch_error(e)}")
         return items
 
 
@@ -283,7 +306,7 @@ class HackerNewsFetcher(BaseFetcher):
                 except Exception:
                     continue
         except Exception as e:
-            print(f"  [HN] 失败: {e}")
+            print(f"  [HN] 失败: {_format_fetch_error(e)}")
         return items
 
 
@@ -322,7 +345,7 @@ class GoogleNewsFetcher(BaseFetcher):
                         metadata=_build_item_metadata(feed_cfg),
                     ))
             except Exception as e:
-                print(f"  [Google News] '{feed_cfg['name']}' 失败: {e}")
+                print(f"  [Google News] '{feed_cfg['name']}' 失败: {_format_fetch_error(e)}")
         return items
 
 
@@ -353,7 +376,7 @@ class CustomFeedFetcher(BaseFetcher):
             try:
                 items.extend(await handler(source_cfg, since))
             except Exception as exc:
-                print(f"  [Custom] {source_cfg['name']} 失败: {exc}")
+                print(f"  [Custom] {source_cfg['name']} 失败: {_format_fetch_error(exc)}")
         return items
 
     async def _fetch_feed_like_page(self, source_cfg: dict, since: datetime) -> List[ContentItem]:
@@ -470,7 +493,7 @@ async def _fetch_with_progress(name: str, fetcher: BaseFetcher, since: datetime)
         print(f"  ⏰ {name}: 超时跳过")
         return []
     except Exception as e:
-        print(f"  ❌ {name}: {str(e)[:60]}")
+        print(f"  ❌ {name}: {_format_fetch_error(e)[:120]}")
         return []
 
 
