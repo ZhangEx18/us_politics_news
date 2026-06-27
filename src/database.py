@@ -55,6 +55,9 @@ class ArticleCandidate:
     published_at: Optional[datetime] = None
     fetched_at: Optional[datetime] = None
     source_url_normalized: str = ""
+    freshness_date: str = ""
+    event_date: str = ""
+    freshness_status: str = ""
 
 
 @dataclass
@@ -70,6 +73,9 @@ class ReportEvent:
     quality_status: str = "ok"
     tags: str = ""
     published_at: Optional[datetime] = None
+    freshness_date: str = ""
+    event_date: str = ""
+    freshness_status: str = ""
 
 
 # v2 新增列列表（用于幂等迁移）
@@ -83,6 +89,19 @@ _V2_COLUMNS = [
     ("llm_tags", "TEXT DEFAULT ''"),
     ("llm_reason", "TEXT DEFAULT ''"),
 ]
+
+_REPORT_LAYER_COLUMNS: dict[str, list[tuple[str, str]]] = {
+    "article_candidates": [
+        ("freshness_date", "TEXT DEFAULT ''"),
+        ("event_date", "TEXT DEFAULT ''"),
+        ("freshness_status", "TEXT DEFAULT ''"),
+    ],
+    "report_events": [
+        ("freshness_date", "TEXT DEFAULT ''"),
+        ("event_date", "TEXT DEFAULT ''"),
+        ("freshness_status", "TEXT DEFAULT ''"),
+    ],
+}
 
 
 def _to_utc_storage(dt: Optional[datetime]) -> str | None:
@@ -154,6 +173,7 @@ class NewsDatabase:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_tables()
         self._migrate_v2()
+        self._migrate_report_layers()
         self._migrate_legacy_datetimes()
 
     def _connect(self):
@@ -216,6 +236,9 @@ class NewsDatabase:
                     published_at TEXT,
                     fetched_at TEXT,
                     source_url_normalized TEXT DEFAULT '',
+                    freshness_date TEXT DEFAULT '',
+                    event_date TEXT DEFAULT '',
+                    freshness_status TEXT DEFAULT '',
                     created_at TEXT NOT NULL,
                     UNIQUE(report_key, report_type, url_hash)
                 );
@@ -234,6 +257,9 @@ class NewsDatabase:
                     quality_status TEXT DEFAULT 'ok',
                     tags TEXT DEFAULT '',
                     published_at TEXT,
+                    freshness_date TEXT DEFAULT '',
+                    event_date TEXT DEFAULT '',
+                    freshness_status TEXT DEFAULT '',
                     created_at TEXT NOT NULL,
                     UNIQUE(report_key, report_type, event_key, "column")
                 );
@@ -269,6 +295,15 @@ class NewsDatabase:
                     conn.execute(f"ALTER TABLE articles ADD COLUMN {col_name} {col_def}")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_column ON articles(\"column\")")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_event_key ON articles(event_key)")
+
+    def _migrate_report_layers(self):
+        """幂等迁移：为候选池和事件库补充今日性字段。"""
+        with self._connect() as conn:
+            for table, columns in _REPORT_LAYER_COLUMNS.items():
+                existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+                for col_name, col_def in columns:
+                    if col_name not in existing:
+                        conn.execute(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_def}")
 
     def _migrate_legacy_datetimes(self):
         """把旧版本写入的本地 naive 时间迁移为显式 UTC ISO。"""
@@ -518,6 +553,9 @@ class NewsDatabase:
                 _to_utc_storage(candidate.published_at),
                 _to_utc_storage(candidate.fetched_at),
                 normalized,
+                candidate.freshness_date,
+                candidate.event_date,
+                candidate.freshness_status,
                 now,
             ))
         with self._connect() as conn:
@@ -526,8 +564,9 @@ class NewsDatabase:
                 """INSERT INTO article_candidates
                 (report_key, report_type, url_hash, url, title, source, "column",
                  candidate_score, source_tier, reason, status, event_key,
-                 published_at, fetched_at, source_url_normalized, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 published_at, fetched_at, source_url_normalized,
+                 freshness_date, event_date, freshness_status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(report_key, report_type, url_hash) DO UPDATE SET
                     title = excluded.title,
                     source = excluded.source,
@@ -539,7 +578,10 @@ class NewsDatabase:
                     event_key = excluded.event_key,
                     published_at = excluded.published_at,
                     fetched_at = excluded.fetched_at,
-                    source_url_normalized = excluded.source_url_normalized""",
+                    source_url_normalized = excluded.source_url_normalized,
+                    freshness_date = excluded.freshness_date,
+                    event_date = excluded.event_date,
+                    freshness_status = excluded.freshness_status""",
                 rows,
             )
             return conn.total_changes - before
@@ -575,6 +617,9 @@ class NewsDatabase:
                 published_at=_from_utc_storage(row["published_at"]),
                 fetched_at=_from_utc_storage(row["fetched_at"]),
                 source_url_normalized=row["source_url_normalized"] or "",
+                freshness_date=row["freshness_date"] or "",
+                event_date=row["event_date"] or "",
+                freshness_status=row["freshness_status"] or "",
             )
             for row in rows
         ]
@@ -596,6 +641,9 @@ class NewsDatabase:
                 event.quality_status,
                 event.tags,
                 _to_utc_storage(event.published_at),
+                event.freshness_date,
+                event.event_date,
+                event.freshness_status,
                 now,
             )
             for event in events
@@ -606,8 +654,9 @@ class NewsDatabase:
             conn.executemany(
                 """INSERT INTO report_events
                 (report_key, report_type, event_key, "column", title_zh, summary_zh,
-                 score, source_links_json, quality_status, tags, published_at, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 score, source_links_json, quality_status, tags, published_at,
+                 freshness_date, event_date, freshness_status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(report_key, report_type, event_key, "column") DO UPDATE SET
                     title_zh = excluded.title_zh,
                     summary_zh = excluded.summary_zh,
@@ -615,7 +664,10 @@ class NewsDatabase:
                     source_links_json = excluded.source_links_json,
                     quality_status = excluded.quality_status,
                     tags = excluded.tags,
-                    published_at = excluded.published_at""",
+                    published_at = excluded.published_at,
+                    freshness_date = excluded.freshness_date,
+                    event_date = excluded.event_date,
+                    freshness_status = excluded.freshness_status""",
                 rows,
             )
             return conn.total_changes - before
@@ -657,6 +709,9 @@ class NewsDatabase:
                 quality_status=row["quality_status"] or "ok",
                 tags=row["tags"] or "",
                 published_at=_from_utc_storage(row["published_at"]),
+                freshness_date=row["freshness_date"] or "",
+                event_date=row["event_date"] or "",
+                freshness_status=row["freshness_status"] or "",
             ))
         return events
 

@@ -239,6 +239,156 @@ def _item_recency_hours(item: ContentItem, now: datetime) -> float:
     return max((now_utc - ref).total_seconds() / 3600, 0.0)
 
 
+def _allowed_freshness_dates(report_date: str) -> set[str]:
+    """日报今日性口径：报告日自然日 + 前一自然日。"""
+    report_day = datetime.strptime(report_date, "%Y-%m-%d").date()
+    return {
+        (report_day - timedelta(days=1)).isoformat(),
+        report_day.isoformat(),
+    }
+
+
+def _freshness_reference_dt(item: ContentItem, config: dict | None = None) -> datetime | None:
+    ref = item.published_at or item.fetched_at
+    if ref is None:
+        return None
+    if ref.tzinfo is None:
+        ref = ref.replace(tzinfo=timezone.utc)
+    return ref.astimezone(_get_schedule_timezone(config))
+
+
+def _freshness_date_for_item(item: ContentItem, config: dict | None = None) -> str:
+    ref = _freshness_reference_dt(item, config)
+    return ref.date().isoformat() if ref else ""
+
+
+def _freshness_status_for_date(freshness_date: str, allowed_dates: set[str]) -> str:
+    if not freshness_date:
+        return "unknown_date"
+    return "today" if freshness_date in allowed_dates else "old_background"
+
+
+def _parse_entry_datetime(value: object) -> datetime | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    try:
+        dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def _filter_items_by_report_dates(
+    items_by_column: dict[str, list[ContentItem]],
+    report_date: str,
+    config: dict | None = None,
+) -> tuple[dict[str, list[ContentItem]], dict[str, object]]:
+    """候选送评前按报告日自然日过滤，旧内容不能进入日报主输入。"""
+    allowed = _allowed_freshness_dates(report_date)
+    filtered: dict[str, list[ContentItem]] = {}
+    dropped_by_column: dict[str, int] = {}
+    kept = 0
+    dropped = 0
+
+    for col_key, items in items_by_column.items():
+        col_items: list[ContentItem] = []
+        for item in items:
+            freshness_date = _freshness_date_for_item(item, config)
+            if freshness_date in allowed:
+                col_items.append(item)
+                kept += 1
+                continue
+            dropped += 1
+            dropped_by_column[col_key] = dropped_by_column.get(col_key, 0) + 1
+        filtered[col_key] = col_items
+
+    return filtered, {
+        "allowed_dates": sorted(allowed),
+        "kept": kept,
+        "dropped": dropped,
+        "dropped_by_column": dropped_by_column,
+    }
+
+
+def _filter_items_to_daily_dates(
+    items: list[ContentItem],
+    report_date: str,
+    config: dict | None = None,
+) -> tuple[list[ContentItem], dict[str, object]]:
+    """日报级自然日过滤：只保留报告日和前一日的条目。"""
+    by_column: dict[str, list[ContentItem]] = {}
+    for item in items:
+        by_column.setdefault(item.column or "unknown", []).append(item)
+    filtered_by_column, stats = _filter_items_by_report_dates(by_column, report_date, config)
+    filtered: list[ContentItem] = []
+    for col_items in filtered_by_column.values():
+        filtered.extend(col_items)
+    return filtered, stats
+
+
+def _freshness_metrics(entries: list[dict], allowed_dates: set[str]) -> dict[str, object]:
+    total = 0
+    today_count = 0
+    old_count = 0
+    unknown_count = 0
+    status_counts: dict[str, int] = {}
+
+    for entry in entries:
+        total += 1
+        status = str(entry.get("freshness_status") or "").strip()
+        freshness_date = str(entry.get("freshness_date") or "").strip()
+        event_date = str(entry.get("event_date") or "").strip()
+        if not status:
+            status = _freshness_status_for_date(event_date or freshness_date, allowed_dates)
+        status_counts[status] = status_counts.get(status, 0) + 1
+        date_ok = bool((event_date or freshness_date) in allowed_dates or freshness_date in allowed_dates)
+        if status in {"today", "recent_followup"} and date_ok:
+            today_count += 1
+        elif status == "unknown_date":
+            unknown_count += 1
+        else:
+            old_count += 1
+
+    ratio = (today_count / total) if total else 0.0
+    return {
+        "total": total,
+        "freshness_ratio": ratio,
+        "today_count": today_count,
+        "old_count": old_count,
+        "unknown_date_count": unknown_count,
+        "status_counts": status_counts,
+        "allowed_dates": sorted(allowed_dates),
+    }
+
+
+def _entry_passes_freshness(entry: dict, allowed_dates: set[str]) -> bool:
+    status = str(entry.get("freshness_status") or "").strip()
+    freshness_date = str(entry.get("freshness_date") or "").strip()
+    event_date = str(entry.get("event_date") or "").strip()
+    if status in {"today", "recent_followup"}:
+        return bool((event_date or freshness_date) in allowed_dates or freshness_date in allowed_dates)
+    return (event_date or freshness_date) in allowed_dates
+
+
+def _filter_scored_entries_by_freshness(
+    entries: list[dict],
+    report_date: str,
+    min_ratio: float,
+) -> tuple[list[dict], dict[str, object]]:
+    allowed = _allowed_freshness_dates(report_date)
+    fresh_entries = [entry for entry in entries if _entry_passes_freshness(entry, allowed)]
+    metrics = _freshness_metrics(entries, allowed)
+    metrics["fresh_after_gate"] = len(fresh_entries)
+    if entries and metrics["freshness_ratio"] < min_ratio:
+        metrics["gate_failed"] = True
+    else:
+        metrics["gate_failed"] = False
+    return fresh_entries, metrics
+
+
 def _keyword_bonus(item: ContentItem) -> int:
     """按栏目关键词给预筛选打额外权重。"""
     keywords = _COLUMN_KEYWORDS.get(item.column or "us_politics", ())
@@ -289,11 +439,14 @@ def _content_items_to_candidates(
     report_key: str,
     report_type: str,
     now: datetime | None = None,
+    config: dict | None = None,
 ) -> list[ArticleCandidate]:
     now = now or datetime.now(timezone.utc)
+    allowed_dates = _allowed_freshness_dates(report_key) if report_type == "daily" else set()
     candidates: list[ArticleCandidate] = []
     for col_key, items in items_by_column.items():
         for item in items:
+            freshness_date = _freshness_date_for_item(item, config)
             candidates.append(ArticleCandidate(
                 report_key=report_key,
                 report_type=report_type,
@@ -309,6 +462,12 @@ def _content_items_to_candidates(
                 published_at=item.published_at,
                 fetched_at=item.fetched_at,
                 source_url_normalized=item.source_url_normalized or normalize_url(str(item.url)),
+                freshness_date=freshness_date,
+                event_date=freshness_date,
+                freshness_status=(
+                    _freshness_status_for_date(freshness_date, allowed_dates)
+                    if allowed_dates else ""
+                ),
             ))
     return candidates
 
@@ -354,31 +513,42 @@ def _prefilter_items_for_scoring(
 
 def _build_scoring_entries_by_column(
     column_items: dict[str, list[ContentItem]],
+    report_date: str | None = None,
+    config: dict | None = None,
 ) -> tuple[list[dict], dict[str, list[dict]]]:
     """将预筛后的 ContentItem 转成评分输入，同时保留按栏目映射。"""
+    allowed_dates = _allowed_freshness_dates(report_date) if report_date else set()
     all_entries: list[dict] = []
     by_column_entries: dict[str, list[dict]] = {}
     for col_key, items in column_items.items():
-        entries = [
-            {
+        entries = []
+        for item in items:
+            freshness_date = _freshness_date_for_item(item, config)
+            entries.append({
                 "link": str(item.url),
                 "title": item.title,
                 "source": item.source_name,
                 "published": item.published_at.isoformat() if item.published_at else "",
+                "fetched": item.fetched_at.isoformat() if item.fetched_at else "",
+                "freshness_date": freshness_date,
+                "event_date": freshness_date,
+                "freshness_status": (
+                    _freshness_status_for_date(freshness_date, allowed_dates)
+                    if allowed_dates else ""
+                ),
                 "content": (item.content or "")[:600],
                 "column_hint": item.column or col_key,
                 "source_tier": item.source_tier or 4,
                 "language": item.metadata.get("language", ""),
                 "tags": list(item.metadata.get("tags", [])),
-            }
-            for item in items
-        ]
+            })
         by_column_entries[col_key] = entries
         all_entries.extend(entries)
     return all_entries, by_column_entries
 
 
 def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> dict:
+    freshness_date = _freshness_date_for_item(item)
     return {
         "title": item.title,
         "source": item.source_name,
@@ -391,6 +561,11 @@ def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> di
         "event_key": "",
         "is_hard_news": False,
         "column": item.column or "us_politics",
+        "published": item.published_at.isoformat() if item.published_at else "",
+        "fetched": item.fetched_at.isoformat() if item.fetched_at else "",
+        "freshness_date": freshness_date,
+        "event_date": freshness_date,
+        "freshness_status": "",
     }
 
 
@@ -425,6 +600,10 @@ def _scored_entries_to_report_events(
             source_links=source_links,
             quality_status="ok" if _is_hard_news_entry(entry) else "candidate",
             tags=tags_str,
+            published_at=_parse_entry_datetime(entry.get("published")),
+            freshness_date=str(entry.get("freshness_date") or ""),
+            event_date=str(entry.get("event_date") or ""),
+            freshness_status=str(entry.get("freshness_status") or ""),
         ))
     return events
 
@@ -445,6 +624,10 @@ def _report_event_to_scored_dict(event: ReportEvent) -> dict:
         "source_tier": 2,
         "is_hard_news": True,
         "source_links": event.source_links,
+        "published": event.published_at.isoformat() if event.published_at else "",
+        "freshness_date": event.freshness_date,
+        "event_date": event.event_date,
+        "freshness_status": event.freshness_status,
     }
 
 
@@ -528,13 +711,29 @@ def _get_report_publish_time(report_date: str, config: dict | None = None) -> da
     )
 
 
+def _get_daily_freshness_window(report_date: str, config: dict | None = None) -> tuple[datetime, datetime]:
+    """日报今日性窗口：报告日前一日 00:00 到报告日次日 00:00。"""
+    local_tz = _get_schedule_timezone(config)
+    report_day = datetime.strptime(report_date, "%Y-%m-%d").date()
+    since = datetime(
+        report_day.year,
+        report_day.month,
+        report_day.day,
+        0,
+        0,
+        tzinfo=local_tz,
+    ) - timedelta(days=1)
+    until = since + timedelta(days=2)
+    return since, until
+
+
 def _filter_articles_to_window(
     items: list[ContentItem],
     since: datetime,
     until: datetime,
     config: dict | None = None,
 ) -> list[ContentItem]:
-    """只保留日报固定窗口内抓取到的新闻。"""
+    """只保留给定本地时间窗口内抓取或发布的新闻。"""
     local_tz = _get_schedule_timezone(config)
     filtered: list[ContentItem] = []
     for item in items:
@@ -647,8 +846,11 @@ def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
     merged_items = merge_cross_source_duplicates(all_items)
     print(f"   合并 {len(all_items) - len(merged_items)} 条 -> {len(merged_items)} 条唯一")
 
-    print("\n[2.5/13] 新鲜度过滤...")
-    merged_items, freshness_stats = _filter_items_by_freshness(merged_items, sources, config)
+    print("\n[2.5/13] 今日性日期过滤...")
+    if report_type == "daily":
+        merged_items, freshness_stats = _filter_items_to_daily_dates(merged_items, report_date, config)
+    else:
+        merged_items, freshness_stats = _filter_items_by_freshness(merged_items, sources, config)
     print(f"   保留 {freshness_stats['kept']} 条，过滤陈旧内容 {freshness_stats['dropped']} 条")
 
     # === 3. 入库 ===
@@ -753,15 +955,21 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
 
     db = _open_news_db(config)
 
+    freshness_since, freshness_until = (
+        _get_daily_freshness_window(report_date, config)
+        if report_type == "daily"
+        else (since, until)
+    )
+
     # 健康检查：在查询前打印数据库状态
-    window_since_utc = since.astimezone(timezone.utc).replace(tzinfo=None)
+    window_since_utc = freshness_since.astimezone(timezone.utc).replace(tzinfo=None)
     health = db_health_check(
         storage_cfg.get("db_path", "data/products/news/news.db"),
         window_since=window_since_utc,
     )
     print(f"\n[数据库状态]\n{format_health_report(health)}")
 
-    # 从数据库读取固定晨报窗口文章，补跑不改变窗口
+    # 从数据库读取今日性自然日窗口文章，补跑不改变报告日期
     today_articles = db.fetch_since(window_since_utc)
     if not today_articles:
         if not health["db_exists"]:
@@ -787,12 +995,28 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
     ]
 
     sources = _load_sources(config)
-    merged_items = _filter_articles_to_window(merged_items, since, until, config=config)
-    merged_items, freshness_stats = _filter_items_by_freshness(merged_items, sources, config)
-    print(f"固定窗口过滤后保留 {len(merged_items)} 条文章")
+    before_window_count = len(merged_items)
+    merged_items = _filter_articles_to_window(merged_items, freshness_since, freshness_until, config=config)
+    window_dropped = before_window_count - len(merged_items)
+    if report_type == "daily":
+        merged_items, freshness_stats = _filter_items_to_daily_dates(merged_items, report_date, config)
+        if window_dropped:
+            freshness_stats["dropped"] = int(freshness_stats.get("dropped", 0)) + window_dropped
+            freshness_stats["window_dropped"] = window_dropped
+    else:
+        merged_items, freshness_stats = _filter_items_by_freshness(merged_items, sources, config)
+    print(f"今日性窗口过滤后保留 {len(merged_items)} 条文章")
     if not merged_items:
-        print("\n[警告] 固定日报窗口内无文章，无法生成 digest")
-        return {"total_selected": 0}
+        allowed_dates = ",".join(freshness_stats.get("allowed_dates", []))
+        print("\n[错误] 今日性不足: 数据库没有可用于本期日报的新文章")
+        print(f"  报告日期: {report_date}")
+        print(f"  允许日期: {allowed_dates or '未知'}")
+        print(f"  今日性过滤: 保留 {freshness_stats.get('kept', 0)} 条, 过滤 {freshness_stats.get('dropped', 0)} 条")
+        return {
+            "total_selected": 0,
+            "error": "今日性不足",
+            "freshness_gate": freshness_stats,
+        }
 
     return _run_digest_phase(
         config,
@@ -809,6 +1033,10 @@ def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
         pipeline_context={
             "sources": sources,
             "freshness": freshness_stats,
+            "freshness_window": {
+                "since": freshness_since.isoformat(),
+                "until": freshness_until.isoformat(),
+            },
             "raw_fetched": len(today_articles),
             "raw_merged": len(merged_items),
         },
@@ -844,6 +1072,41 @@ def _build_and_log_digest_report(
     score_errors: list[str],
 ) -> dict:
     """构造并保存日报，供新评分路径和事件库复用路径共享。"""
+    if report_type == "daily":
+        freshness_gate_cfg = config.get("rules", {}).get("freshness_gate", {})
+        min_freshness_ratio = float(freshness_gate_cfg.get("min_ratio", 0.95))
+        _, final_freshness = _filter_scored_entries_by_freshness(
+            hard_news_scored,
+            report_date,
+            min_freshness_ratio,
+        )
+        phase_metrics.setdefault("freshness_gate", {})["before_render"] = final_freshness
+        phase_metrics["freshness_ratio"] = final_freshness["freshness_ratio"]
+        phase_metrics["today_count"] = final_freshness["today_count"]
+        phase_metrics["old_count"] = final_freshness["old_count"]
+        phase_metrics["unknown_date_count"] = final_freshness["unknown_date_count"]
+        if hard_news_scored and final_freshness.get("gate_failed"):
+            _log_digest_run(
+                db,
+                report_key=report_date,
+                report_type=report_type,
+                status="freshness_failed",
+                window_since=window_since,
+                window_until=window_until,
+                input_count=merged_count,
+                candidate_count=candidate_count,
+                selected_count=len(hard_news_scored),
+                ai_duration_seconds=ai_duration,
+                error_count=len(score_errors),
+                metrics=phase_metrics,
+            )
+            raise RuntimeError(
+                "今日性不足: "
+                f"fresh={final_freshness['today_count']}/{final_freshness['total']} "
+                f"ratio={final_freshness['freshness_ratio']:.0%}, "
+                f"required>={min_freshness_ratio:.0%}"
+            )
+
     spec = ReportSpec(
         product_key=product_key,
         report_type=report_type,
@@ -966,6 +1229,23 @@ def _run_digest_phase(
     # === 4. 预筛 + Pre-LLM 硬过滤 + AI score_batch ===
     print("\n[4/13] 预筛 + AI 批量评分...")
     prefiltered_by_column = _prefilter_items_for_scoring(merged_items, columns_cfg)
+    freshness_gate_cfg = config.get("rules", {}).get("freshness_gate", {})
+    min_freshness_ratio = float(freshness_gate_cfg.get("min_ratio", 0.95))
+    if report_type == "daily":
+        prefiltered_by_column, report_date_filter = _filter_items_by_report_dates(
+            prefiltered_by_column,
+            report_date,
+            config,
+        )
+        phase_metrics["freshness_gate"] = {
+            "min_ratio": min_freshness_ratio,
+            "candidate_date_filter": report_date_filter,
+        }
+        print(
+            "   今日性候选过滤: "
+            f"{report_date_filter['kept']} 保留, {report_date_filter['dropped']} 过滤, "
+            f"允许日期={','.join(report_date_filter['allowed_dates'])}"
+        )
     for col_key, items in sorted(prefiltered_by_column.items()):
         print(f"   预筛 {col_key}: {len(items)} 条")
         phase_metrics["columns"].setdefault(col_key, {})["prefiltered"] = len(items)
@@ -985,6 +1265,7 @@ def _run_digest_phase(
         prefiltered_by_column,
         report_key=report_date,
         report_type=report_type,
+        config=config,
     )
     candidate_upserts = db.upsert_article_candidates(candidates)
     phase_metrics["candidate_pool"] = {
@@ -1001,47 +1282,119 @@ def _run_digest_phase(
         else []
     )
     if stored_events and _has_events_for_required_columns(stored_events, columns_cfg):
-        print(f"   复用事件库: {len(stored_events)} 条，跳过 AI 评分")
         hard_news_scored = [_report_event_to_scored_dict(event) for event in stored_events]
-        phase_metrics["report_events"] = {
-            "reused": len(stored_events),
-            "source": "report_events",
-        }
-        phase_metrics["ai"]["score_errors"] = 0
-        phase_metrics["ai"]["score_duration_seconds"] = 0
-        fallback_candidates_by_column = {
-            col_key: [_content_item_to_report_candidate(item) for item in items]
-            for col_key, items in prefiltered_by_column.items()
-        }
-        return _build_and_log_digest_report(
-            config=config,
-            db=db,
-            hard_news_scored=hard_news_scored,
-            fallback_candidates_by_column=fallback_candidates_by_column,
-            phase_metrics=phase_metrics,
-            start_time=start_time,
-            phase_start=phase_start,
-            window_since=window_since,
-            window_until=window_until,
-            report_date=report_date,
-            report_type=report_type,
-            product_key=product_key,
-            site_root=site_root,
-            daily_dir=daily_dir,
-            feed_path=feed_path,
-            base_url=base_url,
-            history_days=history_days,
-            columns_cfg=columns_cfg,
-            digest_cfg=digest_cfg,
-            analysis_cfg=analysis_cfg,
-            ai_config=ai_config,
-            merged_count=len(merged_items),
-            candidate_count=len(candidates),
-            ai_duration=0.0,
-            score_errors=[],
-        )
+        if report_type == "daily":
+            hard_news_scored, reuse_freshness = _filter_scored_entries_by_freshness(
+                hard_news_scored,
+                report_date,
+                min_freshness_ratio,
+            )
+            phase_metrics.setdefault("freshness_gate", {})["report_events_reuse"] = reuse_freshness
+            if reuse_freshness.get("gate_failed") or not _has_events_for_required_columns(
+                [
+                    ReportEvent(
+                        report_key=report_date,
+                        report_type=report_type,
+                        event_key=str(entry.get("event_key") or ""),
+                        column=str(entry.get("column") or ""),
+                        title_zh=str(entry.get("title_zh") or entry.get("title") or ""),
+                        summary_zh=str(entry.get("summary") or ""),
+                        score=float(entry.get("score") or 0),
+                        source_links=entry.get("source_links") or [],
+                    )
+                    for entry in hard_news_scored
+                ],
+                columns_cfg,
+            ):
+                print(
+                    "   事件库今日性不足，改走重新评分: "
+                    f"fresh={reuse_freshness['today_count']}/{reuse_freshness['total']} "
+                    f"ratio={reuse_freshness['freshness_ratio']:.0%}"
+                )
+            else:
+                print(f"   复用事件库: {len(hard_news_scored)} 条，跳过 AI 评分")
+                phase_metrics["report_events"] = {
+                    "reused": len(hard_news_scored),
+                    "source": "report_events",
+                }
+                phase_metrics["ai"]["score_errors"] = 0
+                phase_metrics["ai"]["score_duration_seconds"] = 0
+                fallback_candidates_by_column = {
+                    col_key: [_content_item_to_report_candidate(item) for item in items]
+                    for col_key, items in prefiltered_by_column.items()
+                }
+                return _build_and_log_digest_report(
+                    config=config,
+                    db=db,
+                    hard_news_scored=hard_news_scored,
+                    fallback_candidates_by_column=fallback_candidates_by_column,
+                    phase_metrics=phase_metrics,
+                    start_time=start_time,
+                    phase_start=phase_start,
+                    window_since=window_since,
+                    window_until=window_until,
+                    report_date=report_date,
+                    report_type=report_type,
+                    product_key=product_key,
+                    site_root=site_root,
+                    daily_dir=daily_dir,
+                    feed_path=feed_path,
+                    base_url=base_url,
+                    history_days=history_days,
+                    columns_cfg=columns_cfg,
+                    digest_cfg=digest_cfg,
+                    analysis_cfg=analysis_cfg,
+                    ai_config=ai_config,
+                    merged_count=len(merged_items),
+                    candidate_count=len(candidates),
+                    ai_duration=0.0,
+                    score_errors=[],
+                )
+        else:
+            print(f"   复用事件库: {len(stored_events)} 条，跳过 AI 评分")
+            phase_metrics["report_events"] = {
+                "reused": len(stored_events),
+                "source": "report_events",
+            }
+            phase_metrics["ai"]["score_errors"] = 0
+            phase_metrics["ai"]["score_duration_seconds"] = 0
+            fallback_candidates_by_column = {
+                col_key: [_content_item_to_report_candidate(item) for item in items]
+                for col_key, items in prefiltered_by_column.items()
+            }
+            return _build_and_log_digest_report(
+                config=config,
+                db=db,
+                hard_news_scored=hard_news_scored,
+                fallback_candidates_by_column=fallback_candidates_by_column,
+                phase_metrics=phase_metrics,
+                start_time=start_time,
+                phase_start=phase_start,
+                window_since=window_since,
+                window_until=window_until,
+                report_date=report_date,
+                report_type=report_type,
+                product_key=product_key,
+                site_root=site_root,
+                daily_dir=daily_dir,
+                feed_path=feed_path,
+                base_url=base_url,
+                history_days=history_days,
+                columns_cfg=columns_cfg,
+                digest_cfg=digest_cfg,
+                analysis_cfg=analysis_cfg,
+                ai_config=ai_config,
+                merged_count=len(merged_items),
+                candidate_count=len(candidates),
+                ai_duration=0.0,
+                score_errors=[],
+            )
 
-    entries_for_scoring, _ = _build_scoring_entries_by_column(prefiltered_by_column)
+    entries_for_scoring, _ = _build_scoring_entries_by_column(
+        prefiltered_by_column,
+        report_date=report_date,
+        config=config,
+    )
     print(f"   送评总数: {len(entries_for_scoring)} 条")
     score_start = datetime.now()
     scored_dicts, score_errors = asyncio.run(score_batch(entries_for_scoring, ai_config))
@@ -1093,6 +1446,34 @@ def _run_digest_phase(
     # === 6. 硬新闻过滤 ===
     print("\n[6/13] 硬新闻过滤...")
     hard_news_scored = [entry for entry in scored_dicts if _is_hard_news_entry(entry)]
+    if report_type == "daily":
+        hard_news_scored, scored_freshness = _filter_scored_entries_by_freshness(
+            hard_news_scored,
+            report_date,
+            min_freshness_ratio,
+        )
+        phase_metrics.setdefault("freshness_gate", {})["scored_events"] = scored_freshness
+        if scored_freshness.get("gate_failed"):
+            print(
+                "\n[错误] 今日性不足: "
+                f"fresh={scored_freshness['today_count']}/{scored_freshness['total']} "
+                f"ratio={scored_freshness['freshness_ratio']:.0%}, "
+                f"required>={min_freshness_ratio:.0%}"
+            )
+            _log_digest_run(
+                db,
+                report_key=report_date,
+                report_type=report_type,
+                status="freshness_failed",
+                window_since=window_since,
+                window_until=window_until,
+                input_count=len(merged_items),
+                candidate_count=len(candidates),
+                ai_duration_seconds=ai_duration,
+                error_count=len(score_errors),
+                metrics=phase_metrics,
+            )
+            sys.exit(1)
     event_upserts = db.upsert_report_events(
         _scored_entries_to_report_events(hard_news_scored, report_date, report_type)
     )
