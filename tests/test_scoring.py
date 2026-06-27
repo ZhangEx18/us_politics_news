@@ -3,7 +3,13 @@
 import asyncio
 
 from models import ScoredArticle
-from ai_analyzer import _build_digest_evidence, _score_batch_with_retry, merge_events, score_batch
+from ai_analyzer import (
+    _build_digest_evidence,
+    _parse_jsonish_object,
+    _score_batch_with_retry,
+    merge_events,
+    score_batch,
+)
 
 
 # ── ScoredArticle 默认值 ──
@@ -199,6 +205,21 @@ def test_score_batch_wall_timeout_keeps_finished_batches(monkeypatch):
     scored = [item for item in scores if item.get("score")]
     assert len(scored) == 1
     assert any("评分总耗时超过" in err for err in errors)
+
+
+def test_parse_jsonish_object_accepts_chinese_curly_quotes():
+    response = """{
+      “events”: [
+        {
+          “title_zh”: “美国政局事件”,
+          “reader_body”: “白宫宣布新的政策安排。”
+        }
+      ]
+    }"""
+
+    parsed = _parse_jsonish_object(response)
+
+    assert parsed["events"][0]["title_zh"] == "美国政局事件"
 
 
 def test_merge_events_preserves_source_evidence_for_writer():
