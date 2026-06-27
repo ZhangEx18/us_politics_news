@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from database import NewsDatabase, article_to_content_item
 from ai_analyzer import _load_ai_config
 from config import load_config, augment_ai_config_with_runtime
+from run_pipeline import _open_news_db
 from models import ContentItem
 from report_engine import ReportSpec, build_report
 from report_titles import build_weekly_title
@@ -95,7 +96,7 @@ def run_weekly() -> dict:
     analysis_cfg = config.get("analysis", {})
     publish_cfg = config.get("publish", {})
 
-    db_path = storage_cfg.get("db_path", "data/news.db")
+    db = _open_news_db(config)
 
     # === 1. 计算时间窗口 ===
     since, until, report_key = _get_weekly_window()
@@ -103,7 +104,6 @@ def run_weekly() -> dict:
     print(f"[周报] 窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}  标识: {report_key}")
 
     # === 2. 从数据库读取文章 ===
-    db = NewsDatabase(db_path)
     articles = db.fetch_since(since.replace(tzinfo=None))
     print(f"[周报] 数据库加载 {len(articles)} 条文章")
 

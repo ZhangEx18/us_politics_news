@@ -187,7 +187,7 @@ def test_publish_product_validate_checks_all_report_types():
     assert "feed.xml" in run
 
 
-def test_publish_product_persist_state_keeps_legacy_news_db_alias():
+def test_publish_product_persist_state_only_writes_canonical_path():
     workflow = _load_workflow("publish-product.yml")
     publish_job = workflow["jobs"]["publish"]
 
@@ -197,9 +197,10 @@ def test_publish_product_persist_state_keeps_legacy_news_db_alias():
     )
     run = persist_step["run"]
 
-    assert 'LEGACY_DB_PATH="${{ steps.config.outputs.legacy_db_path }}"' in run
-    assert 'cp "$DB_PATH" "$TMP_DIR/$LEGACY_DB_PATH"' in run
-    assert 'git add "$LEGACY_DB_PATH"' in run
+    # 持久化只写正式路径，不再写 legacy 别名
+    assert 'DB_PATH=' in run
+    assert 'git add "$DB_PATH"' in run
+    assert "LEGACY_DB_PATH" not in run
 
 
 # ── legacy fetch/publish 测试 ──

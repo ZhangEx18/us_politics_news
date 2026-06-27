@@ -18,6 +18,7 @@ from run_pipeline import (
     _is_cn_source_entry,
     _is_cn_source_item,
     _load_schedule_config,
+    _open_news_db,
     _is_hard_news_entry,
     run_digest_only,
 )
@@ -221,6 +222,9 @@ def test_digest_only_uses_converted_schedule_timezone_for_report_window(monkeypa
         def __init__(self, db_path):
             self.db_path = db_path
 
+        def article_count(self):
+            return 0
+
         def fetch_since(self, since):
             assert since == datetime(2026, 6, 18, 23, 0)
             return []
@@ -229,11 +233,57 @@ def test_digest_only_uses_converted_schedule_timezone_for_report_window(monkeypa
     monkeypatch.setattr("run_pipeline._load_config", lambda: {"schedule": {"timezone": "Asia/Shanghai"}})
     monkeypatch.setattr("run_pipeline._load_ai_config", lambda: {"api_key": "k"})
     monkeypatch.setattr("run_pipeline._augment_ai_config_with_runtime", lambda ai_config, config: ai_config)
+    monkeypatch.setattr(
+        "run_pipeline.migrate_legacy_news_db",
+        lambda db_path: {
+            "legacy_exists": False,
+            "migrated_articles": 0,
+            "migrated_fetch_logs": 0,
+        },
+    )
     monkeypatch.setattr("run_pipeline.NewsDatabase", EmptyDatabase)
+    monkeypatch.setattr(
+        "sync_state_db.sync_product_db",
+        lambda product_key: {"restored": False, "error": "远端分支不存在"},
+    )
 
     stats = run_digest_only()
 
     assert stats == {"total_selected": 0}
+
+
+def test_open_news_db_runs_legacy_migration(monkeypatch):
+    called = {}
+
+    class DummyDb:
+        def __init__(self, db_path):
+            called["db_path"] = db_path
+
+        def article_count(self):
+            return 3
+
+    monkeypatch.setattr(
+        "run_pipeline.migrate_legacy_news_db",
+        lambda db_path: (
+            called.setdefault("migration_path", db_path),
+            {
+                "legacy_exists": True,
+                "migrated_articles": 3,
+                "migrated_fetch_logs": 1,
+            },
+        )[1],
+    )
+    monkeypatch.setattr("run_pipeline.NewsDatabase", DummyDb)
+    monkeypatch.setattr(
+        "sync_state_db.sync_product_db",
+        lambda product_key: (_ for _ in ()).throw(AssertionError("不应在非空库时调用同步")),
+    )
+
+    db = _open_news_db({"storage": {"db_path": "data/products/news/news.db"}, "product_key": "news"})
+
+    assert isinstance(db, DummyDb)
+    assert called["migration_path"] == "data/products/news/news.db"
+    assert called["db_path"] == "data/products/news/news.db"
 
 
 def test_get_report_publish_time_reads_schedule_publish_at():
