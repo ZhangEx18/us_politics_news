@@ -834,6 +834,9 @@ def build_report(
         "require_non_empty_columns": bool(
             config.get("format_contract", {}).get("require_non_empty_columns", False)
         ),
+        "require_detailed_events": bool(
+            config.get("format_contract", {}).get("require_detailed_events", False)
+        ),
         "overview": overview_payload,
         "report_since": spec.since.isoformat(),
         "report_until": spec.until.isoformat(),

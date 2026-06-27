@@ -339,6 +339,25 @@ def test_validate_report_format_rejects_english_detailed_title():
     assert any("标题未中文化" in issue for issue in issues)
 
 
+def test_validate_report_format_requires_detailed_events_when_configured():
+    meta = {
+        "date": "2026-06-27",
+        "title": "观察日报",
+        "require_non_empty_columns": True,
+        "require_detailed_events": True,
+    }
+    columns = {
+        "us_politics": {"headline_only_events": [{"title_zh": "美国其他要闻", "reader_body": "美国其他要闻正文。"}]},
+        "global_affairs": {"detailed_events": [{"title_zh": "国际事件", "reader_body": "国际事件正文。"}]},
+        "technology": {"detailed_events": [{"title_zh": "科技事件", "reader_body": "科技事件正文。"}]},
+        "economy": {"detailed_events": [{"title_zh": "经济事件", "reader_body": "经济事件正文。"}]},
+    }
+
+    issues = validate_report_format(meta, columns, report_type="daily")
+
+    assert "栏目缺少重点解析: us_politics" in issues
+
+
 def test_save_daily_report_syncs_news_legacy_aliases(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     meta = {"date": "2026-06-27", "title": "观察日报", "highlights": ["要点"]}

@@ -105,6 +105,45 @@ def _strip_markdown_fence(text: str) -> str:
     return text.strip()
 
 
+def _normalize_jsonish_text(text: str) -> str:
+    """修正常见的模型 JSON 近似输出，例如中文弯引号。"""
+    replacements = {
+        "“": '"',
+        "”": '"',
+        "‘": "'",
+        "’": "'",
+        "：": ":",
+        "，": ",",
+    }
+    for src, dst in replacements.items():
+        text = text.replace(src, dst)
+    return text
+
+
+def _parse_jsonish_object(response: str) -> dict:
+    """解析模型返回的 JSON 对象，兼容 markdown 包裹和少量中文标点。"""
+    text = _strip_markdown_fence(response)
+    candidates = [text, _normalize_jsonish_text(text)]
+    for candidate in candidates:
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            pass
+
+        m = re.search(r"\{.*\}", candidate, re.DOTALL)
+        if m:
+            try:
+                parsed = json.loads(m.group())
+                if isinstance(parsed, dict):
+                    return parsed
+            except json.JSONDecodeError:
+                pass
+
+    raise ValueError(f"无法从响应中解析 JSON 对象: {response[:300]}")
+
+
 def _parse_score_response(response: str) -> list[dict]:
     """解析评分 LLM 响应，兼容 {"items":[...]} / [...] / markdown 包裹"""
     text = _strip_markdown_fence(response)
@@ -1042,22 +1081,10 @@ async def generate_column_digest(
         timeout=_timeout_for(ai_config, "digest", 180),
     )
 
-    # 解析 JSON 响应（兼容 markdown 代码块包裹）
-    text = _strip_markdown_fence(response)
-    parsed = None
-
     try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", text, re.DOTALL)
-        if m:
-            try:
-                parsed = json.loads(m.group())
-            except json.JSONDecodeError:
-                pass
-
-    if parsed is None:
-        raise RuntimeError(f"generate_column_digest JSON 解析失败: {response[:300]}")
+        parsed = _parse_jsonish_object(response)
+    except ValueError as exc:
+        raise RuntimeError(f"generate_column_digest JSON 解析失败: {response[:300]}") from exc
 
     # 提取 events 数组
     if isinstance(parsed, dict) and isinstance(parsed.get("events"), list):
@@ -1106,20 +1133,10 @@ async def generate_periodical_overview(
         ai_config,
         timeout=_timeout_for(ai_config, "digest", 180),
     )
-    text = _strip_markdown_fence(response)
-    parsed = None
     try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", text, re.DOTALL)
-        if m:
-            try:
-                parsed = json.loads(m.group())
-            except json.JSONDecodeError:
-                pass
-
-    if not isinstance(parsed, dict):
-        raise RuntimeError(f"generate_periodical_overview JSON 解析失败: {response[:300]}")
+        parsed = _parse_jsonish_object(response)
+    except ValueError as exc:
+        raise RuntimeError(f"generate_periodical_overview JSON 解析失败: {response[:300]}") from exc
 
     summary = _clean_periodical_overview_text(parsed.get("summary", ""), limit=220)
 
@@ -1174,20 +1191,10 @@ async def generate_daily_overview(
         ai_config,
         timeout=_timeout_for(ai_config, "digest", 180),
     )
-    text = _strip_markdown_fence(response)
-    parsed = None
     try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", text, re.DOTALL)
-        if m:
-            try:
-                parsed = json.loads(m.group())
-            except json.JSONDecodeError:
-                pass
-
-    if not isinstance(parsed, dict):
-        raise RuntimeError(f"generate_daily_overview JSON 解析失败: {response[:300]}")
+        parsed = _parse_jsonish_object(response)
+    except ValueError as exc:
+        raise RuntimeError(f"generate_daily_overview JSON 解析失败: {response[:300]}") from exc
 
     return _clean_periodical_overview_text(parsed.get("summary", ""), limit=220)
 
@@ -1211,19 +1218,12 @@ async def translate_headline_titles(
         timeout=_timeout_for(ai_config, "meta", 120),
     )
 
-    text = _strip_markdown_fence(response)
-    parsed = None
     try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", text, re.DOTALL)
-        if m:
-            try:
-                parsed = json.loads(m.group())
-            except json.JSONDecodeError:
-                pass
+        parsed = _parse_jsonish_object(response)
+    except ValueError as exc:
+        raise RuntimeError(f"translate_headline_titles JSON 解析失败: {response[:300]}") from exc
 
-    if not isinstance(parsed, dict) or not isinstance(parsed.get("items"), list):
+    if not isinstance(parsed.get("items"), list):
         raise RuntimeError(f"translate_headline_titles JSON 解析失败: {response[:300]}")
 
     translated: list[str] = []
