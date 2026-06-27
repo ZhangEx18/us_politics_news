@@ -127,6 +127,14 @@ class NewsDatabase:
         conn.row_factory = sqlite3.Row
         return conn
 
+    def article_count(self) -> int:
+        with self._connect() as conn:
+            return int(conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0])
+
+    def fetch_log_count(self) -> int:
+        with self._connect() as conn:
+            return int(conn.execute("SELECT COUNT(*) FROM fetch_log").fetchone()[0])
+
     def _init_tables(self):
         with self._connect() as conn:
             conn.executescript("""
@@ -418,3 +426,138 @@ class NewsDatabase:
             llm_tags=row["llm_tags"] or "",
             llm_reason=row["llm_reason"] or "",
         )
+
+
+def db_health_check(db_path: str, window_since: datetime | None = None) -> dict:
+    """数据库健康检查：返回文章总数、最晚抓取时间、窗口命中数等状态信息。
+
+    用于在 digest-only 或完整流程前打印可观测状态，帮助排查"停更无感"问题。
+    """
+    from pathlib import Path as _Path
+
+    result = {
+        "db_exists": False,
+        "db_path": db_path,
+        "article_count": 0,
+        "latest_fetched_at": None,
+        "window_count": 0,
+        "window_since": None,
+    }
+
+    if not _Path(db_path).exists():
+        return result
+
+    result["db_exists"] = True
+
+    try:
+        db = NewsDatabase(db_path)
+        result["article_count"] = db.article_count()
+    except Exception:
+        return result
+
+    import sqlite3 as _sqlite3
+
+    try:
+        with _sqlite3.connect(db_path) as conn:
+            row = conn.execute("SELECT MAX(fetched_at) FROM articles").fetchone()
+            if row and row[0]:
+                result["latest_fetched_at"] = row[0]
+
+            if window_since is not None:
+                cutoff = _to_utc_storage(window_since)
+                if cutoff:
+                    count_row = conn.execute(
+                        "SELECT COUNT(*) FROM articles WHERE fetched_at >= ?", (cutoff,)
+                    ).fetchone()
+                    result["window_count"] = count_row[0] if count_row else 0
+                    result["window_since"] = cutoff
+    except Exception:
+        pass
+
+    return result
+
+
+def format_health_report(check: dict) -> str:
+    """将健康检查结果格式化为人类可读的状态报告。"""
+    lines = []
+    lines.append(f"  数据库路径: {check['db_path']}")
+
+    if not check["db_exists"]:
+        lines.append("  状态: 数据库文件不存在")
+        return "\n".join(lines)
+
+    lines.append(f"  文章总数: {check['article_count']}")
+
+    if check["latest_fetched_at"]:
+        lines.append(f"  最晚抓取时间: {check['latest_fetched_at']}")
+    else:
+        lines.append("  最晚抓取时间: 无数据")
+
+    if check.get("window_since"):
+        lines.append(f"  窗口起始: {check['window_since']}")
+        lines.append(f"  窗口内文章数: {check['window_count']}")
+
+    # 状态判定
+    if check["article_count"] == 0:
+        lines.append("  判定: 空库，需要先抓取或同步远端状态")
+    elif check.get("window_count", -1) == 0:
+        lines.append("  判定: 有历史数据但当前窗口为空，库可能已停更")
+    elif check.get("window_count", -1) > 0:
+        lines.append("  判定: 正常")
+
+    return "\n".join(lines)
+
+
+def migrate_legacy_news_db(
+    target_db_path: str,
+    legacy_db_path: str = "data/news.db",
+) -> dict[str, int | str | bool]:
+    """把旧 news 库的数据幂等迁入当前正式库。"""
+    target = NewsDatabase(target_db_path)
+    legacy_path = Path(legacy_db_path)
+    if not legacy_path.exists():
+        return {
+            "legacy_exists": False,
+            "migrated_articles": 0,
+            "migrated_fetch_logs": 0,
+            "target_db_path": str(target.db_path),
+            "legacy_db_path": str(legacy_path),
+        }
+
+    legacy = NewsDatabase(str(legacy_path))
+    article_columns = [
+        "url_hash", "url", "title", "summary", "source", "source_type",
+        "published_at", "fetched_at", "category", "score", "topic", "reason", "level",
+        "column", "source_tier", "event_key", "source_url_normalized",
+        "llm_score", "llm_summary", "llm_tags", "llm_reason",
+    ]
+    migrated_fetch_logs = 0
+
+    with legacy._connect() as src, target._connect() as dst:
+        before_articles = int(dst.execute("SELECT COUNT(*) FROM articles").fetchone()[0])
+        article_rows = src.execute(
+            f'SELECT {", ".join(f"""\"{col}\"""" for col in article_columns)} FROM articles ORDER BY id ASC'
+        ).fetchall()
+        dst.executemany(
+            f'''INSERT OR IGNORE INTO articles ({", ".join(f'"{col}"' for col in article_columns)})
+                VALUES ({", ".join("?" for _ in article_columns)})''',
+            [tuple(row[col] for col in article_columns) for row in article_rows],
+        )
+
+        if int(dst.execute("SELECT COUNT(*) FROM fetch_log").fetchone()[0]) == 0:
+            fetch_rows = src.execute(
+                "SELECT source, fetched_at, count, status FROM fetch_log ORDER BY id ASC"
+            ).fetchall()
+            dst.executemany(
+                "INSERT INTO fetch_log (source, fetched_at, count, status) VALUES (?, ?, ?, ?)",
+                [(row["source"], row["fetched_at"], row["count"], row["status"]) for row in fetch_rows],
+            )
+            migrated_fetch_logs = len(fetch_rows)
+
+    return {
+        "legacy_exists": True,
+        "migrated_articles": max(0, target.article_count() - before_articles),
+        "migrated_fetch_logs": migrated_fetch_logs,
+        "target_db_path": str(target.db_path),
+        "legacy_db_path": str(legacy_path),
+    }
