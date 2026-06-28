@@ -31,22 +31,13 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     assert dispatch["inputs"]["digest_only"]["type"] == "boolean"
     assert workflow["concurrency"]["group"] == "publish-news-daily"
 
-    scheduled_job = workflow["jobs"]["scheduled"]
-    assert scheduled_job["if"] == "github.event_name == 'schedule'"
-    assert scheduled_job["uses"] == "ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main"
-    assert scheduled_job["with"]["product_key"] == "news"
-    assert scheduled_job["with"]["report_type"] == "daily"
-    assert scheduled_job["with"]["digest_only"] is False
-    assert "inputs" not in str(scheduled_job["with"])
-    assert scheduled_job["secrets"] == "inherit"
-
-    manual_job = workflow["jobs"]["manual"]
-    assert manual_job["if"] == "github.event_name == 'workflow_dispatch'"
-    assert manual_job["uses"] == "ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main"
-    assert manual_job["with"]["product_key"] == "news"
-    assert manual_job["with"]["report_type"] == "daily"
-    assert manual_job["with"]["digest_only"] == "${{ inputs.digest_only }}"
-    assert manual_job["secrets"] == "inherit"
+    delegate_job = workflow["jobs"]["delegate"]
+    assert delegate_job["uses"] == "ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main"
+    assert delegate_job["with"]["product_key"] == "news"
+    assert delegate_job["with"]["report_type"] == "daily"
+    assert delegate_job["with"]["digest_only"] is False
+    assert "inputs" not in str(delegate_job["with"])
+    assert delegate_job["secrets"] == "inherit"
 
 
 def test_weekly_publish_is_thin_wrapper_to_publish_product():
