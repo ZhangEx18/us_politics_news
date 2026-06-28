@@ -18,20 +18,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  scheduled:
-    if: github.event_name == 'schedule'
+  delegate:
     uses: ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main
     with:
       product_key: news
       report_type: daily
       digest_only: false
-    secrets: inherit
-
-  manual:
-    if: github.event_name == 'workflow_dispatch'
-    uses: ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main
-    with:
-      product_key: news
-      report_type: daily
-      digest_only: ${{ inputs.digest_only }}
     secrets: inherit

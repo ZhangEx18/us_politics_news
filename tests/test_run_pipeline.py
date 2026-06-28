@@ -548,7 +548,7 @@ def test_filter_items_to_daily_dates_keeps_previous_day_midnight_items():
     assert stats["kept"] == 1
 
 
-def test_filter_scored_entries_by_freshness_enforces_95_percent_gate():
+def test_filter_scored_entries_by_freshness_drops_old_entries_without_blocking_when_fresh_remain():
     fresh = [
         {
             "link": f"https://example.com/fresh/{idx}",
@@ -570,7 +570,7 @@ def test_filter_scored_entries_by_freshness_enforces_95_percent_gate():
 
     assert len(kept) == 90
     assert metrics["freshness_ratio"] == 0.9
-    assert metrics["gate_failed"] is True
+    assert metrics["gate_failed"] is False
 
 
 def test_freshness_gate_requires_allowed_date_even_when_status_is_today():

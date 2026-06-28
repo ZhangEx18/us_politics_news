@@ -382,7 +382,7 @@ def _filter_scored_entries_by_freshness(
     fresh_entries = [entry for entry in entries if _entry_passes_freshness(entry, allowed)]
     metrics = _freshness_metrics(entries, allowed)
     metrics["fresh_after_gate"] = len(fresh_entries)
-    if entries and metrics["freshness_ratio"] < min_ratio:
+    if entries and not fresh_entries:
         metrics["gate_failed"] = True
     else:
         metrics["gate_failed"] = False

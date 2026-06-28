@@ -70,7 +70,7 @@ flowchart TD
 关键设计约束：
 
 - `publish-product.yml` 是统一发布入口；`daily-rss-publish.yml`、`weekly-publish.yml`、`monthly-publish.yml` 只是 thin wrapper，不复制发布逻辑。
-- `daily-rss-publish.yml` 的定时入口必须固定传 `digest_only: false`，不要在 `schedule` job 中读取 `inputs.*`。`inputs` 只属于手动 `workflow_dispatch` 场景，否则 GitHub 可能在创建 job 前直接判定 workflow 文件错误。
+- `daily-rss-publish.yml` 必须固定传 `digest_only: false`，不要在 wrapper job 中读取 `inputs.*`。如果需要手动 digest-only 补刊，直接触发 `publish-product.yml` 并传入 `product_key=news`、`report_type=daily`、`digest_only=true`。
 - Cloudflare Worker 只负责 dispatch workflow，不直接抓取、生成、写库或发布页面；实际业务流程全部在 GitHub Actions 中执行。
 - product 的路径、数据库和 feed 由 `config/products/<product>/product.yaml` 决定。`news` 的正式输出是 `docs/news/...` 和 `docs/feeds/news.xml`，兼容别名 `docs/daily/...` 与 `docs/feed.xml` 只由发布流程同步维护。
 - 发布前必须从 `gh-pages` 恢复历史报告和 feed，再生成当期内容；否则新发布会覆盖历史归档或让 Reader 只看到单期内容。
