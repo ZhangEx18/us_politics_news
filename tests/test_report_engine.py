@@ -449,6 +449,134 @@ def test_normalize_detailed_events_to_chinese_drops_english_items():
     assert metrics["technology"]["detailed_translation_failed"] == 1
 
 
+def test_build_report_daily_falls_back_when_digest_outputs_empty_columns(tmp_path):
+    """2026-06-28 发布回归：AI 栏目写作被过滤为空时，候选摘要应补成重点解析。"""
+    spec = ReportSpec(
+        report_type="daily",
+        report_key="2026-06-28",
+        title="测试日报",
+        since=datetime(2026, 6, 27, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 28, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "daily"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="https://example.com",
+        column_quotas={
+            "us_politics": {"label": "美国政局", "target_items": 1, "max_items": 1, "headline_items": 0},
+            "global_affairs": {"label": "国际局势", "target_items": 1, "max_items": 1, "headline_items": 0},
+            "technology": {"label": "科技前沿", "target_items": 1, "max_items": 1, "headline_items": 0},
+            "economy": {"label": "经济走势", "target_items": 1, "max_items": 1, "headline_items": 0},
+        },
+    )
+    scored_events = [
+        {
+            "title": "White House meeting",
+            "source": "Example",
+            "score": 90,
+            "summary": "白宫与国会领导人举行会议，讨论预算安排和后续表决节奏。",
+            "content": "白宫与国会领导人举行会议，讨论预算安排和后续表决节奏。",
+            "column": "us_politics",
+            "event_key": "us_budget_20260628",
+            "event_date": "2026-06-28",
+            "freshness_date": "2026-06-28",
+            "freshness_status": "today",
+            "language": "en",
+            "tags": [],
+            "source_links": [{"title": "Example", "url": "https://example.com/us"}],
+            "is_hard_news": True,
+        },
+        {
+            "title": "国际谈判继续推进",
+            "source": "Example",
+            "score": 89,
+            "summary": "多国代表继续推进安全谈判，并把后续文本审议列入下一轮议程。",
+            "content": "多国代表继续推进安全谈判，并把后续文本审议列入下一轮议程。",
+            "column": "global_affairs",
+            "event_key": "security_talks_20260628",
+            "event_date": "2026-06-28",
+            "freshness_date": "2026-06-28",
+            "freshness_status": "today",
+            "language": "zh",
+            "tags": [],
+            "source_links": [{"title": "Example", "url": "https://example.com/global"}],
+            "is_hard_news": True,
+        },
+        {
+            "title": "AI regulation update",
+            "source": "Example",
+            "score": 88,
+            "summary": "监管机构发布人工智能合规指引，要求平台补充风险披露和审计材料。",
+            "content": "监管机构发布人工智能合规指引，要求平台补充风险披露和审计材料。",
+            "column": "technology",
+            "event_key": "ai_regulation_20260628",
+            "event_date": "2026-06-28",
+            "freshness_date": "2026-06-28",
+            "freshness_status": "today",
+            "language": "en",
+            "tags": [],
+            "source_links": [{"title": "Example", "url": "https://example.com/tech"}],
+            "is_hard_news": True,
+        },
+        {
+            "title": "经济数据更新",
+            "source": "Example",
+            "score": 87,
+            "summary": "政府发布新的经济数据，显示就业和价格指标继续影响政策预期。",
+            "content": "政府发布新的经济数据，显示就业和价格指标继续影响政策预期。",
+            "column": "economy",
+            "event_key": "economic_data_20260628",
+            "event_date": "2026-06-28",
+            "freshness_date": "2026-06-28",
+            "freshness_status": "today",
+            "language": "zh",
+            "tags": [],
+            "source_links": [{"title": "Example", "url": "https://example.com/economy"}],
+            "is_hard_news": True,
+        },
+    ]
+    config = {
+        "rules": {"quality_gate": {"min_chars": 40, "max_chars": 260, "min_sentences": 2, "max_sentences": 4}},
+        "format_contract": {
+            "require_non_empty_columns": True,
+            "require_detailed_events": True,
+            "require_date_in_body": True,
+        },
+    }
+
+    class _DummyDb:
+        def fetch_since(self, since):
+            return []
+
+    async def _fake_digest(**kwargs):
+        if kwargs["column_key"] == "global_affairs":
+            return [{
+                "title_zh": "国际谈判继续推进",
+                "reader_body": "6 月 28 日，多国代表继续推进安全谈判。下一轮议程将审议后续文本。",
+                "core_facts": "6 月 28 日，多国代表继续推进安全谈判。下一轮议程将审议后续文本。",
+            }]
+        if kwargs["column_key"] == "technology":
+            return [{
+                "title_zh": "AI regulation update",
+                "reader_body": "The agency released guidance.",
+                "core_facts": "The agency released guidance.",
+            }]
+        return []
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=_fake_digest)), \
+         patch("report_engine.generate_daily_overview", new=AsyncMock(return_value="")), \
+         patch("report_engine.save_daily_report", return_value=("daily.md", "daily.html")) as save_report, \
+         patch("report_engine.save_feed", return_value="feed.xml"):
+        stats = build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
+
+    columns = save_report.call_args.args[1]
+    assert all(columns[col_key]["detailed_events"] for col_key in spec.column_quotas)
+    assert columns["us_politics"]["detailed_events"][0]["title_zh"].startswith("白宫与国会")
+    assert columns["technology"]["detailed_events"][0]["title_zh"].startswith("监管机构")
+    assert stats["metrics"]["columns"]["us_politics"]["detailed_fallback_added"] == 1
+    assert stats["metrics"]["columns"]["technology"]["detailed_translation_failed"] == 1
+    assert stats["metrics"]["columns"]["technology"]["detailed_fallback_added"] == 1
+    assert stats["total_selected"] == 4
+
+
 def test_normalize_headline_only_by_column_keeps_bill_items_with_clear_summary():
     normalized, metrics = _normalize_headline_only_by_column({
         "us_politics": [
