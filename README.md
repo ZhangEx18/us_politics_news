@@ -76,6 +76,7 @@ flowchart TD
 - 发布前必须从 `gh-pages` 恢复历史报告和 feed，再生成当期内容；否则新发布会覆盖历史归档或让 Reader 只看到单期内容。
 - 状态数据库不放在 `main` 的 `docs/` 里发布。`news` 使用 `news-data` 分支保存 `data/products/news/news.db`，其他 product 使用 `{product}-state` 分支。
 - Feed 必须包含 `content:encoded`，并通过 workflow 校验；Reader 订阅依赖 `docs/feeds/news.xml` 的全文 RSS。
+- 日报发布契约要求四个栏目都有中文 `重点解析`，不要通过放宽 `format_contract.require_detailed_events` 绕过校验。AI 栏目写作输出为空或未中文化时，应从已评分候选的中文摘要降级生成简版重点解析，仍保留日期和事实边界。
 
 ## Pipeline 流程
 

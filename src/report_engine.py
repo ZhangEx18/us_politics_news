@@ -224,6 +224,91 @@ def _build_periodical_overview_payload(overview: PeriodicalOverview | dict | Non
     return PeriodicalOverview.from_raw(overview, []).to_payload()
 
 
+def _format_event_date_for_reader(value: object) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    try:
+        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        match = re.search(r"(20\d{2})-(\d{1,2})-(\d{1,2})", text)
+        if not match:
+            return ""
+        return f"{int(match.group(2))} 月 {int(match.group(3))} 日"
+    return f"{dt.month} 月 {dt.day} 日"
+
+
+def _build_fallback_detailed_event(candidate: dict) -> dict | None:
+    """从已评分候选构造保守中文正文，用于 AI 写作结果被过滤为空的日报栏。"""
+    summary = str(candidate.get("summary") or candidate.get("content") or "").strip()
+    summary = re.sub(r"\s+", " ", summary)
+    if not summary or _looks_like_english_fragment(summary) or not _contains_meaningful_cjk(summary):
+        return None
+
+    raw_title = str(candidate.get("title_zh") or candidate.get("title") or "").strip()
+    title = raw_title
+    if not title or _looks_like_english_fragment(title) or not _contains_meaningful_cjk(title):
+        title = summary[:36].rstrip(" ，,。；;:：")
+    if not title or _looks_like_english_fragment(title) or not _contains_meaningful_cjk(title):
+        return None
+
+    date_text = (
+        _format_event_date_for_reader(candidate.get("event_date"))
+        or _format_event_date_for_reader(candidate.get("freshness_date"))
+        or _format_event_date_for_reader(candidate.get("published"))
+    )
+    if not date_text:
+        return None
+
+    sentence_match = re.match(r"(.+?[。！？!?])", summary)
+    first_sentence = sentence_match.group(1).strip() if sentence_match else summary[:120].rstrip(" ，,。；;:：")
+    if not first_sentence:
+        return None
+    if first_sentence[-1] not in "。！？!?":
+        first_sentence += "。"
+    if _is_uninformative_bill_sentence(first_sentence):
+        return None
+
+    body = f"{date_text}，{first_sentence}现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。"
+    if len(body) > 220:
+        body = body[:220].rstrip(" ，,。. ") + "。"
+
+    return {
+        **candidate,
+        "title_zh": title,
+        "reader_body": body,
+        "core_facts": body,
+    }
+
+
+def _ensure_daily_detailed_events(
+    column_results: dict[str, list[dict]],
+    column_candidates: dict[str, list[dict]],
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
+    """日报每个有候选的栏目至少保留一条中文重点解析，避免 AI 空输出阻断发布。"""
+    ensured = {col_key: list(items) for col_key, items in column_results.items()}
+    metrics: dict[str, dict[str, int]] = {}
+
+    for col_key, candidates in column_candidates.items():
+        current = ensured.get(col_key, [])
+        added = 0
+        failed = 0
+        if not current and candidates:
+            for candidate in candidates:
+                fallback_event = _build_fallback_detailed_event(candidate)
+                if fallback_event:
+                    ensured[col_key] = [fallback_event]
+                    added = 1
+                    break
+                failed += 1
+        metrics[col_key] = {
+            "detailed_fallback_added": added,
+            "detailed_fallback_failed": failed,
+        }
+
+    return ensured, metrics
+
+
 async def _generate_all_column_digests(
     columns_cfg: dict[str, dict],
     column_candidates: dict[str, list[dict]],
@@ -389,6 +474,12 @@ def _to_candidate_dict(entry: dict) -> dict:
         "tags": entry.get("tags", []),
         "event_key": entry.get("event_key", ""),
         "is_hard_news": entry.get("is_hard_news", False),
+        "published": entry.get("published", ""),
+        "fetched": entry.get("fetched", ""),
+        "freshness_date": entry.get("freshness_date", ""),
+        "event_date": entry.get("event_date", ""),
+        "freshness_status": entry.get("freshness_status", ""),
+        "column": entry.get("column", ""),
     }
 
 
@@ -753,6 +844,9 @@ def build_report(
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
         column_results, detailed_metrics = _normalize_detailed_events_to_chinese(column_results)
         for col_key, column_metrics in detailed_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        column_results, fallback_metrics = _ensure_daily_detailed_events(column_results, column_candidates)
+        for col_key, column_metrics in fallback_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
 
     # ── 提炼要点 ──
