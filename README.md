@@ -48,6 +48,35 @@ Reader 订阅地址：
 https://<username>.github.io/us_politics_news/feeds/news.xml
 ```
 
+## 发布链路设计
+
+```mermaid
+flowchart TD
+    CF["Cloudflare Workers Cron"] -->|workflow_dispatch| GH["GitHub Actions"]
+    GH --> PP["publish-product.yml"]
+    PP --> CFG["读取 product 配置"]
+    CFG --> DB["从 state 分支恢复 SQLite"]
+    CFG --> PAGES["从 gh-pages 恢复历史归档"]
+    DB --> RUN["src/run_product.py"]
+    PAGES --> RUN
+    RUN --> OUT["生成 Markdown / HTML / RSS"]
+    OUT --> CHECK["校验报告、全文 Feed、栏目结构"]
+    CHECK --> DEPLOY["发布 docs/ 到 GitHub Pages"]
+    CHECK --> STATE["写回 state 分支数据库"]
+    DEPLOY --> RSS["/feeds/news.xml"]
+    RSS --> READER["Reeder / Reader 客户端"]
+```
+
+关键设计约束：
+
+- `publish-product.yml` 是统一发布入口；`daily-rss-publish.yml`、`weekly-publish.yml`、`monthly-publish.yml` 只是 thin wrapper，不复制发布逻辑。
+- `daily-rss-publish.yml` 的定时入口必须固定传 `digest_only: false`，不要在 `schedule` job 中读取 `inputs.*`。`inputs` 只属于手动 `workflow_dispatch` 场景，否则 GitHub 可能在创建 job 前直接判定 workflow 文件错误。
+- Cloudflare Worker 只负责 dispatch workflow，不直接抓取、生成、写库或发布页面；实际业务流程全部在 GitHub Actions 中执行。
+- product 的路径、数据库和 feed 由 `config/products/<product>/product.yaml` 决定。`news` 的正式输出是 `docs/news/...` 和 `docs/feeds/news.xml`，兼容别名 `docs/daily/...` 与 `docs/feed.xml` 只由发布流程同步维护。
+- 发布前必须从 `gh-pages` 恢复历史报告和 feed，再生成当期内容；否则新发布会覆盖历史归档或让 Reader 只看到单期内容。
+- 状态数据库不放在 `main` 的 `docs/` 里发布。`news` 使用 `news-data` 分支保存 `data/products/news/news.db`，其他 product 使用 `{product}-state` 分支。
+- Feed 必须包含 `content:encoded`，并通过 workflow 校验；Reader 订阅依赖 `docs/feeds/news.xml` 的全文 RSS。
+
 ## Pipeline 流程
 
 ```
