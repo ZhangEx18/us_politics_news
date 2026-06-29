@@ -155,7 +155,7 @@ class RSSFetcher(BaseFetcher):
                     lambda m: os.environ.get(m.group(1), m.group(0)).strip(),
                     feed_cfg["url"],
                 )
-                text = await self._get(feed_url, timeout=aiohttp.ClientTimeout(total=30))
+                text = await self._get(feed_url, timeout=aiohttp.ClientTimeout(total=60))
                 data = feedparser.parse(text)
 
                 for entry in data.entries:
@@ -324,13 +324,21 @@ class GoogleNewsFetcher(BaseFetcher):
         items = []
         for feed_cfg in self.feeds:
             try:
-                text = await self._get(feed_cfg["url"], timeout=aiohttp.ClientTimeout(total=30))
+                text = await self._get(feed_cfg["url"], timeout=aiohttp.ClientTimeout(total=60))
                 data = feedparser.parse(text)
                 for entry in data.entries:
                     title = entry.get("title", "").strip()
                     link = entry.get("link", "").strip()
                     content = re.sub(r"<[^>]+>", "", entry.get("summary", ""))
                     entry_hash = self._hash_id(entry.get("id", link))
+                    # 解析 Google News 的发布时间
+                    published = None
+                    parsed = entry.get("published_parsed") or entry.get("updated_parsed")
+                    if parsed:
+                        try:
+                            published = datetime(*parsed[:6], tzinfo=timezone.utc)
+                        except Exception:
+                            pass
                     items.append(ContentItem(
                         id=self._generate_id("gnews", feed_cfg["name"].replace(" ", "_"), entry_hash),
                         source_type=SourceType.GOOGLE_NEWS,
@@ -338,7 +346,7 @@ class GoogleNewsFetcher(BaseFetcher):
                         url=link,
                         content=content[:500],
                         source_name="Google News",
-                        published_at=None,
+                        published_at=published,
                         column=feed_cfg.get("column", ""),
                         source_tier=4,
                         source_url_normalized=normalize_url(link),
@@ -466,7 +474,9 @@ async def fetch_all_sources(since: datetime, sources: list[dict]) -> List[Conten
     ]
 
     headers = {"User-Agent": "Mozilla/5.0 (compatible; USPoliticsNews/2.0)"}
-    async with aiohttp.ClientSession(headers=headers, trust_env=True) as session:
+    # 禁用 SSL 验证以兼容证书过期的 RSS 源
+    connector = aiohttp.TCPConnector(ssl=False)
+    async with aiohttp.ClientSession(headers=headers, trust_env=True, connector=connector) as session:
         tasks = []
         for name, fetcher in fetchers:
             fetcher.session = session
@@ -486,7 +496,7 @@ async def fetch_all_sources(since: datetime, sources: list[dict]) -> List[Conten
 async def _fetch_with_progress(name: str, fetcher: BaseFetcher, since: datetime) -> List[ContentItem]:
     print(f"  🔍 {name}...")
     try:
-        items = await asyncio.wait_for(fetcher.fetch(since), timeout=90)
+        items = await asyncio.wait_for(fetcher.fetch(since), timeout=180)
         print(f"  ✅ {name}: {len(items)} 条")
         return items
     except asyncio.TimeoutError:
@@ -621,7 +631,7 @@ def save_to_db(items: List[ContentItem], db: NewsDatabase) -> dict:
             source=item.source_name,
             source_type=item.source_type,
             published_at=item.published_at,
-            fetched_at=datetime.now(timezone.utc),
+            fetched_at=item.fetched_at,
             topic=item.topic,
             score=item.score,
             reason=item.reason,
