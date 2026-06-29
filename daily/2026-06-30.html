@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年6月30日 日报 — 2026-06-30</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年6月30日 日报</h1>
+<div class='date'>2026-06-30</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>FTC 与多州起诉跨性别健康协会，指控其对儿童治疗进行虚假宣传</li>
+<li>以色列同日多线军事行动，财长呼吁在加沙建定居点</li>
+<li>Anthropic 的 Claude 模型登陆 NVIDIA GB300 Blackwel…</li>
+<li>美国贸易代表就中国海运物流造船行业举行 301 调查听证会并征求意见</li>
+<li>美最高法院裁定允许计票迟到的邮寄选票，驳回特朗普方面挑战</li>
+<li>美国称与伊朗在交火后达成“暂停”协议</li>
+<li>FTC 最终批准对 Illuminate 的数据安全处罚令</li>
+<li>美国贸易代表就中国半导体行业举行 301 调查听证会</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. FTC 与多州起诉跨性别健康协会，指控其对儿童治疗进行虚假宣传</h3>
+<p>6 月 30 日，美国联邦贸易委员会（FTC）与多个州联合对世界跨性别健康协会（WPATH）提起诉讼，指控该协会在儿童性别肯定治疗方面做出了欺骗性声明。此前，该协会发布的指南在医疗行业内具有权威影响力，此次诉讼将争议从学术讨论直接推向法律追责。该行动将直接影响跨性别儿童医疗指南的制定过程与标准，并可能促使各州加强对相关医疗服务广告和宣传的监管。</p>
+</div>
+<div class='event'>
+<h3>2. 美最高法院裁定允许计票迟到的邮寄选票，驳回特朗普方面挑战 <span class="followup">持续跟踪</span></h3>
+<p>6 月 29 日，美国最高法院作出裁决，允许各州对选举日后到达的邮寄选票进行计票，这驳回了由特朗普方面主导的一项法律挑战。此前，关于此类选票有效性的法律地位，此次裁决为相关程序设立了明确的司法规则。这一决定将直接影响未来美国选举的计票程序，并可能影响两党在选民动员与诉讼策略上的竞争。</p>
+</div>
+<div class='event'>
+<h3>3. 最高法院裁决确认美联储独立地位，总统无权随意解雇其理事 <span class="followup">持续跟踪</span></h3>
+<p>6 月 29 日，美国最高法院的一项裁决确认了美联储作为独特联邦机构的独立性，PBS 报道称其结论是总统不能随意解雇美联储理事会成员。此前，行政部门对联邦独立机构人事权的边界存在法律争议，此次裁决明确划出了美联储的例外红线。该裁决直接巩固了美联储在货币政策上的独立决策地位，并对总统未来任命或罢免联邦独立机构负责人的权力构成制约。</p>
+</div>
+<div class='event'>
+<h3>4. 美最高法院将审理亚利桑那州严格投票法，特朗普支持的共和党推动复审</h3>
+<p>6 月 29 日，美国最高法院宣布将审理一起案件，事关亚利桑那州在 2020 年大选后通过的严格投票法律，这些法律获得了特朗普支持的共和党人推动。此前，这些法律的合宪性在下级法院受到质疑，最高法院的受理将对此进行最终司法审查。该案的判决结果将直接影响亚利桑那州选民的投票资格与程序，并可能为其他州的类似立法树立关键先例。</p>
+</div>
+<div class='event'>
+<h3>5. FTC 提交法庭之友意见书，介入制药垄断案件以保护消费者</h3>
+<p>6 月 30 日，FTC 新闻稿显示，美国联邦贸易委员会（FTC）向法院提交了一份法庭之友意见书，旨在保护消费者免受制药垄断行为的侵害。此前，FTC 已多次就药品市场竞争问题发声，此次提交意见书其通过司法渠道强化了反对垄断的立场。该行动直接影响当前审理中的具体制药行业诉讼案件，并向法院传递了联邦贸易监管机构对维护药品市场竞争的明确态度。</p>
+</div>
+<div class='event'>
+<h3>6. FTC 与各州起诉世界跨性别健康协会，指控其在儿童治疗方面做出虚假声明</h3>
+<p>6 月 30 日，FTC 与各州起诉世界跨性别健康协会，指控其在儿童治疗方面做出虚假声明。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<div class='event'>
+<h3>7. 最高法院裁决允许迟到邮寄选票，对特朗普构成挫折</h3>
+<p>6 月 29 日，最高法院裁决允许迟到邮寄选票，对特朗普构成挫折。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<div class='event'>
+<h3>8. 最高法院裁决总统无权解雇美联储理事</h3>
+<p>6 月 29 日，最高法院裁决总统无权解雇美联储理事。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<ul class='headline-list'>
+<li>最高法院裁决宪法隐私保护适用于手机位置数据。</li>
+<li>FTC 起诉一家企业，指控其运营非法订阅计划欺骗消费者。</li>
+<li>FTC 对 Amare Global 公司及三人提出藐视法庭动议，指控其提出未经证实的健康声明。</li>
+<li>FTC 宣布一家曾设计律所 DEI 项目的公司已解散，被视为反 DEI 执法行动。</li>
+<li>美国参议院确认 Jamieson Greer 为美国贸易代表。</li>
+<li>FTC 最终敲定针对 Sevita 收购 BrightSpring 交易的同意令。</li>
+<li>报道指出特朗普政府对 Anthropic 和 OpenAI 的限制措施正受到批评和攻击。</li>
+<li>参议院道德委员会驳回对参议员加列戈的投诉。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 以色列同日多线军事行动，财长呼吁在加沙建定居点</h3>
+<p>6 月 29 日，以色列政府官员呼吁与军队行动同步推进。以色列财长斯莫特里奇当天公开呼吁在加沙地带立即建立犹太人定居点，并主张实施‘征服’。同日，以色列军队对加沙地带发动袭击，造成 8 名巴勒斯坦人死亡，并在约旦河西岸杀害一名青少年；此外，以军还对叙利亚南部村庄进行了炮击并发射照明弹。此前以色列在加沙的行动多为定点清除或冲突，此次变化在于政治高层将定居计划与军事行动公开捆绑，并将打击范围同时延伸至加沙、约旦河西岸和叙利亚。后续影响直接指向巴勒斯坦民众的生存空间与安全，同时扩大了地区冲突的外溢风险，可能激化与叙利亚的紧张关系。</p>
+</div>
+<div class='event'>
+<h3>2. 美国称与伊朗在交火后达成“暂停”协议</h3>
+<p>6 月 29 日，美国表示已与伊朗达成协议，在周末相互袭击后同意“暂停”敌对行动。此前美伊在多个地区发生直接军事交火，冲突处于直接对抗状态，此次协议双方同意从即时军事对抗转入一个不确定的暂停期。后续影响聚焦于该暂停协议能否持续，以及美国在中东的盟友和伊朗支持的地区武装组织的反应，这将直接影响波斯湾地区的安全与能源通道稳定。</p>
+</div>
+<div class='event'>
+<h3>3. 巴基斯坦跨境打击行动致数十名阿富汗村民死亡</h3>
+<p>6 月 30 日，巴基斯坦针对塔利班盟友的袭击导致数十名阿富汗村民死亡。此次袭击的打击目标被定义为塔利班盟友，但造成了平民的重大伤亡。此前巴基斯坦的跨境反恐行动范围与后果时有报道，此次事件变化在于袭击直接导致了规模较大的平民死亡。后续影响将加剧巴基斯坦与阿富汗塔利班当局之间的紧张关系，并可能影响地区反恐合作的前景。</p>
+</div>
+<div class='event'>
+<h3>4. 巴基斯坦针对塔利班盟友的袭击导致数十名阿富汗村民死亡</h3>
+<p>6 月 30 日，巴基斯坦针对塔利班盟友的袭击导致数十名阿富汗村民死亡。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<div class='event'>
+<h3>5. 美国贸易代表办公室发布声明，回应欧盟宣布的报复性关税措施</h3>
+<p>3 月 1 日，美国贸易代表办公室发布声明，回应欧盟宣布的报复性关税措施。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<div class='event'>
+<h3>6. 美国贸易代表与中国副总理举行会谈，讨论双边贸易关系</h3>
+<p>3 月 1 日，美国贸易代表与中国副总理举行会谈，讨论双边贸易关系。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<div class='event'>
+<h3>7. 美国表示已与伊朗达成协议，在周末相互袭击后同意“暂停”敌对行动</h3>
+<p>6 月 29 日，美国表示已与伊朗达成协议，在周末相互袭击后同意“暂停”敌对行动。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<ul class='headline-list'>
+<li>美国欢迎墨西哥为解决 USMCA 生物技术玉米争端采取行动。</li>
+<li>安理会举行公开会议，聚焦以色列在巴勒斯坦被占领土上的定居点活动。</li>
+<li>白宫称，特朗普期望英国遵守其国防开支承诺。</li>
+<li>以色列在叙利亚南部发动新的袭击，导致家庭被迫逃离，土耳其予以谴责。</li>
+<li>特朗普声称伊朗已同意在多哈举行和谈，此前双方在霍尔木兹海峡交火。</li>
+<li>白俄罗斯总统卢卡申科访问俄罗斯和中国，寻求加强与两国的关系。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. Anthropic 的 Claude 模型登陆 NVIDIA GB300 Blackwell Ultra 平台</h3>
+<p>6 月 29 日，NVIDIA 在博客中宣布，Anthropic 的 Claude 模型现在可以在 Microsoft Azure 上使用 GB300 Blackwell Ultra GPU 运行。此前，Claude 模型的部署主要依赖其他计算硬件，此次整合 AI 模型获得了更先进的 GPU 支持。这将直接提升 Claude 模型的推理和训练效率，为 AI 开发者提供更强计算能力，可能加速大语言模型在云服务中的应用。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 最终批准对 Illuminate 的数据安全处罚令</h3>
+<p>6 月 30 日，美国联邦贸易委员会（FTC）最终批准了一项针对教育科技公司 Illuminate 的处罚令，指控其未能保护学生个人数据。此前，FTC 已对类似数据泄露事件进行调查，此次正式处罚表明监管机构对数据安全问题采取零容忍态度。这为教育科技行业设定了更高的合规标准，相关企业需加强数据保护措施，否则将面临严厉后果。</p>
+</div>
+<div class='event'>
+<h3>3. Meta 发布非侵入式脑活动 AI 翻译技术</h3>
+<p>6 月 29 日，根据 Decrypt 报道，Meta 发布了一项利用 AI 将大脑活动非侵入式地翻译为文本的新技术。此前，脑机接口技术多依赖手术植入设备，此次突破实现了无需手术的脑活动解码。这为医疗康复、人机交互等领域开辟了新途径，可能推动神经科技研发方向转变，影响相关产业创新。</p>
+</div>
+<div class='event'>
+<h3>4. Rocket Lab 宣布 80 亿美元收购 Iridium 挑战 Starlink</h3>
+<p>6 月 30 日，据 MarketWatch 报道，火箭实验室（Rocket Lab）宣布以 80 亿美元收购卫星公司 Iridium，旨在挑战 SpaceX 的 Starlink 服务。此前，卫星互联网市场由 SpaceX 主导，此次收购新玩家通过整合资源进入竞争。这将加剧低轨卫星通信市场的竞争，可能影响定价策略、覆盖范围和技术创新，波及航天产业链和消费者。</p>
+</div>
+<div class='event'>
+<h3>5. 谷歌向美国免费用户开放 Gemini AI 图像生成功能</h3>
+<p>6 月 29 日，TechCrunch 报道，谷歌宣布将 Gemini 的个性化 AI 图像生成功能扩展到美国免费用户。此前，该功能可能仅限于付费或高级订阅用户，此次开放使得更多用户能够访问 AI 图像生成工具。这扩大了 AI 创作工具的普及度，可能推动内容创作、广告和娱乐行业的应用，影响 AI 平台竞争格局。</p>
+</div>
+<div class='event'>
+<h3>6. Anthropic 的 Claude 模型现可在 Microsoft Azure</h3>
+<p>6 月 29 日，Anthropic 的 Claude 模型现可在 Microsoft Azure 上使用 NVIDIA GB300 Blackwell Ultra GPU 运行。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 美国贸易代表就中国海运物流造船行业举行 301 调查听证会并征求意见</h3>
+<p>6 月 30 日，美国贸易代表办公室就中国在海运、物流和造船行业的相关政策与做法举行公开听证会，并同时征求公众对拟议行动的意见。此前，美方已启动针对该领域的 301 调查，此次程序将调查推向可能采取具体行动的准备阶段。后续影响指向中国相关行业对美出口及供应链结构，并牵动国际贸易规则下的利益博弈。</p>
+</div>
+<div class='event'>
+<h3>2. 美国贸易代表就中国半导体行业举行 301 调查听证会</h3>
+<p>6 月 30 日，美国贸易代表办公室就中国针对半导体行业的相关政策、做法及追求主导地位的行为举行公开听证会。此次听证是美方 301 调查程序的一部分，旨在评估相关行为对美国产业的影响。听证会将为美方决定是否采取关税或其他贸易行动提供依据，直接指向中国半导体产业及全球芯片供应链格局。</p>
+</div>
+<div class='event'>
+<h3>3. 美最高法院裁定解雇美联储理事违宪</h3>
+<p>6 月 29 日，美国最高法院裁定，特朗普此前解雇美联储理事丽莎·库克的行为违宪。此前，围绕总统是否有权独立解雇美联储高级官员存在法律争议，此次裁定明确了美联储理事会成员受法律保护的职位稳定性。该裁决强化了央行独立于政治干预的制度安排，直接影响未来美国货币政策的制定过程及市场对其可信度的预期。</p>
+</div>
+<div class='event'>
+<h3>4. 三星与 SK 海力士承诺超 5500 亿美元投资缓解内存短缺</h3>
+<p>6 月 29 日，韩国科技巨头三星电子与 SK 海力士宣布，将承诺超过 5500 亿美元的资本支出，用于扩产以缓解由人工智能需求驱动的内存芯片短缺问题。此前，市场对 AI 服务器所需的高带宽内存供应紧张持续担忧，此次大规模投资承诺是业界对“内存荒”（RAMageddon）问题的直接回应。该计划若实施，将显著影响全球半导体产能格局和 AI 算力供应，同时对相关设备与材料供应链产生巨大需求。</p>
+</div>
+<div class='event'>
+<h3>5. 欧盟与中国同意就贸易逆差启动为期三个月谈判</h3>
+<p>6 月 29 日，欧盟与中国同意就规模达 3600 亿欧元的贸易逆差问题启动为期三个月的谈判。此前，双边贸易失衡是欧盟关切的核心议题，此次正式谈判的设置将贸易问题纳入结构化对话框架。后续三个月的谈判结果将直接影响中欧贸易关系走向、具体行业关税安排，并对全球供应链的稳定与重构产生实质影响。</p>
+</div>
+<div class='event'>
+<h3>6. 美国贸易代表就中国航运、物流和造船行业主导地位的 301 调查举行公开听证会</h3>
+<p>6 月 30 日，美国贸易代表就中国航运、物流和造船行业主导地位的 301 调查举行公开听证会。现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。</p>
+</div>
+<ul class='headline-list'>
+<li>美国贸易代表就外国不公平和非互惠贸易实践征求公众意见。</li>
+<li>美国贸易代表就 2025 年特别 301 审查举行公开听证会。</li>
+<li>OpenAI 发布报告，分析 AI 技术可能如何重塑欧盟各国的就业结构与工作岗位。</li>
+</ul>
+</body>
+</html>
