@@ -8,6 +8,8 @@ from report_engine import (
     PeriodicalOverview,
     ReportPreparation,
     ReportSpec,
+    _build_periodical_gate_result,
+    _build_periodical_overview_fallback,
     _normalize_detailed_events_to_chinese,
     _normalize_headline_only_by_column,
     _build_periodical_overview_payload,
@@ -644,7 +646,10 @@ def test_build_report_prefers_quantity_for_daily_fill(tmp_path):
             "is_hard_news": True,
         },
     ]
-    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+    config = {"rules": {
+        "quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4},
+        "periodical_gate": {"min_total_events": 1, "min_columns_with_events": 1, "min_hard_news": 1, "min_source_tiers": 1},
+    }}
 
     class _DummyDb:
         def fetch_since(self, since):
@@ -706,7 +711,10 @@ def test_build_report_injects_weekly_overview_into_meta_and_columns(tmp_path):
         "source_links": [],
         "is_hard_news": True,
     }]
-    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+    config = {"rules": {
+        "quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4},
+        "periodical_gate": {"min_total_events": 1, "min_columns_with_events": 1, "min_hard_news": 1, "min_source_tiers": 1},
+    }}
 
     class _DummyDb:
         def fetch_since(self, since):
@@ -777,7 +785,10 @@ def test_build_report_injects_monthly_overview_into_meta_and_columns(tmp_path):
         "source_links": [],
         "is_hard_news": True,
     }]
-    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+    config = {"rules": {
+        "quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4},
+        "periodical_gate": {"min_total_events": 1, "min_columns_with_events": 1, "min_hard_news": 1, "min_source_tiers": 1},
+    }}
 
     class _DummyDb:
         def fetch_since(self, since):
@@ -817,6 +828,81 @@ def test_build_report_injects_monthly_overview_into_meta_and_columns(tmp_path):
     assert feed_meta["overview"]["watchlist"] == ["观察点一"]
 
 
+def test_build_periodical_gate_result_blocks_single_source_sparse_window():
+    spec = ReportSpec(
+        report_type="weekly",
+        report_key="2026-W25",
+        title="测试周报",
+        since=datetime(2026, 6, 15, tzinfo=timezone.utc),
+        until=datetime(2026, 6, 22, tzinfo=timezone.utc),
+        output_dir="docs/news/weekly",
+        feed_path="docs/feeds/news.xml",
+        base_url="",
+        column_quotas={
+            "us_politics": {"label": "美国政局"},
+            "global_affairs": {"label": "国际局势"},
+            "technology": {"label": "科技前沿"},
+            "economy": {"label": "经济走势"},
+        },
+    )
+
+    scored_events = [
+        {
+            "title": "美国事件",
+            "source": "Source A",
+            "score": 90,
+            "summary": "摘要",
+            "content": "正文",
+            "column": "us_politics",
+            "event_key": "a",
+            "source_tier": 1,
+            "is_hard_news": True,
+        }
+    ]
+
+    class _DummyDb:
+        def source_health_rows(self, **kwargs):
+            return [{
+                "source": "Source A",
+                "source_tier": 1,
+                "column": "us_politics",
+                "article_count": 1,
+                "scored_count": 1,
+                "strong_scored_count": 1,
+                "active_days": 1,
+                "latest_seen_at": "2026-06-21T00:00:00+00:00",
+                "fetch_mode": "rss",
+                "configured_column": "us_politics",
+                "configured_source_tier": 1,
+                "source_enabled": True,
+            }]
+
+        def fetch_log_rows(self, **kwargs):
+            return []
+
+    config = {"rules": {"periodical_gate": {"min_total_events": 2, "min_columns_with_events": 2, "min_hard_news": 2}}}
+    result = _build_periodical_gate_result(spec, scored_events, _DummyDb(), config)
+
+    assert result["gate_failed"] is True
+    assert any("总事件量不足" in item for item in result["reasons"])
+    assert any("覆盖栏目不足" in item for item in result["reasons"])
+
+
+def test_build_periodical_overview_fallback_uses_existing_column_text():
+    columns = {
+        "us_politics": {
+            "detailed_events": [{"title_zh": "白宫推动新措施", "reader_body": "6 月 28 日，白宫推动新措施并协调国会。"}],
+            "headline_only_events": [],
+        },
+        "global_affairs": {"detailed_events": [], "headline_only_events": []},
+    }
+    overview = _build_periodical_overview_fallback("weekly", "测试周报", ["要点一"], columns)
+
+    assert "测试周报" in overview.summary
+    assert overview.themes[0] == "白宫推动新措施"
+    assert "us_politics" in overview.column_analyses
+
+
 def test_build_report_daily_uses_daily_overview_generation(tmp_path):
     spec = ReportSpec(
         report_type="daily",
@@ -847,7 +933,10 @@ def test_build_report_daily_uses_daily_overview_generation(tmp_path):
         "source_links": [],
         "is_hard_news": True,
     }]
-    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+    config = {"rules": {
+        "quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4},
+        "periodical_gate": {"min_total_events": 1, "min_columns_with_events": 1, "min_hard_news": 1, "min_source_tiers": 1},
+    }}
 
     class _DummyDb:
         def fetch_since(self, since):
@@ -903,7 +992,10 @@ def test_build_report_daily_overview_failure_falls_back_to_empty_lead(tmp_path):
         "source_links": [],
         "is_hard_news": True,
     }]
-    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+    config = {"rules": {
+        "quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4},
+        "periodical_gate": {"min_total_events": 1, "min_columns_with_events": 1, "min_hard_news": 1, "min_source_tiers": 1},
+    }}
 
     class _DummyDb:
         def fetch_since(self, since):
@@ -958,7 +1050,10 @@ def test_build_report_periodical_overview_failure_falls_back_to_empty_payload(tm
         "source_links": [],
         "is_hard_news": True,
     }]
-    config = {"rules": {"quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4}}}
+    config = {"rules": {
+        "quality_gate": {"min_chars": 1, "max_chars": 260, "min_sentences": 1, "max_sentences": 4},
+        "periodical_gate": {"min_total_events": 1, "min_columns_with_events": 1, "min_hard_news": 1, "min_source_tiers": 1},
+    }}
 
     class _DummyDb:
         def fetch_since(self, since):
@@ -981,8 +1076,8 @@ def test_build_report_periodical_overview_failure_falls_back_to_empty_payload(tm
     columns = save_report.call_args.args[1]
     feed_meta = save_feed.call_args.args[0]
 
-    assert meta["lead"] == ""
-    assert meta["overview"] == {}
-    assert columns["us_politics"]["analysis"] == ""
-    assert feed_meta["overview"] == {}
+    assert "测试周报" in meta["lead"]
+    assert meta["overview"]["summary"] == meta["lead"]
+    assert columns["us_politics"]["analysis"] == "美国事件正文"
+    assert feed_meta["overview"]["themes"] == ["美国事件"]
     assert stats["metrics"]["ai"]["overview_failure"] == "overview timeout"

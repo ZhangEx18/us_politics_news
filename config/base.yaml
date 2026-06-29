@@ -118,3 +118,12 @@ rules:
 
   freshness_gate:
     min_ratio: 0.95
+
+  periodical_gate:
+    min_total_events: 8
+    min_columns_with_events: 3
+    min_column_events: 2
+    min_hard_news: 8
+    min_sources_per_column: 2
+    min_source_tiers: 2
+    min_scored_ratio: 0.6

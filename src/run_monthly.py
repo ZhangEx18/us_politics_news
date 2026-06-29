@@ -17,10 +17,10 @@ _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(_project_root)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from database import NewsDatabase
+from database import NewsDatabase, db_health_check, format_health_report
 from ai_analyzer import _load_ai_config
 from config import load_config, augment_ai_config_with_runtime
-from run_pipeline import _open_news_db
+from run_pipeline import _open_news_db, _load_sources
 from report_engine import ReportSpec, build_report
 from report_titles import build_monthly_title
 
@@ -77,11 +77,18 @@ def run_monthly() -> dict:
     publish_cfg = config.get("publish", {})
 
     db = _open_news_db(config)
+    sources = _load_sources(config)
 
     # === 1. 计算时间窗口 ===
     since, until, report_key = _get_monthly_window()
     year, month = since.year, since.month
     print(f"[月报] 窗口: {since.strftime('%Y-%m-%d %H:%M')} → {until.strftime('%Y-%m-%d %H:%M')}  标识: {report_key}")
+    health = db_health_check(
+        storage_cfg.get("db_path", "data/products/news/news.db"),
+        window_since=since.astimezone(timezone.utc).replace(tzinfo=None),
+        source_defs=sources,
+    )
+    print(f"\n[数据库状态]\n{format_health_report(health)}")
 
     since_key = since.strftime("%Y-%m-%d")
     until_key = until.strftime("%Y-%m-%d")

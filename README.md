@@ -59,7 +59,10 @@ flowchart TD
     CFG --> PAGES["从 gh-pages 恢复历史归档"]
     DB --> RUN["src/run_product.py"]
     PAGES --> RUN
-    RUN --> OUT["生成 Markdown / HTML / RSS"]
+    RUN --> HEALTH["源健康与窗口覆盖检查"]
+    HEALTH --> GATE{"日报今日性 / 周月报周期门禁"}
+    GATE -->|通过| OUT["生成 Markdown / HTML / RSS"]
+    GATE -->|失败| FAIL["明确失败并记录原因"]
     OUT --> CHECK["校验报告、全文 Feed、栏目结构"]
     CHECK --> DEPLOY["发布 docs/ 到 GitHub Pages"]
     CHECK --> STATE["写回 state 分支数据库"]
@@ -77,11 +80,14 @@ flowchart TD
 - 状态数据库不放在 `main` 的 `docs/` 里发布。`news` 使用 `news-data` 分支保存 `data/products/news/news.db`，其他 product 使用 `{product}-state` 分支。
 - Feed 必须包含 `content:encoded`，并通过 workflow 校验；Reader 订阅依赖 `docs/feeds/news.xml` 的全文 RSS。
 - 日报发布契约要求四个栏目都有中文 `重点解析`，不要通过放宽 `format_contract.require_detailed_events` 绕过校验。AI 栏目写作输出为空或未中文化时，应从已评分候选的中文摘要降级生成简版重点解析，仍保留日期和事实边界。
+- 周报/月报按时由 workflow 触发，但不是“无论数据质量如何都出刊”。`report_engine` 会在写作前执行 `periodical_gate`：检查窗口内总事件量、硬新闻量、覆盖栏目数、来源层级和源健康；不满足时返回 `periodical_gate_failed`，并把原因写进 metrics，而不是发布结构不完整的周报/月报。
+- 源健康不只看 `fetch_log`。由于抓取日志可能为空，健康判断以 `articles` 中的 `source`、`source_tier`、`fetch_mode`、最近出现时间、7/30 天入库量、评分量和栏目分布为主，`fetch_log` 只作为有则使用的辅助信号。
+- 周报/月报总览必须是主题线驱动：先聚合周期内事件，再输出跨事件主线、观察点和栏目前置分析。AI 总览失败时，只能从已入选事件标题和正文生成保守 fallback，不得补写输入没有的因果、数字或后续影响。
 
 ## Pipeline 流程
 
 ```
-并发抓取 -> 跨源去重 -> AI 评分 -> 事件合并 -> AI 写作 -> 渲染日报 -> 生成 Feed
+并发抓取 -> 跨源去重 -> AI 评分 -> 源健康/窗口门禁 -> 事件合并 -> AI 写作 -> 渲染报告 -> 生成 Feed
 ```
 
 | 步骤 | 说明 |
@@ -89,10 +95,21 @@ flowchart TD
 | 并发抓取 | RSS / RSSHub / Google News / Custom 等抓取器异步并发，统一返回 ContentItem |
 | 跨源 URL 去重 | 同一 URL 多源 -> 保留内容最丰富的，合并 metadata |
 | AI 评分 | 来源权重 + 主题优先级 + 关键词命中 + AI 深度分析 |
+| 源健康/窗口门禁 | 日报检查今日性；周报/月报检查栏目覆盖、硬新闻量、来源层级和单源偏置 |
 | 事件合并 | 语义相似度识别同一事件的不同报道 |
 | AI 写作 | 生成中文栏目正文、要点与周期性总览 |
-| 渲染日报 | Markdown + HTML + Reader 友好 HTML 片段 |
+| 渲染报告 | Markdown + HTML + Reader 友好 HTML 片段 |
 | 生成 Feed | RSS 2.0 全文，Reader 订阅 |
+
+## 周报 / 月报稳定性
+
+周报和月报的目标是“可按时、可解释、可连续”，不是把窗口里的文章简单堆叠成一篇长文。
+
+- 按时：`weekly-publish.yml` 每周一北京时间 07:35 触发，`monthly-publish.yml` 在北京时间月初 07:40 命中后触发，二者都委托 `publish-product.yml` 和 `src/run_product.py`。
+- 可解释：运行前会打印数据库健康报告，包括文章总数、窗口内文章数、源覆盖、栏目覆盖和重点源状态。
+- 可连续：周/月报优先复用日报沉淀事件；若没有可复用事件，再从数据库窗口内已评分文章构建周期事件。
+- 失败优先于坏内容：窗口内数据不满足 `rules.periodical_gate` 时，发布失败并给出原因；不要为了“按时”降低栏目、硬新闻或来源健康门槛。
+- 历史回补遵循 7/30 天优先：先补最近 7 天和 30 天缺口，再决定是否扩大到更早历史，不做无边界全量回灌。
 
 ## 输出文章结构
 

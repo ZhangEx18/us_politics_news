@@ -5,6 +5,7 @@ import hashlib
 import json
 import sqlite3
 from dataclasses import dataclass
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import List, Optional
@@ -184,6 +185,69 @@ class NewsDatabase:
     def article_count(self) -> int:
         with self._connect() as conn:
             return int(conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0])
+
+    def source_health_rows(
+        self,
+        window_since: datetime | None = None,
+        window_days: int = 30,
+        source_defs: list[dict] | None = None,
+    ) -> list[dict]:
+        """汇总源健康数据：按 source 聚合最近窗口的入库量、评分量与栏目分布。"""
+        if window_since is None:
+            window_since = datetime.now(timezone.utc) - timedelta(days=window_days)
+        cutoff = _to_utc_storage(window_since)
+        source_meta = {
+            str(item.get("name") or "").strip(): dict(item)
+            for item in (source_defs or [])
+            if str(item.get("name") or "").strip()
+        }
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT
+                    source,
+                    source_type,
+                    source_tier,
+                    "column",
+                    COUNT(*) AS article_count,
+                    SUM(CASE WHEN llm_score IS NOT NULL THEN 1 ELSE 0 END) AS scored_count,
+                    SUM(CASE WHEN llm_score IS NOT NULL AND llm_score >= 65 THEN 1 ELSE 0 END) AS strong_scored_count,
+                    COUNT(DISTINCT substr(COALESCE(published_at, fetched_at), 1, 10)) AS active_days,
+                    MAX(COALESCE(published_at, fetched_at)) AS latest_seen_at
+                FROM articles
+                WHERE COALESCE(published_at, fetched_at) >= ?
+                GROUP BY source, source_type, source_tier, "column"
+                ORDER BY article_count DESC, source ASC, "column" ASC
+                """,
+                (cutoff,),
+            ).fetchall()
+        result: list[dict] = []
+        for row in rows:
+            row_dict = dict(row)
+            meta = source_meta.get(str(row_dict.get("source") or "").strip(), {})
+            row_dict["fetch_mode"] = meta.get("fetch_mode") or row_dict.get("source_type") or "rss"
+            row_dict["configured_column"] = meta.get("column", row_dict.get("column") or "")
+            row_dict["configured_source_tier"] = int(meta.get("source_tier") or row_dict.get("source_tier") or 4)
+            row_dict["source_enabled"] = bool(meta.get("enabled", True))
+            result.append(row_dict)
+        return result
+
+    def fetch_log_rows(self, window_since: datetime | None = None, window_days: int = 30) -> list[dict]:
+        """返回抓取日志汇总，供健康报告使用。"""
+        if window_since is None:
+            window_since = datetime.now(timezone.utc) - timedelta(days=window_days)
+        cutoff = _to_utc_storage(window_since)
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT source, status, count, fetched_at
+                FROM fetch_log
+                WHERE fetched_at >= ?
+                ORDER BY fetched_at DESC
+                """,
+                (cutoff,),
+            ).fetchall()
+        return [dict(row) for row in rows]
 
     def fetch_log_count(self) -> int:
         with self._connect() as conn:
@@ -784,7 +848,11 @@ class NewsDatabase:
         )
 
 
-def db_health_check(db_path: str, window_since: datetime | None = None) -> dict:
+def db_health_check(
+    db_path: str,
+    window_since: datetime | None = None,
+    source_defs: list[dict] | None = None,
+) -> dict:
     """数据库健康检查：返回文章总数、最晚抓取时间、窗口命中数等状态信息。
 
     用于在 digest-only 或完整流程前打印可观测状态，帮助排查"停更无感"问题。
@@ -798,6 +866,9 @@ def db_health_check(db_path: str, window_since: datetime | None = None) -> dict:
         "latest_fetched_at": None,
         "window_count": 0,
         "window_since": None,
+        "fetch_log_count": 0,
+        "source_health_rows": [],
+        "source_health_summary": {},
     }
 
     if not _Path(db_path).exists():
@@ -808,8 +879,14 @@ def db_health_check(db_path: str, window_since: datetime | None = None) -> dict:
     try:
         db = NewsDatabase(db_path)
         result["article_count"] = db.article_count()
+        result["fetch_log_count"] = db.fetch_log_count()
     except Exception:
         return result
+
+    window_since_utc = None
+    if window_since is not None:
+        window_since_utc = window_since if window_since.tzinfo else window_since.replace(tzinfo=timezone.utc)
+        window_since_utc = window_since_utc.astimezone(timezone.utc)
 
     import sqlite3 as _sqlite3
 
@@ -819,14 +896,31 @@ def db_health_check(db_path: str, window_since: datetime | None = None) -> dict:
             if row and row[0]:
                 result["latest_fetched_at"] = row[0]
 
-            if window_since is not None:
-                cutoff = _to_utc_storage(window_since)
+            if window_since_utc is not None:
+                cutoff = _to_utc_storage(window_since_utc)
                 if cutoff:
                     count_row = conn.execute(
                         "SELECT COUNT(*) FROM articles WHERE fetched_at >= ?", (cutoff,)
                     ).fetchone()
                     result["window_count"] = count_row[0] if count_row else 0
                     result["window_since"] = cutoff
+        try:
+            result["source_health_rows"] = db.source_health_rows(
+                window_since=window_since,
+                source_defs=source_defs,
+            )
+            result["source_health_summary"] = build_source_health_summary(
+                result["source_health_rows"],
+                fetch_log_rows=db.fetch_log_rows(window_since=window_since_utc) if window_since_utc else [],
+                window_days=max(
+                    1,
+                    int((datetime.now(timezone.utc) - window_since_utc).days) if window_since_utc else 30,
+                ),
+                source_defs=source_defs,
+            )
+        except Exception:
+            result["source_health_rows"] = []
+            result["source_health_summary"] = {}
     except Exception:
         pass
 
@@ -843,6 +937,7 @@ def format_health_report(check: dict) -> str:
         return "\n".join(lines)
 
     lines.append(f"  文章总数: {check['article_count']}")
+    lines.append(f"  抓取日志: {check.get('fetch_log_count', 0)} 条")
 
     if check["latest_fetched_at"]:
         lines.append(f"  最晚抓取时间: {check['latest_fetched_at']}")
@@ -853,15 +948,305 @@ def format_health_report(check: dict) -> str:
         lines.append(f"  窗口起始: {check['window_since']}")
         lines.append(f"  窗口内文章数: {check['window_count']}")
 
+    summary = check.get("source_health_summary") or {}
+    if summary:
+        lines.append(
+            f"  源覆盖: {summary.get('source_count', 0)} 个源 / {summary.get('column_count', 0)} 个栏目"
+        )
+        column_parts = []
+        for col_key in ("us_politics", "global_affairs", "technology", "economy"):
+            col = summary.get("columns", {}).get(col_key, {})
+            if not col:
+                continue
+            column_parts.append(
+                f"{col_key}:{col.get('article_count', 0)}"
+                f"/源{col.get('source_count', 0)}"
+                f"/{col.get('status', 'unknown')}"
+            )
+        if column_parts:
+            lines.append("  栏目覆盖: " + " | ".join(column_parts))
+        top_sources = summary.get("sources", [])[:3]
+        if top_sources:
+            rendered = []
+            for source in top_sources:
+                rendered.append(
+                    f"{source.get('source', '')}({source.get('health_status', 'unknown')},"
+                    f"{source.get('article_count', 0)}篇)"
+                )
+            lines.append("  重点源: " + " | ".join(rendered))
+
     # 状态判定
     if check["article_count"] == 0:
         lines.append("  判定: 空库，需要先抓取或同步远端状态")
     elif check.get("window_count", -1) == 0:
         lines.append("  判定: 有历史数据但当前窗口为空，库可能已停更")
     elif check.get("window_count", -1) > 0:
-        lines.append("  判定: 正常")
+        if summary and summary.get("column_health_state") == "single_source_bias":
+            lines.append("  判定: 有数据，但栏目来源偏单一")
+        elif summary and summary.get("window_state") == "stale":
+            lines.append("  判定: 有数据，但最近窗口偏旧")
+        else:
+            lines.append("  判定: 正常")
 
     return "\n".join(lines)
+
+
+def _parse_health_timestamp(value: object) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _health_status_for_source(
+    article_count: int,
+    active_days: int,
+    latest_seen_at: str,
+    fetch_success_rate: float | None,
+    source_enabled: bool,
+) -> str:
+    if not source_enabled:
+        return "disabled"
+    if article_count <= 0:
+        return "empty"
+    if fetch_success_rate is not None and fetch_success_rate <= 0:
+        return "fetch_failed"
+    latest_dt = _parse_health_timestamp(latest_seen_at)
+    if latest_dt is not None:
+        age_days = max(0.0, (datetime.now(timezone.utc) - latest_dt).total_seconds() / 86400)
+        if age_days >= 7:
+            return "stale"
+    if article_count >= 5 and active_days >= 2:
+        return "healthy"
+    if article_count >= 2:
+        return "watch"
+    return "thin"
+
+
+def _column_status(article_count: int, source_count: int) -> str:
+    if article_count <= 0:
+        return "empty"
+    if article_count < 3:
+        return "thin"
+    if source_count <= 1:
+        return "single_source"
+    return "healthy"
+
+
+def build_source_health_summary(
+    rows: list[dict],
+    fetch_log_rows: list[dict] | None = None,
+    window_days: int = 30,
+    source_defs: list[dict] | None = None,
+) -> dict:
+    """把源级别健康行聚合成可读摘要，兼顾源健康与栏目覆盖。"""
+    source_meta = {
+        str(item.get("name") or "").strip(): dict(item)
+        for item in (source_defs or [])
+        if str(item.get("name") or "").strip()
+    }
+    source_logs: dict[str, dict[str, object]] = defaultdict(lambda: {"total": 0, "ok": 0, "latest": ""})
+    for row in fetch_log_rows or []:
+        source = str(row.get("source") or "").strip()
+        if not source:
+            continue
+        entry = source_logs[source]
+        entry["total"] = int(entry["total"]) + 1
+        if str(row.get("status") or "").strip().lower() in {"ok", "success", "succeeded"}:
+            entry["ok"] = int(entry["ok"]) + 1
+        fetched_at = str(row.get("fetched_at") or "").strip()
+        if fetched_at and fetched_at > str(entry["latest"] or ""):
+            entry["latest"] = fetched_at
+
+    sources: dict[str, dict] = {}
+    columns: dict[str, dict] = {}
+    total_articles = 0
+    total_scored = 0
+    total_strong_scored = 0
+    latest_seen_at = ""
+
+    for row in rows:
+        source = str(row.get("source") or "").strip() or "unknown"
+        column = str(row.get("column") or "").strip() or "unknown"
+        tier = int(row.get("configured_source_tier") or row.get("source_tier") or 4)
+        article_count = int(row.get("article_count") or 0)
+        scored_count = int(row.get("scored_count") or 0)
+        strong_scored_count = int(row.get("strong_scored_count") or 0)
+        active_days = int(row.get("active_days") or 0)
+        seen_at = str(row.get("latest_seen_at") or "").strip()
+        fetch_mode = str(row.get("fetch_mode") or source_meta.get(source, {}).get("fetch_mode") or row.get("source_type") or "rss").strip()
+        expected_column = str(row.get("configured_column") or source_meta.get(source, {}).get("column") or "").strip()
+        source_enabled = bool(row.get("source_enabled", True))
+
+        total_articles += article_count
+        total_scored += scored_count
+        total_strong_scored += strong_scored_count
+        if seen_at and (not latest_seen_at or seen_at > latest_seen_at):
+            latest_seen_at = seen_at
+
+        source_entry = sources.setdefault(source, {
+            "source": source,
+            "fetch_mode": fetch_mode,
+            "source_tier": tier,
+            "expected_column": expected_column,
+            "source_enabled": source_enabled,
+            "article_count": 0,
+            "scored_count": 0,
+            "strong_scored_count": 0,
+            "active_days": 0,
+            "latest_seen_at": "",
+            "columns": {},
+            "health_status": "thin",
+            "coverage_status": "empty",
+            "fetch_success_rate": None,
+            "fetch_log_count": 0,
+            "fetch_log_ok_count": 0,
+        })
+        source_entry["article_count"] += article_count
+        source_entry["scored_count"] += scored_count
+        source_entry["strong_scored_count"] += strong_scored_count
+        source_entry["active_days"] = max(int(source_entry["active_days"]), active_days)
+        if seen_at and (not source_entry["latest_seen_at"] or seen_at > source_entry["latest_seen_at"]):
+            source_entry["latest_seen_at"] = seen_at
+        source_entry["columns"][column] = source_entry["columns"].get(column, 0) + article_count
+
+        log_info = source_logs.get(source, {"total": 0, "ok": 0, "latest": ""})
+        source_entry["fetch_log_count"] = int(log_info.get("total") or 0)
+        source_entry["fetch_log_ok_count"] = int(log_info.get("ok") or 0)
+        if int(log_info.get("total") or 0) > 0:
+            source_entry["fetch_success_rate"] = round(
+                int(log_info.get("ok") or 0) / int(log_info.get("total") or 1),
+                3,
+            )
+        source_entry["health_status"] = _health_status_for_source(
+            article_count=int(source_entry["article_count"]),
+            active_days=int(source_entry["active_days"]),
+            latest_seen_at=str(source_entry["latest_seen_at"]),
+            fetch_success_rate=source_entry["fetch_success_rate"],
+            source_enabled=source_enabled,
+        )
+        if expected_column and article_count > 0:
+            observed_columns = {key for key, value in source_entry["columns"].items() if value > 0}
+            if expected_column not in observed_columns:
+                source_entry["coverage_status"] = "column_mismatch"
+            elif len(observed_columns) > 1:
+                source_entry["coverage_status"] = "multi_column"
+            else:
+                source_entry["coverage_status"] = "covered"
+        elif article_count > 0:
+            source_entry["coverage_status"] = "covered"
+
+        column_entry = columns.setdefault(column, {
+            "column": column,
+            "article_count": 0,
+            "scored_count": 0,
+            "strong_scored_count": 0,
+            "source_count": 0,
+            "source_tier_counts": {},
+            "source_names": [],
+            "status": "empty",
+        })
+        column_entry["article_count"] += article_count
+        column_entry["scored_count"] += scored_count
+        column_entry["strong_scored_count"] += strong_scored_count
+        column_entry.setdefault("source_names", [])
+        if source not in column_entry["source_names"]:
+            column_entry["source_names"].append(source)
+        column_entry["source_count"] = len(column_entry["source_names"])
+        tier_counts = column_entry.setdefault("source_tier_counts", {})
+        tier_counts[str(tier)] = tier_counts.get(str(tier), 0) + article_count
+        column_entry["status"] = _column_status(
+            article_count=int(column_entry["article_count"]),
+            source_count=int(column_entry["source_count"]),
+        )
+
+    for source, meta in source_meta.items():
+        if source in sources:
+            continue
+        source_enabled = bool(meta.get("enabled", True))
+        log_info = source_logs.get(source, {"total": 0, "ok": 0, "latest": ""})
+        fetch_success_rate = None
+        if int(log_info.get("total") or 0) > 0:
+            fetch_success_rate = round(
+                int(log_info.get("ok") or 0) / int(log_info.get("total") or 1),
+                3,
+            )
+        sources[source] = {
+            "source": source,
+            "fetch_mode": str(meta.get("fetch_mode") or "rss"),
+            "source_tier": int(meta.get("source_tier") or 4),
+            "expected_column": str(meta.get("column") or ""),
+            "source_enabled": source_enabled,
+            "article_count": 0,
+            "scored_count": 0,
+            "strong_scored_count": 0,
+            "active_days": 0,
+            "latest_seen_at": "",
+            "columns": {},
+            "health_status": _health_status_for_source(
+                article_count=0,
+                active_days=0,
+                latest_seen_at="",
+                fetch_success_rate=fetch_success_rate,
+                source_enabled=source_enabled,
+            ),
+            "coverage_status": "empty",
+            "fetch_success_rate": fetch_success_rate,
+            "fetch_log_count": int(log_info.get("total") or 0),
+            "fetch_log_ok_count": int(log_info.get("ok") or 0),
+        }
+
+    source_list = sorted(
+        sources.values(),
+        key=lambda item: (-int(item.get("article_count") or 0), str(item.get("source") or "")),
+    )
+    column_list = [columns[key] for key in sorted(columns)]
+
+    source_count = len(source_list)
+    column_count = len(column_list)
+    if not column_list:
+        column_health_state = "empty"
+    elif any(item["status"] == "single_source" for item in column_list):
+        column_health_state = "single_source_bias"
+    elif any(item["status"] == "empty" for item in column_list):
+        column_health_state = "missing_column"
+    elif any(item["status"] == "thin" for item in column_list):
+        column_health_state = "thin"
+    else:
+        column_health_state = "healthy"
+
+    if latest_seen_at:
+        latest_dt = _parse_health_timestamp(latest_seen_at)
+        if latest_dt is not None:
+            window_age_days = max(0.0, (datetime.now(timezone.utc) - latest_dt).total_seconds() / 86400)
+            if window_age_days >= max(7, window_days * 0.5):
+                window_state = "stale"
+            else:
+                window_state = "fresh"
+        else:
+            window_state = "unknown"
+    else:
+        window_state = "empty"
+
+    return {
+        "window_days": window_days,
+        "source_count": source_count,
+        "column_count": column_count,
+        "total_articles": total_articles,
+        "total_scored": total_scored,
+        "total_strong_scored": total_strong_scored,
+        "latest_seen_at": latest_seen_at,
+        "window_state": window_state,
+        "column_health_state": column_health_state,
+        "sources": source_list,
+        "columns": {item["column"]: item for item in column_list},
+    }
 
 
 def migrate_legacy_news_db(
