@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>观察日报 · 控制台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                   'PingFang SC', 'Microsoft YaHei', sans-serif;
+      color: #212121; background: #fff; -webkit-font-smoothing: antialiased;
+    }
+    .header {
+      border-bottom: 1px solid #e5e7eb; padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-title { font-family: 'Noto Serif SC', serif; font-size: 1.3rem; font-weight: 700; }
+    .header-actions { display: flex; gap: 12px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .btn {
+      font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 500;
+      padding: 8px 18px; border-radius: 9999px; border: none; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: #000; color: #fff; }
+    .btn-primary:hover { background: #1863dc; }
+    .btn-primary:disabled { background: #d9d9dd; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: #212121; border: 1px solid #d9d9dd; }
+    .btn-outline:hover { border-color: #1863dc; color: #1863dc; }
+
+    /* Stat Cards */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: #fff; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px; }
+    .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #93939f; margin-bottom: 6px; }
+    .stat-value { font-family: 'Noto Serif SC', serif; font-size: 1.8rem; font-weight: 700; }
+    .stat-sub { font-size: 0.8rem; color: #93939f; margin-top: 4px; }
+
+    /* Pipeline */
+    .section-title { font-family: 'Noto Serif SC', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
+    .pipeline-steps { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 32px; }
+    .pipeline-step {
+      display: flex; align-items: center; gap: 8px;
+      background: #fafafa; border: 1px solid #f2f2f2;
+      border-radius: 9999px; padding: 8px 16px; font-size: 0.85rem;
+    }
+    .pipeline-step .dot { width: 8px; height: 8px; border-radius: 50%; background: #d9d9dd; }
+    .pipeline-step.success .dot { background: #16a34a; }
+    .pipeline-step.running .dot { background: #1863dc; animation: pulse 1.5s infinite; }
+    .pipeline-arrow { color: #d9d9dd; font-size: 1.2rem; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* Daily Stats Table */
+    .stats-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+    .stats-table th {
+      text-align: left; font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #93939f; padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .stats-table td {
+      padding: 12px; border-bottom: 1px solid #f2f2f2; font-size: 0.9rem;
+    }
+    .stats-table tr:hover { background: #fafafa; }
+    .bar-cell { width: 120px; }
+    .bar-bg { height: 6px; background: #f2f2f2; border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    .bar-fill.total { background: #1863dc; }
+    .bar-fill.used { background: #16a34a; }
+    .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 9999px; border: 1px solid #e5e7eb; color: #93939f; }
+    .tag.ok { color: #16a34a; border-color: #bbf7d0; }
+    .tag.failed { color: #dc2626; border-color: #fecaca; }
+
+    /* Report List */
+    .report-list { border: 1px solid #f2f2f2; border-radius: 22px; overflow: hidden; margin-bottom: 32px; }
+    .report-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid #f2f2f2;
+      cursor: pointer; transition: background 0.1s;
+    }
+    .report-item:last-child { border-bottom: none; }
+    .report-item:hover { background: #fafafa; }
+    .report-item.active { background: #f0f4ff; border-left: 3px solid #1863dc; }
+    .report-date { font-family: 'Noto Serif SC', serif; font-size: 0.95rem; font-weight: 700; }
+    .report-meta { font-size: 0.8rem; color: #93939f; margin-top: 3px; }
+
+    /* Report Viewer */
+    .viewer-panel {
+      display: none; margin-bottom: 32px;
+      border: 1px solid #e5e7eb; border-radius: 22px; overflow: hidden;
+    }
+    .viewer-panel.open { display: block; }
+    .viewer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid #e5e7eb; background: #fafafa;
+    }
+    .viewer-title { font-family: 'Noto Serif SC', serif; font-weight: 700; }
+    .viewer-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #93939f; }
+    .viewer-close:hover { color: #212121; }
+    .viewer-body { padding: 0; max-height: 70vh; overflow-y: auto; }
+    .viewer-body iframe { width: 100%; height: 65vh; border: none; }
+
+    /* Log */
+    .log-box {
+      background: #1a1a2e; color: #e5e7eb; border-radius: 22px;
+      padding: 16px 20px; font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 0.78rem; line-height: 1.6; max-height: 250px; overflow-y: auto;
+    }
+    .log-line.error { color: #f87171; }
+    .log-line.success { color: #4ade80; }
+
+    @media (max-width: 768px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .pipeline-steps { flex-direction: column; align-items: flex-start; }
+      .pipeline-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-title">观察日报 · 控制台</div>
+    <div class="header-actions">
+      <a href="/" class="btn btn-outline">首页</a>
+      <button id="run-btn" class="btn btn-primary" onclick="triggerRun()">运行日报</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Stats -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">文章总数</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">今日新增</div>
+        <div class="stat-value" id="stat-today">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">最近运行</div>
+        <div class="stat-value" id="stat-last-run">—</div>
+        <div class="stat-sub" id="stat-last-run-time"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">数据源</div>
+        <div class="stat-value" id="stat-sources">—</div>
+        <div class="stat-sub" id="stat-sources-detail"></div>
+      </div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="section-title">Pipeline 状态</div>
+    <div class="pipeline-steps" id="pipeline-steps">
+      <div class="pipeline-step"><div class="dot"></div>抓取</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step"><div class="dot"></div>评分</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step"><div class="dot"></div>写作</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step"><div class="dot"></div>渲染</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step"><div class="dot"></div>发布</div>
+    </div>
+
+    <!-- Daily Collection Stats -->
+    <div class="section-title">每日新闻采集与使用</div>
+    <table class="stats-table" id="daily-stats-table">
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>采集量</th>
+          <th>候选</th>
+          <th>入选</th>
+          <th>使用率</th>
+          <th>采集趋势</th>
+          <th>状态</th>
+        </tr>
+      </thead>
+      <tbody id="daily-stats-body">
+        <tr><td colspan="7" style="text-align:center;color:#93939f">加载中...</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Reports -->
+    <div class="section-title">已发布日报</div>
+    <div class="report-list" id="report-list">
+      <div style="padding:20px;text-align:center;color:#93939f">加载中...</div>
+    </div>
+
+    <!-- Report Viewer (inline) -->
+    <div class="viewer-panel" id="viewer-panel">
+      <div class="viewer-header">
+        <div class="viewer-title" id="viewer-title">日报查看</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <a id="viewer-open-tab" href="#" target="_blank" class="btn btn-outline" style="font-size:0.75rem;padding:4px 12px">新窗口打开</a>
+          <button class="viewer-close" onclick="closeViewer()">✕</button>
+        </div>
+      </div>
+      <div class="viewer-body">
+        <iframe id="viewer-iframe"></iframe>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="section-title" style="margin-top:16px">运行日志</div>
+    <div class="log-box" id="log-box">
+      <div class="log-line">等待加载...</div>
+    </div>
+
+  </div>
+
+  <script>
+    const API = '';
+
+    // ── Load Status ──
+    async function loadStatus() {
+      try {
+        const r = await fetch(`${API}/api/status`);
+        const d = await r.json();
+        document.getElementById('stat-total').textContent = d.articles.total.toLocaleString();
+        document.getElementById('stat-today').textContent = `+${d.articles.today_new}`;
+        if (d.recent_runs?.length) {
+          const last = d.recent_runs[0];
+          const map = { ok: '✅', failed: '❌', running: '🔄' };
+          document.getElementById('stat-last-run').textContent = map[last.status] || last.status;
+          document.getElementById('stat-last-run-time').textContent = new Date(last.created_at).toLocaleString('zh-CN');
+        }
+        if (d.sources) {
+          document.getElementById('stat-sources').textContent = d.sources.total_sources?.toLocaleString() || '—';
+          document.getElementById('stat-sources-detail').textContent = `${d.sources.total_articles?.toLocaleString()} 篇`;
+        }
+      } catch(e) { console.error(e); }
+    }
+
+    // ── Load Daily Stats ──
+    async function loadDailyStats() {
+      try {
+        const [statsR, runsR] = await Promise.all([
+          fetch(`${API}/api/stats`),
+          fetch(`${API}/api/status`),
+        ]);
+        const stats = await statsR.json();
+        const status = await runsR.runs || (await fetch(`${API}/api/status`)).json();
+        const runs = (await (await fetch(`${API}/api/status`)).json()).recent_runs || [];
+
+        // 合并 daily stats 和 runs
+        const runMap = {};
+        for (const run of runs) {
+          if (!runMap[run.report_key]) {
+            runMap[run.report_key] = run;
+          }
+        }
+
+        const maxCount = Math.max(...(stats.daily || []).map(d => d.count), 1);
+        const tbody = document.getElementById('daily-stats-body');
+
+        if (!stats.daily?.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#93939f">暂无数据</td></tr>';
+          return;
+        }
+
+        // 最近 14 天
+        const recent = stats.daily.slice(-14).reverse();
+        tbody.innerHTML = recent.map(day => {
+          const run = runMap[day.pub_date];
+          const pct = (day.count / maxCount * 100).toFixed(0);
+          const usedPct = run ? ((run.selected_count || 0) / (run.candidate_count || 1) * 100).toFixed(0) : '—';
+          const statusTag = run
+            ? (run.status === 'ok' ? '<span class="tag ok">✅ 已发布</span>' : '<span class="tag failed">❌ 失败</span>')
+            : '<span class="tag">未运行</span>';
+
+          return `<tr>
+            <td style="font-weight:500">${day.pub_date}</td>
+            <td>${day.count.toLocaleString()}</td>
+            <td>${run?.candidate_count || '—'}</td>
+            <td>${run?.selected_count || '—'}</td>
+            <td>${run ? usedPct + '%' : '—'}</td>
+            <td class="bar-cell">
+              <div class="bar-bg"><div class="bar-fill total" style="width:${pct}%"></div></div>
+            </td>
+            <td>${statusTag}</td>
+          </tr>`;
+        }).join('');
+      } catch(e) { console.error(e); }
+    }
+
+    // ── Load Reports ──
+    async function loadReports() {
+      try {
+        const r = await fetch(`${API}/api/reports`);
+        const d = await r.json();
+        const container = document.getElementById('report-list');
+        if (!d.reports?.length) {
+          container.innerHTML = '<div style="padding:20px;text-align:center;color:#93939f">暂无日报</div>';
+          return;
+        }
+        container.innerHTML = d.reports.map(report => `
+          <div class="report-item" onclick="openViewer('${report.date}')" id="report-${report.date}">
+            <div>
+              <div class="report-date">${report.date}</div>
+              <div class="report-meta">${report.highlights?.slice(0,2).join(' · ') || ''}</div>
+            </div>
+            <div style="display:flex;gap:8px" onclick="event.stopPropagation()">
+              <a href="${report.html_url}" target="_blank" class="btn btn-outline" style="font-size:0.75rem;padding:4px 10px">HTML</a>
+            </div>
+          </div>
+        `).join('');
+      } catch(e) { console.error(e); }
+    }
+
+    // ── Inline Viewer ──
+    function openViewer(date) {
+      const panel = document.getElementById('viewer-panel');
+      const iframe = document.getElementById('viewer-iframe');
+      const title = document.getElementById('viewer-title');
+      const openTab = document.getElementById('viewer-open-tab');
+
+      // 高亮当前选中
+      document.querySelectorAll('.report-item').forEach(el => el.classList.remove('active'));
+      const item = document.getElementById(`report-${date}`);
+      if (item) item.classList.add('active');
+
+      title.textContent = `${date} 日报`;
+      openTab.href = `/docs/news/daily/${date}.html`;
+      iframe.src = `/docs/news/daily/${date}.html`;
+      panel.classList.add('open');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeViewer() {
+      const panel = document.getElementById('viewer-panel');
+      const iframe = document.getElementById('viewer-iframe');
+      panel.classList.remove('open');
+      iframe.src = '';
+      document.querySelectorAll('.report-item').forEach(el => el.classList.remove('active'));
+    }
+
+    // ── Pipeline Status ──
+    async function loadPipeline() {
+      try {
+        const r = await fetch(`${API}/api/pipeline`);
+        const d = await r.json();
+        const steps = document.querySelectorAll('.pipeline-step');
+        if (d.is_running) steps.forEach(s => s.classList.add('running'));
+        if (d.log_tail?.length) {
+          const box = document.getElementById('log-box');
+          box.innerHTML = d.log_tail.map(l => {
+            let cls = 'log-line';
+            if (l.includes('✅') || l.includes('成功')) cls += ' success';
+            if (l.includes('❌') || l.includes('失败')) cls += ' error';
+            return `<div class="${cls}">${esc(l)}</div>`;
+          }).join('');
+          box.scrollTop = box.scrollHeight;
+        }
+      } catch(e) { console.error(e); }
+    }
+
+    // ── Trigger Run ──
+    async function triggerRun() {
+      const btn = document.getElementById('run-btn');
+      btn.disabled = true; btn.textContent = '启动中...';
+      try {
+        const r = await fetch(`${API}/api/run`, { method: 'POST' });
+        const d = await r.json();
+        btn.textContent = d.status === 'already_running' ? '已在运行' : '已启动';
+      } catch(e) { btn.textContent = '失败'; }
+      setTimeout(() => { btn.disabled = false; btn.textContent = '运行日报'; }, 3000);
+    }
+
+    function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    // ── Init ──
+    async function init() {
+      await Promise.all([loadStatus(), loadDailyStats(), loadReports(), loadPipeline()]);
+    }
+    init();
+  </script>
+</body>
+</html>
