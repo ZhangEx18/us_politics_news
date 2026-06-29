@@ -368,6 +368,9 @@ def _entry_passes_freshness(entry: dict, allowed_dates: set[str]) -> bool:
     status = str(entry.get("freshness_status") or "").strip()
     freshness_date = str(entry.get("freshness_date") or "").strip()
     event_date = str(entry.get("event_date") or "").strip()
+    # unknown_date 且无明确 event_date 的条目，视为无法确认时效，不通过
+    if status == "unknown_date" and not event_date:
+        return False
     if status in {"today", "recent_followup"}:
         return bool((event_date or freshness_date) in allowed_dates or freshness_date in allowed_dates)
     return (event_date or freshness_date) in allowed_dates
@@ -694,6 +697,25 @@ def _get_report_window(now: datetime | None = None, config: dict | None = None) 
     return since_local, until_local, report_date
 
 
+def _get_report_window_for_date(report_date: str, config: dict | None = None) -> tuple[datetime, datetime, str]:
+    """按指定报告日期构造晨报窗口：前一日 cutoff 到报告日 cutoff。"""
+    schedule_cfg = _load_schedule_config(config)
+    local_tz = ZoneInfo(schedule_cfg["timezone"])
+    cutoff_hour = schedule_cfg["cutoff_hour"]
+    report_day = datetime.strptime(report_date, "%Y-%m-%d").date()
+    until_local = datetime(
+        report_day.year,
+        report_day.month,
+        report_day.day,
+        cutoff_hour,
+        0,
+        0,
+        tzinfo=local_tz,
+    )
+    since_local = until_local - timedelta(days=1)
+    return since_local, until_local, report_day.isoformat()
+
+
 def _get_report_publish_time(report_date: str, config: dict | None = None) -> datetime:
     """晨报 RSS 发布时间由配置驱动。"""
     schedule_cfg = _load_schedule_config(config)
@@ -791,11 +813,14 @@ def _write_metrics_file(output_root: str, metrics: dict) -> str:
     return path
 
 
-def run_pipeline(hours: int = 24, report_type: str = "daily") -> dict:
+def run_pipeline(hours: int = 24, report_type: str = "daily", report_date: str | None = None) -> dict:
     """完整流程：抓取 + 评分 + 分栏 digest"""
     start_time = datetime.now()
     config = _load_config()
-    since, until, report_date = _get_report_window(config=config)
+    since, until, report_date = (
+        _get_report_window_for_date(report_date, config=config)
+        if report_date else _get_report_window(config=config)
+    )
     print(f"日报窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}")
     publish_cfg = config.get("publish", {})
     storage_cfg = config.get("storage", {})
@@ -939,11 +964,14 @@ def run_fetch_only(hours: int = 24) -> dict:
     }
 
 
-def run_digest_only(hours: int = 24, report_type: str = "daily") -> dict:
+def run_digest_only(hours: int = 24, report_type: str = "daily", report_date: str | None = None) -> dict:
     """只执行 digest 流程（步骤 4-13），从数据库读取已有数据"""
     start_time = datetime.now()
     config = _load_config()
-    since, until, report_date = _get_report_window(config=config)
+    since, until, report_date = (
+        _get_report_window_for_date(report_date, config=config)
+        if report_date else _get_report_window(config=config)
+    )
     storage_cfg = config.get("storage", {})
     publish_cfg = config.get("publish", {})
     # 从环境变量加载 AI 配置
@@ -1544,6 +1572,7 @@ def main():
     parser.add_argument("--fetch-only", action="store_true", help="只执行抓取入库（步骤 1-3）")
     parser.add_argument("--digest-only", action="store_true", help="只执行 digest 流程（步骤 4-13）")
     parser.add_argument("--report-type", default="daily", choices=["daily", "weekly", "monthly"], help="报告类型（默认 daily）")
+    parser.add_argument("--report-date", help="手动指定日报日期 YYYY-MM-DD，用于历史回补")
     args = parser.parse_args()
 
     if args.fetch_only and args.digest_only:
@@ -1552,11 +1581,14 @@ def main():
 
     try:
         if args.fetch_only:
+            if args.report_date:
+                print("[错误] --fetch-only 不支持 --report-date")
+                sys.exit(1)
             stats = run_fetch_only(hours=args.hours)
         elif args.digest_only:
-            stats = run_digest_only(hours=args.hours, report_type=args.report_type)
+            stats = run_digest_only(hours=args.hours, report_type=args.report_type, report_date=args.report_date)
         else:
-            stats = run_pipeline(hours=args.hours, report_type=args.report_type)
+            stats = run_pipeline(hours=args.hours, report_type=args.report_type, report_date=args.report_date)
 
         if args.digest_only and stats.get("total_selected", 0) == 0:
             print("[错误] Digest 未生成任何内容")
