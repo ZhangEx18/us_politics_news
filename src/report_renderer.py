@@ -202,80 +202,211 @@ def render_structured_html(
     date = _html_text(meta.get("date", datetime.now().strftime("%Y-%m-%d")))
 
     css = """
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-                 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
-    max-width: 720px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
     margin: 0 auto;
-    padding: 24px 20px;
-    line-height: 1.8;
-    color: #1a1a1a;
-    background: #fafafa;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
 }
+
+/* ── Header ── */
 header {
-    border-bottom: 2px solid #1a1a1a;
-    padding-bottom: 16px;
-    margin-bottom: 32px;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
 }
 header h1 {
-    font-size: 1.6em;
-    margin: 0 0 8px 0;
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
 }
 header .date {
-    color: #666;
-    font-size: 0.9em;
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
 }
 header .lead {
-    color: #444;
-    font-size: 0.95em;
-    margin-top: 12px;
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
     line-height: 1.6;
 }
-h2 {
-    font-size: 1.3em;
-    font-weight: 700;
-    margin-top: 40px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e0e0e0;
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
 }
-.event {
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
     margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
 }
 .event:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 .event h3 {
-    font-size: 1.05em;
-    font-weight: 600;
-    margin-top: 28px;
-    margin-bottom: 8px;
-    color: #1a1a1a;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
 }
-.facts {
-    margin: 8px 0;
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
 }
-.impact {
-    color: #555;
-    margin: 8px 0;
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
 }
-.why {
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
     background: #fafafa;
-    border-left: 3px solid #999;
-    padding: 8px 12px;
-    margin: 8px 0;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
 }
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
 footer {
-    margin-top: 48px;
-    padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
-    color: #999;
-    font-size: 0.8em;
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
     text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
 }
 """
 
@@ -298,11 +429,13 @@ footer {
     ]
 
     if highlights:
+        html.append("<div class='highlights'>")
         html.append("<h2>今日要点</h2>")
         html.append("<ul>")
         for item in highlights:
             html.append(f"<li>{_html_text(item)}</li>")
         html.append("</ul>")
+        html.append("</div>")
 
     _append_periodical_overview_html(html, meta, report_type)
 
@@ -324,10 +457,10 @@ footer {
         for idx, event in enumerate(detailed, 1):
             event_title = _html_text(event.get("title_zh", ""))
             is_followup = event.get("is_followup", False)
-            suffix = " [持续跟踪]" if is_followup else ""
+            followup_badge = ' <span class="followup">持续跟踪</span>' if is_followup else ""
 
             html.append("<div class='event'>")
-            html.append(f"<h3>{idx}. {event_title}{suffix}</h3>")
+            html.append(f"<h3>{idx}. {event_title}{followup_badge}</h3>")
 
             reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
             if reader_body:
@@ -337,7 +470,7 @@ footer {
 
         # 无序条目：仅标题
         if headline_only:
-            html.append("<ul>")
+            html.append("<ul class='headline-list'>")
             for event in headline_only:
                 event_title = _html_text(_headline_only_text(event))
                 if event_title:
