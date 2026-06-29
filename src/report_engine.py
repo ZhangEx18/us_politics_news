@@ -574,6 +574,45 @@ async def _generate_all_column_digests(
     return column_results, failures
 
 
+def _fill_underrepresented_columns(
+    column_results: dict[str, list[dict]],
+    column_candidates: dict[str, list[dict]],
+    columns_cfg: dict[str, dict],
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
+    """AI 写作后，某栏目事件数不足 min_items 时，从候选中补充。"""
+    MIN_FILL_BODY = 60  # 候补 reader_body 最短长度
+    filled = {col_key: list(items) for col_key, items in column_results.items()}
+    metrics: dict[str, dict[str, int]] = {}
+
+    for col_key, col_cfg in columns_cfg.items():
+        min_items = col_cfg.get("min_items", 3)
+        current = filled.get(col_key, [])
+        if len(current) >= min_items:
+            metrics[col_key] = {"fill_added": 0}
+            continue
+
+        candidates = column_candidates.get(col_key, [])
+        existing_titles = {str(e.get("title_zh", "")).strip() for e in current}
+        added = 0
+
+        for candidate in candidates:
+            if len(current) + added >= min_items:
+                break
+            title = str(candidate.get("title_zh") or candidate.get("title") or "").strip()
+            if not title or title in existing_titles:
+                continue
+            body = _build_fallback_detailed_event(candidate)
+            if not body:
+                continue
+            filled[col_key].append(body)
+            existing_titles.add(title)
+            added += 1
+
+        metrics[col_key] = {"fill_added": added}
+
+    return filled, metrics
+
+
 def _limit_same_org_events(events: list[dict], max_per_org: int) -> list[dict]:
     """限制同一机构/主体的事件数量，超出的降级为丢弃。"""
     if not events or max_per_org <= 0:
@@ -1110,6 +1149,12 @@ def build_report(
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
         column_results, fallback_metrics = _ensure_daily_detailed_events(column_results, column_candidates)
         for col_key, column_metrics in fallback_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        # 保底填充：AI 写作丢弃过多时，从候选中补充
+        column_results, fill_metrics = _fill_underrepresented_columns(
+            column_results, column_candidates, columns_cfg,
+        )
+        for col_key, column_metrics in fill_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
 
     # ── 提炼要点 ──
