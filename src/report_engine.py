@@ -255,7 +255,9 @@ def _load_history_context(db, days: int = 3) -> str:
 
 
 def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> list[str]:
-    """从最终入选事件提炼要点。"""
+    """从最终入选的重点解析事件提炼要点（跳过过短的条目）。"""
+    MIN_BODY_LENGTH = 80  # reader_body 低于此长度的条目不进入今日要点
+
     def _highlight_text(event: dict) -> str:
         title = str(event.get("title_zh", "")).strip()
         core = event.get("core_facts", "")
@@ -270,6 +272,11 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
             text = text[:45].rstrip() + "…"
         return text
 
+    def _is_detailed_event(event: dict) -> bool:
+        """只有 reader_body 足够长的事件才进入今日要点。"""
+        body = str(event.get("reader_body") or event.get("core_facts") or "").strip()
+        return len(body) >= MIN_BODY_LENGTH
+
     highlights: list[str] = []
     column_keys = [key for key in columns if columns.get(key)]
     if not column_keys:
@@ -280,6 +287,8 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
         for col_key in column_keys:
             events = columns.get(col_key, [])
             if idx >= len(events):
+                continue
+            if not _is_detailed_event(events[idx]):
                 continue
             text = _highlight_text(events[idx])
             if not text or text in highlights:
