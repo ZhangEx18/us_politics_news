@@ -565,7 +565,57 @@ async def _generate_all_column_digests(
     ])
     column_results = {col_key: events for col_key, events, _ in results if events}
     failures = {col_key: err for col_key, _, err in results if err}
+
+    # 同机构去重：每栏同一机构/主体最多保留 2 条重点解析
+    MAX_SAME_ORG = 2
+    for col_key, events in column_results.items():
+        column_results[col_key] = _limit_same_org_events(events, MAX_SAME_ORG)
+
     return column_results, failures
+
+
+def _limit_same_org_events(events: list[dict], max_per_org: int) -> list[dict]:
+    """限制同一机构/主体的事件数量，超出的降级为丢弃。"""
+    if not events or max_per_org <= 0:
+        return events
+
+    # 高频机构关键词 → 归一化标识
+    _ORG_KEYWORDS = {
+        "FTC": "ftc", "联邦贸易委员会": "ftc",
+        "SEC": "sec", "证券交易委员会": "sec",
+        "美联储": "fed", "Federal Reserve": "fed",
+        "最高法院": "supreme_court", "Supreme Court": "supreme_court",
+        "白宫": "white_house", "White House": "white_house",
+        "国会": "congress", "Congress": "congress",
+        "NATO": "nato", "北约": "nato",
+        "欧盟": "eu", "EU": "eu",
+    }
+
+    org_counts: dict[str, int] = {}
+    kept: list[dict] = []
+
+    for event in events:
+        title = str(event.get("title_zh") or "").strip()
+        body = str(event.get("reader_body") or event.get("core_facts") or "").strip()
+        text = f"{title} {body}"
+
+        org_id = ""
+        for keyword, normalized in _ORG_KEYWORDS.items():
+            if keyword in text:
+                org_id = normalized
+                break
+
+        if not org_id:
+            kept.append(event)
+            continue
+
+        count = org_counts.get(org_id, 0)
+        if count < max_per_org:
+            org_counts[org_id] = count + 1
+            kept.append(event)
+        # 超出限制的丢弃
+
+    return kept
 
 
 # ── 质量门禁 ──
