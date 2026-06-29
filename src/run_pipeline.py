@@ -499,18 +499,27 @@ def _prefilter_items_for_scoring(
         by_column.setdefault(col, []).append(item)
 
     selected: dict[str, list[ContentItem]] = {}
+    TIER4_RESERVE = 5  # 每栏为 tier=4 源保留的最低名额
     for col_key, col_cfg in columns_cfg.items():
-        ranked = sorted(
-            by_column.get(col_key, []),
-            key=lambda item: (
-                _prefilter_signal(item, now),
-                -(item.source_tier or 4),
-                -len((item.content or "").strip()),
-            ),
-            reverse=True,
-        )
+        all_items = by_column.get(col_key, [])
+        # 按 tier 分组
+        high_tier = [i for i in all_items if (i.source_tier or 4) <= 3]
+        tier4 = [i for i in all_items if (i.source_tier or 4) == 4]
+
+        # 高 tier 按信号排序
+        high_tier.sort(key=lambda item: _prefilter_signal(item, now), reverse=True)
+        # tier=4 按信号排序
+        tier4.sort(key=lambda item: _prefilter_signal(item, now), reverse=True)
+
         limit = col_cfg.get("prefilter_items", 18)
-        selected[col_key] = ranked[:limit]
+        # 先取高 tier，留出 tier=4 保底空间
+        high_limit = max(limit - TIER4_RESERVE, 0)
+        result = high_tier[:high_limit]
+        # 补充 tier=4 保底
+        remaining = limit - len(result)
+        result.extend(tier4[:remaining])
+
+        selected[col_key] = result
     return selected
 
 
