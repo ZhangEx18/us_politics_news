@@ -847,6 +847,77 @@ class NewsDatabase:
             llm_reason=row["llm_reason"] or "",
         )
 
+    # ── API 查询方法 ──
+
+    def count_articles(self) -> int:
+        with self._connect() as conn:
+            return int(conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0])
+
+    def count_articles_since(self, since_date: str) -> int:
+        """统计指定日期以来的文章数"""
+        with self._connect() as conn:
+            return int(conn.execute(
+                "SELECT COUNT(*) FROM articles WHERE date(COALESCE(published_at, fetched_at)) >= ?",
+                (since_date,),
+            ).fetchone()[0])
+
+    def get_recent_runs(self, limit: int = 5) -> list[dict]:
+        """获取最近的运行记录"""
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT report_key, report_type, status, input_count,
+                          candidate_count, selected_count, error_count,
+                          ai_duration_seconds, created_at
+                   FROM report_runs ORDER BY created_at DESC LIMIT ?""",
+                (limit,),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def get_source_stats(self) -> dict:
+        """数据源统计"""
+        with self._connect() as conn:
+            row = conn.execute(
+                """SELECT COUNT(DISTINCT source) as total_sources,
+                          COUNT(*) as total_articles,
+                          COUNT(DISTINCT "column") as total_columns
+                   FROM articles"""
+            ).fetchone()
+        return dict(row) if row else {}
+
+    def get_daily_stats(self, days: int = 30) -> list[dict]:
+        """按日期统计文章数"""
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT date(COALESCE(published_at, fetched_at)) as pub_date,
+                          COUNT(*) as count
+                   FROM articles
+                   WHERE date(COALESCE(published_at, fetched_at)) >= ?
+                   GROUP BY pub_date ORDER BY pub_date""",
+                (cutoff,),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def get_column_stats(self) -> list[dict]:
+        """按栏目统计"""
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT "column", COUNT(*) as count,
+                          COUNT(DISTINCT source) as source_count
+                   FROM articles WHERE "column" != ''
+                   GROUP BY "column" ORDER BY count DESC"""
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def get_source_type_stats(self) -> list[dict]:
+        """按来源类型统计"""
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT source_type, COUNT(*) as count
+                   FROM articles GROUP BY source_type ORDER BY count DESC"""
+            ).fetchall()
+        return [dict(row) for row in rows]
+
 
 def db_health_check(
     db_path: str,
