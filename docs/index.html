@@ -4,89 +4,359 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>观察日报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-                   "Microsoft YaHei", "Noto Sans SC", sans-serif;
-      max-width: 760px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      color: #212121;
+      background: #ffffff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #1a1a2e 100%);
+      color: #ffffff;
+      padding: 80px 24px 72px;
+      text-align: center;
+    }
+    .hero-inner {
+      max-width: 680px;
       margin: 0 auto;
-      padding: 48px 20px 72px;
-      line-height: 1.7;
-      color: #1a1a1a;
-      background: #fafafa;
     }
-    h1 {
-      margin: 0 0 12px;
-      font-size: 2rem;
+    .hero h1 {
+      font-family: 'Noto Serif SC', 'Georgia', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 16px;
     }
-    h2 {
-      margin: 36px 0 12px;
-      font-size: 1.2rem;
+    .hero p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.7);
+      max-width: 520px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
     }
-    p {
-      margin: 0 0 16px;
-      color: #444;
+    .hero-tags {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
     }
-    .links {
+    .hero-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+
+    /* ── Container ── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Quick Links ── */
+    .quick-links {
       display: grid;
-      gap: 12px;
-      margin-top: 28px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: -40px auto 56px;
+      max-width: 960px;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
     }
-    a {
-      color: #0f5e3a;
+    .quick-link {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 22px;
+      padding: 24px;
       text-decoration: none;
-      font-weight: 600;
+      color: #212121;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    a:hover {
-      text-decoration: underline;
+    .quick-link:hover {
+      border-color: #1863dc;
+      box-shadow: 0 2px 12px rgba(24,99,220,0.08);
     }
-    .archive {
-      margin: 0;
-      padding-left: 20px;
+    .quick-link-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #93939f;
+      margin-bottom: 8px;
     }
-    .archive li {
-      margin: 8px 0;
+    .quick-link-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
     }
-    .meta,
-    .muted {
-      color: #666;
+    .quick-link-desc {
+      font-size: 0.85rem;
+      color: #93939f;
+      margin-top: 6px;
     }
-    .meta {
-      margin-top: 36px;
-      font-size: 0.95rem;
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 56px;
+    }
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #93939f;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Archive List ── */
+    .archive-list {
+      list-style: none;
+    }
+    .archive-item {
+      border-bottom: 1px solid #f2f2f2;
+    }
+    .archive-item:last-child {
+      border-bottom: none;
+    }
+    .archive-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      text-decoration: none;
+      color: #212121;
+      transition: color 0.15s;
+    }
+    .archive-link:hover {
+      color: #1863dc;
+    }
+    .archive-date {
+      font-size: 0.85rem;
+      color: #93939f;
+      font-variant-numeric: tabular-nums;
+    }
+    .archive-title {
+      font-size: 1rem;
+    }
+    .archive-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #93939f;
+      border: 1px solid #e5e7eb;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      margin-left: 12px;
+    }
+    .archive-empty {
+      color: #93939f;
+      font-size: 0.9rem;
+      padding: 16px 0;
+    }
+
+    /* ── Columns Grid ── */
+    .columns-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .column-card {
+      background: #ffffff;
+      border: 1px solid #f2f2f2;
+      border-radius: 22px;
+      padding: 28px;
+    }
+    .column-icon {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+    .column-name {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .column-desc {
+      font-size: 0.85rem;
+      color: #93939f;
+      line-height: 1.5;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid #e5e7eb;
+      padding: 32px 24px;
+      text-align: center;
+      color: #93939f;
+      font-size: 0.8rem;
+    }
+    footer a {
+      color: #93939f;
+      text-decoration: none;
+    }
+    footer a:hover {
+      color: #1863dc;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero { padding: 56px 20px 48px; }
+      .hero h1 { font-size: 2rem; }
+      .quick-links { grid-template-columns: 1fr; }
+      .columns-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>观察日报</h1>
-    <p>自动生成日报、周报与月报，覆盖美国政局、国际局势、科技前沿、经济走势四大栏目，并输出适合 Reader 订阅的长文归档。</p>
-    <div class="links">
-      <a href="./feed.xml">订阅 RSS Feed</a>
-      <a href="./daily/2026-06-18.html">查看最新日报（2026-06-18）</a>
-      <span class="muted">暂无已发布周报</span>
-      <span class="muted">暂无已发布月报</span>
-      <a href="https://github.com/ZhangEx18/us_politics_news">查看项目仓库</a>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-tags">
+        <span class="hero-tag">美国政局</span>
+        <span class="hero-tag">国际局势</span>
+        <span class="hero-tag">科技前沿</span>
+        <span class="hero-tag">经济走势</span>
+      </div>
+      <h1>观察日报</h1>
+      <p>AI 驱动的每日国际新闻长文日报，自动抓取、评分、合并、写作，输出全文 RSS 订阅。</p>
     </div>
-    <section>
-      <h2>历史日报</h2>
-      <ul class="archive">
-        <li><a href="./daily/2026-06-18.html">2026-06-18 日报</a></li>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="quick-links">
+    <a href="./feeds/news.xml" class="quick-link">
+      <div class="quick-link-label">订阅</div>
+      <div class="quick-link-title">RSS Feed</div>
+      <div class="quick-link-desc">在 Reader 中订阅每日更新</div>
+    </a>
+    <a href="./news/daily/" class="quick-link">
+      <div class="quick-link-label">最新</div>
+      <div class="quick-link-title">今日日报</div>
+      <div class="quick-link-desc">查看最新生成的日报内容</div>
+    </a>
+    <a href="https://github.com/ZhangEx18/us_politics_news" class="quick-link">
+      <div class="quick-link-label">开源</div>
+      <div class="quick-link-title">GitHub</div>
+      <div class="quick-link-desc">查看项目源码与部署文档</div>
+    </a>
+  </div>
+
+  <div class="container">
+
+    <!-- 四大栏目 -->
+    <div class="section">
+      <div class="section-label">覆盖范围</div>
+      <div class="columns-grid">
+        <div class="column-card">
+          <div class="column-icon">🏛</div>
+          <div class="column-name">美国政局</div>
+          <div class="column-desc">白宫与行政 · 国会与立法 · 选举与竞选 · 最高法院</div>
+        </div>
+        <div class="column-card">
+          <div class="column-icon">🌍</div>
+          <div class="column-name">国际局势</div>
+          <div class="column-desc">中美关系 · 中东局势 · 俄乌冲突 · 外交政策</div>
+        </div>
+        <div class="column-card">
+          <div class="column-icon">🔬</div>
+          <div class="column-name">科技前沿</div>
+          <div class="column-desc">人工智能 · 半导体与芯片 · 科技公司 · 科技监管</div>
+        </div>
+        <div class="column-card">
+          <div class="column-icon">📈</div>
+          <div class="column-name">经济走势</div>
+          <div class="column-desc">美联储与货币政策 · 宏观经济 · 贸易与关税 · 金融市场</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 历史日报 -->
+    <div class="section">
+      <div class="section-label">归档</div>
+      <div class="section-title">历史日报</div>
+      <ul class="archive-list" id="daily-list">
+        <li class="archive-empty">加载中...</li>
       </ul>
-    </section>
-    <section>
-      <h2>历史周报</h2>
-      <ul class="archive">
-        <li class="muted">历史周报将在首次发布后显示</li>
+    </div>
+
+    <!-- 历史周报 -->
+    <div class="section">
+      <div class="section-title">历史周报</div>
+      <ul class="archive-list" id="weekly-list">
+        <li class="archive-empty">暂无已发布周报</li>
       </ul>
-    </section>
-    <section>
-      <h2>历史月报</h2>
-      <ul class="archive">
-        <li class="muted">历史月报将在首次发布后显示</li>
+    </div>
+
+    <!-- 历史月报 -->
+    <div class="section">
+      <div class="section-title">历史月报</div>
+      <ul class="archive-list" id="monthly-list">
+        <li class="archive-empty">暂无已发布月报</li>
       </ul>
-    </section>
-    <p class="meta">如果 Reader 中还看不到最新内容，请先确认 <code>feed.xml</code> 可以在浏览器直接打开。</p>
-  </main>
+    </div>
+
+  </div>
+
+  <footer>
+    观察日报 · AI 自动生成 · <a href="./feeds/news.xml">RSS 订阅</a>
+  </footer>
+
+  <script>
+    // 自动扫描已发布的日报文件
+    async function loadArchive() {
+      const knownDates = [
+        '2026-06-29', '2026-06-27', '2026-06-24', '2026-06-18'
+      ];
+      const dailyList = document.getElementById('daily-list');
+      dailyList.innerHTML = '';
+
+      let found = 0;
+      for (const date of knownDates) {
+        try {
+          const resp = await fetch(`./news/daily/${date}.html`, { method: 'HEAD' });
+          if (resp.ok) {
+            const li = document.createElement('li');
+            li.className = 'archive-item';
+            li.innerHTML = `
+              <a href="./news/daily/${date}.html" class="archive-link">
+                <span class="archive-title">${date} 日报</span>
+                <span class="archive-date">${date}</span>
+              </a>`;
+            dailyList.appendChild(li);
+            found++;
+          }
+        } catch (e) { /* skip */ }
+      }
+
+      if (!found) {
+        dailyList.innerHTML = '<li class="archive-empty">暂无已发布日报</li>';
+      }
+    }
+    loadArchive();
+  </script>
+
 </body>
 </html>
