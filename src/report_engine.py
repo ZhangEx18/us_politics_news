@@ -18,6 +18,7 @@ from ai_analyzer import (
     merge_events,
     translate_headline_titles,
 )
+from database import build_source_health_summary
 from feed_builder import save_feed
 from publish_manifest import build_manifest
 from report_renderer import COLUMN_ORDER, save_daily_report
@@ -103,6 +104,137 @@ class ReportPreparation:
     metrics: dict
 
 
+def _column_label_map(spec: ReportSpec) -> dict[str, str]:
+    return {col_key: str(col_cfg.get("label", col_key)) for col_key, col_cfg in spec.column_quotas.items()}
+
+
+def _column_source_counts(events: list[dict]) -> dict[str, int]:
+    counts: dict[str, set[str]] = {}
+    for event in events:
+        column = str(event.get("column") or "unknown").strip() or "unknown"
+        source = str(event.get("source") or "").strip()
+        if not source:
+            continue
+        counts.setdefault(column, set()).add(source)
+    return {col: len(sources) for col, sources in counts.items()}
+
+
+def _build_periodical_gate_result(
+    spec: ReportSpec,
+    scored_events: list[dict],
+    db,
+    config: dict,
+) -> dict:
+    """周报/月报在写作前做稳定性门禁，避免低覆盖内容继续往下写。"""
+    column_labels = _column_label_map(spec)
+    by_column: dict[str, list[dict]] = {}
+    for event in scored_events:
+        column = str(event.get("column") or "").strip()
+        if not column:
+            continue
+        by_column.setdefault(column, []).append(event)
+
+    thresholds = config.get("rules", {}).get("periodical_gate", {})
+    min_column_events = int(thresholds.get("min_column_events", 2))
+    min_total_events = int(thresholds.get("min_total_events", 8))
+    min_columns_with_events = int(thresholds.get("min_columns_with_events", 3))
+    min_hard_news = int(thresholds.get("min_hard_news", 8))
+    min_sources_per_column = int(thresholds.get("min_sources_per_column", 2))
+    min_source_tiers = int(thresholds.get("min_source_tiers", 2))
+    min_scored_ratio = float(thresholds.get("min_scored_ratio", 0.6))
+
+    column_stats: dict[str, dict] = {}
+    covered_columns = 0
+    total_sources = 0
+    hard_news_count = 0
+    scored_count = 0
+    tier_set: set[int] = set()
+    total_events = 0
+
+    for col_key in spec.column_quotas:
+        events = list(by_column.get(col_key, []))
+        total_events += len(events)
+        sources = {str(event.get("source") or "").strip() for event in events if str(event.get("source") or "").strip()}
+        tier_counts = {}
+        for event in events:
+            tier = int(event.get("source_tier") or 4)
+            tier_set.add(tier)
+            tier_counts[tier] = tier_counts.get(tier, 0) + 1
+            if event.get("is_hard_news", True):
+                hard_news_count += 1
+            if event.get("score") is not None:
+                scored_count += 1
+
+        if events:
+            covered_columns += 1
+        total_sources += len(sources)
+
+        column_stats[col_key] = {
+            "label": column_labels.get(col_key, col_key),
+            "events": len(events),
+            "sources": len(sources),
+            "source_names": sorted(sources),
+            "source_tiers": sorted(tier_counts),
+            "status": "healthy" if len(events) >= min_column_events and len(sources) >= min_sources_per_column else (
+                "thin" if len(events) else "empty"
+            ),
+        }
+
+    health_rows = []
+    source_health_summary = {}
+    try:
+        if hasattr(db, "source_health_rows"):
+            health_rows = db.source_health_rows(window_since=spec.since, window_days=max(1, (spec.until - spec.since).days))
+        if hasattr(db, "fetch_log_rows"):
+            fetch_rows = db.fetch_log_rows(window_since=spec.since, window_days=max(1, (spec.until - spec.since).days))
+        else:
+            fetch_rows = []
+        source_health_summary = build_source_health_summary(
+            health_rows,
+            fetch_log_rows=fetch_rows,
+            window_days=max(1, (spec.until - spec.since).days),
+        )
+    except Exception:
+        source_health_summary = {}
+
+    gate_failed = False
+    reasons: list[str] = []
+    if total_events < min_total_events:
+        gate_failed = True
+        reasons.append(f"总事件量不足: {total_events} < {min_total_events}")
+    if covered_columns < min_columns_with_events:
+        gate_failed = True
+        reasons.append(f"覆盖栏目不足: {covered_columns} < {min_columns_with_events}")
+    if hard_news_count < min_hard_news:
+        gate_failed = True
+        reasons.append(f"硬新闻量不足: {hard_news_count} < {min_hard_news}")
+    if len(tier_set) < min_source_tiers:
+        gate_failed = True
+        reasons.append(f"来源层级不足: {len(tier_set)} < {min_source_tiers}")
+    if total_events and (scored_count / total_events) < min_scored_ratio:
+        gate_failed = True
+        reasons.append(f"评分覆盖不足: {scored_count}/{total_events} < {min_scored_ratio:.0%}")
+    if source_health_summary:
+        if source_health_summary.get("column_health_state") in {"missing_column", "single_source_bias"}:
+            gate_failed = True
+            reasons.append(f"栏目健康异常: {source_health_summary.get('column_health_state')}")
+        if source_health_summary.get("window_state") == "stale":
+            gate_failed = True
+            reasons.append("窗口内容偏旧")
+
+    return {
+        "gate_failed": gate_failed,
+        "reasons": reasons,
+        "total_events": total_events,
+        "covered_columns": covered_columns,
+        "hard_news_count": hard_news_count,
+        "scored_count": scored_count,
+        "source_tiers": sorted(tier_set),
+        "column_stats": column_stats,
+        "source_health_summary": source_health_summary,
+    }
+
+
 # ── 共享工具 ──
 
 def _load_history_context(db, days: int = 3) -> str:
@@ -156,6 +288,63 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
             if len(highlights) >= limit:
                 return highlights
     return highlights
+
+
+def _build_periodical_overview_fallback(
+    report_type: str,
+    title: str,
+    highlights: list[str],
+    columns: dict[str, dict],
+) -> PeriodicalOverview:
+    label = "本周" if report_type == "weekly" else "本月"
+    top_titles: list[str] = []
+    column_analyses: dict[str, str] = {}
+
+    for col_key, col_data in columns.items():
+        detailed = list(col_data.get("detailed_events", [])) if isinstance(col_data, dict) else list(col_data)
+        if detailed:
+            titles = [
+                str(event.get("title_zh") or event.get("title") or "").strip()
+                for event in detailed[:2]
+                if str(event.get("title_zh") or event.get("title") or "").strip()
+            ]
+            if titles:
+                top_titles.extend(titles[:2])
+            first_body = str(detailed[0].get("reader_body") or detailed[0].get("core_facts") or "").strip()
+            if first_body:
+                column_analyses[col_key] = re.sub(r"\s+", " ", first_body).strip()[:110].rstrip(" ，,。．;；:：")
+
+    unique_titles: list[str] = []
+    for item in top_titles + highlights:
+        text = re.sub(r"\s+", " ", str(item or "")).strip()[:32].rstrip(" ，,。．;；:：")
+        if text and text not in unique_titles:
+            unique_titles.append(text)
+
+    summary_parts = [f"{label}聚焦于{title}。"]
+    if unique_titles:
+        summary_parts.append(f"主线围绕{'、'.join(unique_titles[:3])}展开。")
+    else:
+        summary_parts.append("主线以各栏已确认事件为准。")
+    summary = re.sub(r"\s+", " ", "".join(summary_parts)).strip()[:220].rstrip(" ，,。．;；:：")
+
+    themes = unique_titles[:4]
+    if not themes:
+        themes = [f"{label}主线", "栏目交叉推进"]
+
+    watchlist = []
+    for col_key in columns:
+        analysis = column_analyses.get(col_key, "")
+        if analysis:
+            watchlist.append(f"{col_key}:{analysis[:24]}")
+    if not watchlist:
+        watchlist = [f"继续跟踪{label}内已确认事件的后续进展"]
+
+    return PeriodicalOverview(
+        summary=summary,
+        themes=themes,
+        watchlist=watchlist[:4],
+        column_analyses=column_analyses,
+    )
 
 
 def _looks_like_english_fragment(text: str) -> bool:
@@ -811,6 +1000,21 @@ def build_report(
         print("\n[警告] 无候选事件")
         return {"total_selected": 0}
 
+    if spec.report_type in {"weekly", "monthly"}:
+        gate = _build_periodical_gate_result(spec, scored_events, db, config)
+        metrics["periodical_gate"] = gate
+        if gate["gate_failed"]:
+            reason_text = "；".join(gate["reasons"]) if gate["reasons"] else "未满足周期报告门禁"
+            print(f"\n[错误] {spec.report_type} 门禁失败: {reason_text}")
+            return {
+                "total_selected": 0,
+                "error": "periodical_gate_failed",
+                "gate_failed": True,
+                "gate_reasons": gate["reasons"],
+                "metrics": metrics,
+                "source_health_summary": gate.get("source_health_summary", {}),
+            }
+
     preparation = _prepare_report_inputs(spec, scored_events, db, metrics)
     merged_events = preparation.merged_events
     by_column = preparation.by_column
@@ -911,7 +1115,7 @@ def build_report(
         except Exception as exc:
             metrics["ai"]["overview_failure"] = str(exc)
             print(f"   [overview] 生成失败，已降级为空总览: {exc}")
-            overview = PeriodicalOverview()
+            overview = _build_periodical_overview_fallback(spec.report_type, spec.title, highlights, columns)
         for col_key, analysis in overview.column_analyses.items():
             if col_key in columns:
                 columns[col_key]["analysis"] = analysis

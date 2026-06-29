@@ -32,7 +32,7 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     assert workflow["concurrency"]["group"] == "publish-news-daily"
 
     delegate_job = workflow["jobs"]["delegate"]
-    assert delegate_job["uses"] == "ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main"
+    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
     assert delegate_job["with"]["product_key"] == "news"
     assert delegate_job["with"]["report_type"] == "daily"
     assert delegate_job["with"]["digest_only"] is False
@@ -50,7 +50,7 @@ def test_weekly_publish_is_thin_wrapper_to_publish_product():
     assert workflow["concurrency"]["group"] == "publish-news-weekly"
 
     delegate_job = workflow["jobs"]["delegate"]
-    assert delegate_job["uses"] == "ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main"
+    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
     assert delegate_job["with"]["product_key"] == "news"
     assert delegate_job["with"]["report_type"] == "weekly"
     assert delegate_job["secrets"] == "inherit"
@@ -66,7 +66,7 @@ def test_monthly_publish_is_thin_wrapper_to_publish_product():
     assert workflow["concurrency"]["group"] == "publish-news-monthly"
 
     delegate_job = workflow["jobs"]["delegate"]
-    assert delegate_job["uses"] == "ZhangEx18/us_politics_news/.github/workflows/publish-product.yml@main"
+    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
     assert delegate_job["with"]["product_key"] == "news"
     assert delegate_job["with"]["report_type"] == "monthly"
     assert delegate_job["secrets"] == "inherit"

@@ -8,6 +8,7 @@ from database import (
     ArticleCandidate,
     NewsDatabase,
     ReportEvent,
+    build_source_health_summary,
     _to_utc_storage,
     migrate_legacy_news_db,
 )
@@ -181,3 +182,58 @@ def test_database_candidate_event_and_run_layers_are_idempotent(tmp_path):
         metrics={"ok": True},
     )
     assert run_id > 0
+
+
+def test_build_source_health_summary_detects_single_source_bias_and_empty_columns():
+    rows = [
+        {
+            "source": "Source A",
+            "source_tier": 1,
+            "column": "us_politics",
+            "article_count": 4,
+            "scored_count": 3,
+            "strong_scored_count": 2,
+            "active_days": 2,
+            "latest_seen_at": "2026-06-27T00:30:00+00:00",
+            "fetch_mode": "rss",
+            "configured_column": "us_politics",
+            "configured_source_tier": 1,
+            "source_enabled": True,
+        }
+    ]
+
+    summary = build_source_health_summary(rows, fetch_log_rows=[])
+
+    assert summary["column_health_state"] == "single_source_bias"
+    assert summary["columns"]["us_politics"]["status"] == "single_source"
+    assert summary["sources"][0]["health_status"] == "watch"
+
+
+def test_build_source_health_summary_marks_empty_when_no_rows():
+    summary = build_source_health_summary([], fetch_log_rows=[])
+
+    assert summary["column_health_state"] == "empty"
+    assert summary["source_count"] == 0
+    assert summary["column_count"] == 0
+
+
+def test_build_source_health_summary_includes_configured_sources_without_articles():
+    summary = build_source_health_summary(
+        [],
+        fetch_log_rows=[],
+        source_defs=[
+            {
+                "name": "Configured Source",
+                "fetch_mode": "rss",
+                "column": "technology",
+                "source_tier": 2,
+                "enabled": True,
+            }
+        ],
+    )
+
+    assert summary["source_count"] == 1
+    assert summary["sources"][0]["source"] == "Configured Source"
+    assert summary["sources"][0]["health_status"] == "empty"
+    assert summary["sources"][0]["expected_column"] == "technology"
+    assert summary["column_count"] == 0
