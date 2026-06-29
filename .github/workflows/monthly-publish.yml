@@ -7,10 +7,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: publish-news-monthly
-  cancel-in-progress: true
-
 jobs:
   delegate:
     uses: ./.github/workflows/publish-product.yml

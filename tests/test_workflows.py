@@ -29,7 +29,7 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     assert schedule == [{"cron": "30 23 * * *"}]
     assert "digest_only" in dispatch["inputs"]
     assert dispatch["inputs"]["digest_only"]["type"] == "boolean"
-    assert workflow["concurrency"]["group"] == "publish-news-daily"
+    assert "concurrency" not in workflow
 
     delegate_job = workflow["jobs"]["delegate"]
     assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
@@ -47,7 +47,7 @@ def test_weekly_publish_is_thin_wrapper_to_publish_product():
         "schedule": [{"cron": "35 23 * * 1"}],
         "workflow_dispatch": None,
     }
-    assert workflow["concurrency"]["group"] == "publish-news-weekly"
+    assert "concurrency" not in workflow
 
     delegate_job = workflow["jobs"]["delegate"]
     assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
@@ -63,7 +63,7 @@ def test_monthly_publish_is_thin_wrapper_to_publish_product():
         "schedule": [{"cron": "40 23 28-31 * *"}],
         "workflow_dispatch": None,
     }
-    assert workflow["concurrency"]["group"] == "publish-news-monthly"
+    assert "concurrency" not in workflow
 
     delegate_job = workflow["jobs"]["delegate"]
     assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
