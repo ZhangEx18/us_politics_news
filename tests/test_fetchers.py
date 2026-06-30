@@ -10,7 +10,10 @@ from fetchers import (
     RSSFetcher,
     fetch_all_sources,
     _build_contextual_snippet,
+    save_to_db,
 )
+from database import NewsDatabase
+from models import ContentItem
 
 
 def test_rss_fetcher_accepts_rss_and_rsshub_modes():
@@ -285,3 +288,27 @@ def test_fetch_all_sources_routes_custom_and_rsshub(monkeypatch):
     by_source = {item.source_name: item for item in items}
     assert by_source["36氪 - 科技"].metadata["fetch_mode"] == "rsshub"
     assert by_source["联合早报 - 国际"].metadata["language"] == "zh"
+
+
+def test_save_to_db_preserves_item_fetched_at(tmp_path):
+    db = NewsDatabase(str(tmp_path / "news.db"))
+    fetched_at = datetime(2026, 6, 10, 12, 0, tzinfo=timezone.utc)
+    item = ContentItem(
+        id="history:1",
+        source_type="google_news",
+        title="Fed announces policy decision",
+        url="https://example.com/history",
+        content="summary",
+        source_name="Google News",
+        published_at=fetched_at,
+        fetched_at=fetched_at,
+        column="economy",
+        source_tier=4,
+        source_url_normalized="https://example.com/history",
+    )
+
+    assert save_to_db([item], db) == {"google_news": 1}
+
+    rows = db.fetch_since(datetime(2026, 6, 10, tzinfo=timezone.utc))
+    assert len(rows) == 1
+    assert rows[0].fetched_at == fetched_at

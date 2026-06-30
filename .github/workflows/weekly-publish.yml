@@ -1,16 +1,18 @@
 name: Weekly Publish
 on:
-  schedule:
-    - cron: '35 23 * * 1'
   workflow_dispatch:
+    inputs:
+      skipped:
+        description: 'news 周报已暂停'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
 
 jobs:
-  delegate:
-    uses: ./.github/workflows/publish-product.yml
-    with:
-      product_key: news
-      report_type: weekly
-    secrets: inherit
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "news weekly publish is paused"

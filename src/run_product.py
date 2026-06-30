@@ -13,8 +13,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import load_product_config
 from run_pipeline import run_pipeline, run_digest_only
-from run_weekly import run_weekly
-from run_monthly import run_monthly
 
 
 def _validate_report_type(config: dict, report_type: str) -> None:
@@ -31,10 +29,7 @@ def run_product(product_key: str, report_type: str, hours: int = 24, digest_only
     if content_type == "news_digest":
         if report_type == "daily":
             return run_digest_only(hours=hours, report_type=report_type) if digest_only else run_pipeline(hours=hours, report_type=report_type)
-        if report_type == "weekly":
-            return run_weekly()
-        if report_type == "monthly":
-            return run_monthly()
+        raise ValueError(f"news 暂停 report_type={report_type}")
 
     if content_type == "topic_lesson":
         from topic_lesson import run_topic_lesson_daily
