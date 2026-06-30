@@ -1605,17 +1605,17 @@
         "2026-06-29",
         "2026-06-30"
       ],
-      "kept": 1575,
-      "dropped": 885,
+      "kept": 1491,
+      "dropped": 881,
       "dropped_by_column": {
-        "us_politics": 73,
-        "global_affairs": 410,
-        "technology": 99,
-        "economy": 303
+        "us_politics": 71,
+        "global_affairs": 405,
+        "technology": 101,
+        "economy": 304
       }
     },
-    "raw_fetched": 2517,
-    "raw_merged": 1575
+    "raw_fetched": 2427,
+    "raw_merged": 1491
   },
   "cn_source_fetched": 12,
   "cn_source_selected": 0,
@@ -1636,8 +1636,8 @@
       "detailed_filled": 7,
       "headline_filled": 3,
       "post_score_filtered": 10,
-      "headline_translated": 0,
-      "headline_translation_failed": 3,
+      "headline_translated": 3,
+      "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
       "headline_reader_body_missing": 0,
       "detailed_translation_failed": 3,
@@ -1645,11 +1645,11 @@
       "detailed_fallback_failed": 0,
       "fill_added": 3,
       "rendered_detailed": 4,
-      "rendered_headline_only": 0
+      "rendered_headline_only": 3
     },
     "global_affairs": {
       "prefiltered": 40,
-      "hard_news_candidates": 40,
+      "hard_news_candidates": 39,
       "post_merge_scored": 16,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
@@ -1657,16 +1657,16 @@
       "detailed_filled": 10,
       "headline_filled": 8,
       "post_score_filtered": 16,
-      "headline_translated": 0,
-      "headline_translation_failed": 8,
+      "headline_translated": 8,
+      "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 0,
-      "detailed_translation_failed": 3,
-      "detailed_fallback_added": 1,
+      "headline_reader_body_missing": 2,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 5,
-      "rendered_detailed": 6,
-      "rendered_headline_only": 0
+      "fill_added": 3,
+      "rendered_detailed": 8,
+      "rendered_headline_only": 6
     },
     "technology": {
       "prefiltered": 24,
@@ -1678,15 +1678,15 @@
       "detailed_filled": 5,
       "headline_filled": 3,
       "post_score_filtered": 5,
-      "headline_translated": 0,
-      "headline_translation_failed": 3,
+      "headline_translated": 3,
+      "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 0,
-      "detailed_translation_failed": 3,
-      "detailed_fallback_added": 1,
+      "headline_reader_body_missing": 3,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 3,
-      "rendered_detailed": 4,
+      "fill_added": 1,
+      "rendered_detailed": 6,
       "rendered_headline_only": 0
     },
     "us_politics": {
@@ -1699,28 +1699,24 @@
       "detailed_filled": 10,
       "headline_filled": 8,
       "post_score_filtered": 22,
-      "headline_translated": 0,
-      "headline_translation_failed": 8,
+      "headline_translated": 8,
+      "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
       "headline_reader_body_missing": 0,
-      "detailed_translation_failed": 3,
-      "detailed_fallback_added": 1,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 5,
-      "rendered_detailed": 6,
-      "rendered_headline_only": 0
+      "fill_added": 2,
+      "rendered_detailed": 8,
+      "rendered_headline_only": 8
     }
   },
   "ai": {
     "score_errors": 0,
     "digest_failures": {
-      "us_politics": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d",
-      "global_affairs": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d",
-      "technology": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d",
-      "economy": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d"
+      "economy": "generate_column_digest JSON 解析失败: ```json\n{{\n  \"events\": [\n    {{\n      \"title_zh\": \"USTR就中国半导体行业301调查举行公开听证会\",\n      \"reader_body\": \"美国贸易代表办公室于6月30日就中国半导体行业301调查举行公开听证会。该调查旨在审查中国针对半导体行业的主导地位行为。此次听证会是调查程序的一部分，为后续可能采取的行动收集各方意见。听证会结果可能影响美国对中国半导体产品的关税或限制措施。\",\n      \"core_facts\": \"美国贸易代表办公室于6月30日就中国半导体行业301调查举行公开听证会。该调查旨在审查中国针对半导体行业的主导地"
     },
-    "score_duration_seconds": 0,
-    "daily_overview_failure": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d"
+    "score_duration_seconds": 0
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -1769,8 +1765,8 @@
     }
   },
   "candidate_pool": {
-    "upserted": 113,
-    "total": 113
+    "upserted": 112,
+    "total": 112
   },
   "report_events": {
     "reused": 56,
@@ -1783,6 +1779,6 @@
   "report": {
     "title": "2026年6月30日 日报",
     "published_at": "2026-06-30T07:45:00+08:00",
-    "duration_seconds": 1.2
+    "duration_seconds": 130.5
   }
 }
