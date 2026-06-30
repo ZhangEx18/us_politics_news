@@ -7,13 +7,11 @@ on:
         required: true
         type: string
       report_type:
-        description: '报告类型（daily / weekly / monthly）'
+        description: '报告类型（news 仅保留 daily）'
         required: true
         type: choice
         options:
           - daily
-          - weekly
-          - monthly
       digest_only:
         description: '仅对 news/daily 有效：使用数据库现有文章重生成，不重新抓取'
         required: false
@@ -26,7 +24,7 @@ on:
         required: true
         type: string
       report_type:
-        description: '报告类型（daily / weekly / monthly）'
+        description: '报告类型（news 仅保留 daily）'
         required: true
         type: string
       digest_only:
@@ -172,13 +170,9 @@ jobs:
           echo "报告字节: $CHARS"
           if [ "$REPORT_TYPE" = "daily" ]; then
             [ "$CHARS" -gt 5000 ] || { echo "日报字数过少"; exit 1; }
-          elif [ "$REPORT_TYPE" = "weekly" ]; then
-            [ "$CHARS" -gt 10000 ] || { echo "周报字数过少"; exit 1; }
-          elif [ "$REPORT_TYPE" = "monthly" ]; then
-            [ "$CHARS" -gt 15000 ] || { echo "月报字数过少"; exit 1; }
           fi
 
-          # news 四栏目校验（daily/weekly/monthly）
+          # news 四栏目校验（daily）
           if [ "$PRODUCT" = "news" ]; then
             grep -q "一、美国政局" "$REPORT_FILE" || { echo "缺少美国政局栏目"; exit 1; }
             grep -q "二、国际局势" "$REPORT_FILE" || { echo "缺少国际局势栏目"; exit 1; }

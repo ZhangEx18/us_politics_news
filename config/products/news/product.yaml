@@ -2,8 +2,6 @@ product_key: news
 content_type: news_digest
 report_types:
   - daily
-  - weekly
-  - monthly
 
 publish:
   site_root: "docs/news"
@@ -31,16 +29,6 @@ schedule:
     cron: "30 23 * * *"
     fetch_at: "07:00"
     publish_at: "07:45"
-  weekly:
-    workflow: "publish-product.yml"
-    cron: "35 23 * * 1"
-    publish_at: "07:35"
-  monthly:
-    workflow: "publish-product.yml"
-    cron: "40 23 28-31 * *"
-    publish_at: "07:40"
-    beijing_month_start_only: true
-
 digest:
   language: zh
   column:
@@ -83,13 +71,5 @@ digest:
   total_min_items: 34
   total_target_items: 56
   total_max_items: 56
-  weekly:
-    target_word_count_min: 8000
-    target_word_count: 12000
-    target_word_count_max: 16000
-  monthly:
-    target_word_count_min: 15000
-    target_word_count: 20000
-    target_word_count_max: 30000
 
 sources_file: "config/products/news/sources.yaml"

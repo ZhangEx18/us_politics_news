@@ -16,6 +16,7 @@ from run_pipeline import (
     _filter_scored_entries_by_freshness,
     _filter_articles_to_window,
     _get_daily_freshness_window,
+    _get_report_window_for_date,
     _filter_items_by_freshness,
     _get_report_publish_time,
     _get_report_window,
@@ -75,12 +76,27 @@ def test_database_article_can_map_to_content_item_without_id_field():
 
 def test_main_digest_only_exits_when_no_content_generated(monkeypatch):
     monkeypatch.setattr("sys.argv", ["run_pipeline.py", "--digest-only"])
-    monkeypatch.setattr("run_pipeline.run_digest_only", lambda hours=24, report_type="daily": {"total_selected": 0})
+    monkeypatch.setattr("run_pipeline.run_digest_only", lambda **kwargs: {"total_selected": 0})
 
     with pytest.raises(SystemExit) as exc:
         main()
 
     assert exc.value.code == 1
+
+
+def test_main_passes_report_date_to_digest_only(monkeypatch):
+    called = {}
+    monkeypatch.setattr("sys.argv", ["run_pipeline.py", "--digest-only", "--report-date", "2026-06-24"])
+
+    def fake_run_digest_only(**kwargs):
+        called.update(kwargs)
+        return {"total_selected": 1}
+
+    monkeypatch.setattr("run_pipeline.run_digest_only", fake_run_digest_only)
+
+    main()
+
+    assert called["report_date"] == "2026-06-24"
 
 
 def test_build_reader_highlights_prefers_titles_and_deduplicates():
@@ -212,6 +228,17 @@ def test_get_report_window_converts_github_runner_utc_time_to_beijing():
     assert since == datetime(2026, 6, 19, 7, 0, tzinfo=tz)
     assert until == datetime(2026, 6, 20, 7, 0, tzinfo=tz)
     assert report_date == "2026-06-20"
+
+
+def test_get_report_window_for_date_builds_fixed_cutoff_window():
+    tz = ZoneInfo("Asia/Shanghai")
+    config = {"schedule": {"timezone": "Asia/Shanghai", "cutoff_hour": 7}}
+
+    since, until, report_date = _get_report_window_for_date("2026-06-24", config=config)
+
+    assert since == datetime(2026, 6, 23, 7, 0, tzinfo=tz)
+    assert until == datetime(2026, 6, 24, 7, 0, tzinfo=tz)
+    assert report_date == "2026-06-24"
 
 
 def test_digest_only_uses_converted_schedule_timezone_for_report_window(monkeypatch):
