@@ -65,7 +65,10 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
         "messages": [{"role": "user", "content": prompt}],
         "temperature": float(config.get("temperature", 0.3)),
     }
-    url = f"{config['base_url'].rstrip('/')}/chat/completions"
+    base_url = config["base_url"].rstrip("/")
+    if base_url == "https://openrouter.ai/api":
+        base_url = f"{base_url}/v1"
+    url = f"{base_url}/chat/completions"
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
@@ -145,28 +148,37 @@ def _parse_jsonish_object(response: str) -> dict:
 
 
 def _parse_score_response(response: str) -> list[dict]:
-    """解析评分 LLM 响应，兼容 {"items":[...]} / [...] / markdown 包裹"""
+    """解析评分 LLM 响应，兼容 {"items":[...]} / [...] / markdown 包裹 / JSON-ish 输出。"""
     text = _strip_markdown_fence(response)
+    candidates = [text, _normalize_jsonish_text(text)]
     parsed = None
 
-    # 直接解析
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        # 尝试从文本中提取 JSON 对象或数组
+    def _try_load(raw: str):
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            return None
+
+    for candidate in candidates:
+        normalized = candidate.replace("{{", "{").replace("}}", "}")
+
+        parsed = _try_load(normalized)
+        if parsed is not None:
+            break
+
         for pattern in (r"\{.*\}", r"\[.*\]"):
-            m = re.search(pattern, text, re.DOTALL)
-            if m:
-                try:
-                    parsed = json.loads(m.group())
-                    break
-                except json.JSONDecodeError:
-                    continue
+            m = re.search(pattern, normalized, re.DOTALL)
+            if not m:
+                continue
+            parsed = _try_load(m.group())
+            if parsed is not None:
+                break
+        if parsed is not None:
+            break
 
     if parsed is None:
         raise ValueError(f"无法从评分响应中解析 JSON: {response[:200]}")
 
-    # 提取列表
     if isinstance(parsed, list):
         return parsed
     if isinstance(parsed, dict):
@@ -379,6 +391,9 @@ async def _score_single_batch(
 ) -> tuple[list[dict], list[str]]:
     """对单批 entries 评分，返回 (matched_scores, errors)"""
     content_limit = int(config.get("score_content_chars", 400))
+    base_url = str(config.get("base_url") or "").rstrip("/")
+    if base_url == "https://openrouter.ai/api":
+        content_limit = min(content_limit, 220)
     entries_for_llm = [
         {
             "link": e.get("link", ""),
@@ -426,10 +441,17 @@ async def _score_single_batch(
 
 
 def _is_retryable_score_error(errors: list[str]) -> bool:
-    """超时、结果不完整或风控拒绝时，值得拆小重试。"""
+    """超时、结果不完整、连接/载荷波动或风控拒绝时，值得拆小重试。"""
     if not errors:
         return False
-    retryable_tokens = ("TimeoutError", "结果不完整", "high risk")
+    retryable_tokens = (
+        "TimeoutError",
+        "结果不完整",
+        "high risk",
+        "ClientConnectorError",
+        "ClientPayloadError",
+        "TransferEncodingError",
+    )
     return any(token in err for err in errors for token in retryable_tokens)
 
 
@@ -552,6 +574,11 @@ async def score_batch(
     max_prompt_chars = int(config.get("score_max_prompt_chars", max_prompt_chars))
     max_concurrent = int(config.get("score_max_concurrent", max_concurrent))
     wall_timeout = float(config.get("score_wall_timeout_seconds", 0) or 0)
+
+    base_url = str(config.get("base_url") or "").rstrip("/")
+    if base_url == "https://openrouter.ai/api":
+        max_concurrent = 1
+        max_prompt_chars = min(max_prompt_chars, 5000)
 
     batches = _split_entries_for_batch(entries, max_prompt_chars)
     _ai_log(f"评分: {len(entries)} 条 -> {len(batches)} 批")

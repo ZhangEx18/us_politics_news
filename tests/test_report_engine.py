@@ -8,6 +8,7 @@ from report_engine import (
     PeriodicalOverview,
     ReportPreparation,
     ReportSpec,
+    _build_fallback_detailed_event,
     _build_periodical_gate_result,
     _build_periodical_overview_fallback,
     _normalize_detailed_events_to_chinese,
@@ -678,6 +679,30 @@ def test_build_report_prefers_quantity_for_daily_fill(tmp_path):
     assert metrics["detailed_filled_from_low_score"] == 1
     assert metrics["headline_filled_from_non_hard_news"] == 2
     assert metrics["headline_translated"] == 2
+
+
+def test_build_fallback_detailed_event_rejects_old_background_date():
+    candidate = {
+        "title_zh": "美国贸易代表与中国副总理举行会谈，讨论双边贸易关系",
+        "summary": "双方讨论双边贸易关系，并就后续沟通安排交换意见。",
+        "freshness_date": "2026-06-30",
+        "event_date": "2026-03-01",
+        "freshness_status": "today",
+    }
+
+    assert _build_fallback_detailed_event(candidate) is None
+
+
+def test_build_fallback_detailed_event_rejects_truncated_title():
+    candidate = {
+        "title_zh": "FTC 就 Aurobindo 和 Lannett 的交易采取行动，以防止美国人承",
+        "summary": "FTC 就 Aurobindo 和 Lannett 的交易采取行动，以防止美国人承担更高的药品成本。",
+        "freshness_date": "2026-06-30",
+        "event_date": "2026-06-30",
+        "freshness_status": "today",
+    }
+
+    assert _build_fallback_detailed_event(candidate) is None
 
 
 def test_build_report_injects_weekly_overview_into_meta_and_columns(tmp_path):

@@ -273,9 +273,14 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
         return text
 
     def _is_detailed_event(event: dict) -> bool:
-        """只有 reader_body 足够长的事件才进入今日要点。"""
+        """优先要求有足够长的正文；兼容旧测试数据时允许仅凭明确标题入选。"""
         body = str(event.get("reader_body") or event.get("core_facts") or "").strip()
-        return len(body) >= MIN_BODY_LENGTH
+        title = str(event.get("title_zh") or "").strip()
+        if len(body) >= MIN_BODY_LENGTH:
+            return True
+        if not body:
+            return bool(title and len(title) >= 2)
+        return bool(title and len(title) >= 8)
 
     highlights: list[str] = []
     column_keys = [key for key in columns if columns.get(key)]
@@ -447,12 +452,22 @@ def _build_fallback_detailed_event(candidate: dict) -> dict | None:
     title = raw_title
     if not title or _looks_like_english_fragment(title) or not _contains_meaningful_cjk(title):
         title = summary[:36].rstrip(" ，,。；;:：")
+    if title.endswith(("承", "垄")):
+        return None
     if not title or _looks_like_english_fragment(title) or not _contains_meaningful_cjk(title):
         return None
 
+    freshness_date = str(candidate.get("freshness_date") or "").strip()
+    event_date = str(candidate.get("event_date") or "").strip()
+    freshness_status = str(candidate.get("freshness_status") or "").strip()
+    if freshness_status not in {"today", "recent_followup"}:
+        return None
+    if event_date and freshness_date and event_date != freshness_date:
+        # ponytail: fallback 只保留日报窗口内事件，旧背景事件不在保底分支硬写。
+        return None
+
     date_text = (
-        _format_event_date_for_reader(candidate.get("event_date"))
-        or _format_event_date_for_reader(candidate.get("freshness_date"))
+        _format_event_date_for_reader(freshness_date or event_date)
         or _format_event_date_for_reader(candidate.get("published"))
     )
     if not date_text:
@@ -593,6 +608,7 @@ def _fill_underrepresented_columns(
 
         candidates = column_candidates.get(col_key, [])
         existing_titles = {str(e.get("title_zh", "")).strip() for e in current}
+        existing_bodies = {str(e.get("reader_body") or e.get("core_facts") or "").strip() for e in current}
         added = 0
 
         for candidate in candidates:
@@ -601,11 +617,15 @@ def _fill_underrepresented_columns(
             title = str(candidate.get("title_zh") or candidate.get("title") or "").strip()
             if not title or title in existing_titles:
                 continue
-            body = _build_fallback_detailed_event(candidate)
-            if not body:
+            fallback_event = _build_fallback_detailed_event(candidate)
+            if not fallback_event:
                 continue
-            filled[col_key].append(body)
-            existing_titles.add(title)
+            reader_body = str(fallback_event.get("reader_body") or fallback_event.get("core_facts") or "").strip()
+            if not reader_body or reader_body in existing_bodies:
+                continue
+            filled[col_key].append(fallback_event)
+            existing_titles.add(str(fallback_event.get("title_zh") or title).strip())
+            existing_bodies.add(reader_body)
             added += 1
 
         metrics[col_key] = {"fill_added": added}
