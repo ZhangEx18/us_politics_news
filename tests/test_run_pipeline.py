@@ -102,19 +102,27 @@ def test_main_passes_report_date_to_digest_only(monkeypatch):
 def test_build_reader_highlights_prefers_titles_and_deduplicates():
     columns = {
         "us_politics": [
-            {"title_zh": "华为案证据裁定：孟晚舟供述可被美国检方使用", "core_facts": "事实一"},
-            {"title_zh": "华为案证据裁定：孟晚舟供述可被美国检方使用", "core_facts": "重复标题"},
+            {
+                "title_zh": "华为案证据裁定：孟晚舟供述可被美国检方使用",
+                "reader_body": "6 月 27 日，法院就华为案证据范围作出最新裁定，检方可在后续程序中使用相关供述材料。此前争议集中在证据可采性，此次裁定把案件推进到更实质的审理阶段，并直接影响后续辩方抗辩空间。",
+            },
+            {
+                "title_zh": "华为案证据裁定：孟晚舟供述可被美国检方使用",
+                "reader_body": "6 月 27 日，重复事件，不应再次进入今日要点。",
+            },
         ],
         "global_affairs": [
-            {"title_zh": "", "core_facts": "美国首次公开与伊朗达成的 14 点谅解备忘录全文"},
+            {
+                "title_zh": "",
+                "reader_body": "美国首次公开与伊朗达成的 14 点谅解备忘录全文，但这条正文不足以进入当前的今日要点过滤规则。",
+            },
         ],
     }
 
     highlights = build_reader_highlights(columns, limit=8)
 
     assert highlights[0].startswith("华为案证据裁定")
-    assert len(highlights) == 2
-    assert any("伊朗" in item for item in highlights)
+    assert len(highlights) == 1
 
 
 def test_count_scored_entries_only_counts_real_ai_results():
