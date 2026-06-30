@@ -1605,17 +1605,17 @@
         "2026-06-29",
         "2026-06-30"
       ],
-      "kept": 1472,
-      "dropped": 924,
+      "kept": 1575,
+      "dropped": 885,
       "dropped_by_column": {
-        "us_politics": 77,
-        "global_affairs": 438,
-        "technology": 102,
-        "economy": 307
+        "us_politics": 73,
+        "global_affairs": 410,
+        "technology": 99,
+        "economy": 303
       }
     },
-    "raw_fetched": 2445,
-    "raw_merged": 1472
+    "raw_fetched": 2517,
+    "raw_merged": 1575
   },
   "cn_source_fetched": 12,
   "cn_source_selected": 0,
@@ -1670,7 +1670,7 @@
     },
     "technology": {
       "prefiltered": 24,
-      "hard_news_candidates": 23,
+      "hard_news_candidates": 24,
       "post_merge_scored": 5,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
@@ -1714,13 +1714,13 @@
   "ai": {
     "score_errors": 0,
     "digest_failures": {
-      "us_politics": "LLM API 错误 401: {\n    \"error\": {\n        \"message\": \"Invalid API Key\",\n        \"param\": \"Please provide valid API Key\",\n        \"code\": \"401\",\n        \"type\": \"invalid_key\"\n    }\n}\n",
-      "global_affairs": "LLM API 错误 401: {\n    \"error\": {\n        \"message\": \"Invalid API Key\",\n        \"param\": \"Please provide valid API Key\",\n        \"code\": \"401\",\n        \"type\": \"invalid_key\"\n    }\n}\n",
-      "technology": "LLM API 错误 401: {\n    \"error\": {\n        \"message\": \"Invalid API Key\",\n        \"param\": \"Please provide valid API Key\",\n        \"code\": \"401\",\n        \"type\": \"invalid_key\"\n    }\n}\n",
-      "economy": "LLM API 错误 401: {\n    \"error\": {\n        \"message\": \"Invalid API Key\",\n        \"param\": \"Please provide valid API Key\",\n        \"code\": \"401\",\n        \"type\": \"invalid_key\"\n    }\n}\n"
+      "us_politics": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d",
+      "global_affairs": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d",
+      "technology": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d",
+      "economy": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d"
     },
     "score_duration_seconds": 0,
-    "daily_overview_failure": "LLM API 错误 401: {\n    \"error\": {\n        \"message\": \"Invalid API Key\",\n        \"param\": \"Please provide valid API Key\",\n        \"code\": \"401\",\n        \"type\": \"invalid_key\"\n    }\n}\n"
+    "daily_overview_failure": "LLM API 错误 404: <!DOCTYPE html><html data-dpl-id=\"dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1\"/><link rel=\"stylesheet\" href=\"/_next/static/chunks/0puvfppvifekr.css?dpl=dpl_5eo5mp6yCKX9TdignAqSrpwsULSr\" d"
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -1769,8 +1769,8 @@
     }
   },
   "candidate_pool": {
-    "upserted": 112,
-    "total": 112
+    "upserted": 113,
+    "total": 113
   },
   "report_events": {
     "reused": 56,
@@ -1783,6 +1783,6 @@
   "report": {
     "title": "2026年6月30日 日报",
     "published_at": "2026-06-30T07:45:00+08:00",
-    "duration_seconds": 5.8
+    "duration_seconds": 1.2
   }
 }
