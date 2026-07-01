@@ -9,6 +9,7 @@ from models import ContentItem
 from run_pipeline import (
     main,
     _augment_ai_config_with_runtime,
+    _cap_openrouter_daily_candidates,
     _count_scored_entries,
     _content_item_to_report_candidate,
     _filter_items_by_report_dates,
@@ -134,6 +135,49 @@ def test_count_scored_entries_only_counts_real_ai_results():
     ]
 
     assert _count_scored_entries(scored) == 1
+
+
+def test_cap_openrouter_daily_candidates_uses_column_targets():
+    columns_cfg = {
+        "us_politics": {"target_items": 10},
+        "economy": {"target_items": 7},
+    }
+    items_by_column = {
+        "us_politics": [
+            ContentItem(
+                id=f"u{i}",
+                source_type="rss",
+                title=f"US {i}",
+                url=f"https://example.com/u{i}",
+                content="摘要",
+                source_name="src",
+                column="us_politics",
+            )
+            for i in range(30)
+        ],
+        "economy": [
+            ContentItem(
+                id=f"e{i}",
+                source_type="rss",
+                title=f"E {i}",
+                url=f"https://example.com/e{i}",
+                content="摘要",
+                source_name="src",
+                column="economy",
+            )
+            for i in range(20)
+        ],
+    }
+
+    capped = _cap_openrouter_daily_candidates(
+        items_by_column,
+        columns_cfg,
+        ai_config={"base_url": "https://openrouter.ai/api"},
+        report_type="daily",
+    )
+
+    assert len(capped["us_politics"]) == 14
+    assert len(capped["economy"]) == 11
 
 
 def test_is_hard_news_entry_requires_true_flag():

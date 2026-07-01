@@ -199,6 +199,7 @@ def _split_entries_for_batch(
     entries: list[dict],
     max_prompt_chars: int = 12000,
     prompt_template_chars: int = 1500,
+    content_limit: int = 2000,
 ) -> list[list[dict]]:
     """将 entries 按字符数分批，每批不超过 max_prompt_chars"""
     if not entries:
@@ -214,7 +215,7 @@ def _split_entries_for_batch(
             "title": entry.get("title", "")[:100],
             "source": entry.get("source", ""),
             "published": entry.get("published", ""),
-            "content": entry.get("content", "")[:2000],
+            "content": entry.get("content", "")[:content_limit],
         }, ensure_ascii=False))
 
         if current_chars + entry_chars + prompt_template_chars > max_prompt_chars and current:
@@ -574,13 +575,19 @@ async def score_batch(
     max_prompt_chars = int(config.get("score_max_prompt_chars", max_prompt_chars))
     max_concurrent = int(config.get("score_max_concurrent", max_concurrent))
     wall_timeout = float(config.get("score_wall_timeout_seconds", 0) or 0)
+    content_limit = int(config.get("score_content_chars", 400))
 
     base_url = str(config.get("base_url") or "").rstrip("/")
     if base_url == "https://openrouter.ai/api":
         max_concurrent = 1
         max_prompt_chars = min(max_prompt_chars, 5000)
+        content_limit = min(content_limit, 220)
 
-    batches = _split_entries_for_batch(entries, max_prompt_chars)
+    batches = _split_entries_for_batch(
+        entries,
+        max_prompt_chars=max_prompt_chars,
+        content_limit=content_limit,
+    )
     _ai_log(f"评分: {len(entries)} 条 -> {len(batches)} 批")
 
     if len(batches) == 1:

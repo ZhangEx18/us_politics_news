@@ -7,6 +7,7 @@ from ai_analyzer import (
     _build_digest_evidence,
     _merge_scores,
     _parse_jsonish_object,
+    _split_entries_for_batch,
     _score_batch_with_retry,
     merge_events,
     score_batch,
@@ -235,6 +236,30 @@ def test_score_batch_wall_timeout_keeps_finished_batches(monkeypatch):
     scored = [item for item in scores if item.get("score")]
     assert len(scored) == 1
     assert any("评分总耗时超过" in err for err in errors)
+
+
+def test_split_entries_for_batch_uses_runtime_content_limit():
+    entries = [
+        {
+            "link": f"https://example.com/{idx}",
+            "title": f"title-{idx}",
+            "source": "test",
+            "published": "2026-07-01T00:00:00+00:00",
+            "content": "x" * 600,
+        }
+        for idx in range(112)
+    ]
+
+    default_batches = _split_entries_for_batch(entries, max_prompt_chars=5000)
+    openrouter_batches = _split_entries_for_batch(
+        entries,
+        max_prompt_chars=5000,
+        content_limit=220,
+    )
+
+    assert len(default_batches) > len(openrouter_batches)
+    assert len(default_batches) == 28
+    assert len(openrouter_batches) == 12
 
 
 def test_parse_jsonish_object_accepts_chinese_curly_quotes():
