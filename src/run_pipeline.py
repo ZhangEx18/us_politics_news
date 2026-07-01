@@ -524,6 +524,26 @@ def _prefilter_items_for_scoring(
     return selected
 
 
+def _cap_openrouter_daily_candidates(
+    items_by_column: dict[str, list[ContentItem]],
+    columns_cfg: dict[str, dict],
+    ai_config: dict | None = None,
+    report_type: str = "daily",
+) -> dict[str, list[ContentItem]]:
+    """OpenRouter 串行评分较慢；日报仅保留接近成稿需求的候选冗余。"""
+    base_url = str((ai_config or {}).get("base_url") or "").rstrip("/")
+    if base_url != "https://openrouter.ai/api" or report_type != "daily":
+        return items_by_column
+
+    capped: dict[str, list[ContentItem]] = {}
+    for col_key, items in items_by_column.items():
+        col_cfg = columns_cfg.get(col_key, {})
+        target_items = int(col_cfg.get("target_items", col_cfg.get("min_items", 6)) or 6)
+        cap = max(target_items + 4, target_items)
+        capped[col_key] = items[:cap]
+    return capped
+
+
 def _build_scoring_entries_by_column(
     column_items: dict[str, list[ContentItem]],
     report_date: str | None = None,
@@ -1293,6 +1313,12 @@ def _run_digest_phase(
         col: _pre_llm_hard_filter(items, config)
         for col, items in prefiltered_by_column.items()
     }
+    prefiltered_by_column = _cap_openrouter_daily_candidates(
+        prefiltered_by_column,
+        columns_cfg,
+        ai_config=ai_config,
+        report_type=report_type,
+    )
     pre_llm_after = sum(len(v) for v in prefiltered_by_column.values())
     print(f"   Pre-LLM 过滤: {pre_llm_before} -> {pre_llm_after} 条")
     for col_key, items in sorted(prefiltered_by_column.items()):
