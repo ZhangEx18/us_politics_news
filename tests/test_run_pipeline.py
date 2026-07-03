@@ -9,7 +9,7 @@ from models import ContentItem
 from run_pipeline import (
     main,
     _augment_ai_config_with_runtime,
-    _cap_openrouter_daily_candidates,
+    _cap_slow_daily_candidates,
     _count_scored_entries,
     _content_item_to_report_candidate,
     _filter_items_by_report_dates,
@@ -137,7 +137,14 @@ def test_count_scored_entries_only_counts_real_ai_results():
     assert _count_scored_entries(scored) == 1
 
 
-def test_cap_openrouter_daily_candidates_uses_column_targets():
+@pytest.mark.parametrize(
+    "base_url",
+    [
+        "https://openrouter.ai/api",
+        "https://open.bigmodel.cn/api/paas/v4",
+    ],
+)
+def test_cap_slow_daily_candidates_uses_column_targets(base_url):
     columns_cfg = {
         "us_politics": {"target_items": 10},
         "economy": {"target_items": 7},
@@ -169,10 +176,10 @@ def test_cap_openrouter_daily_candidates_uses_column_targets():
         ],
     }
 
-    capped = _cap_openrouter_daily_candidates(
+    capped = _cap_slow_daily_candidates(
         items_by_column,
         columns_cfg,
-        ai_config={"base_url": "https://openrouter.ai/api"},
+        ai_config={"base_url": base_url},
         report_type="daily",
     )
 
@@ -230,8 +237,8 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
             "score_max_concurrent": 1,
             "score_max_prompt_chars": 4500,
             "score_timeout_seconds": 240,
-            "score_wall_timeout_seconds": 900,
-            "score_content_chars": 300,
+            "score_wall_timeout_seconds": 2400,
+            "score_content_chars": 220,
             "score_retry_split_depth": 1,
             "digest_timeout_seconds": 240,
             "digest_content_chars": 1000,
@@ -247,8 +254,8 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
     assert ai_config["score_max_concurrent"] == 1
     assert ai_config["score_max_prompt_chars"] == 4500
     assert ai_config["score_timeout_seconds"] == 240
-    assert ai_config["score_wall_timeout_seconds"] == 900
-    assert ai_config["score_content_chars"] == 300
+    assert ai_config["score_wall_timeout_seconds"] == 2400
+    assert ai_config["score_content_chars"] == 220
     assert ai_config["score_retry_split_depth"] == 1
     assert ai_config["digest_timeout_seconds"] == 240
     assert ai_config["digest_content_chars"] == 1000

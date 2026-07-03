@@ -17,8 +17,8 @@ llm:
   score_max_concurrent: 1
   score_max_prompt_chars: 4500
   score_timeout_seconds: 240
-  score_wall_timeout_seconds: 900
-  score_content_chars: 300
+  score_wall_timeout_seconds: 2400
+  score_content_chars: 220
   score_retry_split_depth: 1
   digest_timeout_seconds: 240
   digest_content_chars: 1000

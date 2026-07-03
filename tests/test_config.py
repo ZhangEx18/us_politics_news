@@ -70,8 +70,8 @@ def test_digest_targets_match_publish_constraints():
     assert llm.get("score_max_concurrent") == 1
     assert llm.get("score_max_prompt_chars") == 4500
     assert llm.get("score_timeout_seconds") == 240
-    assert llm.get("score_wall_timeout_seconds") == 900
-    assert llm.get("score_content_chars") == 300
+    assert llm.get("score_wall_timeout_seconds") == 2400
+    assert llm.get("score_content_chars") == 220
     assert llm.get("score_retry_split_depth") == 1
     assert llm.get("digest_timeout_seconds") == 240
     assert llm.get("digest_content_chars") == 1000
