@@ -183,8 +183,8 @@ def test_cap_slow_daily_candidates_uses_column_targets(base_url):
         report_type="daily",
     )
 
-    assert len(capped["us_politics"]) == 12
-    assert len(capped["economy"]) == 9
+    assert len(capped["us_politics"]) == 10
+    assert len(capped["economy"]) == 7
 
 
 def test_is_hard_news_entry_requires_true_flag():

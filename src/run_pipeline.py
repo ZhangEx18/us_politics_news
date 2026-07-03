@@ -549,8 +549,7 @@ def _cap_slow_daily_candidates(
     for col_key, items in items_by_column.items():
         col_cfg = columns_cfg.get(col_key, {})
         target_items = int(col_cfg.get("target_items", col_cfg.get("min_items", 6)) or 6)
-        cap = max(target_items + 2, target_items)
-        capped[col_key] = items[:cap]
+        capped[col_key] = items[:target_items]
     return capped
 
 
