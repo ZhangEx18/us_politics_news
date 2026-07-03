@@ -40,36 +40,26 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     assert delegate_job["secrets"] == "inherit"
 
 
-def test_weekly_publish_is_thin_wrapper_to_publish_product():
+def test_weekly_publish_is_paused():
     workflow = _load_workflow("weekly-publish.yml")
 
-    assert _workflow_triggers(workflow) == {
-        "schedule": [{"cron": "35 23 * * 1"}],
-        "workflow_dispatch": None,
-    }
+    assert list(_workflow_triggers(workflow)) == ["workflow_dispatch"]
     assert "concurrency" not in workflow
 
-    delegate_job = workflow["jobs"]["delegate"]
-    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
-    assert delegate_job["with"]["product_key"] == "news"
-    assert delegate_job["with"]["report_type"] == "weekly"
-    assert delegate_job["secrets"] == "inherit"
+    disabled_job = workflow["jobs"]["disabled"]
+    assert disabled_job["runs-on"] == "ubuntu-latest"
+    assert "news weekly publish is paused" in disabled_job["steps"][0]["run"]
 
 
-def test_monthly_publish_is_thin_wrapper_to_publish_product():
+def test_monthly_publish_is_paused():
     workflow = _load_workflow("monthly-publish.yml")
 
-    assert _workflow_triggers(workflow) == {
-        "schedule": [{"cron": "40 23 28-31 * *"}],
-        "workflow_dispatch": None,
-    }
+    assert list(_workflow_triggers(workflow)) == ["workflow_dispatch"]
     assert "concurrency" not in workflow
 
-    delegate_job = workflow["jobs"]["delegate"]
-    assert delegate_job["uses"] == "./.github/workflows/publish-product.yml"
-    assert delegate_job["with"]["product_key"] == "news"
-    assert delegate_job["with"]["report_type"] == "monthly"
-    assert delegate_job["secrets"] == "inherit"
+    disabled_job = workflow["jobs"]["disabled"]
+    assert disabled_job["runs-on"] == "ubuntu-latest"
+    assert "news monthly publish is paused" in disabled_job["steps"][0]["run"]
 
 
 # ── publish-product.yml 测试 ──
@@ -83,7 +73,7 @@ def test_publish_product_workflow_has_required_inputs():
     assert "product_key" in dispatch["inputs"]
     assert "report_type" in dispatch["inputs"]
     assert dispatch["inputs"]["report_type"]["type"] == "choice"
-    assert set(dispatch["inputs"]["report_type"]["options"]) == {"daily", "weekly", "monthly"}
+    assert set(dispatch["inputs"]["report_type"]["options"]) == {"daily"}
     assert workflow_call["inputs"]["product_key"]["type"] == "string"
     assert workflow_call["inputs"]["report_type"]["type"] == "string"
 
@@ -165,8 +155,8 @@ def test_publish_product_sync_legacy_aliases_uses_heredoc_python():
     assert 'Path("docs")' in run
 
 
-def test_publish_product_validate_checks_all_report_types():
-    """validate step 对 news 四栏目校验覆盖 daily/weekly/monthly。"""
+def test_publish_product_validate_checks_daily_output():
+    """validate step 对 news daily 做四栏目校验。"""
     workflow = _load_workflow("publish-product.yml")
     publish_job = workflow["jobs"]["publish"]
 
@@ -180,10 +170,10 @@ def test_publish_product_validate_checks_all_report_types():
     assert "content:encoded" in run
     # 校验报告存在
     assert "REPORT_FILE" in run
-    # 校验字数（daily/weekly/monthly 都有）
+    # 校验字数
     assert "日报字数过少" in run
-    assert "周报字数过少" in run
-    assert "月报字数过少" in run
+    assert "周报字数过少" not in run
+    assert "月报字数过少" not in run
     # news 四栏目校验
     assert "一、美国政局" in run
     assert "二、国际局势" in run

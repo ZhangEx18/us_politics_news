@@ -9,8 +9,8 @@ analysis:
 
 llm:
   provider: openai
-  model: mimo-v2.5-pro
-  base_url: "https://token-plan-cn.xiaomimimo.com/v1"
+  model: glm-4.7
+  base_url: "https://open.bigmodel.cn/api/paas/v4"
   max_concurrent: 5
   max_prompt_chars: 120000
   timeout_seconds: 180

@@ -31,6 +31,19 @@ def test_config_loads_successfully():
     assert isinstance(config, dict), "config.yaml 应解析为字典"
 
 
+def test_ai_config_defaults_to_bigmodel_when_optional_env_empty(monkeypatch):
+    from ai_analyzer import _load_ai_config
+
+    monkeypatch.setenv("AI_API_KEY", "test-key")
+    monkeypatch.setenv("AI_BASE_URL", "")
+    monkeypatch.setenv("AI_MODEL", "")
+
+    config = _load_ai_config()
+
+    assert config["base_url"] == "https://open.bigmodel.cn/api/paas/v4"
+    assert config["model"] == "glm-4.7"
+
+
 def test_digest_columns_contains_four_columns():
     config = load_product_config("news")
     columns = config.get("digest", {}).get("columns", {})
