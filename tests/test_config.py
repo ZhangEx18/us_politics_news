@@ -67,12 +67,12 @@ def test_digest_targets_match_publish_constraints():
     assert total.get("target_word_count_max") == 20000
     assert runtime.get("min_score_coverage") == 0.7
     schedule = config.get("schedule", {})
-    assert llm.get("score_max_concurrent") == 2
-    assert llm.get("score_max_prompt_chars") == 9000
-    assert llm.get("score_timeout_seconds") == 120
-    assert llm.get("score_wall_timeout_seconds") == 420
-    assert llm.get("score_content_chars") == 400
-    assert llm.get("score_retry_split_depth") == 3
+    assert llm.get("score_max_concurrent") == 1
+    assert llm.get("score_max_prompt_chars") == 4500
+    assert llm.get("score_timeout_seconds") == 240
+    assert llm.get("score_wall_timeout_seconds") == 900
+    assert llm.get("score_content_chars") == 300
+    assert llm.get("score_retry_split_depth") == 1
     assert llm.get("digest_timeout_seconds") == 240
     assert llm.get("digest_content_chars") == 1000
     assert llm.get("meta_timeout_seconds") == 120

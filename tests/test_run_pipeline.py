@@ -227,12 +227,12 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
             "max_concurrent": 5,
             "max_prompt_chars": 120000,
             "timeout_seconds": 180,
-            "score_max_concurrent": 2,
-            "score_max_prompt_chars": 9000,
-            "score_timeout_seconds": 120,
-            "score_wall_timeout_seconds": 420,
-            "score_content_chars": 400,
-            "score_retry_split_depth": 3,
+            "score_max_concurrent": 1,
+            "score_max_prompt_chars": 4500,
+            "score_timeout_seconds": 240,
+            "score_wall_timeout_seconds": 900,
+            "score_content_chars": 300,
+            "score_retry_split_depth": 1,
             "digest_timeout_seconds": 240,
             "digest_content_chars": 1000,
             "meta_timeout_seconds": 120,
@@ -244,12 +244,12 @@ def test_augment_ai_config_with_runtime_applies_llm_limits():
         config,
     )
 
-    assert ai_config["score_max_concurrent"] == 2
-    assert ai_config["score_max_prompt_chars"] == 9000
-    assert ai_config["score_timeout_seconds"] == 120
-    assert ai_config["score_wall_timeout_seconds"] == 420
-    assert ai_config["score_content_chars"] == 400
-    assert ai_config["score_retry_split_depth"] == 3
+    assert ai_config["score_max_concurrent"] == 1
+    assert ai_config["score_max_prompt_chars"] == 4500
+    assert ai_config["score_timeout_seconds"] == 240
+    assert ai_config["score_wall_timeout_seconds"] == 900
+    assert ai_config["score_content_chars"] == 300
+    assert ai_config["score_retry_split_depth"] == 1
     assert ai_config["digest_timeout_seconds"] == 240
     assert ai_config["digest_content_chars"] == 1000
     assert ai_config["meta_timeout_seconds"] == 120
