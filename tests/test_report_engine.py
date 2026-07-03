@@ -265,6 +265,32 @@ def test_generate_all_column_digests_falls_back_per_column():
     assert failures == {"global_affairs": "llm timeout"}
 
 
+def test_generate_all_column_digests_fallback_keeps_more_context():
+    columns_cfg = {"us_politics": {"label": "美国政局"}}
+    long_summary = "政策团队围绕预算、监管和外交议程展开密集谈判。" * 12
+    candidates = {
+        "us_politics": [
+            {"title": f"事件{i}", "summary": long_summary}
+            for i in range(1, 7)
+        ],
+    }
+
+    with patch("report_engine.generate_column_digest", new=AsyncMock(side_effect=RuntimeError("rate limited"))):
+        results, failures = asyncio.run(_generate_all_column_digests(
+            columns_cfg=columns_cfg,
+            column_candidates=candidates,
+            history_context="",
+            ai_config={},
+            word_count_min=100,
+            word_count_max=200,
+        ))
+
+    assert [event["title_zh"] for event in results["us_politics"]] == ["事件1", "事件2", "事件3", "事件4", "事件5"]
+    assert len(results["us_politics"][0]["reader_body"]) > 220
+    assert len(results["us_politics"][0]["reader_body"]) <= 421
+    assert failures == {"us_politics": "rate limited"}
+
+
 def test_prepare_report_inputs_extracts_shared_context():
     spec = ReportSpec(
         report_type="daily",

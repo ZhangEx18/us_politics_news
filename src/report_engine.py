@@ -540,20 +540,21 @@ async def _generate_all_column_digests(
         content = str(candidate.get("content", "")).strip()
         body = summary or content
         body = re.sub(r"\s+", " ", body)
-        if len(body) > 220:
-            body = body[:220].rstrip(" ，,。. ") + "。"
+        if len(body) > 420:
+            body = body[:420].rstrip(" ，,。. ") + "。"
         return body or "该事件写作降级为简版概述，保留标题供后续人工复核。"
 
     def _fallback_events(candidates: list[dict]) -> list[dict]:
         events: list[dict] = []
-        for candidate in candidates[:3]:
+        for candidate in candidates[:5]:
             title = str(candidate.get("title", "")).strip()
             if not title:
                 continue
+            reader_body = _fallback_reader_body(candidate)
             events.append({
                 "title_zh": title,
-                "reader_body": _fallback_reader_body(candidate),
-                "core_facts": _fallback_reader_body(candidate),
+                "reader_body": reader_body,
+                "core_facts": reader_body,
             })
         return events
 
