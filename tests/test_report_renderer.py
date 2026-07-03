@@ -336,7 +336,7 @@ def test_validate_report_format_rejects_english_detailed_title():
     assert any("标题未中文化" in issue for issue in issues)
 
 
-def test_validate_report_format_requires_detailed_events_when_configured():
+def test_validate_report_format_allows_headline_only_when_detailed_drops():
     meta = {
         "date": "2026-06-27",
         "title": "观察日报",
@@ -352,6 +352,26 @@ def test_validate_report_format_requires_detailed_events_when_configured():
 
     issues = validate_report_format(meta, columns, report_type="daily")
 
+    assert "栏目缺少重点解析: us_politics" not in issues
+
+
+def test_validate_report_format_rejects_empty_column_when_detailed_required():
+    meta = {
+        "date": "2026-06-27",
+        "title": "观察日报",
+        "require_non_empty_columns": True,
+        "require_detailed_events": True,
+    }
+    columns = {
+        "us_politics": {"detailed_events": [], "headline_only_events": []},
+        "global_affairs": {"detailed_events": [{"title_zh": "国际事件", "reader_body": "国际事件正文。"}]},
+        "technology": {"detailed_events": [{"title_zh": "科技事件", "reader_body": "科技事件正文。"}]},
+        "economy": {"detailed_events": [{"title_zh": "经济事件", "reader_body": "经济事件正文。"}]},
+    }
+
+    issues = validate_report_format(meta, columns, report_type="daily")
+
+    assert "栏目为空: us_politics" in issues
     assert "栏目缺少重点解析: us_politics" in issues
 
 
