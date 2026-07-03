@@ -619,7 +619,7 @@ def build_legacy_news_index(docs_dir: Path = DOCS_DIR) -> Path | None:
 <body>
   <main>
     <h1>观察日报</h1>
-    <p>自动生成日报、周报与月报，覆盖美国政局、国际局势、科技前沿、经济走势四大栏目，并输出适合 Reader 订阅的长文归档。</p>
+    <p>自动生成日报，覆盖美国政局、国际局势、科技前沿、经济走势四大栏目，并输出适合 Reader 订阅的长文归档。</p>
     <div class="links">
       <a href="./feed.xml">订阅 RSS Feed</a>
 {"\n".join(latest_links)}

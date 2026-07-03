@@ -33,8 +33,8 @@ def _load_ai_config() -> dict:
         )
     return {
         "api_key": api_key,
-        "base_url": os.getenv("AI_BASE_URL", "https://api.openai.com/v1"),
-        "model": os.getenv("AI_MODEL", "gpt-4o-mini"),
+        "base_url": os.getenv("AI_BASE_URL") or "https://open.bigmodel.cn/api/paas/v4",
+        "model": os.getenv("AI_MODEL") or "glm-4.7",
     }
 
 

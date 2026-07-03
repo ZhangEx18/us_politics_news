@@ -33,13 +33,13 @@ def test_build_manifest_contains_all_products():
     assert "algorithms" in product_keys
 
 
-def test_build_manifest_news_has_three_report_types():
+def test_build_manifest_news_daily_only():
     mod = _load_build_schedule_manifest()
     manifest = mod.build_manifest()
 
     news_schedules = [s for s in manifest["schedules"] if s["product_key"] == "news"]
     report_types = {s["report_type"] for s in news_schedules}
-    assert report_types == {"daily", "weekly", "monthly"}
+    assert report_types == {"daily"}
 
 
 def test_build_manifest_algorithms_daily_only():
@@ -92,6 +92,10 @@ def test_run_product_rejects_unsupported_report_type():
     supported = config.get("report_types", [])
     assert "weekly" not in supported
     assert "monthly" not in supported
+
+    news_config = load_product_config("news")
+    news_supported = news_config.get("report_types", [])
+    assert news_supported == ["daily"]
 
 
 def test_run_product_config_content_types():
@@ -178,24 +182,22 @@ def test_run_product_news_daily_digest_only_routes_to_digest(monkeypatch):
     assert called[0][0] == "digest"
 
 
-def test_run_product_news_weekly_routes_to_weekly(monkeypatch):
-    """news/weekly 路由到 run_weekly。"""
+def test_run_product_news_weekly_raises():
+    """news/weekly 已暂停。"""
+    import pytest
     from run_product import run_product
 
-    called = []
-    monkeypatch.setattr("run_product.run_weekly", lambda: called.append("weekly") or {"total_selected": 1})
-    run_product("news", "weekly")
-    assert called == ["weekly"]
+    with pytest.raises(ValueError, match="不支持 report_type=weekly"):
+        run_product("news", "weekly")
 
 
-def test_run_product_news_monthly_routes_to_monthly(monkeypatch):
-    """news/monthly 路由到 run_monthly。"""
+def test_run_product_news_monthly_raises():
+    """news/monthly 已暂停。"""
+    import pytest
     from run_product import run_product
 
-    called = []
-    monkeypatch.setattr("run_product.run_monthly", lambda: called.append("monthly") or {"total_selected": 1})
-    run_product("news", "monthly")
-    assert called == ["monthly"]
+    with pytest.raises(ValueError, match="不支持 report_type=monthly"):
+        run_product("news", "monthly")
 
 
 def test_run_product_algorithms_daily_routes_to_topic_lesson(monkeypatch):
