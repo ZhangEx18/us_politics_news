@@ -524,15 +524,19 @@ def _prefilter_items_for_scoring(
     return selected
 
 
-def _cap_openrouter_daily_candidates(
+def _cap_slow_daily_candidates(
     items_by_column: dict[str, list[ContentItem]],
     columns_cfg: dict[str, dict],
     ai_config: dict | None = None,
     report_type: str = "daily",
 ) -> dict[str, list[ContentItem]]:
-    """OpenRouter 串行评分较慢；日报仅保留接近成稿需求的候选冗余。"""
+    """慢模型日报仅保留接近成稿需求的候选冗余。"""
     base_url = str((ai_config or {}).get("base_url") or "").rstrip("/")
-    if base_url != "https://openrouter.ai/api" or report_type != "daily":
+    slow_base_urls = {
+        "https://openrouter.ai/api",
+        "https://open.bigmodel.cn/api/paas/v4",
+    }
+    if base_url not in slow_base_urls or report_type != "daily":
         return items_by_column
 
     capped: dict[str, list[ContentItem]] = {}
@@ -1313,7 +1317,7 @@ def _run_digest_phase(
         col: _pre_llm_hard_filter(items, config)
         for col, items in prefiltered_by_column.items()
     }
-    prefiltered_by_column = _cap_openrouter_daily_candidates(
+    prefiltered_by_column = _cap_slow_daily_candidates(
         prefiltered_by_column,
         columns_cfg,
         ai_config=ai_config,
