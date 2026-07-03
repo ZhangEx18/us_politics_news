@@ -5,8 +5,121 @@
     <link>.</link>
     <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 02 Jul 2026 07:46:34 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jul 2026 07:46:22 +0800</lastBuildDate>
     <item>
+      <title>2026-07-04 每日算法专题</title>
+      <link>algorithms/daily/2026-07-04.html</link>
+      <description><![CDATA[如何用单调栈把“找右侧第一个更大元素”的双重循环优化到线性时间？]]></description>
+      <content:encoded><![CDATA[<article>
+<h2>如何用单调栈把“找右侧第一个更大元素”的双重循环优化到线性时间？</h2>
+<h3>直觉理解</h3>
+<p>这类题的关键，不是“去找”，而是“边走边整理”。如果你从左到右扫描数组，每来一个新元素，都想知道它能不能成为前面某些元素的“下一个更大元素”。单调栈做的事情，就是把那些还没找到答案、而且数值比当前元素小的元素暂时存起来；一旦来了更大的数，它就像一把钥匙，能一次性解锁一批元素的答案。栈里保存的是“还在等待的人”，并且这些人从栈底到栈顶保持递减，这样当前元素一出现，就能连续弹出所有比它小的元素。这样每个元素只进栈一次、出栈一次，不需要反复比较，原本看起来要做很多次的查找，被压缩成了一趟扫描。你可以把它理解为：栈里维护了一条“尚未被更大值击败”的队列，新的更大值到来时，顺手把被击败者全部结算。</p>
+<h3>算法思路</h3>
+<p>先把问题说清楚：给定一个数组，对每个位置 i，找出它右边第一个比它大的元素；如果不存在，就记为 -1。最直观的做法是对每个位置向右扫描，直到找到答案，这样最坏会到 O(n^2)。单调栈的思路是反过来想：我们从左到右遍历数组，维护一个栈，栈里放的是“还没找到下一个更大元素”的下标，并且对应的值保持严格递减。
+
+当我们遍历到当前元素 nums[i] 时，说明它有可能成为栈顶元素的答案。如果当前值比栈顶对应值更大，那么栈顶这个元素的“下一个更大元素”就是当前值，于是把它弹出并记录答案。弹出之后继续比较新的栈顶，直到栈空或者栈顶值不小于当前值为止。这样做的本质，是把“谁能打败谁”的关系在扫描过程中一次性处理完。
+
+为什么栈里要保持递减？因为如果栈顶都比当前值大，那么更下面的元素一定也更大，当前值不可能越过栈顶去成为它们的答案，所以没必要动它们。递减结构保证了每次只处理真正会被当前元素影响的那些位置。遍历结束后，栈里剩下的元素都没有找到更大值，它们的答案保持为 -1 即可。
+
+写代码时，通常用“下标栈”而不是“数值栈”，因为我们最终要写回答案数组，记录下标更方便定位。若题目要求的是“右侧第一个更大元素的值”，那就直接填值；若要求的是位置，也可以记录位置。这个模板还能扩展到很多变体，比如下一个更小元素、循环数组中的下一个更大元素、股票跨度等，核心都是“维护单调性 + 及时结算答案”。</p>
+<h3>Python 示例</h3>
+<pre><code>from typing import List
+
+
+def next_greater_elements(nums: List[int]) -&gt; List[int]:
+    """返回每个元素右侧第一个更大元素；不存在则为 -1。"""
+    n = len(nums)
+    ans = [-1] * n
+    stack = []  # 单调递减栈，存下标，栈顶对应的值最小
+
+    for i, x in enumerate(nums):
+        # 只要当前元素更大，就可以结算栈顶元素的答案
+        while stack and nums[stack[-1]] &lt; x:
+            idx = stack.pop()
+            ans[idx] = x
+        # 当前元素还没找到答案，先压栈等待后续更大的元素
+        stack.append(i)
+
+    return ans
+
+
+def _run_tests() -&gt; None:
+    cases = [
+        ([2, 1, 2, 4, 3], [4, 2, 4, -1, -1]),
+        ([1, 2, 3, 4], [2, 3, 4, -1]),
+        ([4, 3, 2, 1], [-1, -1, -1, -1]),
+        ([1, 1, 1], [-1, -1, -1]),
+        ([2, 7, 3, 5, 4, 6, 8], [7, 8, 5, 6, 6, 8, -1]),
+    ]
+
+    for nums, expected in cases:
+        result = next_greater_elements(nums)
+        assert result == expected, f"输入 {nums}，期望 {expected}，得到 {result}"
+
+    print("所有测试用例通过")
+
+
+if __name__ == "__main__":
+    _run_tests()
+    print(next_greater_elements([2, 1, 2, 4, 3]))
+</code></pre>
+<h3>C++ 对照</h3>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+vector&lt;int&gt; nextGreaterElements(const vector&lt;int&gt;&amp; nums) {
+    int n = (int)nums.size();
+    vector&lt;int&gt; ans(n, -1);
+    stack&lt;int&gt; st; // 单调递减栈，存下标
+
+    for (int i = 0; i &lt; n; ++i) {
+        while (!st.empty() &amp;&amp; nums[st.top()] &lt; nums[i]) {
+            ans[st.top()] = nums[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return ans;
+}
+
+int main() {
+    vector&lt;vector&lt;int&gt;&gt; tests = {
+        {2, 1, 2, 4, 3},
+        {1, 2, 3, 4},
+        {4, 3, 2, 1},
+        {1, 1, 1},
+        {2, 7, 3, 5, 4, 6, 8}
+    };
+    vector&lt;vector&lt;int&gt;&gt; expected = {
+        {4, 2, 4, -1, -1},
+        {2, 3, 4, -1},
+        {-1, -1, -1, -1},
+        {-1, -1, -1},
+        {7, 8, 5, 6, 6, 8, -1}
+    };
+
+    for (size_t i = 0; i &lt; tests.size(); ++i) {
+        auto result = nextGreaterElements(tests[i]);
+        assert(result == expected[i]);
+    }
+
+    cout &lt;&lt; "所有测试用例通过" &lt;&lt; endl;
+    return 0;
+}
+</code></pre>
+<h3>复杂度分析</h3>
+<p>每个元素最多入栈一次、出栈一次，所以总时间复杂度是 O(n)。栈中最多保存 n 个下标，因此空间复杂度是 O(n)。相比暴力枚举的 O(n^2)，单调栈的提升来自“把重复比较提前消化掉”。</p>
+<h3>易错点</h3>
+<ol>
+<li>把栈里存成数值却又想回写下标，导致无法准确更新答案；修复方法是直接存下标，既能比较值，也能定位结果。</li>
+<li>把比较条件写成 `&lt;=` 或 `&lt;` 时不分场景，遇到重复元素会错误弹栈；修复方法是明确题意，若要求“严格更大”，就用 `&lt;`，不要把相等元素当作更大。</li>
+<li>以为栈顶是最大的元素，结果误判处理顺序；修复方法是记住栈维护的是单调递减序列，栈顶永远是当前最容易被新元素结算的候选。</li>
+</ol>
+</article>]]></content:encoded>
+      <pubDate>Sat, 04 Jul 2026 07:45:54 +0800</pubDate>
+      <guid isPermaLink="false">algorithms/daily/2026-07-04</guid>
+    </item>
+<item>
       <title>2026-07-02 每日算法专题</title>
       <link>algorithms/daily/2026-07-02.html</link>
       <description><![CDATA[给定一个数组，如何高效地找到每个元素右边第一个比它大的元素？]]></description>
