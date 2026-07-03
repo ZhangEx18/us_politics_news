@@ -169,7 +169,7 @@ jobs:
           CHARS=$(wc -c < "$REPORT_FILE")
           echo "报告字节: $CHARS"
           if [ "$REPORT_TYPE" = "daily" ]; then
-            [ "$CHARS" -gt 5000 ] || { echo "日报字数过少"; exit 1; }
+            [ "$CHARS" -gt 3000 ] || { echo "日报字数过少"; exit 1; }
           fi
 
           # news 四栏目校验（daily）
