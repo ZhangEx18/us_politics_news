@@ -172,6 +172,7 @@ def test_publish_product_validate_checks_daily_output():
     assert "REPORT_FILE" in run
     # 校验字数
     assert "日报字数过少" in run
+    assert "$CHARS\" -gt 3000" in run
     assert "周报字数过少" not in run
     assert "月报字数过少" not in run
     # news 四栏目校验
