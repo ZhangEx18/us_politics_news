@@ -9,9 +9,11 @@ from report_engine import (
     PeriodicalOverview,
     ReportPreparation,
     ReportSpec,
+    _audit_daily_content,
     _build_fallback_detailed_event,
     _build_periodical_gate_result,
     _build_periodical_overview_fallback,
+    _dedupe_daily_column_events,
     _normalize_detailed_events_to_chinese,
     _normalize_headline_only_by_column,
     _build_periodical_overview_payload,
@@ -72,6 +74,32 @@ def test_generate_all_column_digests_serializes_bigmodel(monkeypatch):
     assert max_active == 1
 
 
+def test_generate_all_column_digests_serializes_baicai(monkeypatch):
+    active = 0
+    max_active = 0
+
+    async def fake_generate_column_digest(**kwargs):
+        nonlocal active, max_active
+        active += 1
+        max_active = max(max_active, active)
+        await asyncio.sleep(0)
+        active -= 1
+        return [{"title_zh": kwargs["column_label"], "reader_body": "正文"}]
+
+    monkeypatch.setattr("report_engine.generate_column_digest", fake_generate_column_digest)
+
+    asyncio.run(_generate_all_column_digests(
+        {"us_politics": {"label": "美国政局"}, "economy": {"label": "经济走势"}},
+        {"us_politics": [{"title": "A"}], "economy": [{"title": "B"}]},
+        "",
+        {"base_url": "https://api.baicai798.cn/v1"},
+        10,
+        20,
+    ))
+
+    assert max_active == 1
+
+
 # ── sanitize_or_validate_events ──
 
 
@@ -106,6 +134,71 @@ def test_validate_empty_body():
     events = [{"title_zh": "测试", "reader_body": ""}]
     cleaned, issues = sanitize_or_validate_events(events)
     assert len(cleaned) == 0
+
+
+def test_sanitize_or_validate_events_drops_body_date_outside_daily_window():
+    events = [{
+        "title_zh": "旧事件",
+        "reader_body": "6 月 3 日，USTR 公布一项旧程序安排。该安排已不属于本期日报窗口。",
+    }]
+
+    cleaned, issues = sanitize_or_validate_events(events, {
+        "require_date_in_body": True,
+        "allowed_body_dates": ["2026-07-02", "2026-07-03"],
+        "body_date_year": 2026,
+    })
+
+    assert cleaned == []
+    assert any("正文日期不在日报窗口: 2026-06-03" in issue for issue in issues)
+
+
+def test_dedupe_daily_column_events_removes_similar_titles_and_event_keys():
+    results, metrics = _dedupe_daily_column_events({
+        "us_politics": [
+            {"event_key": "a", "title_zh": "最高法院裁定协同党派竞选支出限制违宪"},
+            {"event_key": "a", "title_zh": "重复 event key"},
+            {"title_zh": "最高法院在 NRSC v. FEC 中认定相关竞选支出限制违宪"},
+            {"title_zh": "FTC 就药企垄断问题提交法庭意见书"},
+        ],
+    })
+
+    assert [event["title_zh"] for event in results["us_politics"]] == [
+        "最高法院裁定协同党派竞选支出限制违宪",
+        "FTC 就药企垄断问题提交法庭意见书",
+    ]
+    assert metrics["us_politics"]["deduped_detailed"] == 2
+
+
+def test_audit_daily_content_counts_common_content_problems():
+    metrics = _audit_daily_content(
+        {
+            "us_politics": {
+                "detailed_events": [
+                    {
+                        "title_zh": "最高法院裁定协同党派竞选支出限制违宪",
+                        "reader_body": "7 月 3 日，最高法院裁定相关限制违宪。政党支出安排将受到影响。",
+                    },
+                    {
+                        "title_zh": "最高法院在 NRSC v. FEC 中认定相关竞选支出限制违宪",
+                        "reader_body": "6 月 3 日，最高法院裁定相关限制违宪。现有材料未提供更多可核验细节。",
+                    },
+                    {
+                        "title_zh": "FTC 就 Aurobindo 和 Lannett 的交易采取行动，以防止美国人承",
+                        "reader_body": "7 月 3 日，FTC 采取行动。相关交易仍待后续审查。",
+                    },
+                ],
+            },
+        },
+        ["2026-07-02", "2026-07-03"],
+        2026,
+    )
+
+    assert metrics == {
+        "duplicate_titles": 1,
+        "old_body_dates": 1,
+        "fallback_boilerplate": 1,
+        "truncated_titles": 1,
+    }
 
 
 # ── build_reader_highlights ──
@@ -241,7 +334,13 @@ def test_generate_all_column_digests_falls_back_per_column():
     }
     candidates = {
         "us_politics": [{"title": "重要事件", "summary": "摘要一。摘要二。"}],
-        "global_affairs": [{"title": "国际事件", "summary": "国际摘要。"}],
+        "global_affairs": [{
+            "title": "国际事件",
+            "summary": "国际谈判代表就安全安排继续磋商，并把停火监督机制列入下一轮议程。相关安排将影响边境管控、人道援助通道、监督机制执行和后续外交协调。各方还将继续提交书面意见。",
+            "freshness_date": "2026-07-03",
+            "event_date": "2026-07-03",
+            "freshness_status": "today",
+        }],
     }
 
     async def _fake_digest(**kwargs):
@@ -261,16 +360,22 @@ def test_generate_all_column_digests_falls_back_per_column():
 
     assert results["us_politics"][0]["reader_body"] == "生成正文。"
     assert results["global_affairs"][0]["title_zh"] == "国际事件"
-    assert "摘要" in results["global_affairs"][0]["reader_body"]
+    assert "国际谈判" in results["global_affairs"][0]["reader_body"]
     assert failures == {"global_affairs": "llm timeout"}
 
 
 def test_generate_all_column_digests_fallback_keeps_more_context():
     columns_cfg = {"us_politics": {"label": "美国政局"}}
-    long_summary = "政策团队围绕预算、监管和外交议程展开密集谈判。" * 12
+    long_summary = "政策团队围绕预算、监管和外交议程展开密集谈判。相关安排将影响委员会审议、部门执行、行业合规和后续外交协调。各方还将继续提交书面意见，并说明谈判结果如何影响后续政策时间表。"
     candidates = {
         "us_politics": [
-            {"title": f"事件{i}", "summary": long_summary}
+            {
+                "title": f"事件{i}",
+                "summary": long_summary,
+                "freshness_date": "2026-07-03",
+                "event_date": "2026-07-03",
+                "freshness_status": "today",
+            }
             for i in range(1, 7)
         ],
     }
@@ -286,8 +391,8 @@ def test_generate_all_column_digests_fallback_keeps_more_context():
         ))
 
     assert [event["title_zh"] for event in results["us_politics"]] == ["事件1", "事件2", "事件3", "事件4", "事件5"]
-    assert len(results["us_politics"][0]["reader_body"]) > 220
-    assert len(results["us_politics"][0]["reader_body"]) <= 421
+    assert len(results["us_politics"][0]["reader_body"]) >= 80
+    assert "现有材料未提供" not in results["us_politics"][0]["reader_body"]
     assert failures == {"us_politics": "rate limited"}
 
 
@@ -528,8 +633,8 @@ def test_build_report_daily_falls_back_when_digest_outputs_empty_columns(tmp_pat
             "title": "White House meeting",
             "source": "Example",
             "score": 90,
-            "summary": "白宫与国会领导人举行会议，讨论预算安排和后续表决节奏。",
-            "content": "白宫与国会领导人举行会议，讨论预算安排和后续表决节奏。",
+            "summary": "白宫与国会领导人举行会议，讨论预算安排和后续表决节奏。双方还把委员会审议、拨款期限、政府部门执行准备和后续协调范围列入议程。相关办公室将继续提交书面方案。",
+            "content": "白宫与国会领导人举行会议，讨论预算安排和后续表决节奏。双方还把委员会审议、拨款期限、政府部门执行准备和后续协调范围列入议程。相关办公室将继续提交书面方案。",
             "column": "us_politics",
             "event_key": "us_budget_20260628",
             "event_date": "2026-06-28",
@@ -544,8 +649,8 @@ def test_build_report_daily_falls_back_when_digest_outputs_empty_columns(tmp_pat
             "title": "国际谈判继续推进",
             "source": "Example",
             "score": 89,
-            "summary": "多国代表继续推进安全谈判，并把后续文本审议列入下一轮议程。",
-            "content": "多国代表继续推进安全谈判，并把后续文本审议列入下一轮议程。",
+            "summary": "多国代表继续推进安全谈判，并把后续文本审议列入下一轮议程。谈判安排还涉及监督机制、执行时间表、各方后续书面反馈和现场协调安排。秘书处将汇总各方文本。",
+            "content": "多国代表继续推进安全谈判，并把后续文本审议列入下一轮议程。谈判安排还涉及监督机制、执行时间表、各方后续书面反馈和现场协调安排。秘书处将汇总各方文本。",
             "column": "global_affairs",
             "event_key": "security_talks_20260628",
             "event_date": "2026-06-28",
@@ -560,8 +665,8 @@ def test_build_report_daily_falls_back_when_digest_outputs_empty_columns(tmp_pat
             "title": "AI regulation update",
             "source": "Example",
             "score": 88,
-            "summary": "监管机构发布人工智能合规指引，要求平台补充风险披露和审计材料。",
-            "content": "监管机构发布人工智能合规指引，要求平台补充风险披露和审计材料。",
+            "summary": "监管机构发布人工智能合规指引，要求平台补充风险披露和审计材料。相关要求还覆盖模型评估、用户告知、企业内部责任链条和后续整改流程。企业需要准备补充说明。",
+            "content": "监管机构发布人工智能合规指引，要求平台补充风险披露和审计材料。相关要求还覆盖模型评估、用户告知、企业内部责任链条和后续整改流程。企业需要准备补充说明。",
             "column": "technology",
             "event_key": "ai_regulation_20260628",
             "event_date": "2026-06-28",
@@ -576,8 +681,8 @@ def test_build_report_daily_falls_back_when_digest_outputs_empty_columns(tmp_pat
             "title": "经济数据更新",
             "source": "Example",
             "score": 87,
-            "summary": "政府发布新的经济数据，显示就业和价格指标继续影响政策预期。",
-            "content": "政府发布新的经济数据，显示就业和价格指标继续影响政策预期。",
+            "summary": "政府发布新的经济数据，显示就业和价格指标继续影响政策预期。市场参与者将据此调整利率路径、财政判断、企业成本假设和资产配置安排。后续数据将影响政策定价。",
+            "content": "政府发布新的经济数据，显示就业和价格指标继续影响政策预期。市场参与者将据此调整利率路径、财政判断、企业成本假设和资产配置安排。后续数据将影响政策定价。",
             "column": "economy",
             "event_key": "economic_data_20260628",
             "event_date": "2026-06-28",
@@ -749,7 +854,7 @@ def test_build_fallback_detailed_event_rejects_old_background_date():
 def test_build_fallback_detailed_event_meets_daily_quality_length():
     candidate = {
         "title_zh": "FTC 就 AI 准确性政策声明征求公众意见",
-        "summary": "FTC 就 AI 准确性政策声明征求公众意见。",
+        "summary": "FTC 就 AI 准确性政策声明征求公众意见，要求企业说明自动化系统如何降低错误输出。该声明将影响平台、开发者、消费者保护流程和使用 AI 决策工具的企业。",
         "freshness_date": "2026-07-03",
         "event_date": "2026-07-03",
         "freshness_status": "today",
@@ -761,6 +866,18 @@ def test_build_fallback_detailed_event_meets_daily_quality_length():
     body = event["reader_body"]
     assert 80 <= len(body) <= 260
     assert body.count("。") >= 2
+
+
+def test_build_fallback_detailed_event_rejects_short_summary():
+    candidate = {
+        "title_zh": "FTC 就 AI 准确性政策声明征求公众意见",
+        "summary": "FTC 就 AI 准确性政策声明征求公众意见。",
+        "freshness_date": "2026-07-03",
+        "event_date": "2026-07-03",
+        "freshness_status": "today",
+    }
+
+    assert _build_fallback_detailed_event(candidate) is None
 
 
 def test_build_fallback_detailed_event_rejects_truncated_title():

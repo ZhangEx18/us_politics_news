@@ -7,6 +7,7 @@ ReportSpec 定义报告类型差异，build_report() 执行共享阶段。
 
 import asyncio
 import re
+from difflib import SequenceMatcher
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
@@ -473,20 +474,19 @@ def _build_fallback_detailed_event(candidate: dict) -> dict | None:
     if not date_text:
         return None
 
-    sentence_match = re.match(r"(.+?[。！？!?])", summary)
-    first_sentence = sentence_match.group(1).strip() if sentence_match else summary[:120].rstrip(" ，,。；;:：")
-    if not first_sentence:
+    sentences = re.findall(r"[^。！？!?]+[。！？!?]?", summary)
+    sentences = [s.strip() for s in sentences if s.strip()]
+    if not sentences:
         return None
-    if first_sentence[-1] not in "。！？!?":
-        first_sentence += "。"
+    first_sentence = sentences[0]
     if _is_uninformative_bill_sentence(first_sentence):
         return None
-
-    body = (
-        f"{date_text}，{first_sentence}"
-        "现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。"
-        "后续需要重点跟踪官方文件、当事方回应以及相关政策或司法程序是否继续推进。"
-    )
+    body_text = "".join(sentences[:3])
+    if body_text[-1] not in "。！？!?":
+        body_text += "。"
+    body = f"{date_text}，{body_text}"
+    if len(body) < 80:
+        return None
     if len(body) > 260:
         body = body[:260].rstrip(" ，,。. ") + "。"
 
@@ -526,6 +526,85 @@ def _ensure_daily_detailed_events(
     return ensured, metrics
 
 
+def _dedupe_daily_column_events(
+    column_results: dict[str, list[dict]],
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
+    """按 event_key 和标题近似度去掉同栏重复重点解析。"""
+    deduped: dict[str, list[dict]] = {}
+    metrics: dict[str, dict[str, int]] = {}
+
+    for col_key, events in column_results.items():
+        kept: list[dict] = []
+        seen_keys: set[str] = set()
+        seen_titles: list[str] = []
+        dropped = 0
+        for event in events:
+            event_key = str(event.get("event_key") or "").strip()
+            title = str(event.get("title_zh") or event.get("title") or "").strip()
+            norm_title = _normalize_event_title(title)
+            if event_key and event_key in seen_keys:
+                dropped += 1
+                continue
+            if norm_title and any(
+                norm_title == old or SequenceMatcher(None, norm_title, old).ratio() >= 0.58
+                for old in seen_titles
+            ):
+                dropped += 1
+                continue
+            kept.append(event)
+            if event_key:
+                seen_keys.add(event_key)
+            if norm_title:
+                seen_titles.append(norm_title)
+        deduped[col_key] = kept
+        metrics[col_key] = {"deduped_detailed": dropped}
+
+    return deduped, metrics
+
+
+def _normalize_event_title(title: str) -> str:
+    return re.sub(r"[^0-9A-Za-z\u4e00-\u9fff]+", "", str(title or "")).lower()
+
+
+def _audit_daily_content(
+    columns: dict[str, dict],
+    allowed_dates: list[str] | None,
+    body_date_year: int | None,
+) -> dict[str, int]:
+    """轻量日报内容审计，只计数不阻断发布。"""
+    metrics = {
+        "duplicate_titles": 0,
+        "old_body_dates": 0,
+        "fallback_boilerplate": 0,
+        "truncated_titles": 0,
+    }
+    allowed = set(allowed_dates or [])
+
+    for column in columns.values():
+        seen_titles: list[str] = []
+        for event in column.get("detailed_events", []):
+            title = str(event.get("title_zh") or event.get("title") or "").strip()
+            norm_title = _normalize_event_title(title)
+            if norm_title and any(
+                norm_title == old or SequenceMatcher(None, norm_title, old).ratio() >= 0.58
+                for old in seen_titles
+            ):
+                metrics["duplicate_titles"] += 1
+            if norm_title:
+                seen_titles.append(norm_title)
+            if title.endswith(("承", "垄")) or "…" in title or "..." in title:
+                metrics["truncated_titles"] += 1
+
+            body = str(event.get("reader_body") or event.get("core_facts") or "").strip()
+            first_date = _first_body_date(body, body_date_year)
+            if first_date and allowed and first_date not in allowed:
+                metrics["old_body_dates"] += 1
+            if "现有材料未提供更多可核验细节" in body:
+                metrics["fallback_boilerplate"] += 1
+
+    return metrics
+
+
 async def _generate_all_column_digests(
     columns_cfg: dict[str, dict],
     column_candidates: dict[str, list[dict]],
@@ -536,30 +615,19 @@ async def _generate_all_column_digests(
 ) -> tuple[dict[str, list[dict]], dict[str, str]]:
     """生成四栏 digest；慢模型串行，避免写作阶段触发限速。"""
     base_url = str((ai_config or {}).get("base_url") or "").rstrip("/")
-    concurrency = 1 if base_url == "https://open.bigmodel.cn/api/paas/v4" else 4
+    serial_digest = (
+        base_url == "https://open.bigmodel.cn/api/paas/v4"
+        or "api.baicai798.cn" in base_url
+    )
+    concurrency = 1 if serial_digest else 4
     semaphore = asyncio.Semaphore(concurrency)
-
-    def _fallback_reader_body(candidate: dict) -> str:
-        summary = str(candidate.get("summary", "")).strip()
-        content = str(candidate.get("content", "")).strip()
-        body = summary or content
-        body = re.sub(r"\s+", " ", body)
-        if len(body) > 420:
-            body = body[:420].rstrip(" ，,。. ") + "。"
-        return body or "该事件写作降级为简版概述，保留标题供后续人工复核。"
 
     def _fallback_events(candidates: list[dict]) -> list[dict]:
         events: list[dict] = []
         for candidate in candidates[:5]:
-            title = str(candidate.get("title", "")).strip()
-            if not title:
-                continue
-            reader_body = _fallback_reader_body(candidate)
-            events.append({
-                "title_zh": title,
-                "reader_body": reader_body,
-                "core_facts": reader_body,
-            })
+            fallback_event = _build_fallback_detailed_event(candidate)
+            if fallback_event:
+                events.append(fallback_event)
         return events
 
     async def _generate(col_key: str, col_cfg: dict) -> tuple[str, list[dict], str | None]:
@@ -715,6 +783,19 @@ def _sanitize_event_text(text: str) -> tuple[str, list[str]]:
     return cleaned, issues
 
 
+def _first_body_date(text: str, default_year: int | None = None) -> str:
+    match = re.search(r"(20\d{2})-(\d{1,2})-(\d{1,2})", text)
+    if match:
+        return f"{int(match.group(1)):04d}-{int(match.group(2)):02d}-{int(match.group(3)):02d}"
+    match = re.search(r"(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日", text)
+    if match:
+        return f"{int(match.group(1)):04d}-{int(match.group(2)):02d}-{int(match.group(3)):02d}"
+    match = re.search(r"(\d{1,2})\s*月\s*(\d{1,2})\s*日", text)
+    if match and default_year:
+        return f"{default_year:04d}-{int(match.group(1)):02d}-{int(match.group(2)):02d}"
+    return ""
+
+
 def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
     """验证单个事件的质量门禁。gate_config 为 None 时使用默认阈值。"""
     cfg = gate_config or {}
@@ -723,6 +804,8 @@ def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
     min_sentences = cfg.get("min_sentences", 2)
     max_sentences = cfg.get("max_sentences", 4)
     require_date_in_body = bool(cfg.get("require_date_in_body", False))
+    allowed_body_dates = {str(d) for d in cfg.get("allowed_body_dates", []) if str(d)}
+    body_date_year = cfg.get("body_date_year")
 
     issues: list[str] = []
     body = str(event.get("reader_body", "")).strip()
@@ -745,6 +828,9 @@ def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
         body,
     ):
         issues.append("缺少明确日期表达")
+    first_date = _first_body_date(body, int(body_date_year) if body_date_year else None)
+    if first_date and allowed_body_dates and first_date not in allowed_body_dates:
+        issues.append(f"正文日期不在日报窗口: {first_date}")
     return issues
 
 
@@ -768,6 +854,8 @@ def sanitize_or_validate_events(
         validate_issues = _validate_event(event, gate_config)
         for issue in validate_issues:
             all_issues.append(f"[{title}] {issue}")
+        if any("正文日期不在日报窗口" in issue for issue in validate_issues):
+            continue
         if not cleaned_body.strip():
             all_issues.append(f"[{title}] 严重: reader_body 清理后为空，已移除")
             continue
@@ -1183,6 +1271,9 @@ def build_report(
         )
         for col_key, column_metrics in fill_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        column_results, dedupe_metrics = _dedupe_daily_column_events(column_results)
+        for col_key, column_metrics in dedupe_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
 
     # ── 提炼要点 ──
     print(f"\n[要点] 提炼要点...")
@@ -1196,6 +1287,15 @@ def build_report(
         gate_config["require_date_in_body"] = bool(
             config.get("format_contract", {}).get("require_date_in_body", False)
         )
+        try:
+            report_date = datetime.fromisoformat(spec.report_key).date()
+            gate_config["allowed_body_dates"] = [
+                (report_date - timedelta(days=1)).isoformat(),
+                report_date.isoformat(),
+            ]
+            gate_config["body_date_year"] = report_date.year
+        except ValueError:
+            pass
     total_issues = 0
     for col_key in list(column_results.keys()):
         events = column_results[col_key]
@@ -1219,6 +1319,21 @@ def build_report(
         }
         metrics["columns"].setdefault(col_key, {})["rendered_detailed"] = len(columns[col_key]["detailed_events"])
         metrics["columns"].setdefault(col_key, {})["rendered_headline_only"] = len(columns[col_key]["headline_only_events"])
+
+    if spec.report_type == "daily":
+        content_audit = _audit_daily_content(
+            columns,
+            gate_config.get("allowed_body_dates"),
+            gate_config.get("body_date_year"),
+        )
+        metrics["content_audit"] = content_audit
+        print(
+            "   内容审计: "
+            f"重复标题 {content_audit['duplicate_titles']}，"
+            f"旧日期正文 {content_audit['old_body_dates']}，"
+            f"fallback 套话 {content_audit['fallback_boilerplate']}，"
+            f"疑似截断标题 {content_audit['truncated_titles']}"
+        )
 
     overview = PeriodicalOverview()
     daily_overview = ""
