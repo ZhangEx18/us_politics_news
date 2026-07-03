@@ -482,9 +482,13 @@ def _build_fallback_detailed_event(candidate: dict) -> dict | None:
     if _is_uninformative_bill_sentence(first_sentence):
         return None
 
-    body = f"{date_text}，{first_sentence}现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。"
-    if len(body) > 220:
-        body = body[:220].rstrip(" ，,。. ") + "。"
+    body = (
+        f"{date_text}，{first_sentence}"
+        "现有材料未提供更多可核验细节，本文仅保留已确认的新进展和来源摘要。"
+        "后续需要重点跟踪官方文件、当事方回应以及相关政策或司法程序是否继续推进。"
+    )
+    if len(body) > 260:
+        body = body[:260].rstrip(" ，,。. ") + "。"
 
     return {
         **candidate,

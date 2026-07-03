@@ -746,6 +746,23 @@ def test_build_fallback_detailed_event_rejects_old_background_date():
     assert _build_fallback_detailed_event(candidate) is None
 
 
+def test_build_fallback_detailed_event_meets_daily_quality_length():
+    candidate = {
+        "title_zh": "FTC 就 AI 准确性政策声明征求公众意见",
+        "summary": "FTC 就 AI 准确性政策声明征求公众意见。",
+        "freshness_date": "2026-07-03",
+        "event_date": "2026-07-03",
+        "freshness_status": "today",
+    }
+
+    event = _build_fallback_detailed_event(candidate)
+
+    assert event is not None
+    body = event["reader_body"]
+    assert 80 <= len(body) <= 260
+    assert body.count("。") >= 2
+
+
 def test_build_fallback_detailed_event_rejects_truncated_title():
     candidate = {
         "title_zh": "FTC 就 Aurobindo 和 Lannett 的交易采取行动，以防止美国人承",

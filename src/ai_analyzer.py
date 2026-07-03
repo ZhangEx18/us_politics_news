@@ -128,21 +128,25 @@ def _parse_jsonish_object(response: str) -> dict:
     text = _strip_markdown_fence(response)
     candidates = [text, _normalize_jsonish_text(text)]
     for candidate in candidates:
-        try:
-            parsed = json.loads(candidate)
-            if isinstance(parsed, dict):
-                return parsed
-        except json.JSONDecodeError:
-            pass
-
-        m = re.search(r"\{.*\}", candidate, re.DOTALL)
-        if m:
+        variants = [candidate]
+        if "{{" in candidate:
+            variants.append(candidate.replace("{{", "{").replace("}}", "}"))
+        for variant in variants:
             try:
-                parsed = json.loads(m.group())
+                parsed = json.loads(variant)
                 if isinstance(parsed, dict):
                     return parsed
             except json.JSONDecodeError:
                 pass
+
+            m = re.search(r"\{.*\}", variant, re.DOTALL)
+            if m:
+                try:
+                    parsed = json.loads(m.group())
+                    if isinstance(parsed, dict):
+                        return parsed
+                except json.JSONDecodeError:
+                    pass
 
     raise ValueError(f"无法从响应中解析 JSON 对象: {response[:300]}")
 
