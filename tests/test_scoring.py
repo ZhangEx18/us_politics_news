@@ -277,6 +277,23 @@ def test_parse_jsonish_object_accepts_chinese_curly_quotes():
     assert parsed["events"][0]["title_zh"] == "美国政局事件"
 
 
+def test_parse_jsonish_object_accepts_doubled_braces():
+    response = """```json
+{{
+  "events": [
+    {{
+      "title_zh": "美国政局事件",
+      "reader_body": "白宫宣布新的政策安排。"
+    }}
+  ]
+}}
+```"""
+
+    parsed = _parse_jsonish_object(response)
+
+    assert parsed["events"][0]["reader_body"] == "白宫宣布新的政策安排。"
+
+
 def test_merge_events_preserves_source_evidence_for_writer():
     items = [
         {
