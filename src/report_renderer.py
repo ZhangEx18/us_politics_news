@@ -105,7 +105,7 @@ def validate_report_format(meta: dict, columns: dict, report_type: str = "daily"
         detailed, headline_only, _ = _normalize_column_sections(columns.get(col_key, {}))
         if report_type == "daily" and require_non_empty_columns and not detailed and not headline_only:
             issues.append(f"栏目为空: {col_key}")
-        if report_type == "daily" and require_detailed_events and not detailed:
+        if report_type == "daily" and require_detailed_events and not detailed and not headline_only:
             issues.append(f"栏目缺少重点解析: {col_key}")
         for event in detailed:
             title = event.get("title_zh", "")
