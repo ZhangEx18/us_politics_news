@@ -530,8 +530,10 @@ async def _generate_all_column_digests(
     word_count_min: int,
     word_count_max: int,
 ) -> tuple[dict[str, list[dict]], dict[str, str]]:
-    """并发生成四栏 digest。"""
-    semaphore = asyncio.Semaphore(4)
+    """生成四栏 digest；慢模型串行，避免写作阶段触发限速。"""
+    base_url = str((ai_config or {}).get("base_url") or "").rstrip("/")
+    concurrency = 1 if base_url == "https://open.bigmodel.cn/api/paas/v4" else 4
+    semaphore = asyncio.Semaphore(concurrency)
 
     def _fallback_reader_body(candidate: dict) -> str:
         summary = str(candidate.get("summary", "")).strip()

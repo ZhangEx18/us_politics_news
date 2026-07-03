@@ -21,6 +21,7 @@ import asyncio
 import json
 import os
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -524,6 +525,11 @@ def _prefilter_items_for_scoring(
     return selected
 
 
+def _is_bigmodel_ai(ai_config: dict | None) -> bool:
+    base_url = str((ai_config or {}).get("base_url") or "").rstrip("/")
+    return base_url == "https://open.bigmodel.cn/api/paas/v4"
+
+
 def _cap_slow_daily_candidates(
     items_by_column: dict[str, list[ContentItem]],
     columns_cfg: dict[str, dict],
@@ -543,7 +549,7 @@ def _cap_slow_daily_candidates(
     for col_key, items in items_by_column.items():
         col_cfg = columns_cfg.get(col_key, {})
         target_items = int(col_cfg.get("target_items", col_cfg.get("min_items", 6)) or 6)
-        cap = max(target_items + 4, target_items)
+        cap = max(target_items + 2, target_items)
         capped[col_key] = items[:cap]
     return capped
 
@@ -1573,6 +1579,11 @@ def _run_digest_phase(
         cn_selected_by_column[col] = cn_selected_by_column.get(col, 0) + 1
     phase_metrics["cn_source_selected"] = sum(cn_selected_by_column.values())
     phase_metrics["cn_source_selected_by_column"] = cn_selected_by_column
+
+    if _is_bigmodel_ai(ai_config):
+        cooldown_seconds = 180
+        print(f"\n[限速] BigModel 评分后冷却 {cooldown_seconds}s，再进入栏目写作...")
+        time.sleep(cooldown_seconds)
 
     # === 7+. 构造 ReportSpec，委托 report_engine 完成后续阶段 ===
     return _build_and_log_digest_report(
