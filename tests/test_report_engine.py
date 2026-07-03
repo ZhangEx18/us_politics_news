@@ -1,5 +1,6 @@
 """报告编排器测试 — ReportSpec、质量门禁、要点提炼、栏级降级"""
 
+import asyncio
 import json
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
@@ -43,6 +44,32 @@ def test_report_spec_defaults():
     )
     assert spec.allow_headline_only is True
     assert spec.min_llm_score == 65
+
+
+def test_generate_all_column_digests_serializes_bigmodel(monkeypatch):
+    active = 0
+    max_active = 0
+
+    async def fake_generate_column_digest(**kwargs):
+        nonlocal active, max_active
+        active += 1
+        max_active = max(max_active, active)
+        await asyncio.sleep(0)
+        active -= 1
+        return [{"title_zh": kwargs["column_label"], "reader_body": "正文"}]
+
+    monkeypatch.setattr("report_engine.generate_column_digest", fake_generate_column_digest)
+
+    asyncio.run(_generate_all_column_digests(
+        {"us_politics": {"label": "美国政局"}, "economy": {"label": "经济走势"}},
+        {"us_politics": [{"title": "A"}], "economy": [{"title": "B"}]},
+        "",
+        {"base_url": "https://open.bigmodel.cn/api/paas/v4"},
+        10,
+        20,
+    ))
+
+    assert max_active == 1
 
 
 # ── sanitize_or_validate_events ──
