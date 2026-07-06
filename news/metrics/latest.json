@@ -6,9 +6,9 @@
     "publish_at": "07:45"
   },
   "window": {
-    "since": "2026-07-05T07:00:00+08:00",
-    "until": "2026-07-06T07:00:00+08:00",
-    "report_key": "2026-07-06"
+    "since": "2026-07-06T07:00:00+08:00",
+    "until": "2026-07-07T07:00:00+08:00",
+    "report_key": "2026-07-07"
   },
   "pipeline": {
     "sources": [
@@ -1602,106 +1602,105 @@
     ],
     "freshness": {
       "allowed_dates": [
-        "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-07"
       ],
-      "kept": 857,
-      "dropped": 1169,
-      "dropped_by_column": {
-        "us_politics": 132,
-        "global_affairs": 477,
-        "technology": 193,
-        "economy": 367
-      }
+      "kept": 769,
+      "dropped": 0,
+      "dropped_by_column": {}
     },
-    "raw_fetched": 2069,
-    "raw_merged": 857
+    "raw_fetched": 793,
+    "raw_merged": 769
   },
-  "cn_source_fetched": 12,
+  "cn_source_fetched": 0,
   "cn_source_selected": 0,
   "cn_source_selected_by_column": {
-    "economy": 0,
+    "us_politics": 0,
     "global_affairs": 0,
     "technology": 0,
-    "us_politics": 0
+    "economy": 0
   },
   "columns": {
     "economy": {
       "prefiltered": 24,
-      "hard_news_candidates": 23,
-      "post_merge_scored": 15,
+      "hard_news_candidates": 24,
+      "hard_news_scored": 10,
+      "post_merge_scored": 10,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 0,
       "detailed_filled": 7,
       "headline_filled": 3,
-      "post_score_filtered": 14,
+      "post_score_filtered": 10,
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
       "headline_reader_body_missing": 0,
-      "detailed_translation_failed": 0,
-      "detailed_fallback_added": 0,
-      "detailed_fallback_failed": 0,
-      "fill_added": 0,
-      "deduped_detailed": 0,
-      "rendered_detailed": 0,
-      "rendered_headline_only": 3
-    },
-    "global_affairs": {
-      "prefiltered": 40,
-      "hard_news_candidates": 39,
-      "post_merge_scored": 18,
-      "detailed_filled_from_low_score": 0,
-      "headline_filled_from_low_score": 2,
-      "headline_filled_from_non_hard_news": 0,
-      "detailed_filled": 10,
-      "headline_filled": 8,
-      "post_score_filtered": 16,
-      "headline_translated": 8,
-      "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 0,
-      "detailed_translation_failed": 0,
-      "detailed_fallback_added": 0,
-      "detailed_fallback_failed": 0,
-      "fill_added": 0,
-      "deduped_detailed": 1,
-      "rendered_detailed": 5,
-      "rendered_headline_only": 8
-    },
-    "technology": {
-      "prefiltered": 24,
-      "hard_news_candidates": 24,
-      "post_merge_scored": 4,
-      "detailed_filled_from_low_score": 1,
-      "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 3,
-      "detailed_filled": 4,
-      "headline_filled": 3,
-      "post_score_filtered": 3,
-      "headline_translated": 3,
-      "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 3,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
       "fill_added": 0,
       "deduped_detailed": 0,
       "rendered_detailed": 4,
-      "rendered_headline_only": 0
+      "rendered_headline_only": 3
+    },
+    "global_affairs": {
+      "prefiltered": 40,
+      "hard_news_candidates": 40,
+      "hard_news_scored": 23,
+      "post_merge_scored": 16,
+      "detailed_filled_from_low_score": 0,
+      "headline_filled_from_low_score": 1,
+      "headline_filled_from_non_hard_news": 2,
+      "detailed_filled": 10,
+      "headline_filled": 8,
+      "post_score_filtered": 15,
+      "headline_translated": 8,
+      "headline_translation_failed": 0,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 2,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
+      "detailed_fallback_failed": 0,
+      "fill_added": 0,
+      "deduped_detailed": 0,
+      "rendered_detailed": 9,
+      "rendered_headline_only": 6
+    },
+    "technology": {
+      "prefiltered": 24,
+      "hard_news_candidates": 24,
+      "hard_news_scored": 8,
+      "post_merge_scored": 8,
+      "detailed_filled_from_low_score": 0,
+      "headline_filled_from_low_score": 1,
+      "headline_filled_from_non_hard_news": 2,
+      "detailed_filled": 7,
+      "headline_filled": 3,
+      "post_score_filtered": 7,
+      "headline_translated": 3,
+      "headline_translation_failed": 0,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 2,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
+      "detailed_fallback_failed": 0,
+      "fill_added": 0,
+      "deduped_detailed": 0,
+      "rendered_detailed": 7,
+      "rendered_headline_only": 1
     },
     "us_politics": {
       "prefiltered": 25,
       "hard_news_candidates": 25,
-      "post_merge_scored": 17,
+      "hard_news_scored": 20,
+      "post_merge_scored": 19,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 1,
+      "headline_filled_from_non_hard_news": 0,
       "detailed_filled": 10,
       "headline_filled": 8,
-      "post_score_filtered": 17,
+      "post_score_filtered": 18,
       "headline_translated": 8,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
@@ -1711,72 +1710,72 @@
       "detailed_fallback_failed": 0,
       "fill_added": 0,
       "deduped_detailed": 0,
-      "rendered_detailed": 6,
+      "rendered_detailed": 4,
       "rendered_headline_only": 7
     }
   },
   "ai": {
     "score_errors": 0,
     "digest_failures": {},
-    "score_duration_seconds": 0,
-    "daily_overview_failure": "generate_daily_overview JSON 解析失败: {\"summary\":\"当天最受关注的是美国监管与立法同时加压：FTC 一边起诉大规模非法订阅方案、敲定亚马逊信用报告和解，一边就 AI 准确性征求意见；国会与最高法院层面，竞选支出边界和投票身份证法案也继续向前推进。海外则被俄乌战事和西岸医疗受阻事件拉紧，台风 Bavi 登陆美国太平洋岛屿又把灾害压力推到眼前。半导体方面，USTR 听证、韩国扩大芯片援助、SK 海力士赴美上市，把贸易、政策和资本市场拉到同一条线上。\"}}"
+    "score_duration_seconds": 238.0
   },
   "freshness_gate": {
     "min_ratio": 0.95,
     "candidate_date_filter": {
       "allowed_dates": [
-        "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-07"
       ],
       "kept": 113,
       "dropped": 0,
       "dropped_by_column": {}
     },
-    "report_events_reuse": {
-      "total": 54,
-      "freshness_ratio": 1.0,
-      "today_count": 54,
-      "old_count": 0,
+    "scored_events": {
+      "total": 71,
+      "freshness_ratio": 0.8591549295774648,
+      "today_count": 61,
+      "old_count": 10,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 45,
-        "recent_followup": 9
+        "today": 57,
+        "old_background": 10,
+        "recent_followup": 4
       },
       "allowed_dates": [
-        "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-07"
       ],
-      "fresh_after_gate": 54,
+      "fresh_after_gate": 61,
       "gate_failed": false
     },
     "before_render": {
-      "total": 54,
+      "total": 61,
       "freshness_ratio": 1.0,
-      "today_count": 54,
+      "today_count": 61,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 45,
-        "recent_followup": 9
+        "today": 57,
+        "recent_followup": 4
       },
       "allowed_dates": [
-        "2026-07-05",
-        "2026-07-06"
+        "2026-07-06",
+        "2026-07-07"
       ],
-      "fresh_after_gate": 54,
+      "fresh_after_gate": 61,
       "gate_failed": false
     }
   },
   "candidate_pool": {
-    "upserted": 111,
-    "total": 111
+    "upserted": 113,
+    "total": 113
   },
   "report_events": {
-    "reused": 54,
-    "source": "report_events"
+    "upserted": 61,
+    "hard_news": 61
   },
   "freshness_ratio": 1.0,
-  "today_count": 54,
+  "today_count": 61,
   "old_count": 0,
   "unknown_date_count": 0,
   "content_audit": {
@@ -1786,8 +1785,8 @@
     "truncated_titles": 0
   },
   "report": {
-    "title": "2026年7月6日 日报",
-    "published_at": "2026-07-06T07:45:00+08:00",
-    "duration_seconds": 180.8
+    "title": "2026年7月7日 日报",
+    "published_at": "2026-07-07T07:45:00+08:00",
+    "duration_seconds": 174.7
   }
 }
