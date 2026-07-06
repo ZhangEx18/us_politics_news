@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年7月7日 日报 — 2026-07-07</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年7月7日 日报</h1>
+<div class='date'>2026-07-07</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>NIST 确认 Arvind Raman 出任第 18 任局长</li>
+<li>美国贸易代表会晤中国国务院副总理何立峰</li>
+<li>美国就中国半导体产业相关 301 调查举行公开听证</li>
+<li>美国就中国航运、物流和造船业 301 调查举行公开听证</li>
+<li>美国法官驳回马斯克撤销 Twitter 欺诈裁决请求</li>
+<li>联合国称基辅遭俄军袭击致至少 14 人死亡</li>
+<li>美国最高法院放行德州应用年龄验证法继续执行</li>
+<li>美国贸易代表就欧盟宣布报复性关税发表声明</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. FTC 就亚马逊公平信用报告法指控达成 225 万美元和解</h3>
+<p>7 月 7 日，FTC 要求亚马逊支付 225 万美元，以了结其被指故意违反《公平信用报告法》的指控。FTC 新闻稿显示，这是一项以付款结束争议的执法处理。此前指控处于未结状态，此次安排把问题收束到和解层面。后续将影响亚马逊的合规安排，也会成为联邦消费者监管的参考案例。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 起诉一家大规模企业停止非法订阅方案</h3>
+<p>7 月 7 日，FTC 提起诉讼，要求叫停一家被指运营非法订阅方案的大规模企业。FTC 新闻稿只明确了起诉和指控方向，没有提供更多推进结果。此前相关做法处于继续运作状态，此次诉讼把争议带入联邦执法程序。后续将直接影响该企业的商业模式，也会牵动订阅业务的监管对象。</p>
+</div>
+<div class='event'>
+<h3>3. 查理·柯克遇害案嫌疑人听证会举行</h3>
+<p>7 月 7 日，查理·柯克遇害案中被控谋杀的嫌疑人出庭参加听证，家属到场旁听。BBC US &amp; Canada 的报道只确认了听证举行和家属旁听两点。此前案件已进入司法程序，此次听证把程序推进到公开出庭阶段。后续将影响案件审理进度，也会影响家属和支持者对案件的关注焦点。</p>
+</div>
+<div class='event'>
+<h3>4. 特朗普政府推进放松枪支监管</h3>
+<p>7 月 7 日，PBS NewsHour 报道，特朗普政府采取了放松枪支监管的重大步骤。报道只表明联邦层面正在推进相关动作，没有给出更具体的政策文本。此前枪支监管维持在既有框架下，此次动作把方向转向放松管制。后续将影响联邦监管机构、枪支业者以及主张收紧或放宽管制的国会和选民。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 批准终局同意令，处理一起灭虫行业竞业限制案件。</li>
+<li>众院法案页面显示 2027 财年国防授权法案进展。</li>
+<li>众院监督委主席科默批评参院共和党未支持特朗普背书的 SAVE 法案。</li>
+<li>众议院法案推动州际隐蔽携枪许可互认。</li>
+<li>众议院法案拟终止美国教育部。</li>
+<li>众议院法案主张将生命起点定义为受精时刻。</li>
+<li>众院法案页面显示 2027 财年国务院及相关项目拨款案。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 美国贸易代表会晤中国国务院副总理何立峰</h3>
+<p>7 月 7 日，美国贸易代表办公室发布了驻华盛顿大使 Jamieson Greer 与中国国务院副总理何立峰会面的通报。通报只说明双方进行了接触，没有提供更多议题细节或结果。此前中美高层经贸沟通多停留在有限接触，此次公布会谈本身说明双方仍在保持对话渠道。对外贸谈判和相关企业来说，接下来关注点在于后续是否出现更明确的磋商安排。</p>
+</div>
+<div class='event'>
+<h3>2. 联合国称基辅遭俄军袭击致至少 14 人死亡 <span class="followup">持续跟踪</span></h3>
+<p>7 月 6 日，联合国新闻称，俄军对基辅的最新袭击已造成至少 14 人死亡、80 余人受伤。媒体链接中还出现更高伤亡数字，但联合国摘要只确认了这一组数据。此前外界对战事伤亡多依赖各方分散通报，此次联合国给出基辅单点伤亡信息，使袭击后果更集中地落在城市平民安全上。基辅居民、乌克兰救援体系和持续受袭地区的防空补给都将继续承压。</p>
+</div>
+<div class='event'>
+<h3>3. 俄军对乌克兰连续打击造成多地伤亡 <span class="followup">持续跟踪</span></h3>
+<p>7 月 6 日，The Guardian World 报道称，俄罗斯对乌克兰多地发射导弹和无人机，造成至少 21 人死亡。该报道把袭击与北约峰会前夕的紧张局势并列呈现，但输入材料没有提供更多战场变化。此前有关乌克兰战事的伤亡多是单次通报，此次报道显示袭击已扩展到多地并出现更高死亡数字。乌克兰平民、地方医疗救援和北约相关安全讨论都将继续围绕这轮打击展开。</p>
+</div>
+<div class='event'>
+<h3>4. 加拿大选定德国 TKMS 参与新潜艇项目</h3>
+<p>7 月 6 日，Al Jazeera 报道称，加拿大选择德国 TKMS 参与新的潜艇项目。摘要只说明这一选择击败了韩国对手，没有给出合同规模或交付安排。此前该项目的外部竞争关系并未在材料中展开，此次选择把采购方向明确指向德国方案。对加拿大海军采购、德国造船企业和韩国竞标方来说，后续关注点在于项目推进和采购名单是否继续收敛。</p>
+</div>
+<div class='event'>
+<h3>5. 北约敦促成员国提交实现国防支出目标的计划</h3>
+<p>7 月 7 日，Al Jazeera 报道称，北约敦促成员国提交达到国防支出目标的计划。报道同时提到北约秘书长呼吁拿出“可信计划”，但没有给出具体成员国名单。此前北约关于军费目标的讨论多停留在原则层面，此次要求把压力转向各成员国的执行方案。成员国政府、国防部门和预算制定机构接下来都要面对如何交出计划的问题。</p>
+</div>
+<div class='event'>
+<h3>6. 乌方称基辅地区遭袭并警告拦截导弹短缺 <span class="followup">持续跟踪</span></h3>
+<p>7 月 6 日，BBC World 报道称，乌克兰方面表示基辅地区遭到俄军大规模袭击，造成 23 人死亡。报道还写到，乌方同时警告拦截导弹短缺。此前有关防空资源的表述多散见于战事报道，此次把伤亡和拦截弹不足放在同一条线索里。乌克兰防空体系、基辅地区居民以及援乌军备供给链都会直接受到这一压力影响。</p>
+</div>
+<div class='event'>
+<h3>7. 特朗普称俄乌战争“越来越接近”结束</h3>
+<p>7 月 6 日，PBS NewsHour 视频标题显示，特朗普在俄军继续袭击基辅之际表示，他认为俄乌战争“越来越接近”结束。材料还提到他谈到普京希望停战，但没有给出更多对话细节。此前关于停火前景的表态多来自各方单独发声，此次表态把战争走向重新拉回美国政治语境。乌克兰、俄罗斯以及关注停战进程的美国选民和政策圈都会继续盯住后续表态。</p>
+</div>
+<div class='event'>
+<h3>8. 挪威敦促中国帮助推动俄乌和平谈判</h3>
+<p>7 月 6 日，South China Morning Post 报道称，挪威敦促中国利用对俄影响力，推动俄罗斯参加俄乌和平谈判。报道只呈现了挪方的呼吁，没有说明中方回应。此前和平斡旋多由欧洲和当事方主导，此次呼吁把中国放进更直接的外交推动位置。中国外交、挪威对俄沟通路径以及俄乌和平谈判相关讨论都可能围绕这一要求继续展开。</p>
+</div>
+<div class='event'>
+<h3>9. 摩洛哥称捣毁一个涉嫌策划袭击的 ISIL 关联小组</h3>
+<p>7 月 6 日，Al Jazeera 报道称，摩洛哥表示已经捣毁一个与 ISIL 有关联、并在策划袭击的小组，行动中逮捕了 10 人。材料只呈现了摩洛哥方面的说法，没有给出更多行动细节。此前反恐通报常只停留在风险提示，此次把“策划袭击”与逮捕结果连在一起。摩洛哥安全部门、国内公共安全和周边地区反恐合作都会受到这次通报的影响。</p>
+</div>
+<ul class='headline-list'>
+<li>秘鲁左翼候选人承认败选，藤森惠子赢得总统选举。</li>
+<li>北约秘书长称，随着中国军力上升，北约不应对中国保持天真。</li>
+<li>刚果（金）埃博拉疫情死亡人数已超过 500 人。</li>
+<li>报道特朗普前往土耳其参加以国防开支和援乌为焦点的北约峰会。</li>
+<li>报道称 DOGE 削减援助加剧刚果埃博拉疫情。</li>
+<li>哈梅内伊遗体抵达库姆，悼念活动持续进行。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 美国就中国半导体产业相关 301 调查举行公开听证</h3>
+<p>7 月 7 日，美国贸易代表办公室就针对中国半导体产业、涉及“dominance”的 301 调查举行公开听证，公开材料显示这一程序仍在推进。此前外界只能从调查文件了解进展，此次听证把讨论集中到这项调查本身。对半导体企业和中美相关产业链来说，接下来最直接受到影响的是后续审议与可能的贸易处理方向。</p>
+</div>
+<div class='event'>
+<h3>2. 美国最高法院放行德州应用年龄验证法继续执行</h3>
+<p>7 月 6 日，美国最高法院放行德州应用年龄验证法继续执行，Al Jazeera 报道称这一裁定让该法继续适用。此前相关执行状态处于司法争议之中，此次裁定把结果拉回到可执行层面。对应用平台和德州用户而言，接下来关注点转向年龄验证要求如何落实。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 就 AI 准确性政策声明征求公众意见</h3>
+<p>7 月 7 日，FTC 就一项涉及 AI 准确性的政策声明征求公众意见，公开发布的材料只说明了征询动作本身。此前该议题更多停留在监管讨论阶段，此次征求意见把焦点放到具体政策文本上。对 AI 开发者和平台来说，后续要面对的是这项声明可能形成的监管取向。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 与 Havas 达成协议，涉及数字广告生态竞争</h3>
+<p>7 月 7 日，FTC 公开称已与 Havas 达成协议，目标是恢复数字广告生态竞争。此前相关竞争问题主要通过执法或调查方式推进，此次协议把处理方式转为具体安排。对数字广告市场上的广告主、代理商和平台来说，接下来受到影响的是竞争结构如何按照协议调整。</p>
+</div>
+<div class='event'>
+<h3>5. 谷歌上传的搜索媒体开始用于训练 AI</h3>
+<p>7 月 7 日，Engadget 报道称谷歌开始使用用户上传的搜索媒体训练 AI，页面信息同时提到用户可以在设置中退出。此前这些上传内容主要用于搜索相关功能，此次变化把它们纳入训练用途。对上传内容的用户和依赖这些产品的消费者来说，接下来最直接受影响的是数据使用方式和设置选项。</p>
+</div>
+<div class='event'>
+<h3>6. iOS 27 测试版加入 Siri 语速和表现力自定义</h3>
+<p>7 月 7 日，TechCrunch 报道称最新 iOS 27 测试版新增 Siri 语速和表现力自定义选项。此前 Siri 的相关表达方式没有在这条材料里显示出同类设置，此次更新把可调参数放到了用户侧。对 iPhone 用户和 Apple 的语音功能产品来说，接下来关注的是这些选项在测试版之外是否继续保留。</p>
+</div>
+<div class='event'>
+<h3>7. BBC 报道讨论中国能否在 robotaxi 复制电动车式扩张</h3>
+<p>7 月 6 日，BBC World 发布题为“Can China repeat its EV success with robotaxis?”的报道，材料本身是在讨论中国能否在 robotaxi 领域复制电动车经验。此前这类话题多是产业比较，此次报道把焦点集中到 robotaxi 的全球扩张前景。对中国自动驾驶企业、海外竞争对手和相关市场来说，接下来讨论的核心是扩张能力而不是单一产品发布。</p>
+</div>
+<ul class='headline-list'>
+<li>美光股价上涨，市场对芯片板块情绪转暖。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 美国就中国航运、物流和造船业 301 调查举行公开听证</h3>
+<p>7 月 7 日，美国就针对中国航运、物流和造船领域的 301 调查相关“拟采取措施”举行公开听证，USTR 公开页面给出了这一安排。材料只显示听证会本身，没有写明当场作出何种决定。此前这一议题停留在调查和拟议阶段，此次听证把争议集中到具体措施的公开讨论上。后续直接关联美国贸易政策、相关行业企业以及跨境供应链中的航运和造船环节。</p>
+</div>
+<div class='event'>
+<h3>2. 美国贸易代表就欧盟宣布报复性关税发表声明</h3>
+<p>7 月 7 日，美国贸易代表 Jamieson Greer 就欧盟宣布报复性关税发表声明，USTR 公开页面仅显示了这一表态。材料没有提供欧盟关税的具体内容，也没有写明双方已进入哪一步升级。此前相关摩擦只在政策层面推进，此次声明把焦点放到美欧关税对抗的公开回应上。后续主要影响美国与欧盟的贸易谈判节奏，以及相关出口企业和进口企业的预期。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 就 Aurobindo 与 Lannett 交易采取行动</h3>
+<p>7 月 7 日，FTC 就 Aurobindo 与 Lannett 的交易采取行动，FTC 的公开材料称此举是为防止美国药价上升。输入没有说明交易如何被处理，也没有提供更多条款细节。此前相关交易主要处在并购推进阶段，此次行动把重点转到药品价格与交易审查上。后续直接关系到医药并购双方、竞争对手以及面向美国消费者的药品成本。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 批准 Micromarket Kiosks 交易的最终同意令</h3>
+<p>7 月 7 日，FTC 批准了 Micromarket Kiosks 交易的最终同意令，公开标题显示程序已进入收尾阶段。材料没有披露同意令的具体约束内容，也没有列出受影响业务范围。此前交易审查处于进行中，此次批准把案件从审查阶段推进到最终执行文本。后续主要影响交易双方及其在自动售货和零售终端相关业务中的安排。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 批准对 Publishing.com 的最终命令，结案其误导消费者指控。</li>
+<li>FTC 和司法部发布 2025 财年 Hart-Scott-Rodino 年度报告。</li>
+<li>报道称 SK 海力士或于周五启动面向美国投资者的数十亿美元 IPO。</li>
+</ul>
+</body>
+</html>
