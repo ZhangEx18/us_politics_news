@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年7月9日 日报 — 2026-07-09</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年7月9日 日报</h1>
+<div class='date'>2026-07-09</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>司法部威胁起诉州选举官员</li>
+<li>美伊互袭升级，停火再度脆弱</li>
+<li>英伟达称 Nemotron 3 Ultra 在 LangChain Deep Agents…</li>
+<li>美联储公布 6 月会议纪要</li>
+<li>联邦法官下令释放卡萝尔案赔偿金</li>
+<li>特朗普称将许可乌克兰生产“爱国者”系统和导弹</li>
+<li>FTC 就 AI 准确性政策声明征求公众意见</li>
+<li>FTC 介入 Aurobindo 与 Lannett 交易</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 司法部威胁起诉州选举官员</h3>
+<p>7 月 8 日，PBS NewsHour 报道称，司法部威胁起诉州选举官员，焦点是非公民投票执法。此类表态把联邦执法力量直接带入州选举管理争议，也把责任压力推到具体州官员身上。此前相关争议更多停留在选举规则和身份核验层面，此次动作把冲突前移到刑事追责。后续受影响的是州选举机构和选民登记执行流程，双方在执法边界上的分歧会更突出。</p>
+</div>
+<div class='event'>
+<h3>2. 联邦法官下令释放卡萝尔案赔偿金 <span class="followup">持续跟踪</span></h3>
+<p>7 月 8 日，PBS NewsHour 报道称，联邦法官下令向 E. Jean Carroll 支付 580 万美元赔偿金。BBC 也报道，法院要求释放特朗普在该案中的 500 万美元损害赔偿金。此前相关款项处于托管或未释放状态，此次裁定把支付环节推进到执行阶段。后续直接影响特朗普和卡萝尔之间的民事赔偿执行，也关系到类似民事判决在上诉后如何落地。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 就亚马逊 FCRA 指控达成 225 万美元和解</h3>
+<p>7 月 9 日，FTC 发布声明称，亚马逊同意支付 225 万美元，以解决其被指故意违反《公平信用报告法》的指控。该案把联邦消费者保护执法直接指向大型科技公司的信用信息处理做法。此前争议停留在指控阶段，此次和解让案件从调查和指控转入金钱解决。后续受影响的是平台合规团队和依赖信用报告服务的消费者。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 与多州就约翰迪尔维修权达成和解</h3>
+<p>7 月 9 日，FTC 表示已与多州就 Deere &amp; Company 达成和解，相关表述指向农民维修权。该结果把农业设备维修限制问题带入联邦与州协同执法的框架，也直接涉及设备使用者的维修选择。此前争议主要是厂商控制维修渠道，此次和解把焦点转到可维修性和消费者选择。后续受影响的是农民、设备维修商和农业设备售后市场。</p>
+</div>
+<div class='event'>
+<h3>5. 德州 ICE 致命枪击后家属要求调查</h3>
+<p>7 月 9 日，Al Jazeera 报道称，一名美国男子在德州被 ICE 探员打死后，家属要求展开调查。该事件把移民执法和致命武力使用问题直接摆到公众面前。此前相关问题多停留在执法争议层面，此次事件把焦点推到具体执法行为和问责程序。后续受影响的是 ICE 的执法审查、死者家属以及德州当地的移民执法讨论。</p>
+</div>
+<ul class='headline-list'>
+<li>上诉期间，三法官合议庭拒绝恢复特朗普在肯尼迪中心的署名。</li>
+<li>威斯康星前法官涉妨碍 ICE 案件获刑但免入狱。</li>
+<li>参议院确认 Jamieson Greer 出任美国贸易代表。</li>
+<li>分析称最高法院部分否决特朗普议程，同时扩大总统权力。</li>
+<li>FTC 警告企业不要发布可疑的“美国制造”宣传。</li>
+<li>FTC 宣布 Hopper 支付 3500 万美元和解，指其未经同意收费并误导用户。</li>
+<li>FTC 向受 Handy Technologies 影响的消费者发放超过 270 万美元退款。</li>
+<li>FTC 批准针对 Publishing.com 的最终命令，了结其误导消费者指控。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 美伊互袭升级，停火再度脆弱 <span class="followup">持续跟踪</span></h3>
+<p>7 月 9 日，输入材料显示美国在停火破裂后对伊朗发动新一轮打击，BBC 也称伊朗南部出现更多爆炸。此前双方停火已出现松动，此次连续打击把冲突重新推回升级轨道。接下来受影响的将是美伊之间的军事行动节奏，以及霍尔木兹海峡周边的地区安全。</p>
+</div>
+<div class='event'>
+<h3>2. 特朗普称将许可乌克兰生产“爱国者”系统和导弹</h3>
+<p>7 月 8 日，特朗普称美国将给予乌克兰生产 Patriot 防空系统的许可，BBC 还报道他表示乌克兰将获得生产 Patriot 导弹的许可。此前相关援助主要体现为外部提供装备，此次表态把支持方式推进到本地生产层面。接下来受影响的是乌克兰防空能力、美国对乌军援安排，以及俄乌战场上的导弹防御部署。</p>
+</div>
+<div class='event'>
+<h3>3. 美国推动将叙利亚移出恐怖主义国家名单</h3>
+<p>7 月 9 日，输入材料显示美国正推动将叙利亚移出“国家恐怖主义支持者”名单。此前叙利亚仍处于这一分类之下，此次动作把美叙关系中的制裁门槛往下调了一步。接下来受影响的将是美国对叙政策、相关制裁安排，以及叙利亚与外部接触的空间。</p>
+</div>
+<div class='event'>
+<h3>4. 法国法院允许勒庞参加 2027 年总统选举</h3>
+<p>7 月 8 日，输入材料显示法国法院裁定允许玛丽娜·勒庞参加 2027 年总统选举。此前她的参选资格存在司法限制，此次裁定把她重新带回选战名单。接下来受影响的是法国右翼阵营的候选布局，以及 2027 年总统选举的竞争格局。</p>
+</div>
+<div class='event'>
+<h3>5. 北约安卡拉峰会聚焦军费、援乌和对伊朗表态 <span class="followup">持续跟踪</span></h3>
+<p>7 月 8 日，输入材料显示北约安卡拉峰会围绕军费提升、对乌支持和特朗普对欧洲及伊朗的批评展开。此前联盟内部对防务分担和对乌支持已有持续讨论，此次峰会把这些分歧与协调集中到同一场合。接下来受影响的是北约成员国的防务支出安排、对乌政策，以及联盟对伊朗问题的统一口径。</p>
+</div>
+<div class='event'>
+<h3>6. 特朗普称美国可能接管伊朗哈格岛</h3>
+<p>7 月 8 日，输入材料显示特朗普称美国可能接管伊朗的哈格岛。此前海湾紧张已在上升，此次表态把冲突讨论直接拉到关键海上节点。接下来受影响的是霍尔木兹海峡周边的地区安全，以及能源运输相关的航运预期。</p>
+</div>
+<div class='event'>
+<h3>7. 霍尔木兹海峡再现高冲突状态，能源市场承压 <span class="followup">持续跟踪</span></h3>
+<p>7 月 8 日，MarketWatch 报道称霍尔木兹海峡回到“full-conflict conditions”，并称能源市场正在应对冲击。此前市场已围绕美伊互袭重新定价，此次表述说明航运与能源交易都进入更紧张的阶段。接下来受影响的是原油交易、海运航线，以及依赖海湾运输的企业。</p>
+</div>
+<ul class='headline-list'>
+<li>联合国报道黎以停火后，黎巴嫩返乡民众面对严重破坏，局势仍不稳定。</li>
+<li>加沙地带空袭造成 5 人死亡，另有儿童受伤。</li>
+<li>特朗普因北约军费争端威胁切断与西班牙全部贸易。</li>
+<li>特朗普在峰会结束时宣布对北约盟友和乌克兰的新军售。</li>
+<li>北约峰会围绕对乌援助与防务作出新决定，俄方公开谴责。</li>
+<li>加沙遭以色列空袭，致 8 人死亡、12 人受伤。</li>
+<li>报道称许可生产爱国者导弹的安排可能增强乌克兰防御能力。</li>
+<li>特朗普称与伊朗的停火“事实上结束”，伊朗领导层如何收场仍存分歧。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. FTC 就 AI 准确性政策声明征求公众意见</h3>
+<p>7 月 9 日，FTC 发布新闻稿，称其正在就一份涉及 AI 准确性的政策声明征求公众意见。材料只说明了征求意见这一动作，没有给出声明全文、适用范围或最终定案内容。此前相关表述尚停留在机构内部或政策草案层面，此次公开征询把问题带到了正式程序中。后续主要影响 AI 企业、合规团队和监管机构对产品表述与准确性责任的界定。</p>
+</div>
+<div class='event'>
+<h3>2. 有媒体称中国拟允许部分 AI 公司有限采购英伟达 H200 芯片</h3>
+<p>7 月 9 日，Reuters 相关聚合页显示，中国计划允许部分顶级 AI 公司有限采购英伟达 H200 芯片。当前输入只提供了转述标题，没有给出主管部门、配额细节或执行方式，因此只能按媒体转述处理。此前相关采购限制更为严格，此次消息若属实，说明高端算力获取方式出现松动。影响将集中在国内 AI 公司、英伟达供货安排和高端芯片流通路径上。</p>
+</div>
+<div class='event'>
+<h3>3. 有报道指 Meta AI 可用公开 Instagram 照片生成深伪内容</h3>
+<p>7 月 9 日，NBC News 的聚合标题显示，Meta AI 被指可利用公开 Instagram 照片生成深伪内容。输入材料没有提供产品说明、平台回应或功能边界，因此不能把这件事写成已确认的产品能力。此前用户对公开照片的使用主要停留在常规内容处理，此次报道把焦点转到肖像与生成滥用风险上。后续直接牵动平台治理、创作者权益和普通用户对公开内容可被如何再利用的判断。</p>
+</div>
+<ul class='headline-list'>
+<li>OpenAI 与沃尔顿家族基金会推出面向 K-12 教师的 AI 技能活动。</li>
+<li>报道指超薄芯片堆叠技术或提升高带宽存储密度，缓解 AI 内存瓶颈。</li>
+</ul>
+</body>
+</html>
