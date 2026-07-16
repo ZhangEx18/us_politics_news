@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026-07-17 每日算法专题</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+                 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    line-height: 1.8;
+    color: #1a1a1a;
+    background: #fafafa;
+}
+header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 16px;
+    margin-bottom: 32px;
+}
+header h1 {
+    font-size: 1.6em;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+header .meta {
+    color: #666;
+    font-size: 0.9em;
+}
+header .question {
+    color: #444;
+    font-size: 1em;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border-left: 3px solid #0f5e3a;
+}
+h2 {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e0e0e0;
+}
+pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+p code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+ol, ul {
+    padding-left: 24px;
+}
+li {
+    margin: 6px 0;
+}
+.tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+.tag {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+.difficulty {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+.diff-1 { background: #e8f5e9; color: #2e7d32; }
+.diff-2 { background: #fff3e0; color: #e65100; }
+.diff-3 { background: #fce4ec; color: #c62828; }
+footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    color: #999;
+    font-size: 0.8em;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<header>
+<h1>单调栈：在线性时间里找下一个更大元素</h1>
+<div class="meta">
+  <span class="difficulty diff-2">进阶</span>
+  <div class="tags"><span class="tag">栈</span><span class="tag">单调栈</span><span class="tag">数组</span></div>
+</div>
+<div class="question">如何把“对每个元素向右找第一个更大值”的双重循环，优化到线性时间完成？</div>
+</header>
+<main>
+<h2>直觉理解</h2>
+<p>下一个更大元素的问题，本质上是在数组里做“右侧第一个比我大的数”的查询。直接做法是：对每个位置都往右扫一遍，直到找到答案为止，这样最坏会重复比较很多次。单调栈的思路是反过来想：既然某些元素一旦被更大的数盖过去，就永远不可能再成为别人的答案，那就把它们提前处理掉。栈里维护一批“还没找到答案、并且从栈底到栈顶保持单调递减”的元素。新元素一来，只要它比栈顶大，就说明栈顶这个元素的下一个更大元素就是它，直接弹出并记录答案。一个元素最多入栈一次、出栈一次，所以整趟扫描虽然看起来有很多弹栈动作，总次数仍然是线性的。这个结构的关键不是记住每一步比较，而是利用单调性删掉不可能再有用的信息，让后来的元素顺手解决前面的悬而未决问题。</p>
+<h2>算法思路</h2>
+<p>我们先把问题具体化：给定数组 `nums`，要求对每个位置 `i` 找到它右边第一个严格大于 `nums[i]` 的元素；如果不存在，就记为 `-1`。暴力解法会对每个位置向右扫描，复杂度是 `O(n^2)`。单调栈的优化点在于：我们不再为每个元素单独找答案，而是用“当前元素”去批量解决之前还没处理完的元素。
+
+做法是从左到右遍历数组，栈里存放的是元素的下标。并且保证栈对应的数值从栈底到栈顶严格递减。为什么要这样维护？因为如果新来的元素 `x` 比栈顶元素 `nums[stack[-1]]` 大，那么栈顶元素已经找到了它右边第一个更大元素，就是 `x` 本身；并且这个结论是正确的，因为我们是按顺序扫描的，`x` 是它右边第一个“遇到的”更大值。于是我们不断弹出栈顶，直到栈顶不小于 `x` 或者栈为空。所有被弹出的元素，其答案都可以立刻写成 `x`。然后再把当前下标压入栈中，等待未来更大的元素来处理它。
+
+整个过程结束后，栈中剩下的元素右侧已经没有更大值，所以答案保持为 `-1` 即可。这个模板不仅适用于“下一个更大元素”，也适用于“下一个更小元素”“温度升高”“股票跨度”等一类问题，核心都是：找到一个合适的单调方向，让后来的元素能够一次性解决前面一批元素。实现时最常见的写法是用一个答案数组，初始化全为 `-1`，遍历时一边弹栈一边填答案，最后返回结果。这样代码清晰，也便于扩展到循环数组或双向扫描的变体。</p>
+<h2>Python 示例</h2>
+<pre><code>from typing import List
+
+
+def next_greater_elements(nums: List[int]) -&gt; List[int]:
+    """返回每个元素右侧第一个更大元素；不存在则为 -1。"""
+    n = len(nums)
+    ans = [-1] * n
+    stack = []  # 存下标，栈内对应值保持严格递减
+
+    for i, x in enumerate(nums):
+        # 当前元素比栈顶元素大，说明它就是栈顶元素的下一个更大元素
+        while stack and nums[stack[-1]] &lt; x:
+            idx = stack.pop()
+            ans[idx] = x
+        stack.append(i)
+
+    return ans
+
+
+if __name__ == "__main__":
+    # 基础测试
+    nums1 = [2, 1, 2, 4, 3]
+    print(next_greater_elements(nums1))  # 期望输出: [4, 2, 4, -1, -1]
+
+    nums2 = [1, 3, 4, 2]
+    print(next_greater_elements(nums2))  # 期望输出: [3, 4, -1, -1]
+
+    nums3 = [5, 5, 5]
+    print(next_greater_elements(nums3))  # 期望输出: [-1, -1, -1]
+
+    nums4 = []
+    print(next_greater_elements(nums4))  # 期望输出: []
+</code></pre>
+<h2>C++ 对照</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+vector&lt;int&gt; nextGreaterElements(const vector&lt;int&gt;&amp; nums) {
+    int n = (int)nums.size();
+    vector&lt;int&gt; ans(n, -1);
+    stack&lt;int&gt; st; // 存下标，保证对应值单调递减
+
+    for (int i = 0; i &lt; n; ++i) {
+        while (!st.empty() &amp;&amp; nums[st.top()] &lt; nums[i]) {
+            ans[st.top()] = nums[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return ans;
+}
+
+int main() {
+    vector&lt;vector&lt;int&gt;&gt; tests = {
+        {2, 1, 2, 4, 3},
+        {1, 3, 4, 2},
+        {5, 5, 5},
+        {}
+    };
+
+    for (const auto&amp; nums : tests) {
+        vector&lt;int&gt; ans = nextGreaterElements(nums);
+        for (int x : ans) cout &lt;&lt; x &lt;&lt; ' ';
+        cout &lt;&lt; '\n';
+    }
+    return 0;
+}
+</code></pre>
+<h2>复杂度分析</h2>
+<p>每个元素最多入栈一次、出栈一次，因此总操作次数是线性的。时间复杂度为 `O(n)`，其中 `n` 是数组长度。栈最多保存所有元素的下标，所以空间复杂度为 `O(n)`。相比双重循环的 `O(n^2)`，单调栈的收益来自于把重复比较压缩掉了。</p>
+<h2>易错点</h2>
+<ol>
+<li>把“严格大于”写成了“大于等于”。如果题目要求下一个更大元素，比较条件应该用 `&lt;` 来弹栈；若误写成 `&lt;=`，会把相等元素当成更大元素处理，答案会错。修复方法是先确认题意是否允许相等。 </li>
+<li>栈里存值而不是存下标，导致没法回填答案位置。下标是更稳妥的做法，因为它既能访问原数组值，也能准确写回结果数组。修复方法是统一用下标做栈元素。 </li>
+<li>只在循环结束后统一处理答案，忘记给未找到更大元素的位置初始化为 `-1`。修复方法是先把答案数组整体设为 `-1`，再只覆盖已经找到答案的位置。</li>
+</ol>
+<h2>延伸练习</h2>
+<ol>
+<li>基础题：给定数组 `nums`，返回每个元素右侧第一个更小元素的位置或数值，要求使用单调栈完成。</li>
+<li>拓展题：实现“循环数组”的下一个更大元素，即数组末尾可以继续回到开头再找一圈，直到找到更大元素或确认不存在。</li>
+</ol>
+</main>
+<footer>
+<p>每日算法专题 · 2026-07-17</p>
+</footer>
+</body>
+</html>
