@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年7月19日 日报 — 2026-07-19</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年7月19日 日报</h1>
+<div class='date'>2026-07-19</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>最高法院裁定协调党派支出限制违宪</li>
+<li>伊朗袭击约旦目标致两名美军死亡</li>
+<li>FTC 就 AI 准确性政策声明征求公众意见</li>
+<li>FTC 与多州就迪尔维修权达成和解</li>
+<li>拉尔夫·诺曼宣布竞逐南卡罗来纳州参议员席位</li>
+<li>美国空袭后伊朗桥梁和海水淡化厂出现损毁</li>
+<li>FTC 批准 TruHeight 最终命令，涉及儿童和青少年保健品广告</li>
+<li>FTC 就 Caremark 反垄断案达成重大和解</li>
+</ul>
+</div>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 伊朗袭击约旦目标致两名美军死亡</h3>
+<p>7 月 18 日，输入材料显示伊朗对约旦一处目标发动袭击，造成两名美军死亡，另有一人失踪。多家来源都提到这起袭击后，美方和相关媒体同步更新了伤亡信息，并把事件放在新一轮冲突升级的背景下。此前双方主要停留在互相威慑，此次出现美军直接伤亡后，冲突重心进一步转向美伊对抗。接下来受影响的是驻中东美军、美国对伊军事行动安排以及约旦周边安全态势。</p>
+</div>
+<div class='event'>
+<h3>2. 美国空袭后伊朗桥梁和海水淡化厂出现损毁</h3>
+<p>7 月 18 日，输入材料显示美国空袭后，伊朗的桥梁和海水淡化厂出现可见损毁。页面材料只提供了受损画面和地点，没有补充更多打击细节。此前相关冲突更多停留在军事行动通报，此次出现基础设施受损后，焦点扩展到伊朗境内民用和交通设施。接下来受影响的是伊朗当地交通、供水相关设施，以及美国后续军事打击的目标选择。</p>
+</div>
+<div class='event'>
+<h3>3. 美国对伊拉克企业签署 48 项协议</h3>
+<p>7 月 18 日，输入材料显示伊拉克总理访华盛顿期间，伊拉克与美国公司签署了 48 项协议。摘要点到这些协议涵盖管道重建等能源合作，但没有展开每项内容。此前伊美关系更多体现为政治和安全接触，此次批量签约把合作落到具体商业项目上。接下来受影响的是伊拉克能源和基础设施项目，以及参与协议的美国企业。</p>
+</div>
+<div class='event'>
+<h3>4. 黎巴嫩总统阿翁将赴华盛顿讨论以色列谈判</h3>
+<p>7 月 18 日，输入材料显示黎巴嫩总统阿翁将前往华盛顿，与特朗普讨论以色列谈判。材料只说明会谈安排和议题，没有给出谈判文本或结果。此前相关接触仍停留在双边与地区沟通层面，此次把议题直接带到华盛顿，说明谈判进入更高层级的政治接触。接下来受影响的是黎巴嫩、以色列以及参与斡旋的美国外交安排。</p>
+</div>
+<div class='event'>
+<h3>5. 以色列对加沙居民区发动袭击致 8 人死亡</h3>
+<p>7 月 18 日，输入材料显示以色列对加沙居民区发动袭击，造成 8 人死亡。材料没有提供更多地点细节或后续行动，只明确了袭击对象和伤亡结果。此前局势已处在持续军事冲突中，此次伤亡再次把焦点放回加沙平民区域。接下来受影响的是加沙居民、救援力量以及地区停火谈判压力。</p>
+</div>
+<div class='event'>
+<h3>6. 比利时禁止进口以色列定居点商品</h3>
+<p>7 月 18 日，输入材料显示比利时宣布禁止进口被占领巴勒斯坦地区以色列定居点商品。页面只列出禁令本身，没有提供执行细则或覆盖范围之外的新信息。此前欧盟成员国在相关问题上的动作并不一致，此次禁令把贸易限制直接落到进口环节。接下来受影响的是相关进口商、定居点商品流通链条以及比利时与以色列的贸易关系。</p>
+</div>
+<div class='event'>
+<h3>7. 乌克兰无人机袭击俄在线零售仓库致多人死亡</h3>
+<p>7 月 18 日，BBC 材料显示乌克兰无人机袭击了俄罗斯的在线零售仓储设施，并造成多人死亡。标题和摘要只说明袭击对象与伤亡结果，没有补充仓库归属或更大范围的战果。此前俄乌冲突中的打击多集中于前线和军事目标，此次把打击延伸到零售仓储设施。接下来受影响的是俄罗斯仓储物流、在线零售供应链以及双方报复性打击的节奏。</p>
+</div>
+<div class='event'>
+<h3>8. 马里武装组织袭击高地区军方车队 <span class="followup">持续跟踪</span></h3>
+<p>7 月 18 日，输入材料显示马里高地区一支军方车队遭到武装组织袭击，政府称已展开反击。页面只给出袭击地点、对象和政府回应，没有补充伤亡或战果。此前当地冲突已呈持续对峙状态，此次车队遇袭把冲突重新推到马里北部安全线。接下来受影响的是马里军方在高地区的机动部署，以及当地平民和道路安全。</p>
+</div>
+<ul class='headline-list'>
+<li>报道聚焦特朗普重启对伊朗战争引发的政治风险。</li>
+<li>匈牙利总统在议会支持罢免后同意下台。</li>
+<li>中国就英国政府全面国有化英国钢铁发出警告并要求公平解决。</li>
+<li>伊朗多次袭击后，科威特多地出现浓烟。</li>
+<li>乌克兰对俄能源和军事目标发动无人机袭击，造成多人死亡。</li>
+<li>法国博彩监管机构要求 ISP 屏蔽 Polymarket 网站访问。</li>
+<li>一名巴勒斯坦少年足球员在遭以色列定居者袭击一周后死亡。</li>
+<li>无人机画面显示西班牙北部大火已烧毁逾 150 平方公里。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. FTC 就 AI 准确性政策声明征求公众意见</h3>
+<p>2026 年 7 月 19 日，FTC 就一份涉及 AI 准确性的政策声明征求公众意见，公开页面显示该事项已进入征询阶段。此前材料只给出政策声明主题，此次动作把焦点放在 AI 系统输出是否准确这一监管问题上。后续会直接影响依赖 AI 产品的企业、提交意见的行业参与者，以及关注平台合规标准的监管机构。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 批准 TruHeight 最终命令，涉及儿童和青少年保健品广告</h3>
+<p>2026 年 7 月 19 日，FTC 批准了针对 TruHeight 的最终命令，公开材料指向其儿童和青少年保健品广告被认定为误导且缺乏证据。此前页面只显示执法事项处于审结阶段，此次批准把争议从宣传层面推进到正式命令。对保健品企业来说，后续约束集中在广告表述和证据支持上，儿童与青少年消费品市场也会受到更严格的合规审视。</p>
+</div>
+<div class='event'>
+<h3>3. USTR 就中国半导体产业 301 调查举行公开听证</h3>
+<p>2026 年 7 月 19 日，USTR 就一项针对中国行为、政策和做法的 301 调查举行公开听证，议题聚焦半导体产业被瞄准以追求主导地位。此前材料只列出调查主题，此次听证把争议放到公开程序中。对半导体产业链而言，后续关注点在于美国贸易代表办公室如何整理陈述材料，并据此推进对相关做法的审视。</p>
+</div>
+<div class='event'>
+<h3>4. Mozilla 报告称开源 AI 与大厂模型差距继续缩小</h3>
+<p>2026 年 7 月 19 日，Google News 转引的一篇题为“Mozilla report claims open-source AI nearly matches Big Tech models”的报道提到，Mozilla 报告认为开源 AI 与大厂模型的差距已接近。由于输入只提供了标题摘录和聚合页信息，这里只能写成页面所述的判断，不能把结论扩写为已被全面证实。对模型开发者和企业采购方来说，关注点会落在开源模型能力是否正在接近主流商业模型。</p>
+</div>
+<div class='event'>
+<h3>5. H.R. 2821 显示 FDA 现代化法案 3.0 进入公开列表</h3>
+<p>2026 年 7 月 19 日，GovTrack 页面列出 H.R. 2821，标题为“FDA Modernization Act 3.0”，材料只说明它是一项与 FDA 现代化相关的法案。由于输入没有提供法案内容、推进动作或影响对象，这里只能写成页面列示，而不能扩写为已经推进的监管改革。对药监行业而言，当前可确认的只是相关立法条目已被公开收录。</p>
+</div>
+<div class='event'>
+<h3>6. H.R. 3029 显示核酸标准生物安全法案被公开列出</h3>
+<p>2026 年 7 月 19 日，GovTrack 页面列出 H.R. 3029，标题为“Nucleic Acid Standards for Biosecurity Act”，公开材料仅表明该法案与生物安全和核酸标准有关。输入没有提供法案内容或具体推进步骤，因此不能把它写成已经展开的监管行动。对生物技术企业和监管观察者来说，当前可确认的只是相关立法条目已进入公开列表。</p>
+</div>
+<div class='event'>
+<h3>7. TechCrunch 标题提及 Moonshot AI 的 Kimi 引发关注</h3>
+<p>2026 年 7 月 19 日，TechCrunch 发布了题为“Kimi: Threat or menace?”的文章，输入材料只表明 Moonshot AI 的新 Kimi 模型引发了关注。由于这里只有标题摘录，不能把讨论内容写成已经验证的产品结论或性能判断。对 AI 行业来说，这类报道主要影响的是市场对新模型的关注度，以及外界对其竞争位置的观察。</p>
+</div>
+<ul class='headline-list'>
+<li>报道称英特尔与谷歌在 AI 辅助芯片设计上加深合作。</li>
+<li>Silicon Motion 因 AI 存储需求预期上涨，但估值仍受关注。</li>
+</ul>
+</body>
+</html>
