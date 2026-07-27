@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年7月28日 日报 — 2026-07-28</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年7月28日 日报</h1>
+<div class='date'>2026-07-28</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>司法部请求最高法院放行特朗普限制邮寄投票的行政令</li>
+<li>美伊停火进入第三天，谈判窗口被重新打开</li>
+<li>微软发布面向 AI 时代的安全方案</li>
+<li>USTR 就中国海事、物流和造船业 301 调查拟议措施征求意见</li>
+<li>参议院确认 Jamieson Greer 出任美国贸易代表</li>
+<li>特朗普警告伊朗外交失败后可能恢复军事行动</li>
+<li>USTR 就中国半导体行业 301 调查举行公开听证</li>
+<li>FTC 与 Caremark 达成和解，结束反垄断案件</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 司法部请求最高法院放行特朗普限制邮寄投票的行政令 <span class="followup">持续跟踪</span></h3>
+<p>7 月 27 日，司法部请求最高法院放行特朗普针对邮寄投票的行政令，相关材料显示这一争议已进入联邦司法最高层面。此前有关邮寄投票的规则主要由现行选举安排约束，此次请求把冲突直接推到法院是否允许该命令生效。接下来受影响的是选民、州选举管理部门和两党围绕中期选举规则的准备工作。</p>
+</div>
+<div class='event'>
+<h3>2. 参议院确认 Jamieson Greer 出任美国贸易代表</h3>
+<p>7 月 28 日，参议院确认 Jamieson Greer 出任美国贸易代表，公开材料显示这一人事程序已经完成。此前该职位处于等待确认状态，此次确认把美国贸易代表办公室的负责人位置补齐。接下来直接受到影响的是国会、白宫以及围绕贸易政策执行的相关企业和产业。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 采取行动指控 Elite Events 规避购票限制</h3>
+<p>7 月 28 日，FTC 对 Elite Events 采取行动，指其绕过购票限额并违反《Better Online Ticket Sales Act》。此前相关限制旨在约束购票上限，此次执法把问题集中到具体公司是否规避规则。接下来受影响的是票务市场、消费者和依赖合规售票流程的演出主办方。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 与各州就 Deere 维修权纠纷达成和解</h3>
+<p>7 月 28 日，FTC 和各州就 Deere &amp; Company 达成和解，公开材料称此举推进农民的维修权。此前维修权争议围绕设备能否更容易维修展开，此次和解把争议从对抗推进到具体解决方案。接下来受影响的是农民、农业设备维修服务和农机供应链中的相关企业。</p>
+</div>
+<div class='event'>
+<h3>5. 特朗普政府请求最高法院放行邮寄投票限制 <span class="followup">持续跟踪</span></h3>
+<p>7 月 28 日，特朗普政府请求最高法院放行一项针对邮寄投票的命令，PBS 的材料显示争议焦点放在中期选举前的投票规则上。此前邮寄投票规则按既有制度运行，此次请求把是否限制邮寄投票交给最高法院判断。接下来受影响的是选民、州政府和负责选举执行的机构。</p>
+</div>
+<ul class='headline-list'>
+<li>H.R. 899 旨在终止教育部，属于 7 月 24 日众议院法案进展。</li>
+<li>特朗普要求参议院取消 8 月休会，直到通过 SAVE America Act。</li>
+<li>FTC 就 TruHeight 针对儿童和青少年的补充剂误导性广告批准最终命令。</li>
+<li>佐治亚州第 13 国会选区特别选举进入直播计票，胜者将填补剩余任期。</li>
+<li>SAVE Act 作为众议院法案条目出现在 7 月 24 日国会进展中。</li>
+<li>上诉法院阻止特朗普关于选举规则的命令，案件料将上诉至最高法院。</li>
+<li>RentGrow 同意支付 225 万美元和解 FTC 指控。</li>
+<li>Thune 回应特朗普要求参院推动 SAVE America Act，并延长夏季休会争议。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 美伊停火进入第三天，谈判窗口被重新打开 <span class="followup">持续跟踪</span></h3>
+<p>7 月 28 日，Al Jazeera 报道称美伊冲突停火已进入第三天，调停方正推动重启外交谈判；BBC World 也称，美国暂停对伊朗的攻击，为谈判留出空间。此前双方处在持续交火状态，此次停火把冲突从军事对抗拉回到外交接触。接下来受影响的是美伊谈判进程、地区安全预期以及原油市场的短期波动。</p>
+</div>
+<div class='event'>
+<h3>2. 特朗普警告伊朗外交失败后可能恢复军事行动 <span class="followup">持续跟踪</span></h3>
+<p>7 月 27 日，The Guardian World 报道称特朗普警告，如果与伊朗的外交努力失败，美国可能恢复强力军事行动。此前外界讨论焦点主要是停火与对话空间，此次表态把军事选项重新摆回台面。接下来直接影响的是美伊谈判压力、地区对抗风险和相关盟友的安全判断。</p>
+</div>
+<div class='event'>
+<h3>3. 联合国安理会应乌方请求听取乌克兰局势通报</h3>
+<p>7 月 27 日，UN News 表示，联合国安理会应乌方请求就俄军对乌城市和港口的袭击举行通报。此前相关冲突主要停留在战场层面，此次进入安理会程序，说明议题被正式带到联合国场域。接下来影响的是安理会成员对局势的表态，以及乌克兰、俄罗斯和相关国家的外交互动。</p>
+</div>
+<div class='event'>
+<h3>4. 联合国批评以色列扩大约旦河西岸定居点</h3>
+<p>7 月 27 日，Al Jazeera 报道称联合国批评以色列扩大被占约旦河西岸定居点。此前相关争议长期围绕占领地区管理展开，此次公开批评把焦点集中到定居点扩张上。接下来受影响的是联合国、以色列与围绕约旦河西岸局势的外交立场。</p>
+</div>
+<div class='event'>
+<h3>5. 联合国人权高专关注以色列在黎巴嫩的潜在战争罪问题</h3>
+<p>7 月 27 日，Al Jazeera 报道称联合国人权高专正在关注以色列在黎巴嫩的潜在战争罪问题。此前黎巴嫩局势更多体现为持续冲突，此次表态把问题推进到国际人权和战争罪讨论层面。接下来影响的是联合国的跟进调查方向，以及以色列在黎巴嫩行动所承受的国际压力。</p>
+</div>
+<div class='event'>
+<h3>6. 英国法院驳回巴林阻止间谍软件诉讼的请求</h3>
+<p>7 月 27 日，Al Jazeera 报道称英国法院驳回了巴林阻止活动人士间谍软件诉讼的请求。此前争议集中在案件能否继续推进，此次裁定让诉讼程序继续向前。接下来影响的是巴林相关法律防线、活动人士的索赔路径，以及英国法院对类似跨境案件的处理。</p>
+</div>
+<div class='event'>
+<h3>7. 乌方称里海袭击把乌克兰与伊朗局势直接关联 <span class="followup">持续跟踪</span></h3>
+<p>7 月 27 日，BBC World 报道称乌方认为里海袭击把两场战争直接关联起来，伊朗方面则威胁此事不会不了了之。此前乌克兰和中东局势多被分开讨论，此次表述把两条冲突线放到同一外交框架里。接下来影响的是乌克兰、伊朗以及相关地区对冲突外溢的判断。</p>
+</div>
+<div class='event'>
+<h3>8. 格里尔与何立峰会谈纪要发布</h3>
+<p>7 月 28 日，USTR 发布了美国贸易代表 Jamieson Greer 与中国副总理何立峰会谈的纪要。此前中美经贸接触多停留在外界等待信号，此次纪要公开说明双方已进行面对面沟通。接下来影响的是中美经贸对话节奏，以及市场对后续沟通安排的解读。</p>
+</div>
+<ul class='headline-list'>
+<li>伊朗因油轮遇袭指责乌克兰，并威胁采取报复行动。</li>
+<li>美国外交官在法国发言时离席，联合国安理会场边外交摩擦升温。</li>
+<li>法国波尔多附近山火逼近城区，当地正在准备进一步疏散。</li>
+<li>巴控克什米尔在暴力和抗议背景下开始投票。</li>
+<li>英国新首相伯纳姆向泽连斯基确认将继续支持乌克兰。</li>
+<li>美国在安理会会议上退场，法美围绕人权议题公开分歧升级。</li>
+<li>委内瑞拉决定退出国际刑事法院，ICC 称调查将继续。</li>
+<li>美伊战事进入第 16 天，冲突放缓且外交窗口暂时出现。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 微软发布面向 AI 时代的安全方案</h3>
+<p>7 月 27 日，Microsoft Blog 发布《Rethinking security for the age of AI》，介绍了 Project Perception 和新的 Cyber Stack 构想。公开材料只显示微软在重新组织 AI 时代的安全方案，并未给出更具体的落地范围。此前安全产品多围绕传统威胁展开，此次发布把重心放到 AI 相关场景。后续最直接受到影响的是企业安全团队和微软生态中的客户。</p>
+</div>
+<div class='event'>
+<h3>2. USTR 就中国半导体行业 301 调查举行公开听证</h3>
+<p>7 月 28 日，USTR 就“针对中国半导体行业的行为、政策和做法”的 Section 301 调查举行公开听证。页面标题和摘要只显示听证这一动作，没有提供更多程序结果或结论。此前该事项停留在调查和审查框架内，此次听证把争议集中到半导体产业竞争上。后续直接关联的是美国贸易代表办公室、相关产业企业以及半导体供应链。</p>
+</div>
+<div class='event'>
+<h3>3. 英伟达用 Vera CPU 加速下一代 CPU 和 GPU 设计</h3>
+<p>7 月 27 日，NVIDIA Blog 表示，英伟达正用 Vera CPU 加速新一代 CPU 和 GPU 的设计。公开材料只确认了这种内部设计加速做法，没有展开具体性能数字或产品时间表。此前芯片设计流程更多依赖常规研发节奏，此次披露说明英伟达把算力和设计工具本身也纳入竞争环节。后续会直接影响芯片设计效率、研发组织方式以及相关供应链伙伴。</p>
+</div>
+<div class='event'>
+<h3>4. OpenAI 发布关于 AI 扩展工作任务边界的研究</h3>
+<p>7 月 27 日，OpenAI Blog 发布研究，称 AI 正在扩展人们在工作中的任务边界。输入材料只提供了研究结论方向，没有给出行业分布、样本规模或更细的岗位变化。此前讨论多停留在 AI 替代单一任务，此次研究把焦点放到工作内容的扩展。后续受影响的主要是企业用工安排、职业培训和围绕 AI 工具部署的管理决策。</p>
+</div>
+<div class='event'>
+<h3>5. 英伟达牵头成立 Open Secure AI Alliance</h3>
+<p>7 月 27 日，NVIDIA Blog 宣布业界联合成立 Open Secure AI Alliance，目标是推进 AI 安全与防护。公开材料只显示联盟成立这一动作，没有列出成员规模、治理机制或具体项目。此前 AI 安全讨论多分散在单个企业内部，此次联合把安全议题推向行业协作层面。后续直接关联的是模型开发者、平台厂商和部署 AI 的企业客户。</p>
+</div>
+<div class='event'>
+<h3>6. 英伟达拟加码 OpenAI 基础设施投入</h3>
+<p>7 月 28 日，Al Jazeera 报道称，英伟达计划投入 2500 亿美元，支持 OpenAI 的基础设施扩张。输入材料只给出这一计划性表述，没有提供已签署协议或资金落地细节。此前相关合作更多停留在产品和算力合作层面，此次报道把焦点推到基础设施规模上。后续会直接影响数据中心建设、算力供应链以及围绕 AI 基础设施的监管讨论。</p>
+</div>
+<ul class='headline-list'>
+<li>Microchip Technology 收购 Hailo，补强端侧 AI 处理能力。</li>
+<li>韩国风投加码半导体材料初创公司，押注 AI 芯片需求扩张。</li>
+<li>媒体报道微软推出首个网络安全 AI 模型和新安全平台。</li>
+</ul>
+</body>
+</html>
