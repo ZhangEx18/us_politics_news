@@ -5,8 +5,122 @@
     <link>.</link>
     <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 28 Jul 2026 07:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 02 Aug 2026 07:46:05 +0800</lastBuildDate>
     <item>
+      <title>2026-08-02 每日算法专题</title>
+      <link>algorithms/daily/2026-08-02.html</link>
+      <description><![CDATA[如何把“对每个元素向右暴力找第一个更大值”的双重循环，优化成一次遍历的线性算法？]]></description>
+      <content:encoded><![CDATA[<article>
+<h2>如何把“对每个元素向右暴力找第一个更大值”的双重循环，优化成一次遍历的线性算法？</h2>
+<h3>直觉理解</h3>
+<p>下一个更大元素的问题，本质上是在问：每个数右边第一个比它大的数是谁。最直接的想法是对每个位置都往右扫一遍，但这样会重复比较很多次。单调栈的核心技巧，就是把这些“已经看过、暂时还没找到答案”的元素按某种顺序保存起来，让新来的元素一次性解决一批旧问题。对于下一个更大元素，我们维护一个“从栈底到栈顶单调递减”的栈，这样栈顶永远是当前最小心、最容易被新元素击败的那个。只要来一个更大的数，就不断把比它小的栈顶弹出，并且这个新数正好就是它们的下一个更大元素。每个元素最多入栈一次、出栈一次，所以整体是线性的。它像是在排队：后面来了一个更强的人，前面所有比他弱、又还没等到答案的人就都可以当场得到结果了。</p>
+<h3>算法思路</h3>
+<p>我们先把问题抽象成“对数组中每个位置，找到右侧第一个严格大于它的元素”。如果直接枚举，外层固定一个位置，内层往右找第一个更大值，最坏情况下会做成 O(n^2)。单调栈的思路是反过来想：不要等每个元素自己去找答案，而是让“新出现的元素”来处理一批还没答案的旧元素。
+
+具体做法是维护一个栈，栈里放的是“还没找到下一个更大元素”的数值或下标，并保证栈内元素从栈底到栈顶单调递减。这样栈顶元素是当前最小的“待解决对象”。当我们遍历到一个新元素 x 时，只要 x 比栈顶元素大，就说明 x 是栈顶元素右边遇到的第一个更大元素，可以立刻记录答案，并把栈顶弹出。然后继续判断新的栈顶，直到栈为空或者栈顶不再小于 x。处理完之后，把 x 入栈，等待未来更大的元素来解决它。
+
+如果题目是经典的“下一个更大元素”，通常可以返回每个位置的答案数组，初始化为 -1，表示右侧不存在更大元素。遍历结束后，所有还留在栈里的元素都没有更大的右侧元素，它们的答案自然保持 -1。这个算法的关键在于：虽然看起来有 while 循环，但每个元素最多只会被压入栈一次、弹出栈一次，因此总操作次数是 O(n)，不是 O(n^2)。
+
+实际写代码时，推荐栈里存下标而不是值。这样一方面可以直接回写答案数组，另一方面当数组中有重复值时也更稳妥。若要求“严格更大”，弹栈条件用 `&lt;`；如果题目允许“下一个更大或相等”，则条件要相应改成 `&lt;=`。这个细节会直接影响结果，是单调栈题里最常见的分界线。</p>
+<h3>Python 示例</h3>
+<pre><code>from typing import List
+
+
+def next_greater_elements(nums: List[int]) -&gt; List[int]:
+    """返回每个元素右侧第一个严格更大的元素；若不存在则为 -1。"""
+    n = len(nums)
+    ans = [-1] * n
+    stack = []  # 存下标，栈内对应的 nums 值单调递减
+
+    for i, x in enumerate(nums):
+        # 当前元素 x 可以解决所有比它小的栈顶元素
+        while stack and nums[stack[-1]] &lt; x:
+            j = stack.pop()
+            ans[j] = x
+        stack.append(i)
+
+    return ans
+
+
+def _run_tests():
+    tests = [
+        ([2, 1, 2, 4, 3], [4, 2, 4, -1, -1]),
+        ([1, 2, 3, 4], [2, 3, 4, -1]),
+        ([4, 3, 2, 1], [-1, -1, -1, -1]),
+        ([1, 1, 1], [-1, -1, -1]),
+        ([1, 3, 2, 4, 2, 5], [3, 4, 4, 5, 5, -1]),
+    ]
+
+    for nums, expected in tests:
+        result = next_greater_elements(nums)
+        assert result == expected, f"输入 {nums}，期望 {expected}，得到 {result}"
+
+    print("所有测试用例通过")
+
+
+if __name__ == "__main__":
+    _run_tests()
+</code></pre>
+<h3>C++ 对照</h3>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+vector&lt;int&gt; nextGreaterElements(const vector&lt;int&gt;&amp; nums) {
+    int n = (int)nums.size();
+    vector&lt;int&gt; ans(n, -1);
+    stack&lt;int&gt; st; // 存下标，保持对应值单调递减
+
+    for (int i = 0; i &lt; n; ++i) {
+        while (!st.empty() &amp;&amp; nums[st.top()] &lt; nums[i]) {
+            int j = st.top();
+            st.pop();
+            ans[j] = nums[i];
+        }
+        st.push(i);
+    }
+    return ans;
+}
+
+int main() {
+    vector&lt;vector&lt;int&gt;&gt; tests = {
+        {2, 1, 2, 4, 3},
+        {1, 2, 3, 4},
+        {4, 3, 2, 1},
+        {1, 1, 1},
+        {1, 3, 2, 4, 2, 5}
+    };
+
+    vector&lt;vector&lt;int&gt;&gt; expected = {
+        {4, 2, 4, -1, -1},
+        {2, 3, 4, -1},
+        {-1, -1, -1, -1},
+        {-1, -1, -1},
+        {3, 4, 4, 5, 5, -1}
+    };
+
+    for (size_t t = 0; t &lt; tests.size(); ++t) {
+        auto result = nextGreaterElements(tests[t]);
+        assert(result == expected[t]);
+    }
+
+    cout &lt;&lt; "所有测试用例通过" &lt;&lt; endl;
+    return 0;
+}
+</code></pre>
+<h3>复杂度分析</h3>
+<p>时间复杂度是 O(n)。每个元素最多入栈一次、出栈一次，虽然内部有 while 循环，但总弹栈次数是线性的。空间复杂度是 O(n)，主要来自答案数组和辅助栈。相比暴力枚举的 O(n^2)，单调栈把重复比较压缩掉了。</p>
+<h3>易错点</h3>
+<ol>
+<li>把栈里存“值”而不是“下标”，导致无法准确回填答案数组，尤其在有重复元素时会混淆位置；修复方法是优先存下标，再通过下标访问原数组。</li>
+<li>把弹栈条件写成 `&lt;=` 或 `&lt;` 搞错，导致“严格更大”和“更大或相等”的语义混淆；修复方法是先确认题目要求，再决定是否允许相等元素弹出。</li>
+<li>以为 while 循环一定是 O(n^2)，忽略了每个元素只会被弹一次；修复方法是用“总入栈次数 + 总出栈次数”来分析，而不是只看单层循环。</li>
+<li>忘记给默认答案设为 -1，导致没有更大元素的位置保留了错误初值；修复方法是在开始时统一初始化答案数组。</li>
+</ol>
+</article>]]></content:encoded>
+      <pubDate>Sun, 02 Aug 2026 07:45:36 +0800</pubDate>
+      <guid isPermaLink="false">algorithms/daily/2026-08-02</guid>
+    </item>
+<item>
       <title>2026-07-28 每日算法专题</title>
       <link>algorithms/daily/2026-07-28.html</link>
       <description><![CDATA[如何在数组中用线性时间为每个元素快速找到右侧第一个更大的数？]]></description>
@@ -2340,489 +2454,6 @@ int main() {
 </article>]]></content:encoded>
       <pubDate>Thu, 02 Jul 2026 07:46:03 +0800</pubDate>
       <guid isPermaLink="false">algorithms/daily/2026-07-02</guid>
-    </item>
-<item>
-      <title>2026-06-30 每日算法专题</title>
-      <link>algorithms/daily/2026-06-30.html</link>
-      <description><![CDATA[如何在O(n)时间内，找到数组中每个元素右边第一个比它大的元素？]]></description>
-      <content:encoded><![CDATA[<article>
-<h2>如何在O(n)时间内，找到数组中每个元素右边第一个比它大的元素？</h2>
-<h3>直觉理解</h3>
-<p>想象一下，你站在一列人中，要找到你右边第一个比你高的人。最笨的方法是一个个往后看（O(n^2)）。一个聪明的办法是，你转身朝后（从右向左）看，同时维护一个‘候选者’名单，但这个名单有个规矩：个子必须是从前到后（从栈底到栈顶）递减的。为什么？因为如果名单里有个人比你矮，那他肯定不是你的答案，而且如果他后面有高个子，那个高个子会先被更前面的人（你左边的人）‘拦住’，所以名单里的矮个子可以直接被淘汰。当你检查到自己时，名单里第一个（栈顶）比你高的，就是你要找的人。然后，你把自己加入名单（并根据规矩淘汰比你矮的），转身，让左边的人也来利用这个名单。这个‘规矩’保证了名单（栈）的单调性，让每个元素最多进出一次，从而实现了高效查找。</p>
-<h3>算法思路</h3>
-<p>算法框架如下：
-1. **初始化**：创建一个空栈 `stack`，用于存储元素索引（存索引比存值更灵活，能获取更多信息）。创建一个与输入数组 `nums` 等长的结果数组 `result`，通常初始化为 -1，表示默认找不到更大元素。
-2. **遍历**：**关键点是从右向左遍历**数组。为什么从右向左？因为我们要找的是右边第一个更大元素，从左向右处理时，左边的元素无法预知右边的情况，但反向遍历时，栈中存储的都是已经处理过的‘右边’的元素。
-3. **维护单调性**：对于当前遍历到的元素 `nums[i]`（索引 `i`），只要栈不为空，并且栈顶索引对应的元素小于等于当前元素，就不断弹出栈顶。**这个循环的含义是：把栈里所有‘没用’的候选者（比当前元素小的）清空，因为它们对于当前元素和当前元素左边的元素来说，都不可能是‘下一个更大元素’。**
-4. **获取结果**：经过上一步的弹出后，如果栈不为空，那么栈顶索引对应的元素就是当前元素 `nums[i]` 右边第一个比它大的元素，将其记录到 `result[i]` 中。
-5. **入栈**：将当前索引 `i` 压入栈中，成为新的候选者，供左边元素查询。整个过程保证栈内元素对应值从栈底到栈顶是单调递减的。</p>
-<h3>Python 示例</h3>
-<pre><code>def nextGreaterElement(nums):
-    """
-    使用单调栈找到每个元素右边第一个比它大的元素
-    :param nums: 输入数组
-    :return: 结果数组，若不存在更大元素则为 -1
-    """
-    n = len(nums)
-    stack = []  # 存储索引，维护一个单调递减栈（栈底到栈顶）
-    result = [-1] * n  # 初始化结果数组
-    
-    # 从右向左遍历数组
-    for i in range(n-1, -1, -1):
-        # 核心步骤：维护栈的单调性
-        # 当栈不为空，并且栈顶元素（索引对应的值）小于等于当前元素
-        # 就意味着栈顶元素不可能是当前元素或左边元素的‘下一个更大元素’，可以安全弹出
-        while stack and nums[stack[-1]] &lt;= nums[i]:
-            stack.pop()
-        
-        # 如果栈不为空，栈顶索引对应的元素就是当前元素右边的第一个更大元素
-        if stack:
-            result[i] = nums[stack[-1]]
-        
-        # 将当前索引入栈，作为左边元素的候选‘更大元素’
-        stack.append(i)
-    
-    return result
-
-# 测试用例
-if __name__ == "__main__":
-    # 测试用例1：标准情况
-    test1 = [2, 1, 2, 4, 3]
-    print(f"输入: {test1}")
-    print(f"输出: {nextGreaterElement(test1)}")  # 期望：[4, 2, 4, -1, -1]
-    
-    # 测试用例2：单调递减序列
-    test2 = [5, 4, 3, 2, 1]
-    print(f"\n输入: {test2}")
-    print(f"输出: {nextGreaterElement(test2)}")  # 期望：[-1, -1, -1, -1, -1]
-    
-    # 测试用例3：单调递增序列
-    test3 = [1, 2, 3, 4, 5]
-    print(f"\n输入: {test3}")
-    print(f"输出: {nextGreaterElement(test3)}")  # 期望：[2, 3, 4, 5, -1]
-    
-    # 测试用例4：含有重复元素
-    test4 = [1, 1, 1, 1]
-    print(f"\n输入: {test4}")
-    print(f"输出: {nextGreaterElement(test4)}")  # 期望：[-1, -1, -1, -1]</code></pre>
-<h3>C++ 对照</h3>
-<pre><code>#include &lt;vector&gt;
-#include &lt;stack&gt;
-#include &lt;iostream&gt;
-
-std::vector&lt;int&gt; nextGreaterElement(std::vector&lt;int&gt;&amp; nums) {
-    int n = nums.size();
-    std::stack&lt;int&gt; stack; // 存储索引
-    std::vector&lt;int&gt; result(n, -1); // 初始化结果数组
-    
-    // 从右向左遍历
-    for (int i = n - 1; i &gt;= 0; --i) {
-        // 维护单调栈（弹出比当前元素小的栈顶）
-        while (!stack.empty() &amp;&amp; nums[stack.top()] &lt;= nums[i]) {
-            stack.pop();
-        }
-        
-        // 获取结果
-        if (!stack.empty()) {
-            result[i] = nums[stack.top()];
-        }
-        
-        // 当前索引入栈
-        stack.push(i);
-    }
-    
-    return result;
-}
-
-// 测试函数
-int main() {
-    std::vector&lt;int&gt; test1 = {2, 1, 2, 4, 3};
-    std::vector&lt;int&gt; res1 = nextGreaterElement(test1);
-    
-    std::cout &lt;&lt; "输入: [2, 1, 2, 4, 3]" &lt;&lt; std::endl;
-    std::cout &lt;&lt; "输出: ";
-    for (int num : res1) {
-        std::cout &lt;&lt; num &lt;&lt; " ";
-    }
-    std::cout &lt;&lt; "\n" &lt;&lt; std::endl;
-    
-    // 可以添加更多测试...
-    return 0;
-}</code></pre>
-<h3>复杂度分析</h3>
-<p>**时间复杂度：O(n)**。虽然代码中有两层循环（for 和 while），但每个元素最多入栈一次、出栈一次。总的栈操作次数不超过 2n，因此均摊下来时间复杂度是线性的。
-
-**空间复杂度：O(n)**。最坏情况下，栈中需要存储所有 n 个元素的索引（例如当输入数组是单调递减序列时）。结果数组也占用 O(n) 的空间。</p>
-<h3>易错点</h3>
-<ol>
-<li>**栈中存值而非索引**：初学者可能直接存入元素值，这在‘下一个更大元素’问题中看似可行，但丧失了灵活性。当问题需要返回索引、处理循环数组或结合其他信息时，存索引是必须的。修复：**养成存索引的习惯**，通过 `nums[stack[-1]]` 获取值。</li>
-<li>**遍历方向错误**：试图从左向右遍历并构建单调栈。这会导致无法正确找到右边第一个更大元素，因为栈中存的是左边的元素。修复：**牢记‘下一个更大’问题，栈用于缓存右边的元素，因此必须从右向左遍历**。</li>
-<li>**循环条件 `&lt;=` 与 `&lt;` 混淆**：在维护单调递减栈时，条件应为 `while stack and nums[stack[-1]] &lt;= nums[i]`。如果写成 `&lt;`，栈中可能保留相等的元素，虽然不影响本题答案（下一个**更大**），但破坏了栈的严格单调性，可能影响基于此模型的其他问题（如计算跨度）。修复：根据问题定义明确是严格单调还是非严格单调。本题要求‘更大’，相等不算，所以弹出条件包含等于。</li>
-</ol>
-</article>]]></content:encoded>
-      <pubDate>Tue, 30 Jun 2026 07:46:07 +0800</pubDate>
-      <guid isPermaLink="false">algorithms/daily/2026-06-30</guid>
-    </item>
-<item>
-      <title>2026-06-29 每日算法专题</title>
-      <link>algorithms/daily/2026-06-29.html</link>
-      <description><![CDATA[如何在无序数组中，高效地找出和为目标值的两个数。]]></description>
-      <content:encoded><![CDATA[<article>
-<h2>如何在无序数组中，高效地找出和为目标值的两个数。</h2>
-<h3>直觉理解</h3>
-<p>想象一下，你有一堆写着不同数字的卡片，你的任务是从中找出两张，让它们的和等于一个特定的数，比如10。最笨的方法是什么？拿着第一张卡片，然后一张一张地跟后面所有卡片去试，看哪两张加起来是10；接着再拿起第二张卡片，重复这个过程。这就像在电话簿里找某个人的号码，你从头到尾一页页翻，效率非常低。更聪明的做法是，当你看到一张卡片数字是 `3` 时，你立刻知道，你需要找的另一张卡片一定是 `7`（因为 10-3=7）。这时，你不需要再一张张翻电话簿了，你希望有一个魔法索引，能直接告诉你 `7` 在哪里，或者至少能立刻确认它存不存在。哈希表（在Python里就是字典）就是这个魔法索引。你每看一张卡片，就把它和它对应的位置（索引）记到这个索引本上。这样，当你需要找 `7` 时，你只需在索引本里一查，如果查到了，就说明找到了；如果没查到，说明这张卡片暂时还没出现过，你只需要继续处理下一张卡片。这个过程，本质上是用一个额外的空间（索引本）来换取查找时间的巨大缩短，这就是“用空间换时间”的经典思路。</p>
-<h3>算法思路</h3>
-<p>解题框架可以分为两步：暴力枚举和哈希表优化。
-
-**步骤一：暴力枚举（理解基础问题）**
-最直接的想法是双重循环。我们遍历数组中的每一个元素 `nums[i]`，对于每个 `nums[i]`，再遍历它后面的所有元素 `nums[j]`（其中 `j &gt; i`），检查 `nums[i] + nums[j] == target` 是否成立。如果成立，就返回它们的下标 `[i, j]`。这个方法时间复杂度是 O(n²)，对于数据量大的数组来说太慢了。
-
-**步骤二：哈希表优化（一次遍历）**
-我们观察到，暴力解法中，对于每个 `nums[i]`，我们都在其后面的序列里寻找一个值为 `target - nums[i]` 的数。这个寻找过程是 O(n) 的，这正是瓶颈所在。哈希表可以帮我们把这个寻找过程降到 O(1)。
-具体做法是：我们遍历数组，对于当前元素 `nums[i]`，先计算它的“伴侣”值 `complement = target - nums[i]`。然后在哈希表（字典）里查找这个 `complement` 是否存在。如果存在，说明我们之前已经遇到过这个伴侣值，直接返回它的下标和当前下标 `i`。如果不存在，就把当前元素 `nums[i]` 作为键，它的下标 `i` 作为值，存入哈希表，然后继续遍历下一个元素。这样，我们只需要一次遍历，就能解决问题。</p>
-<h3>Python 示例</h3>
-<pre><code>def twoSum(nums, target):
-    """
-    使用哈希表在一次遍历内解决问题
-    """
-    # 创建一个哈希表（字典），用于存储已经遍历过的数字及其索引
-    hash_map = {}
-    # 遍历数组，同时获取索引和值
-    for i, num in enumerate(nums):
-        # 计算当前数字需要的“伴侣”数字
-        complement = target - num
-        # 检查这个伴侣数字是否已经在哈希表中
-        if complement in hash_map:
-            # 如果找到了，直接返回两个索引
-            return [hash_map[complement], i]
-        # 如果没找到，将当前数字及其索引存入哈希表
-        hash_map[num] = i
-    # 根据题目保证，总会有解，所以这里理论上不会执行到
-    return []
-
-# 测试用例
-if __name__ == "__main__":
-    # 测试案例1
-    nums1 = [2, 7, 11, 15]
-    target1 = 9
-    print(f"输入: {nums1}, 目标: {target1}")
-    print(f"输出: {twoSum(nums1, target1)}") # 期望: [0, 1]
-    
-    # 测试案例2
-    nums2 = [3, 2, 4]
-    target2 = 6
-    print(f"\n输入: {nums2}, 目标: {target2}")
-    print(f"输出: {twoSum(nums2, target2)}") # 期望: [1, 2]
-    
-    # 测试案例3：注意下标不能重复使用同一个元素
-    nums3 = [3, 3]
-    target3 = 6
-    print(f"\n输入: {nums3}, 目标: {target3}")
-    print(f"输出: {twoSum(nums3, target3)}") # 期望: [0, 1]</code></pre>
-<h3>C++ 对照</h3>
-<pre><code>#include &lt;vector&gt;
-#include &lt;unordered_map&gt;
-using namespace std;
-
-class Solution {
-public:
-    vector&lt;int&gt; twoSum(vector&lt;int&gt;&amp; nums, int target) {
-        // 创建一个哈希表，键是数字，值是它的索引
-        unordered_map&lt;int, int&gt; hash_map;
-        // 遍历数组
-        for (int i = 0; i &lt; nums.size(); i++) {
-            // 计算伴侣值
-            int complement = target - nums[i];
-            // 在哈希表中查找伴侣值
-            auto it = hash_map.find(complement);
-            if (it != hash_map.end()) {
-                // 如果找到，返回结果
-                return {it-&gt;second, i};
-            }
-            // 如果没找到，将当前数字和索引存入哈希表
-            hash_map[nums[i]] = i;
-        }
-        // 题目保证有解，这里返回空向量（作为占位）
-        return {};
-    }
-};</code></pre>
-<h3>复杂度分析</h3>
-<p>时间复杂度：O(n)。我们只对数组进行了一次遍历，n是数组的长度。在循环中，哈希表的查找和插入操作平均时间复杂度都是O(1)。
-空间复杂度：O(n)。在最坏的情况下，我们需要将数组中的每一个元素都存入哈希表中，直到找到解或遍历结束，因此哈希表最多需要存储 n 个元素。这就是用空间换时间的典型代价。</p>
-<h3>易错点</h3>
-<ol>
-<li>**陷阱1：同一元素重复使用。** 错误做法是在遍历时，先将当前元素放入哈希表，然后再去查找伴侣值。例如输入`[3,2,4]`,目标`6`，当`i=0`时，`num=3`，伴侣`3`，哈希表中刚刚放入了`(3,0)`，就会错误地返回`[0,0]`。**修复方法：** 必须遵循“先查找，后插入”的顺序。先检查伴侣值是否存在于之前元素（不包括当前元素）构成的哈希表中，找不到再将当前元素插入。</li>
-<li>陷阱2：不处理哈希表的初始状态。** 对于输入`[3,3]`,目标`6`，第一个`3`遍历时，哈希表为空，找不到伴侣`3`，然后插入`(3,0)`。第二个`3`遍历时，就能在哈希表中找到第一个`3`及其索引`0`，正确返回`[0,1]`。如果代码逻辑错误，可能会误判。</li>
-<li>陷阱3：未考虑存在重复元素的情况。** 虽然题目保证有且只有一个答案，但数组中可能存在多个相同的数字。我们的解法通过存储索引，天然地可以处理这种情况，因为每个索引都是唯一的。关键点在于我们存的是索引，而不是简单地标记数字是否存在。</li>
-</ol>
-</article>]]></content:encoded>
-      <pubDate>Mon, 29 Jun 2026 07:46:16 +0800</pubDate>
-      <guid isPermaLink="false">algorithms/daily/2026-06-29</guid>
-    </item>
-<item>
-      <title>2026-06-28 每日算法专题</title>
-      <link>algorithms/daily/2026-06-28.html</link>
-      <description><![CDATA[如何正确设置二分查找的区间定义（开闭）和更新规则，以避免死循环和越界，高效地查找左右边界？]]></description>
-      <content:encoded><![CDATA[<article>
-<h2>如何正确设置二分查找的区间定义（开闭）和更新规则，以避免死循环和越界，高效地查找左右边界？</h2>
-<h3>直觉理解</h3>
-<p>二分查找的本质，是利用数据已排序的特性，通过每次将搜索范围减半来快速定位目标。就像在电话簿里找人，你不会从头翻到尾，而是先翻到中间，看名字比目标大还是小，从而决定看前半本还是后半本。但“中间”有好几个：这个人可能刚好出现多次，你可能想找第一个或最后一个。这时，“边界”问题就来了。关键在于定义一个“循环不变量”：在整个查找过程中，始终维护一个保证包含答案的“范围”，并用明确的规则（比如左闭右闭或左闭右开）来描述它。每次循环，我们都通过这个规则安全地“切掉”不可能的一半，直到范围缩小到一个点。理解并固定一种区间定义，是避免“越界”和“死循环”的根本。</p>
-<h3>算法思路</h3>
-<p>解决二分查找边界问题，核心是统一区间定义并保持逻辑一致。我们通常采用两种模板：左闭右闭 `[left, right]` 和左闭右开 `[left, right)`。以下是基于“左闭右闭”模板的通用解题框架。
-1.  **初始化**：设定搜索区间。对于在数组中查找某个值的左边界（第一个出现的位置），`left = 0`，`right = len(nums) - 1`。注意 `right` 是有效下标。
-2.  **循环条件**：`while left &lt;= right`。这是因为当 `left == right` 时，区间 `[left, right]` 仍包含一个有效元素，需要检查。
-3.  **计算中点**：`mid = left + (right - left) // 2`。这种方式避免了 `(left + right)` 可能的整数溢出（在C++等语言中尤为重要）。
-4.  **比较与更新**：这是查找边界的关键。
-    *   **查找左边界**：若 `nums[mid] &gt;= target`，说明左边界可能在 `mid` 或其左侧，因此令 `right = mid - 1`。这里 `right` 更新为 `mid-1`，是因为 `mid` 已经被检查过，并且我们继续向左搜索更小的索引。即使 `nums[mid] == target`，我们也不停止，因为我们要找的是第一个。
-    *   **查找右边界**：若 `nums[mid] &lt;= target`，说明右边界可能在 `mid` 或其右侧，因此令 `left = mid + 1`。
-5.  **终止与结果**：循环结束时，`left &gt; right`。对于**查找左边界**，`left` 指向第一个大于等于 `target` 的位置。需要额外判断该位置是否越界或值不等于 `target`。对于**查找右边界**，`right` 指向最后一个小于等于 `target` 的位置。
-总结：固定区间定义，用 `&lt;=` 作为循环条件，并严格遵守“收缩区间时，将检查过的 `mid` 排除在外”的原则，是构建正确模板的基石。</p>
-<h3>Python 示例</h3>
-<pre><code>from typing import List
-
-def search_left_boundary(nums: List[int], target: int) -&gt; int:
-    """
-    查找target在升序数组nums中第一次出现的索引（左边界）。
-    如果不存在，返回它本应插入的位置（即第一个大于target的索引）。
-    使用左闭右闭区间 [left, right]。
-    """
-    left, right = 0, len(nums) - 1
-    # 循环不变量：左边界（第一个等于target的位置）一定在 [left, right] 中，或不存在（left 将指向插入点）。
-    while left &lt;= right:
-        # 防止溢出（在Python中不是问题，但作为好习惯保留）
-        mid = left + (right - left) // 2
-        if nums[mid] &gt;= target:
-            # mid 可能是左边界，但我们要找更左的，所以收缩右边界。
-            right = mid - 1
-        else: # nums[mid] &lt; target
-            # mid 肯定在左边界左边，收缩左边界。
-            left = mid + 1
-    
-    # 循环结束时，left 是第一个 &gt;= target 的位置。
-    # 检查 left 是否在数组范围内且等于 target。
-    if left &lt; len(nums) and nums[left] == target:
-        return left
-    else:
-        # 未找到，left 即为插入点（满足题目常见要求）。
-        return left
-
-# 另一个常见变体：查找小于target的最大元素索引
-def find_last_less_than(nums: List[int], target: int) -&gt; int:
-    """
-    查找数组中最后一个严格小于target的元素的索引。
-    如果不存在（所有元素都&gt;=target），返回-1。
-    同样使用左闭右闭区间。
-    """
-    left, right = 0, len(nums) - 1
-    result = -1
-    while left &lt;= right:
-        mid = left + (right - left) // 2
-        if nums[mid] &lt; target:
-            # mid 可能是答案，记录它，并继续向右寻找更大的。
-            result = mid
-            left = mid + 1
-        else: # nums[mid] &gt;= target
-            # 不符合要求，向左收缩。
-            right = mid - 1
-    return result
-
-# 测试用例
-if __name__ == "__main__":
-    nums = [1, 2, 2, 2, 3, 4, 5]
-    
-    # 测试查找左边界
-    print("--- 查找左边界 ---")
-    print(f"数组: {nums}")
-    print(f"目标 2 的左边界索引: {search_left_boundary(nums, 2)}") # 期望输出: 1
-    print(f"目标 3 的左边界索引: {search_left_boundary(nums, 3)}") # 期望输出: 4
-    print(f"目标 0 (不存在) 的左边界索引: {search_left_boundary(nums, 0)}") # 期望输出: 0 (插入点)
-    print(f"目标 6 (不存在) 的左边界索引: {search_left_boundary(nums, 6)}") # 期望输出: 7 (插入点，等于数组长度)
-    
-    # 测试查找小于target的最大索引
-    print("\n--- 查找小于目标的最大值 ---")
-    print(f"数组: {nums}")
-    print(f"小于 3 的最大元素索引: {find_last_less_than(nums, 3)}") # 期望输出: 3 (元素2)
-    print(f"小于 1 的最大元素索引: {find_last_less_than(nums, 1)}") # 期望输出: -1 (不存在)</code></pre>
-<h3>C++ 对照</h3>
-<pre><code>#include &lt;iostream&gt;
-#include &lt;vector&gt;
-using namespace std;
-
-// 查找左边界（第一个等于target的位置）
-int searchLeftBoundary(vector&lt;int&gt;&amp; nums, int target) {
-    int left = 0, right = nums.size() - 1;
-    while (left &lt;= right) {
-        int mid = left + (right - left) / 2; // 防止溢出
-        if (nums[mid] &gt;= target) {
-            right = mid - 1;
-        } else {
-            left = mid + 1;
-        }
-    }
-    // 循环结束，left是第一个&gt;=target的位置
-    if (left &lt; nums.size() &amp;&amp; nums[left] == target) {
-        return left;
-    } else {
-        return left; // 插入点
-    }
-}
-
-// 查找小于target的最大元素索引
-int findLastLessThan(vector&lt;int&gt;&amp; nums, int target) {
-    int left = 0, right = nums.size() - 1;
-    int result = -1;
-    while (left &lt;= right) {
-        int mid = left + (right - left) / 2;
-        if (nums[mid] &lt; target) {
-            result = mid; // 记录候选答案
-            left = mid + 1; // 向右找更大的
-        } else {
-            right = mid - 1;
-        }
-    }
-    return result;
-}
-
-int main() {
-    vector&lt;int&gt; nums = {1, 2, 2, 2, 3, 4, 5};
-    
-    cout &lt;&lt; "--- 查找左边界 ---" &lt;&lt; endl;
-    cout &lt;&lt; "目标 2 的左边界索引: " &lt;&lt; searchLeftBoundary(nums, 2) &lt;&lt; endl; // 1
-    cout &lt;&lt; "目标 3 的左边界索引: " &lt;&lt; searchLeftBoundary(nums, 3) &lt;&lt; endl; // 4
-    
-    cout &lt;&lt; "\n--- 查找小于目标的最大值 ---" &lt;&lt; endl;
-    cout &lt;&lt; "小于 3 的最大元素索引: " &lt;&lt; findLastLessThan(nums, 3) &lt;&lt; endl; // 3
-    
-    return 0;
-}</code></pre>
-<h3>复杂度分析</h3>
-<p>时间复杂度：O(log n)。每次迭代都将搜索区间减半，直到区间为空。对于一个长度为 n 的数组，最多需要 log₂(n) 次迭代，因此时间复杂度是对数级别的，非常高效。
-空间复杂度：O(1)。算法只使用了常数级别的额外空间（几个变量 left, right, mid, result），与输入数组的大小无关。</p>
-<h3>易错点</h3>
-<ol>
-<li>**区间定义与循环条件不匹配**：错误示例：定义区间为 `[left, right)`（右开），却使用 `while left &lt;= right` 作为循环条件。这会导致在 `left == right` 时，区间内其实没有元素，却继续循环，可能引发越界或死循环。**修复**：如果采用左闭右开区间 `[left, right)`，循环条件应为 `while left &lt; right`。</li>
-<li>**计算中点的方式错误**：错误示例：使用 `mid = (left + right) / 2`。在C++、Java等语言中，当 `left` 和 `right` 都很大时，`left + right` 可能导致整数溢出，产生负数，从而引发未定义行为或错误的 `mid` 值。**修复**：始终使用 `mid = left + (right - left) / 2` 来计算中点。</li>
-<li>**查找边界时，更新规则错误导致死循环**：错误示例：在查找左边界时，当 `nums[mid] == target` 时执行 `right = mid`。在 `left &lt; right` 且 `mid == left` (例如 `left=0, right=1`) 的情况下，这会导致 `right` 始终被赋值为 `left`，`left` 无法推进，陷入死循环。**修复**：坚持“收缩区间时将检查过的 `mid` 排除在外”的原则。在左闭右闭区间下，当 `nums[mid] &gt;= target` 时，执行 `right = mid - 1`；当 `nums[mid] &lt;= target` 时，执行 `left = mid + 1`。</li>
-</ol>
-</article>]]></content:encoded>
-      <pubDate>Sun, 28 Jun 2026 07:46:16 +0800</pubDate>
-      <guid isPermaLink="false">algorithms/daily/2026-06-28</guid>
-    </item>
-<item>
-      <title>2026-06-27 每日算法专题</title>
-      <link>algorithms/daily/2026-06-27.html</link>
-      <description><![CDATA[如何用动态规划解决爬楼梯问题，并理解状态定义、转移方程和空间优化？]]></description>
-      <content:encoded><![CDATA[<article>
-<h2>如何用动态规划解决爬楼梯问题，并理解状态定义、转移方程和空间优化？</h2>
-<h3>直觉理解</h3>
-<p>爬楼梯问题就像你站在楼梯底部，每一步只能走1阶或2阶，想知道有多少种不同方式到达顶端。这本质上是一个路径计数问题：当你站在第i阶时，最后一步必然是从第i-1阶（走1步）或第i-2阶（走2步）来的，所以到达第i阶的方式数就是这两种情况之和。这种“当前状态由之前状态决定”的思维，正是动态规划的核心——它把大问题分解成重叠子问题，通过记录子问题的解来避免重复计算。想象一下，如果你用递归暴力枚举，会重复计算很多中间状态；而动态规划用一张表格（数组）存下每个子问题的答案，像填表格一样逐步推导出最终结果。爬楼梯问题之所以经典，是因为它直观展示了动态规划的三个关键：定义状态（如dp[i]表示到第i阶的方式）、状态转移（dp[i] = dp[i-1] + dp[i-2]）、以及初始化（起点的设置）。更进阶地，我们发现计算dp[i]只依赖前两个状态，所以可以用两个变量滚动更新，实现空间优化，这就像你只需要记住最近两步的结果，而不需要保存整个路径历史。</p>
-<h3>算法思路</h3>
-<p>解题框架分四步：
-1. **状态定义**：设dp[i]表示爬到第i阶楼梯的总方式数。这里i从0开始，dp[0]表示地面（起点），通常设为1（空操作的一种方式）。
-2. **状态转移方程**：由于最后一步只能是1阶或2阶，所以dp[i] = dp[i-1] + dp[i-2]。这个方程体现了问题的最优子结构——当前解由子问题解组合而成。
-3. **初始化**：确定边界条件。当n=0时，只有一种方式（不动），所以dp[0]=1；当n=1时，只有一种方式（走1步），所以dp[1]=1。注意，有些定义会从n=1开始，但统一从0开始更利于代码处理。
-4. **计算顺序与优化**：基础版本从i=2到n顺序计算dp数组，时间O(n)，空间O(n)。但观察转移方程，dp[i]只依赖dp[i-1]和dp[i-2]，因此可以用两个变量滚动更新：设a表示dp[i-2]，b表示dp[i-1]，每次计算新值c = a + b，然后更新a, b = b, c。这降空间到O(1)，像斐波那契数列的迭代解法。
-实现时，先写基础版本验证正确性，再优化空间。关键是确保循环范围正确：从2开始迭代到n，因为前两个状态已初始化。如果n较小（如0或1），直接返回初始值，避免数组越界。</p>
-<h3>Python 示例</h3>
-<pre><code># 爬楼梯问题的动态规划解法
-# 基础版本：使用数组记录所有状态
-
-def climb_stairs(n: int) -&gt; int:
-    """
-    计算爬到第n阶楼梯的方式数（每次可爬1或2阶）
-    :param n: 楼梯总阶数
-    :return: 方式数
-    """
-    if n &lt;= 1:
-        return 1  # 边界条件：0或1阶时只有一种方式
-    # 初始化dp数组，dp[i]表示到第i阶的方式数
-    dp = [0] * (n + 1)
-    dp[0] = 1  # 地面，一种方式（不动）
-    dp[1] = 1  # 第一阶，一种方式（走1步）
-    # 从第2阶开始递推
-    for i in range(2, n + 1):
-        dp[i] = dp[i-1] + dp[i-2]  # 状态转移：从i-1或i-2阶过来
-    return dp[n]
-
-# 空间优化版本：使用两个变量滚动更新
-
-def climb_stairs_optimized(n: int) -&gt; int:
-    """
-    空间优化版本，时间复杂度O(n)，空间复杂度O(1)
-    """
-    if n &lt;= 1:
-        return 1
-    a, b = 1, 1  # a表示dp[i-2]，b表示dp[i-1]
-    for i in range(2, n + 1):
-        # 计算当前值，并更新状态
-        a, b = b, a + b  # 滚动：新a是旧b，新b是旧a+旧b
-    return b  # 循环结束后b即为dp[n]
-
-# 测试用例
-if __name__ == "__main__":
-    test_cases = [0, 1, 2, 3, 5, 10]
-    for n in test_cases:
-        result1 = climb_stairs(n)
-        result2 = climb_stairs_optimized(n)
-        print(f"n={n}: 基础版本={result1}, 优化版本={result2}")
-    # 预期输出：
-    # n=0: 1, 1
-    # n=1: 1, 1
-    # n=2: 2, 2
-    # n=3: 3, 3
-    # n=5: 8, 8
-    # n=10: 89, 89</code></pre>
-<h3>C++ 对照</h3>
-<pre><code>// 爬楼梯问题的C++对照代码
-#include &lt;iostream&gt;
-#include &lt;vector&gt;
-using namespace std;
-
-// 基础版本：动态规划数组解法
-int climb_stairs(int n) {
-    if (n &lt;= 1) return 1;
-    vector&lt;int&gt; dp(n + 1, 0);
-    dp[0] = 1;  // 地面
-    dp[1] = 1;  // 第一阶
-    for (int i = 2; i &lt;= n; i++) {
-        dp[i] = dp[i-1] + dp[i-2];  // 状态转移
-    }
-    return dp[n];
-}
-
-// 空间优化版本：滚动变量解法
-int climb_stairs_optimized(int n) {
-    if (n &lt;= 1) return 1;
-    int a = 1, b = 1;  // a表示dp[i-2], b表示dp[i-1]
-    for (int i = 2; i &lt;= n; i++) {
-        int c = a + b;  // 计算当前值
-        a = b;          // 更新a为上一个b
-        b = c;          // 更新b为当前值
-    }
-    return b;
-}
-
-// 主函数测试
-int main() {
-    int test_cases[] = {0, 1, 2, 3, 5, 10};
-    for (int n : test_cases) {
-        int res1 = climb_stairs(n);
-        int res2 = climb_stairs_optimized(n);
-        cout &lt;&lt; "n=" &lt;&lt; n &lt;&lt; ": 基础版本=" &lt;&lt; res1 &lt;&lt; ", 优化版本=" &lt;&lt; res2 &lt;&lt; endl;
-    }
-    return 0;
-}</code></pre>
-<h3>复杂度分析</h3>
-<p>基础版本：时间复杂度为O(n)，因为需要从2到n遍历一次计算每个状态；空间复杂度为O(n)，使用了长度为n+1的数组存储所有状态。优化版本：时间复杂度保持O(n)，循环次数不变；空间复杂度降为O(1)，只用两个变量滚动更新，无需数组。这种优化基于状态转移的局部性——每个状态只依赖前两个历史状态，类似斐波那契数列的迭代解法，是动态规划中常见的空间优化技巧。</p>
-<h3>易错点</h3>
-<ol>
-<li>边界条件处理错误：当n=0或1时，应返回1，但有些人误认为地面没有方式而返回0。修复方法：在代码开头显式判断n&lt;=1并返回1，或确保dp[0]和dp[1]正确初始化。</li>
-<li>状态定义混淆：dp[i]的含义不清晰，例如误以为dp[i]表示从第i阶出发的方式数。修复方法：在注释中明确“dp[i]表示到达第i阶的总方式数”，并在转移方程中保持一致。</li>
-<li>空间优化时变量更新顺序错误：在滚动更新中，直接写a = b; b = a + b; 会导致a被提前覆盖，计算错误。修复方法：使用临时变量或Python的元组赋值（a, b = b, a + b）确保同时更新。</li>
-</ol>
-</article>]]></content:encoded>
-      <pubDate>Sat, 27 Jun 2026 07:46:20 +0800</pubDate>
-      <guid isPermaLink="false">algorithms/daily/2026-06-27</guid>
     </item>
   </channel>
 </rss>
