@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月4日 日报 — 2026-08-04</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月4日 日报</h1>
+<div class='date'>2026-08-04</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>FTC 与多州就约翰迪尔维修权和解</li>
+<li>美中经贸代表举行会晤</li>
+<li>OpenAI 发布实时语音交互系统 GPT-Live</li>
+<li>美国贸易代表办公室就中国海运、物流和造船领域 301 调查举行公开听证</li>
+<li>参议院确认格里尔出任美国贸易代表</li>
+<li>黑海海滩无人机袭击致死伤</li>
+<li>USTR 就中国半导体产业相关 301 调查举行公开听证</li>
+<li>FTC 就 Caremark 达成重大和解，结束第二起药品中间商反垄断案</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. FTC 与多州就约翰迪尔维修权和解</h3>
+<p>8 月 4 日，FTC 与多个州就 Deere &amp; Company 达成和解，公开材料显示这起案件围绕农民维修权展开。此前相关争议主要停留在监管和诉讼层面，此次和解把焦点收束到设备维修权限的实际安排上。对农民与农机维修服务商来说，后续最直接的影响是维修环节的可操作空间将按和解条款变化。</p>
+</div>
+<div class='event'>
+<h3>2. 参议院确认格里尔出任美国贸易代表</h3>
+<p>8 月 4 日，美国参议院确认 Jamieson Greer 出任美国贸易代表，USTR 公开材料显示这一人事任命已经完成。此前该职位处于提名与等待确认阶段，此次确认使贸易代表办公室重新进入正式履职状态。对白宫和国会而言，接下来与关税、贸易谈判和相关政策执行直接对接的将是这名新任贸易代表。</p>
+</div>
+<div class='event'>
+<h3>3. 密歇根州民主党参议员初选分裂党内路线</h3>
+<p>8 月 4 日，PBS NewsHour 的报道聚焦密歇根州民主党参议员初选，并称这场对决正在分化民主党内部的方向判断。此前党内路线争论更多停留在抽象立场上，此次初选把分歧具体压到候选人竞争上。对密歇根州民主党选民来说，接下来要面对的是在两种党内路线之间作出选择。</p>
+</div>
+<div class='event'>
+<h3>4. 特朗普签署行政令成立军人配偶委员会</h3>
+<p>8 月 3 日，PBS NewsHour 画面显示特朗普签署行政令，成立军人配偶委员会。此前相关安排并未出现在这份输入材料中，此次行政令把军人配偶议题纳入白宫正式机制。对军人家庭和相关联邦部门来说，后续工作将围绕这个新委员会展开。</p>
+</div>
+<div class='event'>
+<h3>5. 司法部命令后，共和党人转而支持布兰奇</h3>
+<p>8 月 4 日，报道显示，在美国司法部发布命令后，两名共和党参议员撤回反对，转而支持 Blanche。此前相关争议集中在一个有争议的 18 亿美元基金上，此次立场变化把推进阻力从公开反对变成了党内支持。对参议院和司法部来说，接下来围绕该基金的争论重点会落到是否继续推进取消。</p>
+</div>
+<div class='event'>
+<h3>6. 布兰奇承诺取消“反武器化基金”后获共和党支持 <span class="followup">持续跟踪</span></h3>
+<p>8 月 3 日，PBS NewsHour 报道称，Todd Blanche 在承诺取消所谓“反武器化基金”后，争取到共和党持保留意见议员的支持。此前他面对的是党内阻力，此次表态把争论从是否支持转为是否接受取消方案。对共和党参议员和司法部相关安排来说，下一步焦点将集中在该基金是否被真正撤销。</p>
+</div>
+<div class='event'>
+<h3>7. 众议院伦理委员会建议谴责 Chuck Edwards</h3>
+<p>8 月 4 日，NPR Politics 报道称，众议院伦理委员会在骚扰指控后建议对 Chuck Edwards 进行谴责。此前相关事项仍处于调查和审议阶段，此次建议把问题从指控层面推进到正式纪律处分程序。对众议院和 Edwards 所在选区来说，接下来将关注众议院是否采纳这一建议。</p>
+</div>
+<div class='event'>
+<h3>8. 莫雷诺呼吁前女婿米勒辞职</h3>
+<p>8 月 4 日，PBS NewsHour 报道称，参议员 Moreno 呼吁其前女婿、众议员 Miller 在家暴指控下辞职。此前围绕米勒的压力主要来自外部舆论，此次公开表态把压力直接推到共和党内部。对俄亥俄州共和党和众议院席位安排来说，接下来要面对的是米勒是否继续留任。</p>
+</div>
+<ul class='headline-list'>
+<li>众议院法案《Protection of Women and Girls in Sports Act of 2025》处于跟踪更新。</li>
+<li>FTC 支持俄亥俄州最高法院削弱 ABA 法学院认证垄断的提案。</li>
+<li>Pirro 因 Reflecting Pool 案件处理方式与特朗普出现分歧。</li>
+<li>美国报告与寄生虫感染相关的爆发已出现前两例死亡。</li>
+<li>参院领导人达成协议，避免大选前政府关门。</li>
+<li>美国通报环孢子虫疫情首批两例死亡，死者均有基础病。</li>
+<li>GovTrack 法案页展示 SAVE Act 的当前跟踪信息，未体现新增事实。</li>
+<li>GovTrack 法案页展示终止教育部法案的跟踪信息。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 美中经贸代表举行会晤</h3>
+<p>8 月 4 日，美国贸易代表办公室发布通报称，Ambassador Jamieson Greer 与中国副总理何立峰会晤，议题涉及中美经贸沟通。此前双方相关接触多停留在外界推测，此次通报把接触对象和沟通主题明确写入公开材料。对外界而言，这为中美经贸部门后续是否继续保持沟通提供了一个可核实的官方节点。</p>
+</div>
+<div class='event'>
+<h3>2. 黑海海滩无人机袭击致死伤 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，Al Jazeera 转载的报道显示，一架无人机撞击俄罗斯黑海海滩，造成至少 7 人死亡。此前同类袭击多被分散在不同战线叙述中，此次事件把俄方海滨民用区域的伤亡情况集中呈现出来。对俄罗斯黑海沿岸居民和当地安全部署来说，海滩等开放场所的防护压力因此被直接推到前台。</p>
+</div>
+<div class='event'>
+<h3>3. 特朗普再警告伊朗谈判是最后机会 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，特朗普称与伊朗的谈判是达成协议的“最后机会”，相关表述也被其他媒体同步转述。此前外界对美伊是否在谈判上的说法并不一致，此次公开警告把双方接触的紧迫性直接摆到台面上。对伊朗、美国及关注中东局势的外交圈而言，这谈判空间被压缩到更明确的时间窗口。</p>
+</div>
+<div class='event'>
+<h3>4. 联合国称以军周末在加沙致死二十余人并侵犯黎巴嫩领空 <span class="followup">持续跟踪</span></h3>
+<p>8 月 3 日，联合国新闻称，以军周末在加沙造成二十余人死亡，并多次侵犯黎巴嫩领空。此前加沙和黎巴嫩方向的冲突往往分开叙述，这则材料把两条战线放进同一份战况描述中。对加沙平民、黎巴嫩边境居民以及相关外交斡旋方来说，冲突外溢到邻国空域的风险更直接。</p>
+</div>
+<div class='event'>
+<h3>5. 以色列最高法院审理 UNRWA 禁令挑战</h3>
+<p>8 月 4 日，Al Jazeera 的报道显示，以色列最高法院正在审理对 UNRWA 禁止令的合宪性质疑。此前该争议停留在立法和行政层面，此次进入最高法院审理，说明围绕 UNRWA 的法律争点已被正式带到司法程序中。对巴勒斯坦援助体系、以色列政府和国际人道机构而言，接下来关注点转向法院如何处理这一禁令。</p>
+</div>
+<div class='event'>
+<h3>6. 中东油轮安全威胁被指为战争以来最严重 <span class="followup">持续跟踪</span></h3>
+<p>8 月 3 日，BBC World 引述分析人士称，中东替代航线上的油轮面临的威胁是自伊朗战争开始以来最严重的。此前航运风险多被拆分为单点事件，这次表述把油轮安全放进更长的冲突背景里。对航运公司、保险方和依赖中东航线的企业来说，海上通行成本和安全安排都被推到更高优先级。</p>
+</div>
+<div class='event'>
+<h3>7. 乌方无人机袭击黑海度假区和克里米亚致死伤 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，《卫报》转述俄方说法称，乌克兰无人机袭击黑海度假区和克里米亚，造成 11 人死亡。此前类似伤亡消息多分散在不同媒体和不同地点，这则报道把俄方指认的袭击对象与伤亡数字集中列出。对黑海沿岸旅游区、克里米亚当地居民以及俄乌冲突中的后方安全态势，这会继续加重防空和反无人机部署压力。</p>
+</div>
+<ul class='headline-list'>
+<li>特朗普称霍尔木兹海峡或很快重开，伊朗否认正在与美方谈判。</li>
+<li>欧盟在休达移民越境后呼吁加强边境管控。</li>
+<li>巴勒斯坦方面称西岸出现新的非法以色列前哨据点。</li>
+<li>泽连斯基以总统令解除乌克兰驻美国大使职务。</li>
+<li>俄反战政治人物纳杰日丁称自己已离开俄罗斯，并在巴黎发布视频。</li>
+<li>以色列对哈马斯解除武装后是否撤出加沙表示怀疑。</li>
+<li>消息称美国国务院计划关闭加拿大、日本和印尼的多个领事机构。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. OpenAI 发布实时语音交互系统 GPT-Live</h3>
+<p>8 月 3 日，OpenAI 发布可连续语音交互的实时系统 GPT-Live，来源材料直接写明这是一个响应式语音 AI 系统。此前相关能力多停留在离散式对话阶段，此次发布把连续语音交互放到产品化位置。对语音助手、客服工具和相关 AI 应用开发者来说，后续竞争将更集中在实时响应能力上。</p>
+</div>
+<div class='event'>
+<h3>2. USTR 就中国半导体产业相关 301 调查举行公开听证</h3>
+<p>8 月 4 日，USTR 就中国半导体产业相关 Section 301 调查举行公开听证，来源材料明确指向针对半导体行业主导地位的做法、政策和实践。此前这一程序停留在调查阶段，此次听证把争议集中到公开陈述环节。对美国贸易执法和半导体产业链相关企业来说，接下来关注点会落在听证记录和后续程序上。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 提前终止 IonQ 收购 SkyWater 调查</h3>
+<p>8 月 4 日，FTC 批准对 IonQ 拟收购 SkyWater 调查的提前终止，来源材料显示该并购审查程序因此结束得更早。此前这笔交易仍处在监管审查中，此次决定把焦点从调查转回交易本身。对量子计算、半导体和并购市场的企业来说，监管放行节奏将直接影响后续交易安排。</p>
+</div>
+<div class='event'>
+<h3>4. 欧盟 AI 标识与透明度规则正式生效</h3>
+<p>8 月 4 日，欧盟 AI 法新增的标识与透明度规则正式生效，来源材料明确写明相关要求已经进入执行阶段。此前这些条款处于制度设计或过渡准备中，此次生效把合规要求直接落到 AI 产品和服务上。对模型提供方、平台和内容分发企业来说，接下来要按标识与透明度要求调整产品流程。</p>
+</div>
+<div class='event'>
+<h3>5. FTC 及多州就 Hims &amp; Hers 隐私做法采取执法行动</h3>
+<p>8 月 4 日，FTC 及多州就 Hims &amp; Hers 的欺骗性和违法隐私做法采取执法行动，来源材料只说明了执法性质，没有提供更多细节。此前相关问题尚处于监管观察阶段，此次行动把争议推进到正式执法层面。对远程医疗平台和消费者来说，隐私合规将成为更直接的经营约束。</p>
+</div>
+<div class='event'>
+<h3>6. USTR 举行 2025 年 Special 301 审查公开听证</h3>
+<p>8 月 4 日，USTR 举行 2025 年 Special 301 审查公开听证，来源材料只说明这是审查程序中的公开听证。此前相关事项处在审查准备或意见收集阶段，此次听证把流程推进到公开讨论环节。对知识产权政策、科技企业和贸易谈判相关方来说，后续关注点将集中在审查结论如何形成。</p>
+</div>
+<ul class='headline-list'>
+<li>Palantir 财报后股价上涨，AI 业务驱动增长加速。</li>
+<li>微软股价创 26 年罕见连涨，抹去年内跌幅。</li>
+<li>Google 更新允许 Fitbit 数据直接同步至 Apple Health。</li>
+</ul>
+</body>
+</html>
