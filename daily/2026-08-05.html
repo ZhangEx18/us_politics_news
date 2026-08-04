@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月5日 日报 — 2026-08-05</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月5日 日报</h1>
+<div class='date'>2026-08-05</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>代理司法部长据报拟在各州推动进一步限制堕胎权</li>
+<li>美国称霍尔木兹海峡重开协议接近达成</li>
+<li>英伟达开放自动驾驶模型 Alpamayo 2 Super 商用</li>
+<li>霍尔木兹海峡重开预期推动国际油价下跌</li>
+<li>FTC 与多州就迪尔公司农机维修权达成和解</li>
+<li>俄乌互袭无人机，双方各有 5 人死亡</li>
+<li>OpenAI 披露第三方网络安全评估及模型防护措施</li>
+<li>联邦上诉法院认定取消清洁能源拨款很可能违法</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 代理司法部长据报拟在各州推动进一步限制堕胎权</h3>
+<p>8 月 5 日，《The Hill》报道，代理司法部长布兰奇计划推动在各州进一步限制堕胎权，并寻求让多布斯案裁决在各州成为长期安排。此前堕胎政策已因该裁决转由各州处理，此次表态把联邦司法部门的行动方向指向州层面的限制。相关变化将直接影响各州政府、法院以及寻求堕胎服务的选民，争议集中在联邦权力与州政策空间之间。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 与多州就迪尔公司农机维修权达成和解</h3>
+<p>8 月 5 日，美国联邦贸易委员会与多个州宣布同迪尔公司就农民维修农机的权利达成和解，FTC 公告称该行动旨在推进农民维修权。此前争议集中在农机维修是否受厂商限制，此次和解把问题推进到监管与企业共同承担安排的阶段。受影响对象包括迪尔公司、使用其设备的农民以及参与执行的州和联邦监管机构。</p>
+</div>
+<div class='event'>
+<h3>3. 联邦上诉法院认定取消清洁能源拨款很可能违法</h3>
+<p>8 月 4 日，半岛电视台报道，美国联邦上诉法院认定环保署取消清洁能源拨款很可能违法，案件因此对特朗普政府削减相关项目的行动形成阻力。此前环保署已采取取消拨款的方向，此次裁定把争议集中到该行政动作的合法性。环保署、清洁能源拨款项目以及相关诉讼中的政府与项目方将受到直接影响，后续焦点是法院对取消决定的处理。</p>
+</div>
+<div class='event'>
+<h3>4. 布兰奇出任正式司法部长的提名通过参议院司法委员会</h3>
+<p>8 月 4 日，PBS NewsHour 报道，参议院司法委员会以微弱优势通过布兰奇出任正式司法部长的提名。此前他以代理身份履职，此次委员会表决把任命程序推进到参议院后续审议环节。白宫提名、参议院以及司法部的权力交接将受到影响，但输入材料没有提供全院表决日期或票数。</p>
+</div>
+<div class='event'>
+<h3>5. 科罗拉多加入多州诉讼挑战特朗普政府新关税</h3>
+<p>8 月 4 日，Google News 页面列出的报道显示，科罗拉多州加入多州诉讼，挑战特朗普政府实施的新关税，相关联盟已向国际贸易法院提起诉讼。此前这些关税由行政部门推动，此次州政府加入诉讼，把争议推进到联邦法院审查层面。科罗拉多州、多州诉讼联盟、特朗普政府及受关税影响的贸易主体将受到影响，当前争点是关税措施的合法性。</p>
+</div>
+<div class='event'>
+<h3>6. 宾夕法尼亚回应白宫调整邮寄选票规则的行动</h3>
+<p>8 月 5 日，Google News 页面列出的 WHYY 报道显示，宾夕法尼亚州回应白宫试图调整邮寄选票规则的行动。此前邮寄选票规则涉及州级选举管理，此次争议把白宫与州政府之间的权限边界推到公开对抗层面。宾夕法尼亚州选举管理机构、白宫以及使用邮寄选票的选民将受到影响，当前焦点是规则调整能否改变州内选举安排。</p>
+</div>
+<div class='event'>
+<h3>7. 弗吉尼亚民主党确定中期选举众议院席位提名人</h3>
+<p>8 月 4 日，PBS NewsHour 报道，弗吉尼亚民主党选民在该州多个众议院席位初选中选出提名人，相关席位被该党视为中期选举争取翻转的目标。此前这些席位仍处于党内提名竞争阶段，此次投票把竞争推进到民主党候选人确定后的阶段。弗吉尼亚选民、民主党候选人以及寻求保住席位的对手党派将受到影响，后续选举将围绕这些席位展开。</p>
+</div>
+<div class='event'>
+<h3>8. 堪萨斯举行州长初选，共和党寻求翻转州长职位</h3>
+<p>8 月 4 日，《The Hill》报道，堪萨斯州举行州长初选，共和党寻求在秋季选举中翻转州长职位。此前该职位仍处于两党争夺背景下，此次初选先确定共和党方面的候选人和竞选方向。堪萨斯州选民、共和党候选人以及现有州政府阵营将受到影响，后续竞争焦点是州长职位能否发生党派变化。</p>
+</div>
+<ul class='headline-list'>
+<li>部署国民警卫队维护华盛顿治安预计耗资约 14 亿美元。</li>
+<li>RentGrow 支付 225 万美元，就违反公平信用报告法等指控与 FTC 和解。</li>
+<li>密歇根州举行众议院初选，两个开放席位成为主要竞争焦点。</li>
+<li>众议院伦理委员会宣布调查共和党议员马克斯·米勒。</li>
+<li>美国众议员马克斯·米勒拒绝因前妻家暴指控放弃连任竞选。</li>
+<li>FTC 支持俄亥俄州最高法院削弱美国律师协会认证垄断的提案。</li>
+<li>美国参议院确认贾米森·格里尔出任美国贸易代表。</li>
+<li>美国五州举行中期初选，密歇根参议员竞选受关注。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 美国称霍尔木兹海峡重开协议接近达成 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，美国称霍尔木兹海峡重开协议接近达成，伊朗与阿曼举行了“积极”会谈。相关说法来自美国及半岛电视台报道，材料未提供协议文本或正式签署信息。此前海峡通行受阻，此次磋商把外交接触集中到恢复航道这一环节。若协议推进，直接涉及伊朗、阿曼、美国及依赖该航道的航运与能源运输；目前输入材料只确认谈判进展，未显示协议已生效。</p>
+</div>
+<div class='event'>
+<h3>2. 俄乌互袭无人机，双方各有 5 人死亡 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，俄罗斯与乌克兰发生相互无人机袭击，媒体报道两国各有 5 人死亡；乌克兰方面还指控俄军无人机追击并击伤赫尔松一名蔬菜商贩，相关视频被作为涉嫌战争罪的证据提出。此前无人机袭击已涉及双方境内目标，此次事件同时出现人员死亡和针对平民的指控。伤亡者、赫尔松平民以及俄乌双方军事和调查机构将受到直接影响，但输入材料未提供独立调查或责任认定结果。</p>
+</div>
+<div class='event'>
+<h3>3. 也门近海一艘印度籍船只被炮弹击沉</h3>
+<p>8 月 4 日，一艘悬挂印度国旗的船只在也门海岸附近遭炮弹袭击并沉没，船上 14 人获救。英国广播公司报道确认了沉船和获救人数，但输入材料没有说明袭击者、船名或货物信息。此前事件仅能确认海上航行遭到武器攻击，此次损失具体表现为一艘船只沉没。获救船员、印度航运利益以及也门附近海域的商船通行受到直接影响，责任归属仍未在材料中得到确认。</p>
+</div>
+<div class='event'>
+<h3>4. 哥伦比亚通过禁止女性生殖器切割的法案</h3>
+<p>8 月 5 日，哥伦比亚通过禁止女性生殖器切割的法案，英国广播公司以相关受害经历报道这一立法行动。输入材料未提供法案编号、具体条款、处罚方式或生效时间，因此只能确认禁令获得通过。此前材料没有显示哥伦比亚存在这一项已通过的全国性禁令，此次动作把法律措施指向女性生殖器切割行为。相关家庭、儿童及执行该禁令的哥伦比亚公共机构将受到直接影响，后续执行范围和时间尚未由输入材料说明。</p>
+</div>
+<div class='event'>
+<h3>5. 科索沃发现第三处战时万人坑遗址并扩大搜寻 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，科索沃发现第三处战时万人坑遗址，相关官员扩大了挖掘和搜寻范围。半岛电视台报道了遗址发现与官方行动，但输入材料未提供遗骸数量、所属冲突或责任方信息。此前搜寻已发现两处相关遗址，此次发现把调查范围扩大到第三处地点。科索沃搜寻人员、失踪者家属及负责战时罪行调查的机构将受到直接影响，材料未说明挖掘结果或后续司法安排。</p>
+</div>
+<div class='event'>
+<h3>6. 加沙两家族为 2023 年袭击遇难者举行集体葬礼 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，加沙两个家族为 2023 年袭击中遇难的 112 人举行集体葬礼，半岛电视台报道了家属等待葬礼的经历。材料未说明袭击地点、遇难者身份或遗体确认过程，因此不能进一步判断事件责任和具体经过。此前遇难者家属未能完成葬礼，此次仪式把长期等待转化为对 112 人的集中安葬。家属和当地社区将直接面对这场葬礼带来的丧亲处境，但输入材料没有提供新的停火、援助或司法安排。</p>
+</div>
+<ul class='headline-list'>
+<li>乌克兰监察专员称已俘获来自 51 国的俄军外国战斗员。</li>
+<li>乌克兰称 7 月无人机袭击造成超 3 万名俄军人员损失。</li>
+<li>西班牙称已将上周进入休达的约七万人中七万二千人遣返摩洛哥。</li>
+<li>美国欢迎墨西哥采取措施解决 USMCA 转基因玉米争端。</li>
+<li>以色列拆除令下达后，加沙商户自行拆卸店铺设施。</li>
+<li>伊朗格什姆岛一户家庭在美国袭击中死亡后举行葬礼。</li>
+<li>埃及警方逮捕涉嫌冒充法官并伪造庭审场景诈骗的人员。</li>
+<li>一艘载有移民的船只在英吉利海峡起火，逾 170 人获救并将被送回法国。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 英伟达开放自动驾驶模型 Alpamayo 2 Super 商用</h3>
+<p>8 月 4 日，英伟达发布 Alpamayo 2 Super，并开放该模型商业使用，应用对象包括机器人出租车和自动驾驶汽车。此前输入材料未提供该模型的商业授权安排，此次发布把模型从技术展示推进到可商用阶段。自动驾驶汽车和机器人出租车相关企业将成为直接使用者，模型开发与部署环节也因此新增可采用的开放模型选项。</p>
+</div>
+<div class='event'>
+<h3>2. OpenAI 披露第三方网络安全评估及模型防护措施</h3>
+<p>8 月 4 日，OpenAI 披露涉及其模型的第三方网络安全评估事件，并公布模型测试与防护措施。输入材料没有说明评估发现的具体问题或事件结果，因此目前能够确认的变化是相关模型安全测试和防护信息被公开。第三方评估机构、模型使用者及关注人工智能网络安全的企业，将成为这项披露的直接关联对象。</p>
+</div>
+<div class='event'>
+<h3>3. 英伟达加入美国区域人工智能枢纽计划</h3>
+<p>8 月 5 日，英伟达宣布加入美国国家科学基金会州和区域人工智能枢纽计划，计划目标是扩大美国各地的人工智能研究与教育。此前输入材料未提供该计划的具体资金、参与地区或项目安排，此次信息只确认英伟达成为计划参与方。美国人工智能研究机构、教育机构和参与区域枢纽的相关人员将受到这项合作安排影响。</p>
+</div>
+<div class='event'>
+<h3>4. 白宫拟与人工智能企业商讨先进模型安全</h3>
+<p>8 月 4 日，半岛电视台报道，白宫将与人工智能企业商讨先进模型安全问题；8 月 5 日，Google News 页面列出的《The Hill》报道显示，参议院民主党要求特朗普政府说明先进人工智能模型的访问政策。此前输入材料未提供会议结论或政府具体政策，此次行动把讨论集中到模型安全与访问安排。白宫、人工智能企业和参议院民主党将分别面对会议磋商与政策说明要求。</p>
+</div>
+<div class='event'>
+<h3>5. AMD 称人工智能芯片需求推动营收预期上升</h3>
+<p>8 月 4 日，Google News 页面转引路透社报道，AMD 预计第三季度营收将受到人工智能芯片需求推动而增长，但公司股价因市场预期较高而下跌。此前输入材料未提供 AMD 具体营收数字或股价跌幅，此次信息同时呈现芯片需求预期与股票表现之间的差异。AMD 及其投资者受到直接影响，人工智能芯片市场的关注点也集中在需求增长能否匹配更高预期。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 提前终止对 IonQ 拟收购 SkyWater 交易的调查。</li>
+<li>美国联邦贸易委员会及多州指控 Hims &amp; Hers 存在欺骗性和违法隐私行为。</li>
+<li>开放安全 AI 联盟成员提出代理式 AI 网络安全透明度指南。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 霍尔木兹海峡重开预期推动国际油价下跌 <span class="followup">持续跟踪</span></h3>
+<p>8 月 4 日，BBC World 报道，市场因霍尔木兹海峡可能重新开放而改善对航运的预期，国际油价随之下跌。此次变化显示，海峡通航预期已从能源运输风险转向潜在恢复，价格反应先于海峡重开本身。能源市场受到直接影响，航运参与者关注的重点也转向海峡能否恢复通行，但公开信息尚未确认重开已经发生。</p>
+</div>
+<ul class='headline-list'>
+<li>美联储批准 FS Bancorp 公司相关申请。</li>
+<li>制造业调查显示通胀担忧加剧，增加美联储政策压力。</li>
+<li>美国贸易代表公布 2025 年贸易政策议程及重点方向。</li>
+</ul>
+</body>
+</html>
