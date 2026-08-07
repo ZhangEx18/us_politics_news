@@ -5,8 +5,114 @@
     <link>.</link>
     <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 07 Aug 2026 07:46:47 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 08 Aug 2026 07:46:29 +0800</lastBuildDate>
     <item>
+      <title>2026-08-08 每日算法专题</title>
+      <link>algorithms/daily/2026-08-08.html</link>
+      <description><![CDATA[如何用动态规划高效计算爬到第 n 阶楼梯的不同走法数？]]></description>
+      <content:encoded><![CDATA[<article>
+<h2>如何用动态规划高效计算爬到第 n 阶楼梯的不同走法数？</h2>
+<h3>直觉理解</h3>
+<p>爬楼梯是动态规划最经典的入门题：每次可以走 1 阶或 2 阶，问爬到第 n 阶共有多少种方法。直觉上，你站在第 n 阶时，最后一步只有两种可能：要么从第 n-1 阶走 1 步上来，要么从第 n-2 阶走 2 步上来。于是，爬到第 n 阶的方法数，就等于爬到第 n-1 阶的方法数加上爬到第 n-2 阶的方法数。这个关系非常像“拆成最后一步”的思考方式，把一个大问题拆成两个更小、结构相同的问题。继续往前看，你会发现第 3 阶、第 4 阶、第 5 阶……都能用同样方式推出来，这就是递推。动态规划做的事情，就是把这些子问题的答案按顺序保存下来，避免重复计算。最初可以用一个数组记录每一阶的答案，最后再发现其实只需要保留前两个状态，就能把空间压缩到常数级。这个题虽然简单，但它完整展示了状态定义、状态转移和空间优化三个核心概念。</p>
+<h3>算法思路</h3>
+<p>解这道题时，先把问题翻成“到达某一阶有多少种方案”。设 dp[i] 表示爬到第 i 阶的方法数，那么目标就是求 dp[n]。接着思考状态转移：如果最后一步走了 1 阶，那么前一刻一定在第 i-1 阶；如果最后一步走了 2 阶，那么前一刻一定在第 i-2 阶。两类情况互不重叠，所以 dp[i] = dp[i-1] + dp[i-2]。这一步是整个题的核心。然后补上边界：dp[0] 可以理解为“站在地面上”的 1 种方法，dp[1] = 1；如果按照题意也可以直接设 dp[1] = 1、dp[2] = 2，再从 3 开始递推。实现时，先用数组版最容易理解：从前往后计算每个 dp[i]，直到 dp[n]。这能帮助建立动态规划的直觉。之后再观察状态转移只依赖前两个值，所以不必保存整个数组，只用两个变量分别表示前一项和前两项，就能一边迭代一边更新，空间从 O(n) 优化到 O(1)。这类优化在很多线性递推题里都很常见，掌握它会让你对动态规划从“会写”进阶到“会省”。</p>
+<h3>Python 示例</h3>
+<pre><code>from typing import List
+
+
+def climb_stairs(n: int) -&gt; int:
+    """计算爬到第 n 阶楼梯的方法数。
+
+    每次可以走 1 阶或 2 阶。
+    使用滚动数组优化空间，时间 O(n)，空间 O(1)。
+    """
+    # 边界情况：
+    # n = 0 时，表示不动，也算 1 种方式
+    if n == 0:
+        return 1
+    # n = 1 时，只有 1 种走法：1
+    if n == 1:
+        return 1
+
+    # prev2 表示 dp[i-2]，prev1 表示 dp[i-1]
+    prev2 = 1  # dp[0]
+    prev1 = 1  # dp[1]
+
+    # 从第 2 阶开始递推
+    for _ in range(2, n + 1):
+        current = prev1 + prev2  # dp[i] = dp[i-1] + dp[i-2]
+        prev2 = prev1
+        prev1 = current
+
+    return prev1
+
+
+if __name__ == "__main__":
+    # 测试用例
+    test_cases = [
+        (0, 1),
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 5),
+        (5, 8),
+        (10, 89),
+    ]
+
+    for n, expected in test_cases:
+        result = climb_stairs(n)
+        print(f"n={n}, 结果={result}, 期望={expected}, {'通过' if result == expected else '失败'}")
+</code></pre>
+<h3>C++ 对照</h3>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int climbStairs(int n) {
+    // 边界情况
+    if (n == 0) return 1;
+    if (n == 1) return 1;
+
+    // prev2 表示 dp[i-2]，prev1 表示 dp[i-1]
+    int prev2 = 1; // dp[0]
+    int prev1 = 1; // dp[1]
+
+    for (int i = 2; i &lt;= n; ++i) {
+        int current = prev1 + prev2; // dp[i] = dp[i-1] + dp[i-2]
+        prev2 = prev1;
+        prev1 = current;
+    }
+
+    return prev1;
+}
+
+int main() {
+    vector&lt;pair&lt;int, int&gt;&gt; testCases = {
+        {0, 1}, {1, 1}, {2, 2}, {3, 3}, {4, 5}, {5, 8}, {10, 89}
+    };
+
+    for (const auto&amp; [n, expected] : testCases) {
+        int result = climbStairs(n);
+        cout &lt;&lt; "n=" &lt;&lt; n &lt;&lt; ", 结果=" &lt;&lt; result &lt;&lt; ", 期望=" &lt;&lt; expected
+             &lt;&lt; ", " &lt;&lt; (result == expected ? "通过" : "失败") &lt;&lt; endl;
+    }
+
+    return 0;
+}
+</code></pre>
+<h3>复杂度分析</h3>
+<p>设 n 为楼梯阶数。状态转移只需要从前两个状态推出当前状态，因此每一阶只计算一次，总时间复杂度为 O(n)。如果使用数组保存全部状态，空间复杂度是 O(n)；如果采用滚动优化，只保留前两个值，空间复杂度可降为 O(1)。</p>
+<h3>易错点</h3>
+<ol>
+<li>把 dp[0] 和 dp[1] 的含义弄混：有些人直接写 dp[1]=1、dp[2]=2，却在循环起点上出错。修复方法是先统一定义，再从相同的边界推下去，或者明确采用滚动变量时的初始值。</li>
+<li>把最后一步的两种情况算重复：有人会把“先走 1 再走 2”和“先走 2 再走 1”误当成同一种，或者在递推里重复加法。修复方法是严格按“最后一步来自哪里”分类，保证每种方案只被统计一次。</li>
+<li>忘记处理 n=0 或小输入：直接从第 2 阶开始循环会导致边界值返回错误。修复方法是在编码前先写清楚 base case，再进入递推。</li>
+</ol>
+</article>]]></content:encoded>
+      <pubDate>Sat, 08 Aug 2026 07:46:02 +0800</pubDate>
+      <guid isPermaLink="false">algorithms/daily/2026-08-08</guid>
+    </item>
+<item>
       <title>2026-08-07 每日算法专题</title>
       <link>algorithms/daily/2026-08-07.html</link>
       <description><![CDATA[如何用递归统一理解二叉树的前序、中序、后序遍历，并形成稳定的 DFS 模板？]]></description>
@@ -2593,108 +2699,6 @@ int main() {
 </article>]]></content:encoded>
       <pubDate>Wed, 08 Jul 2026 07:45:43 +0800</pubDate>
       <guid isPermaLink="false">algorithms/daily/2026-07-08</guid>
-    </item>
-<item>
-      <title>2026-07-07 每日算法专题</title>
-      <link>algorithms/daily/2026-07-07.html</link>
-      <description><![CDATA[如何在数组中快速找到每个元素右侧第一个比它更大的元素？]]></description>
-      <content:encoded><![CDATA[<article>
-<h2>如何在数组中快速找到每个元素右侧第一个比它更大的元素？</h2>
-<h3>直觉理解</h3>
-<p>如果直接暴力做法，就是对每个位置向右一个个扫，直到找到更大的数为止。这样最坏会重复比较很多次，比如数组越接近单调递减，重复劳动就越严重。单调栈的核心想法是：把“暂时还没找到答案”的元素按某种顺序保存起来，并且让它们始终保持一种单调性。这样一来，新来的元素只需要和栈顶比较，就能连续解决一批元素的答案，而不会反复回头检查。你可以把栈想成一个“待处理名单”，名单里的人都在等右边第一个更大的人出现；一旦来了一个更大的数，就把它左边所有比它小、还没被解决的人一次性出栈并填答案。每个元素最多进栈一次、出栈一次，所以整体就从双循环的线性多倍复杂度，优化成了真正的线性复杂度。</p>
-<h3>算法思路</h3>
-<p>这类问题的目标是：对数组中的每个元素，找到它右侧第一个严格更大的元素。如果用暴力方法，外层枚举位置 i，内层从 i+1 开始向右找第一个满足条件的值，时间复杂度是 O(n^2)。单调栈的优化思路是“边扫描边结算”。
-
-具体做法是维护一个栈，栈中存放的是元素下标，且这些下标对应的值保持严格递减。为什么要递减？因为栈顶元素是当前最“容易被解决”的那个：如果新元素 nums[i] 比栈顶值更大，那么它一定也能成为栈顶下面那些比它更小元素的下一个更大元素，于是我们不断弹栈，直到栈顶不再小于 nums[i]。每弹出一个下标 j，就说明 nums[i] 是 nums[j] 右边第一个更大的元素，可以直接记录答案为 nums[i]。
-
-当处理完所有比当前元素小的栈顶后，再把当前下标 i 入栈，等待未来更大的元素来解决它。由于每个元素只会入栈一次、出栈一次，所以总操作量是 O(n)。
-
-如果题目问的是“下一个更大元素的值”，答案数组里存值即可；如果问的是“下一个更大元素的下标”，就存下标；如果要处理循环数组，只需把数组遍历两遍，但第二遍只负责“唤醒”之前未解决的元素，不再重复入栈即可。这个框架非常通用，适合一切“找右边第一个满足某种单调条件的位置”的问题。</p>
-<h3>Python 示例</h3>
-<pre><code>from typing import List
-
-
-def next_greater_elements(nums: List[int]) -&gt; List[int]:
-    """返回每个元素右侧第一个更大元素；若不存在则为 -1。"""
-    n = len(nums)
-    ans = [-1] * n
-    stack = []  # 存下标，且对应值保持单调递减
-
-    for i, x in enumerate(nums):
-        # 当前元素比栈顶元素大，说明它可以作为栈顶元素的下一个更大元素
-        while stack and nums[stack[-1]] &lt; x:
-            j = stack.pop()
-            ans[j] = x
-        stack.append(i)
-
-    return ans
-
-
-if __name__ == "__main__":
-    tests = [
-        [2, 1, 2, 4, 3],
-        [1, 3, 4, 2],
-        [5, 4, 3, 2, 1],
-        [1, 2, 3, 4, 5],
-        [2, 2, 2],
-    ]
-
-    for arr in tests:
-        print("原数组:", arr)
-        print("答案  :", next_greater_elements(arr))
-        print("-")
-</code></pre>
-<h3>C++ 对照</h3>
-<pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-
-vector&lt;int&gt; nextGreaterElements(const vector&lt;int&gt;&amp; nums) {
-    int n = (int)nums.size();
-    vector&lt;int&gt; ans(n, -1);
-    stack&lt;int&gt; st; // 存下标，且对应值保持单调递减
-
-    for (int i = 0; i &lt; n; ++i) {
-        while (!st.empty() &amp;&amp; nums[st.top()] &lt; nums[i]) {
-            int j = st.top();
-            st.pop();
-            ans[j] = nums[i];
-        }
-        st.push(i);
-    }
-    return ans;
-}
-
-int main() {
-    vector&lt;vector&lt;int&gt;&gt; tests = {
-        {2, 1, 2, 4, 3},
-        {1, 3, 4, 2},
-        {5, 4, 3, 2, 1},
-        {1, 2, 3, 4, 5},
-        {2, 2, 2}
-    };
-
-    for (auto&amp; arr : tests) {
-        cout &lt;&lt; "原数组: ";
-        for (int x : arr) cout &lt;&lt; x &lt;&lt; ' ';
-        cout &lt;&lt; "\n答案  : ";
-        auto ans = nextGreaterElements(arr);
-        for (int x : ans) cout &lt;&lt; x &lt;&lt; ' ';
-        cout &lt;&lt; "\n-\n";
-    }
-    return 0;
-}
-</code></pre>
-<h3>复杂度分析</h3>
-<p>每个元素最多入栈一次、出栈一次，因此总时间复杂度是 O(n)。栈中最多保存 n 个下标，额外空间复杂度是 O(n)。这种优化的关键不在于单次操作更快，而在于避免了重复扫描右侧区间。</p>
-<h3>易错点</h3>
-<ol>
-<li>把栈里存成值而不是下标，后续无法准确回填答案或区分重复元素。修复方法：优先存下标，比较时再通过 nums[下标] 取值。</li>
-<li>把比较条件写成 &lt;= 或 &gt;=，导致等于时被错误弹出或错误保留。修复方法：如果题意是“严格更大”，弹栈条件必须是 nums[st[-1]] &lt; 当前值。</li>
-<li>误以为每次入栈前都要先把栈清空。修复方法：只弹出比当前元素小的连续栈顶，保留比当前元素大的旧元素继续等待更大的答案。</li>
-</ol>
-</article>]]></content:encoded>
-      <pubDate>Tue, 07 Jul 2026 07:45:51 +0800</pubDate>
-      <guid isPermaLink="false">algorithms/daily/2026-07-07</guid>
     </item>
   </channel>
 </rss>
