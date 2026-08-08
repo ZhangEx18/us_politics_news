@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026-08-09 每日算法专题</title>
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+                 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    line-height: 1.8;
+    color: #1a1a1a;
+    background: #fafafa;
+}
+header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 16px;
+    margin-bottom: 32px;
+}
+header h1 {
+    font-size: 1.6em;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+header .meta {
+    color: #666;
+    font-size: 0.9em;
+}
+header .question {
+    color: #444;
+    font-size: 1em;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border-left: 3px solid #0f5e3a;
+}
+h2 {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e0e0e0;
+}
+pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+p code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+ol, ul {
+    padding-left: 24px;
+}
+li {
+    margin: 6px 0;
+}
+.tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+.tag {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+.difficulty {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+.diff-1 { background: #e8f5e9; color: #2e7d32; }
+.diff-2 { background: #fff3e0; color: #e65100; }
+.diff-3 { background: #fce4ec; color: #c62828; }
+footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    color: #999;
+    font-size: 0.8em;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<header>
+<h1>二分查找边界模板</h1>
+<div class="meta">
+  <span class="difficulty diff-2">进阶</span>
+  <div class="tags"><span class="tag">二分</span><span class="tag">数组</span></div>
+</div>
+<div class="question">如何用统一的二分模板稳定地找到目标值的左边界、右边界和插入位置，避免死循环与越界？</div>
+</header>
+<main>
+<h2>直觉理解</h2>
+<p>二分查找最容易出错的地方，不是“找不到”，而是“边界到底怎么收”。你可以把数组想成一条排好序的直线，目标值把这条线切成两段：左边是所有“小于目标”的位置，右边是所有“大于等于目标”的位置。我们真正要做的，不是每次都去猜“中点是不是答案”，而是持续缩小“答案一定在其中”的范围。闭区间、开区间、半开区间只是三种不同的“关门方式”，本质都是维护一个循环不变量：答案始终被夹在某个区间里。只要每次更新区间时确保区间严格变小，循环就不会卡住；只要最终返回的位置仍满足不变量，就不会越界。边界问题的核心，就是把“找值”转化为“找分界线”，这样左边界、右边界、插入位置都能用同一套思路完成。</p>
+<h2>算法思路</h2>
+<p>二分查找边界问题的关键，不是记忆某个固定模板，而是先明确你要找的是“位置”还是“值”。如果题目问目标值第一次出现的位置，就要找左边界；如果问最后一次出现的位置，就要找右边界；如果问插入后仍保持有序的位置，本质上也是在找边界。先把问题统一成：在有序数组中，找到第一个满足某个条件的位置。
+
+最稳妥的写法是使用半开区间 `[l, r)`。这样区间长度为 0 时循环自然结束，不容易出现死循环。设 `l = 0, r = n`，表示答案可能在 `[l, r)` 里。每次取 `mid = (l + r) // 2`。如果 `nums[mid] &lt; target`，说明目标边界一定在右侧，于是令 `l = mid + 1`；否则说明边界在左侧或当前位置，令 `r = mid`。这个模板得到的是“第一个大于等于 target 的位置”，也就是左边界。若数组里没有 target，这个位置也正好是它应该插入的位置。
+
+右边界可以在左边界的基础上得到：找到第一个大于 target 的位置，再减 1。做法只需把判断改成 `nums[mid] &lt;= target` 时向右收缩，即可得到“第一个大于 target 的位置”。最后返回 `l - 1`，就是最后一个等于 target 的位置。这样写的好处是逻辑统一，不需要在循环外额外处理很多复杂分支。
+
+理解循环不变量也很重要。对于左边界模板，可以始终保证：`[0, l)` 中的元素都小于 target，`[r, n)` 中的元素都大于等于 target。循环结束时 `l == r`，这个位置就是边界。只要每一步更新都保持这个不变量，代码就既不会漏解，也不会越界。实际写题时，建议优先使用这一套半开区间模板，再根据题意决定比较符号是 `&lt;` 还是 `&lt;=`。</p>
+<h2>Python 示例</h2>
+<pre><code>from typing import List
+
+
+def lower_bound(nums: List[int], target: int) -&gt; int:
+    """返回第一个大于等于 target 的位置，也就是左边界。"""
+    l, r = 0, len(nums)  # 半开区间 [l, r)
+    while l &lt; r:
+        mid = (l + r) // 2
+        # mid 位置太小，左边都不可能是答案
+        if nums[mid] &lt; target:
+            l = mid + 1
+        else:
+            # mid 可能就是答案，不能直接排除
+            r = mid
+    return l
+
+
+def upper_bound(nums: List[int], target: int) -&gt; int:
+    """返回第一个大于 target 的位置。"""
+    l, r = 0, len(nums)
+    while l &lt; r:
+        mid = (l + r) // 2
+        # mid 及其左侧都不够大，答案在右边
+        if nums[mid] &lt;= target:
+            l = mid + 1
+        else:
+            r = mid
+    return l
+
+
+def search_range(nums: List[int], target: int) -&gt; List[int]:
+    """返回 target 的第一次和最后一次出现位置；不存在则返回 [-1, -1]。"""
+    left = lower_bound(nums, target)
+    if left == len(nums) or nums[left] != target:
+        return [-1, -1]
+    right = upper_bound(nums, target) - 1
+    return [left, right]
+
+
+def test() -&gt; None:
+    # 基础测试
+    nums = [1, 2, 2, 2, 3, 5, 8]
+    assert lower_bound(nums, 2) == 1
+    assert upper_bound(nums, 2) == 4
+    assert search_range(nums, 2) == [1, 3]
+
+    # 边界测试
+    assert lower_bound([], 1) == 0
+    assert upper_bound([], 1) == 0
+    assert search_range([], 1) == [-1, -1]
+
+    assert lower_bound([1, 1, 1], 1) == 0
+    assert upper_bound([1, 1, 1], 1) == 3
+    assert search_range([1, 1, 1], 1) == [0, 2]
+
+    assert lower_bound([2, 3, 4], 1) == 0
+    assert upper_bound([2, 3, 4], 1) == 0
+    assert search_range([2, 3, 4], 1) == [-1, -1]
+
+    assert lower_bound([2, 3, 4], 5) == 3
+    assert upper_bound([2, 3, 4], 5) == 3
+    assert search_range([2, 3, 4], 5) == [-1, -1]
+
+    # 插入位置示例
+    nums2 = [1, 3, 5, 6]
+    assert lower_bound(nums2, 5) == 2
+    assert lower_bound(nums2, 2) == 1
+    assert lower_bound(nums2, 7) == 4
+
+    print("所有测试通过")
+
+
+if __name__ == "__main__":
+    test()
+</code></pre>
+<h2>C++ 对照</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+// 返回第一个大于等于 target 的位置，也就是左边界
+int lower_bound_vec(const vector&lt;int&gt;&amp; nums, int target) {
+    int l = 0, r = (int)nums.size();  // 半开区间 [l, r)
+    while (l &lt; r) {
+        int mid = l + (r - l) / 2;
+        if (nums[mid] &lt; target) {
+            l = mid + 1;
+        } else {
+            r = mid;
+        }
+    }
+    return l;
+}
+
+// 返回第一个大于 target 的位置
+int upper_bound_vec(const vector&lt;int&gt;&amp; nums, int target) {
+    int l = 0, r = (int)nums.size();
+    while (l &lt; r) {
+        int mid = l + (r - l) / 2;
+        if (nums[mid] &lt;= target) {
+            l = mid + 1;
+        } else {
+            r = mid;
+        }
+    }
+    return l;
+}
+
+vector&lt;int&gt; search_range(const vector&lt;int&gt;&amp; nums, int target) {
+    int left = lower_bound_vec(nums, target);
+    if (left == (int)nums.size() || nums[left] != target) {
+        return {-1, -1};
+    }
+    int right = upper_bound_vec(nums, target) - 1;
+    return {left, right};
+}
+
+int main() {
+    vector&lt;int&gt; nums = {1, 2, 2, 2, 3, 5, 8};
+    assert(lower_bound_vec(nums, 2) == 1);
+    assert(upper_bound_vec(nums, 2) == 4);
+
+    vector&lt;int&gt; ans = search_range(nums, 2);
+    assert(ans[0] == 1 &amp;&amp; ans[1] == 3);
+
+    vector&lt;int&gt; empty;
+    assert(lower_bound_vec(empty, 1) == 0);
+    assert(upper_bound_vec(empty, 1) == 0);
+
+    vector&lt;int&gt; nums2 = {1, 3, 5, 6};
+    assert(lower_bound_vec(nums2, 2) == 1);
+    assert(lower_bound_vec(nums2, 7) == 4);
+
+    cout &lt;&lt; "所有测试通过" &lt;&lt; endl;
+    return 0;
+}
+</code></pre>
+<h2>复杂度分析</h2>
+<p>二分查找每次都把搜索区间缩小一半，因此时间复杂度是 O(log n)。左边界、右边界和区间搜索都只使用了常数个变量，空间复杂度是 O(1)。如果把“找第一次出现”和“找最后一次出现”拆成两次二分，总复杂度仍然是 O(log n)。</p>
+<h2>易错点</h2>
+<ol>
+<li>把 `while l &lt;= r` 和半开区间 `[l, r)` 混着用，导致区间语义不一致。修复方法是统一模板：半开区间就用 `while l &lt; r`，并让 `r = len(nums)`。</li>
+<li>更新边界时写成 `l = mid` 或 `r = mid`，在相邻元素时无法缩小区间，循环会卡住。修复方法是：当排除 `mid` 时必须用 `mid + 1`，保证区间严格变小。</li>
+<li>把 `mid` 当成最终答案直接返回，忽略重复元素和不存在的情况。修复方法是先找边界位置，再检查该位置是否真的等于 `target`。</li>
+</ol>
+<h2>延伸练习</h2>
+<ol>
+<li>实现一个函数 `insert_position(nums, target)`，返回目标值应插入的位置，要求不破坏数组有序性。</li>
+<li>给定一个升序数组和目标值，分别用闭区间模板和半开区间模板实现左边界搜索，并比较两种写法在边界处理上的区别。</li>
+</ol>
+</main>
+<footer>
+<p>每日算法专题 · 2026-08-09</p>
+</footer>
+</body>
+</html>
