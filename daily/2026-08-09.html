@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月9日 日报 — 2026-08-09</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月9日 日报</h1>
+<div class='date'>2026-08-09</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>FTC 放弃“不同影响”执法立场</li>
+<li>霍尔木兹海峡紧张升级，伊朗对美方重开条件加码</li>
+<li>FTC 提前终止 IonQ 收购 SkyWater 调查</li>
+<li>FTC 与 Caremark 达成重大和解，了结反垄断案</li>
+<li>参议院确认布兰奇出任司法部长</li>
+<li>阿联酋称伊朗在霍尔木兹海峡针对 ADNOC 油轮</li>
+<li>USTR 就中国半导体产业相关行为举行 301 公开听证</li>
+<li>USTR 发布与何立峰会谈简报</li>
+</ul>
+</div>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 霍尔木兹海峡紧张升级，伊朗对美方重开条件加码</h3>
+<p>8 月 9 日，外媒页面显示伊朗就重开霍尔木兹海峡提出一长串对美条件，部分材料还写到包括战争赔偿在内的要求。此前海峡通行已处在受阻状态，此次公开加码把谈判焦点集中到美国是否接受这些前提。对航运企业、能源市场和地区安全而言，接下来关注的是海峡通行能否恢复，以及相关各方是否会围绕条件展开新的交涉。</p>
+</div>
+<div class='event'>
+<h3>2. 阿联酋称伊朗在霍尔木兹海峡针对 ADNOC 油轮</h3>
+<p>8 月 8 日，阿联酋称伊朗在霍尔木兹海峡针对一艘 ADNOC 油轮，所述事件未造成人员伤亡。页面信息显示这起袭击发生在海峡这一关键航道上，而不是单纯的口头摩擦。对能源运输、保险和周边海上安全来说，问题已从政治表态转向船只通行风险本身。</p>
+</div>
+<div class='event'>
+<h3>3. 俄军导弹袭击基辅周边，至少 3 人死亡</h3>
+<p>8 月 9 日，BBC 世界报道俄军导弹袭击基辅周边，造成至少 3 人死亡，其中包括一名儿童。此前相关战事已持续外溢到城市周边，此次伤亡说明打击仍直接落在平民地区。对乌克兰民众、地方救援和冬季供电准备来说，最直接的压力是防空与基础设施承受能力继续被消耗。</p>
+</div>
+<div class='event'>
+<h3>4. 俄乌互袭持续，乌方称俄无人机攻击医疗目标 <span class="followup">持续跟踪</span></h3>
+<p>8 月 8 日，BBC 世界报道乌方称俄军无人机持续攻击医院和救护车等医疗目标。与此同时，France24 也报道俄方袭击造成乌克兰多人死亡，双方攻击都仍围绕城市和基础设施展开。对医疗救援、平民撤离和战地人道行动来说，冲突已不只是在前线推进，而是直接压迫后方救治能力。</p>
+</div>
+<div class='event'>
+<h3>5. 美国批评中国南海自然保护区做法</h3>
+<p>8 月 9 日，阿拉伯电视台页面显示，美国国务院批评中国设立“自然保护区”是在强化对南海的主权主张。此前有关南海的争议主要集中在海上主张与执法活动，此次争点转到环境名义下的行政安排。对中美关系、南海沿岸国家和海上规则讨论来说，接下来受影响的是各方对这一举措的公开表态和地区立场。</p>
+</div>
+<div class='event'>
+<h3>6. 加沙废墟中再找到 19 具遗体</h3>
+<p>8 月 9 日，阿拉伯电视台报道，加沙一处被毁建筑废墟中又找到 19 具遗体。此前相关区域已经是持续受损状态，此次搜寻结果表明清理和确认伤亡仍在进行。对遇难者家属、救援队和当地居民来说，后续压力集中在遗体辨认、搜救推进和废墟处理。</p>
+</div>
+<div class='event'>
+<h3>7. 哥伦比亚汽车炸弹袭击后，政府称将强硬回应</h3>
+<p>8 月 9 日，阿拉伯电视台报道，哥伦比亚发生汽车炸弹袭击，局势在新总统就职后迅速承压。页面信息同时显示，政府承诺会作出强硬回应，说明安全议题已被推到台前。对国内治安、执法力量和地方居民来说，接下来最直接的影响是安保升级和反袭击行动的推进。</p>
+</div>
+<div class='event'>
+<h3>8. 沙特、巴基斯坦和土耳其协议引发地区安全联动解读</h3>
+<p>8 月 8 日，阿拉伯电视台围绕沙特、巴基斯坦和土耳其协议展开报道，并将其放进地区安全框架讨论。材料没有给出更细的条款，但已经足以确认这份安排被外界视为新的安全信号。对三国及周边国家来说，接下来受影响的是联盟关系的解读方式和各方对地区防务合作的判断。</p>
+</div>
+<ul class='headline-list'>
+<li>黎巴嫩士兵在南部城镇附近行动时受伤，事涉以军越境/边境紧张。</li>
+<li>英国海军称监视俄罗斯船只的时间较此前增加 25%。</li>
+<li>保加利亚称一架无人机在靠近输气管道处爆炸，乌克兰予以否认。</li>
+<li>俄罗斯夜间袭击基辅附近地区，造成包括儿童在内的多人死亡。</li>
+<li>也门政府军在马里卜遭炮击后对胡塞武装发起反击。</li>
+<li>台风 Dolphin 侵袭日本冲绳，已造成大面积停电和人员受伤。</li>
+<li>西班牙与意大利因塞乌塔移民压力升级，双方采取边境管控措施。</li>
+<li>土耳其外长称土巴沙防务协议在效果上近似北约第五条。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. FTC 提前终止 IonQ 收购 SkyWater 调查</h3>
+<p>8 月 9 日，FTC 发布声明称，针对 IonQ 拟收购 SkyWater 的调查已经提前终止。此前这笔交易仍处在监管审查中，此次动作把焦点从继续调查转到交易本身的推进条件上。对 IonQ、SkyWater 以及关注美国量子与半导体并购的企业来说，后续能否推进将取决于其他交易环节是否继续完成。</p>
+</div>
+<div class='event'>
+<h3>2. USTR 就中国半导体产业相关行为举行 301 公开听证</h3>
+<p>8 月 9 日，USTR 就一项针对中国半导体产业相关行为、政策和做法的 Section 301 调查举行公开听证。文件显示，这一程序已进入公开审理阶段，焦点集中在“针对半导体产业争取主导地位”的相关做法上。对美国贸易主管部门、半导体企业和中美供应链参与方来说，接下来关注的是听证记录如何进入后续调查流程。</p>
+</div>
+<div class='event'>
+<h3>3. Firebird 在亚美尼亚启动 CIS 地区最大 AI 工厂</h3>
+<p>8 月 8 日，NVIDIA Blog 发布消息称，Firebird 在亚美尼亚启动了 CIS 地区最大的 AI 工厂，并采用 NVIDIA 加速平台。公开材料显示，这一项目把算力基础设施和 AI 产业建设直接放到同一条线上，而不只是单一的企业部署。对亚美尼亚本地 AI 生态、区域算力供应和依赖 NVIDIA 平台的开发者来说，这类工厂会成为后续部署与合作的基础设施节点。</p>
+</div>
+<div class='event'>
+<h3>4. OpenAI 收购演示初创公司 NextSlide</h3>
+<p>8 月 8 日，TechCrunch 报道称 OpenAI 已收购演示初创公司 NextSlide，且其团队已并入 ChatGPT。报道显示，这笔收购把演示相关能力直接纳入 OpenAI 的产品线，而不是继续作为外部合作项目存在。对 ChatGPT 用户和 AI 办公工具市场来说，后续变化将体现在产品功能整合与同类服务竞争上。</p>
+</div>
+<div class='event'>
+<h3>5. X 将收入分成计划改为原创内容奖励</h3>
+<p>8 月 9 日，The Verge 报道称，X 正在用“Original Content Rewards”替换原有的收入分成计划，且新机制计划在 9 月 8 日上线。页面显示，这平台对创作者激励的分配方式将从旧方案切换到新的奖励框架。对依赖 X 变现的创作者、内容生产者和平台生态来说，接下来要面对的是奖励规则本身的变化。</p>
+</div>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. FTC 与 Caremark 达成重大和解，了结反垄断案</h3>
+<p>8 月 9 日，FTC 发布消息称，已与 Caremark 达成重大和解，了结针对这家药品中间商的反垄断案件。此前该案仍在推进，此次和解把争议从诉讼程序转到具体解决方案上。对药品中间商和其合作方来说，后续合规审查和反垄断执法压力都会更直接地落到业务安排上。</p>
+</div>
+<div class='event'>
+<h3>2. USTR 发布与何立峰会谈简报</h3>
+<p>8 月 9 日，USTR 发布了 Ambassdor Jamieson Greer 与中国副总理何立峰会谈的简报，材料只说明双方进行了经贸接触。此前外界主要看到的是分散的沟通信号，此次简报把接触内容集中到一则官方通报中。对中美经贸议题而言，后续影响主要落在双方谈判团队和相关产业预期上。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 就并购前申报违规追回 1200 万美元罚款</h3>
+<p>8 月 9 日，FTC 表示，已就并购前申报法违规行为追回 1200 万美元罚款。此前相关违规处理多以个案分散推进，此次罚款把执法结果集中在同一类申报义务上。对计划并购的企业和交易顾问来说，申报合规将继续成为交易流程中的前置环节。</p>
+</div>
+<div class='event'>
+<h3>4. USTR 就欧盟宣布报复性关税发表声明</h3>
+<p>8 月 9 日，USTR 就欧盟宣布报复性关税发表声明，材料显示双方贸易摩擦已进入公开回应阶段。此前相关分歧主要停留在措施宣布层面，此次声明把对抗直接推到官方表态。对跨大西洋贸易、出口企业和依赖双边流通的产业链来说，关税安排将继续左右订单与成本预期。</p>
+</div>
+<div class='event'>
+<h3>5. USTR 就中国海运、物流和造船 301 调查举行公开听证</h3>
+<p>8 月 9 日，USTR 就中国在海运、物流和造船领域的 301 调查拟议措施举行公开听证，页面显示讨论对象是拟议动作本身。此前该程序仍停留在调查和提议阶段，此次听证把争议推进到公开陈述和材料提交环节。对相关产业链、航运企业和贸易参与方来说，后续压力将集中在可能被纳入措施范围的业务安排上。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 就绕过购票限额行为对 Elite Events 采取执法行动。</li>
+<li>FTC 向受 Trend Deploy 误导营销影响的消费者返还资金。</li>
+<li>FTC 宣布一名学贷减免诈骗者被永久禁止从事相关行业和电话营销。</li>
+</ul>
+</body>
+</html>
