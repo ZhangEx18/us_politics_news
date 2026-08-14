@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月15日 日报 — 2026-08-15</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月15日 日报</h1>
+<div class='date'>2026-08-15</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>特朗普请求最高法院允许白宫舞厅工程继续推进</li>
+<li>美中经贸官员会晤</li>
+<li>USTR 就中国半导体产业 301 调查举行公开听证</li>
+<li>USTR 就中国航运、物流和造船业 301 调查拟议措施举行公开听证</li>
+<li>FTC 叫停近 2 亿美元信用修复骗局</li>
+<li>黎巴嫩总理要求以军撤离时间表</li>
+<li>NVIDIA、UGM 和印尼方在印尼开设首个大学 AI 中心</li>
+<li>美国贸易法院维持取消 800 美元以下进口免税豁免</li>
+</ul>
+</div>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. USTR 就中国半导体产业 301 调查举行公开听证</h3>
+<p>2026 年 8 月 15 日，USTR 就针对中国半导体产业相关做法的 301 调查举行公开听证，来源材料明确指向这场程序性会议。此前调查主要停留在审查阶段，此次听证把争点集中到中国半导体产业相关政策与做法上。后续主要影响美国贸易代表办公室、中国半导体企业以及依赖跨境芯片供应链的行业。</p>
+</div>
+<div class='event'>
+<h3>2. NVIDIA、UGM 和印尼方在印尼开设首个大学 AI 中心</h3>
+<p>2026 年 8 月 14 日，NVIDIA、Universitas Gadjah Mada 和 Indosat 在印尼开设该国首个大学 AI 中心，材料明确写到目标是培养本地 AI 人才。此前相关合作多停留在项目筹备或校企协作，此次落地把能力建设放到具体校园场景。后续将直接影响印尼高校、AI 人才培养和当地产业对算力与应用开发的接入。</p>
+</div>
+<div class='event'>
+<h3>3. 中国和巴西披露南美灾害预警卫星计划</h3>
+<p>2026 年 8 月 14 日，报道显示中国和巴西披露将发射一颗面向南美的 24/7 灾害预警卫星，材料只给出了这一联合航天安排。此前两国在这一项目上未见同类公开表述，此次披露把合作从一般交流推进到具体卫星计划。后续将影响南美地区灾害预警能力、两国航天合作以及相关地面数据应用方。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 提前终止对 IonQ 拟收购 SkyWater 的调查 <span class="followup">持续跟踪</span></h3>
+<p>2026 年 8 月 15 日，FTC 发布声明称已提前终止对 IonQ 拟收购 SkyWater 的调查，材料显示这项并购审查在这一节点结束。此前交易仍处于监管审查之中，此次提前终止使案件从待审状态转向可以继续推进。后续将直接影响 IonQ、SkyWater 以及关注量子和半导体并购的投资者。</p>
+</div>
+<div class='event'>
+<h3>5. 印度 C2S 项目称已培训逾 6.8 万名芯片设计学生</h3>
+<p>2026 年 8 月 14 日，印度 C2S 项目相关材料称，已有超过 6.8 万名学生接受半导体芯片设计培训，信息只支持这一培训进展表述。此前项目更多体现为人才培育框架，此次数据把成果具体化到受训人数。后续主要影响印度半导体教育体系、企业招募储备和芯片设计人才供给。</p>
+</div>
+<div class='event'>
+<h3>6. 印度 MeitY Chips to Startup 计划被解读为半导体人才培育举措</h3>
+<p>2026 年 8 月 14 日，Google News 收录的报道把印度 MeitY Chips to Startup 计划解释为半导体人才培育举措，输入材料只支持这一政策解读。此前该计划更多被当作一般项目名称，此次报道将它放进芯片人才培养框架。后续主要影响印度初创公司、半导体教育链条和早期芯片创业生态。</p>
+</div>
+<ul class='headline-list'>
+<li>报道韩国无代码芯片设计正推动半导体自动化。</li>
+<li>报道称 OpenAI 与 Anthropic 下调 AI 成本以应对开源模型竞争。</li>
+<li>报道称微软因 AI 因素重新评估是否留在中国。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. USTR 就中国航运、物流和造船业 301 调查拟议措施举行公开听证</h3>
+<p>2026 年 8 月 15 日，USTR 就针对中国航运、物流和造船业的 301 调查拟议措施举行公开听证。输入材料只显示这是一场围绕拟议措施展开的听证，并未提供更多细节。此前相关安排停留在调查和提议阶段，此次听证把讨论推进到公开征询意见的环节。后续直接影响的是美国贸易政策、相关行业企业和依赖跨境运输的供应链。</p>
+</div>
+<div class='event'>
+<h3>2. 美国贸易法院维持取消 800 美元以下进口免税豁免</h3>
+<p>2026 年 8 月 14 日，美国国际贸易法院维持取消 800 美元以下进口免税豁免。输入材料只给出法院维持这一结果，没有补充诉讼细节。此前相关进口享有免税豁免，此次裁定让低价值包裹继续面对关税门槛。后续直接影响的是跨境电商、物流企业和依赖小额直邮的消费者。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 与 Caremark 达成重大和解，结束反垄断案件</h3>
+<p>2026 年 8 月 15 日，FTC 与 Caremark 达成重大和解，结束针对这家药品中间商的反垄断案件。输入材料只确认案件已通过和解解决，没有给出和解条件。此前案件处于执法和争议状态，此次和解把争端从诉讼程序转到履约与整改阶段。后续直接影响的是药品中间商、药品支付链条和依赖相关服务的医疗机构。</p>
+</div>
+<div class='event'>
+<h3>4. 美国欢迎墨西哥就 USMCA 生物技术玉米争端采取新动作</h3>
+<p>2026 年 8 月 15 日，美国欢迎墨西哥朝解决 USMCA 生物技术玉米争端迈出新动作。输入材料只说明美方表示欢迎，并未披露墨西哥具体做法。此前争端持续存在，此次表态把双边分歧带回到协商解决的轨道。后续直接影响的是美国和墨西哥的农产品贸易，以及受争端牵动的玉米相关企业。</p>
+</div>
+<div class='event'>
+<h3>5. Celsius Network 创始人同意支付 1650 万美元解决 FTC 指控</h3>
+<p>2026 年 8 月 15 日，Celsius Network 创始人被要求支付 1650 万美元以解决 FTC 指控。输入材料只确认了金钱和和解结果，没有给出指控细节。此前争议停留在监管执法阶段，此次结果把责任处理落到具体赔付上。后续直接影响的是加密资产公司、其创始人以及关注监管风险的投资者。</p>
+</div>
+<ul class='headline-list'>
+<li>白宫加大对涉及约 1120 亿美元关税逃避 схем?</li>
+<li>美国贸易代表办公室公布 2025 年贸易政策议程。</li>
+<li>USTR 就不公平且非互惠的外国贸易做法征求公众意见。</li>
+</ul>
+</body>
+</html>
