@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月17日 日报 — 2026-08-17</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月17日 日报</h1>
+<div class='date'>2026-08-17</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>FTC 和各州对 Hims &amp; Hers 采取执法行动</li>
+<li>乌克兰无人机大规模袭击俄境内仓储设施</li>
+<li>Stripe 据称以逾 70 亿美元收购 OpenRouter</li>
+<li>FTC 与 Caremark 达成重大和解，结束反垄断案</li>
+<li>FTC 放弃‘disparate impact’执法思路</li>
+<li>特朗普下令缩减美韩联合军演</li>
+<li>USTR 就中国半导体产业 301 调查举行公开听证</li>
+<li>USTR 就中国海事、物流和造船 301 调查拟议措施征求公众意见</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. FTC 和各州对 Hims &amp; Hers 采取执法行动</h3>
+<p>8 月 17 日，FTC 和多个州对 Hims &amp; Hers 的隐私做法采取执法行动，公开材料将其描述为涉及 deceptive and unlawful privacy practices。此前相关信息只显示监管机构已出手，此次行动把焦点落在消费者隐私合规上。后续影响主要落在医疗健康平台和面向消费者的线上服务，相关公司需要面对更严格的隐私审查。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 放弃‘disparate impact’执法思路</h3>
+<p>8 月 17 日，FTC 宣布不再采用 disparate impact 执法思路，公开材料只说明了这一执法口径调整。此前 FTC 可以按这一思路开展执法，此次改动把标准收窄到机构当前明确表态的框架内。后续影响将落在企业合规和监管预期上，相关行业需要按新的执法口径重新评估风险。</p>
+</div>
+<div class='event'>
+<h3>3. 布兰奇拒绝承诺司法部始终独立于白宫</h3>
+<p>8 月 17 日，司法部长布兰奇拒绝承诺司法部始终独立于白宫，相关表态直接回应了外界对部门独立性的追问。此前讨论集中在司法部与白宫之间应保持多大距离，此次拒绝作出绝对保证，使这一边界问题被放到台面上。后续影响会直接落到国会、法院和关注司法独立的选民身上，他们将继续审视行政部门对执法机构的影响范围。</p>
+</div>
+<div class='event'>
+<h3>4. H.R. 1 进入预算协调程序</h3>
+<p>8 月 17 日，GovTrack 页面列出 H.R. 1，标题显示该案按照预算协调程序推进。页面信息只说明了法案编号和程序路径，没有提供更多内容，因此这里只能确认它处在国会立法流程中。后续影响主要落在国会两院和关心预算立法的选民身上，但目前材料不足以判断具体政策后果。</p>
+</div>
+<div class='event'>
+<h3>5. H.R. 22 的 SAVE Act 条目被列出</h3>
+<p>8 月 17 日，GovTrack 列出 H.R. 22，标题为 SAVE Act，页面材料只确认了该法案条目存在。此前输入没有给出法案文本、推进动作或影响对象，因此只能写到国会法案层面，不能扩写成具体政策变化。后续影响目前只能指向国会立法进程和关注选举规则的选民，具体内容材料不足。</p>
+</div>
+<div class='event'>
+<h3>6. 印第安纳洪灾持续，已出现多人死亡</h3>
+<p>8 月 16 日，印第安纳持续洪灾并造成多人死亡，输入材料还提到部分地区降雨超过 11 英寸。此前灾情主要体现为持续降雨，此次更新把后果推进到人员伤亡和更广范围的救援压力。后续影响首先落在当地居民和地方政府身上，救援、排水和恢复工作都将继续承压。</p>
+</div>
+<ul class='headline-list'>
+<li>H.R. 899 提议终止教育部。</li>
+<li>文章讨论共和党在重划选区竞争中的优势及加州众议员的反击。</li>
+<li>检方调查了与特朗普封口费案法官有关联的公司。</li>
+<li>H.R. 9701 为《Daughters of the American Revolution Membership Integrity Act》。</li>
+<li>S. 26 提议在新员工退休年金计算中剔除地区加成。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. Stripe 据称以逾 70 亿美元收购 OpenRouter</h3>
+<p>8 月 17 日，TechCrunch 报道称 Stripe 将以逾 70 亿美元收购 AI 网关初创公司 OpenRouter，Bloomberg 的标题也指向同一笔交易。输入材料只给出交易金额和双方主体，没有披露交割条件或整合安排。此前市场只看到 OpenRouter 融资到据称 13 亿美元估值，此次并购把其从独立创业公司推到支付平台的 AI 基础设施版图里。后续影响主要落在 AI 开发者和企业客户身上，OpenRouter 作为接口聚合层的归属变化，可能会影响接入路径和平台竞争格局。</p>
+</div>
+<div class='event'>
+<h3>2. USTR 就中国半导体产业 301 调查举行公开听证</h3>
+<p>8 月 17 日，USTR 就针对中国半导体产业主导地位相关做法的 Section 301 调查拟议措施举行公开听证，材料显示这是公开程序的一部分。输入中没有提供听证结论、具体措施或适用对象，因此只能写到程序本身。此前相关事项停留在调查和拟议措施层面，此次听证把争议推进到公开陈述和记录阶段。后续直接受影响的是美国对华半导体贸易政策、相关企业和供应链参与者，是否进入下一步行动仍要以官方后续文件为准。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 提前终止对 IonQ 拟收购 SkyWater 的调查</h3>
+<p>8 月 17 日，FTC 发布声明，表示其对 IonQ 拟收购 SkyWater 的调查获得提前终止。材料只确认了调查状态变化，没有给出是否已经完成交易，也没有说明监管条件。此前该并购还处在审查之中，此次提前终止把监管障碍从调查阶段移开。后续最直接受到影响的是 IonQ、SkyWater 及其投资者，交易推进节奏会转向公司自身和其他监管环节。</p>
+</div>
+<div class='event'>
+<h3>4. Amazon 更新条款要求争议走仲裁</h3>
+<p>8 月 17 日，The Verge 报道称 Amazon 更新条款，要求争议通过仲裁解决。输入材料没有提供新条款的适用范围、具体文本或生效细节，只能写到条款变化本身。此前消费者若发起集体诉讼，路径取决于原有合同安排；此次更新把争议处理方式前移到仲裁条款。后续直接受影响的是 Amazon 用户和潜在原告，他们能否走集体诉讼程序，将取决于新条款如何落地。</p>
+</div>
+<div class='event'>
+<h3>5. 奥克兰前实验室楼宇被考虑改作 AI 数据中心</h3>
+<p>8 月 17 日，ABC7 Bay Area 相关报道经 Google News 摘录显示，奥克兰一处前 Lawrence Berkeley National Laboratory 建筑正被考虑改建为 AI 数据中心综合体。输入材料只说明“正在考虑”，没有给出开发商、审批进度或规模。此前这栋楼属于实验室建筑用途，此次提议把资产方向转到数据中心。后续影响集中在奥克兰的土地再利用、AI 基础设施承载和当地审批流程，是否落地还取决于后续规划与许可。</p>
+</div>
+<div class='event'>
+<h3>6. 加州招募青少年科技委员会参与 AI 与技术决策咨询</h3>
+<p>8 月 17 日，Google News 摘录显示，加州正在招募青少年科技委员会，为州里的 AI 和技术决策提供建议。输入材料没有说明委员会成员构成、职责边界或是否已经开始运作，因此只能写招募这一动作。此前这类咨询通常来自成年人或既有专家网络，此次把青少年纳入政策反馈链条。后续影响主要落在加州 AI 与技术治理的意见来源上，州政府在制定相关决策时会多一个面向青少年的咨询入口。</p>
+</div>
+<div class='event'>
+<h3>7. UT Austin 将 ALIGN AI 素养资源上线供美国学校使用</h3>
+<p>8 月 17 日，Google News 摘录显示，UT Austin 将 ALIGN AI literacy 资源上线，供美国学校使用。输入材料没有提供课程内容、覆盖年级或推广范围，只能确认资源已经公开可用。此前相关材料若未上线，学校需要自行寻找分散资源；此次发布把 AI 素养教材集中到可访问入口。后续影响主要落在美国学校、教师和学生身上，采用这些资源的机构会更容易获得统一的 AI 教学材料。</p>
+</div>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. USTR 就中国海事、物流和造船 301 调查拟议措施征求公众意见</h3>
+<p>8 月 17 日，USTR 就针对中国海事、物流和造船领域的 301 调查拟议措施征求公众意见。页面材料显示，这一动作仍停留在提案和意见收集阶段，没有写明已实施的新措施。此前相关程序尚在推进，此次公开征询把后续争议集中到航运、港口、船舶制造及相关企业的政策风险上。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 叫停一宗信用修复骗局</h3>
+<p>8 月 17 日，FTC 叫停了一宗被指骗取消费者近 2 亿美元的信用修复骗局。公开材料只说明案件规模和执法结果，没有提供更细的损失分布或后续赔付安排。此前这类营销和收费行为处于持续运作状态，此次执法把影响直接落到受骗消费者和信用修复行业的合规边界上。</p>
+</div>
+<div class='event'>
+<h3>3. USTR 就 2025 年 Special 301 审查举行公开听证会</h3>
+<p>8 月 17 日，USTR 就 2025 年 Special 301 审查举行公开听证会。页面材料只显示听证会已安排举行，没有提供审查结论或具体措施。此前该审查处于征询和听证阶段，此次程序推进把关注点放到知识产权相关行业、贸易伙伴和后续政策文本上。</p>
+</div>
+<div class='event'>
+<h3>4. 美加寻求协议以避免 50%关税威胁</h3>
+<p>8 月 17 日，报道显示美国和加拿大正寻求达成协议，以避免特朗普提出的 50% 关税威胁。输入材料只给出了谈判目标，没有说明协议条款或是否已经达成。此前关税威胁悬在双边贸易之上，此次接触直接关系到两国企业、跨境供应链和相关进口成本的走向。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 向受 Grubhub 误导性广告影响的用户发放 2380 万美元。</li>
+<li>Celsius Network 创始人同意支付 1650 万美元以解决 FTC 指控。</li>
+<li>USTR 就不公平和非互惠外国贸易做法公开征求意见。</li>
+</ul>
+</body>
+</html>
