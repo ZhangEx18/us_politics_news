@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月20日 日报 — 2026-08-20</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月20日 日报</h1>
+<div class='date'>2026-08-20</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>FTC 就个性化定价执法政策声明征求公众意见</li>
+<li>以色列确认士兵向涉杭德·拉贾卜车辆开火并启动刑事调查</li>
+<li>OpenAI 为前沿模型客户提供零数据保留</li>
+<li>FTC 向受 Grubhub 误导性广告影响的司机和食客发放 2380 万美元以上赔付</li>
+<li>特朗普提名 Heidi Overton 出任 FDA 负责人</li>
+<li>加沙 24 小时内出现两次致命以军袭击</li>
+<li>OpenAI 被研究者称撤销有限网络安全项目访问权限</li>
+<li>FTC 和多州就 Hims &amp; Hers 的误导性与非法隐私做法采取行动</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. FTC 就个性化定价执法政策声明征求公众意见</h3>
+<p>2026 年 8 月 20 日，FTC 就一份关于个性化定价的执法政策声明征求公众意见，公开材料只显示这一程序性动作。此前相关表述停留在政策声明层面，此次进入征求意见阶段，说明机构正把议题推进到更明确的执法框架讨论中。后续主要影响电商平台、零售商和依赖差异化定价的消费者，具体规则走向仍取决于收到的意见。</p>
+</div>
+<div class='event'>
+<h3>2. 特朗普提名 Heidi Overton 出任 FDA 负责人</h3>
+<p>2026 年 8 月 20 日，特朗普提名 Heidi Overton 出任美国食品和药物管理局负责人，输入材料只确认了这一人事提名。此前该职位尚未由这次提名所指定的人选占据，此次动作把 FDA 领导层交接推到前台。后续将直接影响 FDA 的监管节奏和医药行业的政策预期，参院审议过程也会成为关注点。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 叫停涉近 2 亿美元的信用修复骗局</h3>
+<p>2026 年 8 月 20 日，FTC 表示已叫停一项涉嫌骗取消费者近 2 亿美元的信用修复骗局，公开材料没有给出更多程序细节。此前相关行为持续发生，此次执法把争议集中到消费金融欺诈和信用修复行业。后续主要影响受害消费者、信用修复服务商以及正在寻找合规边界的相关平台。</p>
+</div>
+<div class='event'>
+<h3>4. 司法部为科米“海贝帖子”起诉辩护</h3>
+<p>2026 年 8 月 20 日，美国司法部为针对科米“海贝帖子”的起诉进行辩护，输入材料只显示司法部在这一案件中的立场。此前案件已进入司法争议阶段，此次辩护把焦点放到检方是否应继续推进这起针对前联邦官员的案件。后续影响将落在法院、司法部和关注政府执法边界的政治观察者身上。</p>
+</div>
+<div class='event'>
+<h3>5. 佛州初选出现进步派爆冷胜出</h3>
+<p>2026 年 8 月 19 日，PBS NewsHour 提到佛州初选中一名进步派候选人爆冷胜出，摘要没有提供更多票数或职位信息。此前竞逐格局由更被看好的阵营主导，此次结果把注意力拉回到党内路线竞争。后续主要影响佛州民主党内部排序、基层动员和其他州的初选策略。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 发表声明称其阻止 Loctite 与 Liquid Nails 建筑胶黏剂合并获胜。</li>
+<li>阿拉斯加参议院初选结果出炉，Sullivan 和 Peltola 晋级。</li>
+<li>特朗普在白宫活动中敦促国会通过加密法案。</li>
+<li>FTC 就绕过购票限制行为对 Elite Events 采取执法行动。</li>
+<li>FTC 宣布一名学生贷款减免诈骗者被永久禁止从事相关业务。</li>
+<li>加州通过全美最严家庭周边植被管理防野火规则。</li>
+<li>FTC 向受 Trend Deploy 欺骗性营销影响的消费者返还资金。</li>
+<li>特朗普提名白宫顾问 Heidi Overton 领导 FDA。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 以色列确认士兵向涉杭德·拉贾卜车辆开火并启动刑事调查</h3>
+<p>2026 年 8 月 19 日，以色列确认士兵向一辆涉及杭德·拉贾卜遇袭的车辆开火，并启动刑事调查。BBC World 的标题和摘要只说明了这项确认与调查动作，没有提供更多案情细节。此前相关责任归属主要停留在外界质疑层面，此次正式调查把问题转入司法程序。后续影响将主要落在以色列军方问责、巴勒斯坦平民安全和国际舆论对加沙战事的关注上。</p>
+</div>
+<div class='event'>
+<h3>2. 加沙 24 小时内出现两次致命以军袭击</h3>
+<p>2026 年 8 月 19 日，BBC Verify 核实了加沙在 24 小时内发生的两次致命袭击画面。材料只确认了画面核验与袭击结果，没有给出更多交战背景。此前相关信息多依赖零散视频和报道，此次核实把事件锚定到可见证据上。后续影响主要涉及加沙平民安全、战地信息核验和外界对冲突烈度的判断。</p>
+</div>
+<div class='event'>
+<h3>3. 韩国称应华盛顿要求缩短与美国的联合军演</h3>
+<p>2026 年 8 月 19 日，韩国表示应华盛顿要求缩短与美国的联合军演。BBC World 的标题只给出这一调整，没有披露军演名称或缩短幅度。此前韩美军演按既定安排推进，此次调整说明双方在节奏上作出让步。后续影响将主要落在韩美军事协调、朝鲜半岛安全局势和两国防务安排上。</p>
+</div>
+<div class='event'>
+<h3>4. 联合国谴责新非法以色列前哨和针对巴勒斯坦人的攻击煽动</h3>
+<p>2026 年 8 月 19 日，联合国就新的非法以色列前哨以及针对巴勒斯坦人的攻击和煽动言论发出谴责。UN News 的材料只说明了谴责对象，没有展开具体地点或事件链条。此前围绕定居点和相关暴力的争议已持续存在，此次表态把焦点重新放回前哨扩张和煽动问题上。后续影响主要落在西岸巴勒斯坦居民、以色列相关决策者和国际组织对局势的持续施压上。</p>
+</div>
+<div class='event'>
+<h3>5. 以色列就高度敏感的西岸定居点项目开放投标 <span class="followup">持续跟踪</span></h3>
+<p>2026 年 8 月 19 日，BBC World 报道称以色列为一个高度敏感的西岸定居点项目开放投标。标题和摘要只提供了招标这一动作，没有给出项目细节或参与方。此前该项目处在筹备或等待推进阶段，此次开放投标把它推进到更具体的执行环节。后续影响将主要落在西岸定居点争议、巴勒斯坦居民和以色列政府的对外压力上。</p>
+</div>
+<div class='event'>
+<h3>6. 乌方星链无人机据称削弱克里米亚俄军后勤</h3>
+<p>2026 年 8 月 20 日，Google News 聚合材料称乌方星链无人机正在削弱克里米亚俄军后勤，并考虑更深入打击俄罗斯境内目标。当前输入只转引报道的说法，未提供独立核实细节。此前相关行动主要集中在克里米亚一线，此次表述把作战半径和打击对象的讨论推向更深层次。后续影响将主要涉及俄军后勤、防空部署和乌克兰无人机作战方式。</p>
+</div>
+<div class='event'>
+<h3>7. 美中官员会后通报显示双方举行会晤</h3>
+<p>2026 年 8 月 20 日，美国贸易代表办公室发布了 Jamieson Greer 与中国副总理何立峰会晤的会后通报。输入材料只说明通报已发布，没有提供会谈内容和结论。此前双方沟通主要停留在接触阶段，此次通报表明会晤已进入正式记录。后续影响将主要落在美中经贸沟通、谈判节奏和相关部门对外表述上。</p>
+</div>
+<div class='event'>
+<h3>8. 厄瓜多尔情报负责人和五名美国人在肯尼亚直升机坠毁中身亡</h3>
+<p>2026 年 8 月 19 日，BBC World 报道称肯尼亚一架直升机坠毁，造成 7 人死亡，其中包括厄瓜多尔情报负责人和五名美国人。材料只给出死伤构成，没有提供坠机原因。此前相关人员分散在不同国家和身份，此次事故把厄瓜多尔、美国和肯尼亚联系到同一事件中。后续影响将主要落在遇难者所属机构、涉事家属和肯尼亚航空安全调查上。</p>
+</div>
+<div class='event'>
+<h3>9. 赞比亚反对派领袖将就选举结果提起诉讼</h3>
+<p>2026 年 8 月 20 日，Al Jazeera 报道称赞比亚反对派领袖将就 Hichilema 的选举胜利向法院提出挑战。材料只说明挑战意向，没有提供诉讼理由或法院安排。此前选举结果已经公布，此次行动把争议从政治层面推进到司法层面。后续影响将主要落在赞比亚选举争议、反对派支持者和法院程序上。</p>
+</div>
+<div class='event'>
+<h3>10. 基辅遭俄新一轮袭击，至少两人死亡</h3>
+<p>2026 年 8 月 19 日，Google News 聚合的 Sky News 报道称俄罗斯对基辅发动新一轮袭击，至少造成 2 人死亡。输入只提供了伤亡结果，没有给出更完整的打击范围或目标。此前基辅已多次遭受空袭，此次袭击延续了首都防空和民用安全承压的局面。后续影响将主要落在基辅居民、乌克兰防空体系和俄乌战事的持续升级上。</p>
+</div>
+<ul class='headline-list'>
+<li>朝鲜领导人胞妹否认与美国进行会谈。</li>
+<li>联合国援助负责人警告，俄无人机正威胁乌克兰平民与援助行动。</li>
+<li>特朗普宣布针对伊朗的强力经济行动，并威胁与伊朗贸易国家将受惩罚。</li>
+<li>以军空袭加沙城警察总部，致女性警长及数名警员死亡。</li>
+<li>以军宣布就 6 岁女孩 Hind Rajab 遇害展开刑事调查。</li>
+<li>被解职的乌克兰防长呼吁举行总统选举。</li>
+<li>澳大利亚对以色列决定不就援助人员遇害案起诉表示强烈不满。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. OpenAI 为前沿模型客户提供零数据保留</h3>
+<p>8 月 20 日，OpenAI 发布说明，为符合条件的前沿模型客户提供零数据保留，并预告后续的安全处理功能。此前相关能力并未在这份材料中明确列出，此次更新把数据保留规则收紧到可直接面向客户的服务条款。它主要影响前沿模型客户、企业合规团队和部署敏感任务的开发者，后续会看他们如何据此调整数据使用和接入方式。</p>
+</div>
+<div class='event'>
+<h3>2. OpenAI 被研究者称撤销有限网络安全项目访问权限</h3>
+<p>8 月 19 日，TechCrunch 报道称，研究者表示 OpenAI 撤销了他们对有限网络安全项目的访问权限。输入材料只提供了这一撤销说法，没有给出项目细节或双方解释，因此只能把事件写成一次访问权限变动。它直接影响参与该项目的研究者，也会让外界继续关注 OpenAI 对网络安全相关合作的管理方式。</p>
+</div>
+<div class='event'>
+<h3>3. Cognition CEO 否认 SpaceX 曾试图收购该公司</h3>
+<p>8 月 19 日，TechCrunch 报道称，Cognition CEO 否认了 SpaceX 曾试图收购这家 AI 编程公司的说法。输入材料只有否认本身，没有提供交易条款或其他确认信息，因此这里不能写成一笔已经发生的并购。它主要影响 Cognition、SpaceX 以及关注 AI 编程公司融资和收购传闻的市场参与者。</p>
+</div>
+<div class='event'>
+<h3>4. 特朗普就美国科技创新发表讲话</h3>
+<p>8 月 20 日，The Hill 的直播页面显示，特朗普就美国科技创新和技术优势发表讲话。材料只确认了这场公开表态的存在，没有提供具体政策文本或后续动作，因此只能写成一次面向科技议题的发言。它影响的是美国科技政策讨论、企业对监管走向的预期，以及围绕技术优势的公共辩论。</p>
+</div>
+<div class='event'>
+<h3>5. Moderna 与默克公布 mRNA 癌症疫苗试验结果</h3>
+<p>8 月 19 日，Al Jazeera 报道称，Moderna 和默克公布了一项 mRNA 癌症疫苗试验结果，称可降低黑色素瘤复发。此前相关进展仍停留在试验阶段，此次公布把焦点放到具体疗效数据上。它主要影响黑色素瘤患者、肿瘤药物研发企业和疫苗赛道的投资与合作判断。</p>
+</div>
+<div class='event'>
+<h3>6. Meta 面临社交媒体成瘾诉讼</h3>
+<p>8 月 19 日，Al Jazeera 报道称，Meta 正面临一宗社交媒体成瘾诉讼，材料同时提到公司可能受到处罚并被迫整改。此前输入只给出诉讼结果，没有提供法院阶段或具体指控细节，此次信息仍停留在争议已进入司法程序这一层面。它直接关系到 Meta 的产品合规和青少年用户保护争议，也会影响平台公司在类似诉讼中的应对方式。</p>
+</div>
+<ul class='headline-list'>
+<li>OpenAI 推出新的客户隐私保护措施，以应对 Anthropic 竞争。</li>
+<li>Google 在 Search 和 Gemini 中推出面向学生的新学习工具。</li>
+<li>报道称 Marvell 与 Google 达成 AI 芯片交易，带动股价上涨。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. FTC 向受 Grubhub 误导性广告影响的司机和食客发放 2380 万美元以上赔付</h3>
+<p>2026 年 8 月 20 日，FTC 发布消息称，将向受 Grubhub 误导性广告和其他违法行为影响的司机与食客发放 2380 万美元以上赔付。此前相关消费者损失已被纳入执法处置，此次发放把结果落到具体受害者身上。对平台广告合规和消费者补偿而言，这类付款会直接指向外卖平台、受影响用户和后续执法执行。</p>
+</div>
+<div class='event'>
+<h3>2. 美国欢迎墨西哥采取措施解决 USMCA 生物技术玉米争端</h3>
+<p>2026 年 8 月 20 日，美国贸易代表办公室表示欢迎墨西哥采取措施，推动解决 USMCA 生物技术玉米争端。输入材料只说明双方在推进解决方案，没有披露措施细节或最终结果，因此不能写成争端已经结束。此前争议集中在贸易规则和玉米准入安排，此次表态说明谈判正在向缓和方向移动。后续影响主要落在美墨贸易关系、农业出口商和 USMCA 相关争端处理上。</p>
+</div>
+<div class='event'>
+<h3>3. 加美贸易谈判称已取得进展，正敲定可避免关税的协议</h3>
+<p>2026 年 8 月 20 日，加拿大谈判代表称已回国敲定与美国的贸易协议，双方都说在新协议谈判中取得了进展。输入材料同时提到该协议旨在避免关税，但没有给出最终文本或生效安排，因此只能写到谈判推进到收尾阶段。此前关税风险仍悬在双边磋商上方，此次进展把焦点转向最终条款与签署结果。后续影响主要指向两国出口商、跨境供应链和关税安排。</p>
+</div>
+<div class='event'>
+<h3>4. USTR 就欧盟宣布报复性关税发表声明</h3>
+<p>2026 年 8 月 20 日，美国贸易代表办公室就欧盟宣布报复性关税发表声明。输入材料只显示了声明这一动作，没有提供欧盟税率、对象或美国的具体反制措施，因此不能扩写成已落地的贸易升级。此前双方围绕关税问题各自表态，此次声明把对抗焦点继续留在官方沟通层面。后续影响主要落在跨大西洋贸易往来、受关税波及的企业和谈判空间。</p>
+</div>
+<div class='event'>
+<h3>5. USTR 就不公平和非互惠贸易做法公开征求意见</h3>
+<p>2026 年 8 月 20 日，美国贸易代表办公室公开征求公众对不公平和非互惠外国贸易做法的意见。输入材料只说明征求意见已经发出，没有给出适用行业、调查对象或后续措施，因此只能写到程序启动。此前相关问题多停留在政策讨论，此次征求意见把信息收集和政策准备放到公开阶段。后续影响主要指向出口商、进口商以及可能受到贸易审查的行业。</p>
+</div>
+<ul class='headline-list'>
+<li>USTR 就 2025 年 Special 301 评审举行公开听证会。</li>
+<li>特朗普在白宫会晤中再次主张降息并淡化债市担忧。</li>
+<li>报道称美加贸易协议将加拿大钢铝关税减半。</li>
+</ul>
+</body>
+</html>
