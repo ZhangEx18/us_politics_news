@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月23日 日报 — 2026-08-23</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月23日 日报</h1>
+<div class='date'>2026-08-23</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>联邦法官推翻 75 国签证禁令</li>
+<li>俄军空袭乌克兰致 7 人死亡</li>
+<li>荷兰监管机构因 GDPR 违规重罚 Uber</li>
+<li>加拿大宣布对美商品加征报复性关税</li>
+<li>邮政局仍传播邮寄选票限制信息</li>
+<li>法国将向乌克兰交付拦截导弹</li>
+<li>USTR 就涉华半导体 301 调查举行听证</li>
+<li>美国国际贸易法院裁定 10%普遍关税违法</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 联邦法官推翻 75 国签证禁令</h3>
+<p>8 月 22 日，联邦法官裁定特朗普政府暂停向 75 个国家移民签证发放的政策违法，并认定其超出国务卿 Marco Rubio 的法定权限。此前这项禁令仍在执行，此次裁定把争议拉回法院对行政权限的审查。接下来，签证申请人和处理移民签证的政府部门都会直接受到这项判决影响。</p>
+</div>
+<div class='event'>
+<h3>2. 邮政局仍传播邮寄选票限制信息</h3>
+<p>8 月 23 日，美国邮政局在法院裁决后仍分享邮寄选票限制信息。此前相关限制已进入司法裁决程序，此次信息继续外传，把选务口径和邮政流程放在同一条线上。接下来，使用邮寄投票的选民和州选务机构会更直接面对这类限制说明。</p>
+</div>
+<div class='event'>
+<h3>3. FTC 放弃 disparate impact 政策立场</h3>
+<p>8 月 23 日，FTC 宣布放弃 disparate impact 政策立场。此前这一路径仍在委员会表述中，此次公告把相关执法口径改成不再围绕这一标准展开。接下来，接受 FTC 监管的企业和法律团队都要按新的表述准备应对。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 与多州就 Hims &amp; Hers 隐私执法</h3>
+<p>8 月 23 日，FTC 与多州对 Hims &amp; Hers 采取执法行动，指向其被指存在欺骗性和违法的隐私做法。此前争议分散在公司合规和州层面，此次联合行动把问题集中到隐私执法上。接下来，使用该服务的消费者和同类企业都会面对更强的合规压力。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 终止对 IonQ 收购 SkyWater 的调查。</li>
+<li>FTC 就个性化定价执法政策声明征求意见。</li>
+<li>Doxo 同意支付 210 万美元和解 FTC 欺骗消费者指控。</li>
+<li>特朗普最新股票披露显示 6 月有逾 1000 笔交易。</li>
+<li>最高法院放行后，特朗普称白宫舞厅施工提速。</li>
+<li>FTC 向受 Grubhub 误导宣传影响的用户发放 2380 万美元。</li>
+<li>FTC 指控 Elite Events 绕过购票限制。</li>
+<li>最高法院暂允白宫舞厅工程继续推进。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 俄军空袭乌克兰致 7 人死亡 <span class="followup">持续跟踪</span></h3>
+<p>8 月 23 日，Google News 转载的 Al Jazeera 报道称，俄军空袭乌克兰造成 7 人死亡。此前乌方已连续应对新一轮打击，这次伤亡把平民承受的代价再次摆到台面上。受影响的是乌克兰民防、地方救援和后续防空部署。</p>
+</div>
+<div class='event'>
+<h3>2. 法国将向乌克兰交付拦截导弹 <span class="followup">持续跟踪</span></h3>
+<p>8 月 22 日，France24 报道称，法国将向乌克兰交付拦截导弹。此前乌方一直承受俄军持续打击，这次追加军援把支持重点放到防空补充上。受影响的是乌克兰防空部队和法国对乌援助安排。</p>
+</div>
+<div class='event'>
+<h3>3. 伊朗谴责美国拟宣布新制裁 <span class="followup">持续跟踪</span></h3>
+<p>8 月 23 日，SCMP 报道称，伊朗谴责美国计划宣布新制裁，并指出这会加重经济压力。此前美方施压多停留在制裁预告，此次消息把冲击直接落到伊朗经济部门。受影响的是伊朗经济部门和美国后续制裁安排。</p>
+</div>
+<div class='event'>
+<h3>4. 以色列在叙利亚南部发动打击，大马士革谴责 <span class="followup">持续跟踪</span></h3>
+<p>8 月 22 日，SCMP 报道称，以色列在叙利亚南部打击其称为恐怖分子的目标，大马士革随后谴责这次袭击。此前双方紧张多停留在口头交锋，此次事件把摩擦直接带到叙利亚南部现场。受影响的是当地安全局势和以叙之间的军事对峙。</p>
+</div>
+<div class='event'>
+<h3>5. 以军继续空袭加沙致 2 死多人伤 <span class="followup">持续跟踪</span></h3>
+<p>8 月 23 日，Al Jazeera 报道称，以军在加沙继续空袭，造成 2 人死亡、多人受伤。此前加沙战事已持续延宕，这次袭击把伤亡再次压到平民家庭。受影响的是加沙居民、救援力量和当地人道援助安排。</p>
+</div>
+<div class='event'>
+<h3>6. 美贸易代表办公室通报与何立峰会面 <span class="followup">持续跟踪</span></h3>
+<p>8 月 23 日，美国贸易代表办公室发布通报，称 Jamieson Greer 与中国副总理何立峰会面。此前中美经贸接触多靠沟通维持，此次公开会面说明双方仍在处理贸易议题。受影响的是后续经贸谈判安排和两国释放的政策信号。</p>
+</div>
+<ul class='headline-list'>
+<li>以军和定居者在西岸致多名巴勒斯坦人受伤。</li>
+<li>乌无人机袭击俄境内多地，至少 10 人死亡。</li>
+<li>普京在采访中拒绝乌克兰和平提案并发出警告。</li>
+<li>以色列为西岸新定居点住房单位开放招标。</li>
+<li>美方称以色列未就叙利亚基地空袭提前通报。</li>
+<li>尼日利亚中部多村遭袭，武装人员掳走多人。</li>
+<li>缅甸一座修道院遭袭，14 人死亡。</li>
+<li>苏丹科尔多凡地区战事加剧，新增流离失所者超过 20 万人。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 荷兰监管机构因 GDPR 违规重罚 Uber</h3>
+<p>8 月 22 日，Engadget 报道，荷兰监管机构因 GDPR 违规对 Uber 开出 8.249 亿欧元罚单，指向其在欧洲自动停用司机账号的做法。此前这类争议多停留在平台管理层面，此次处罚把问题直接拉到数据保护执法。后续受影响的是 Uber 在欧洲的合规成本，以及司机账号治理方式，平台对自动化风控的使用也会被重新审视。</p>
+</div>
+<div class='event'>
+<h3>2. USTR 就涉华半导体 301 调查举行听证</h3>
+<p>8 月 23 日，USTR 举行了关于涉华半导体 301 调查的公开听证会，议题是中国在半导体产业上的相关做法。此前调查主要停留在程序推进，此次听证把争议推进到正式陈述和记录阶段。后续会直接影响美国对华芯片贸易讨论，以及相关企业对政策走向的判断。</p>
+</div>
+<div class='event'>
+<h3>3. 彭博称英伟达通知客户 AI 产品涨价逾 15%</h3>
+<p>8 月 23 日，Google News 条目转引彭博称，英伟达已通知客户，AI 相关产品价格上调超过 15%。此前价格变化通常只在单个订单里谈判，此次提价把成本压力直接推向下游买家。后续受影响的是云厂商、企业客户和整个算力采购预算，采购节奏也会更紧。</p>
+</div>
+<div class='event'>
+<h3>4. OpenAI 呼吁加州强化 AI 安全法案</h3>
+<p>8 月 22 日，Engadget 报道，OpenAI 呼吁加州加强 AI 安全法案 SB 53。此前围绕这项法案的讨论集中在是否要保留更强的安全约束，此次表态把焦点放到文本强度上。后续会影响加州立法者、AI 公司和推动安全监管的团体，争点也会更集中。</p>
+</div>
+<div class='event'>
+<h3>5. Inherent 称其 AI 队友在研究复现上领先</h3>
+<p>8 月 23 日，Google News 条目转引 TechCrunch 称，DeepMind 校友创办的 Inherent 表示，其 AI 'teammate' 在研究复现任务上跑赢 Anthropic 和 OpenAI。此前这类产品更多被当作研究辅助工具，此次结果把竞争点推到复现能力本身。后续受影响的是科研代理产品公司，以及评估这类工具的研究团队，比较标准也会更聚焦。</p>
+</div>
+<div class='event'>
+<h3>6. Anthropic 聘请谷歌芯片老将推进硬件布局</h3>
+<p>8 月 23 日，Google News 条目转引《经济时报》称，Anthropic 聘请谷歌芯片老将 Amir Salek，继续推进硬件布局。此前 Anthropic 的竞争焦点更多在模型和产品，此次招聘把人才重心推向芯片和底层硬件。后续会影响其硬件团队、供应链安排，也会让大模型公司在算力层面的竞争更直接。</p>
+</div>
+<div class='event'>
+<h3>7. BBC 视频显示人形机器人跑出 9.39 秒</h3>
+<p>8 月 22 日，BBC 视频显示，北京人形机器人在百米赛跑中跑出 9.39 秒，标题将这一成绩与尤塞恩·博尔特的 100 米纪录对比。此前人形机器人多停留在实验展示和短距离动作，这次成绩把运动能力放到可直接比较的公开场景。后续会影响人形机器人研发团队、展示赛事和关注运动性能指标的产业链，评价标准也会更聚焦。</p>
+</div>
+<ul class='headline-list'>
+<li>TechCrunch 称 Inherent 的 AI 助手在科研复现上表现突出。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 加拿大宣布对美商品加征报复性关税 <span class="followup">持续跟踪</span></h3>
+<p>8 月 22 日，MarketWatch 报道称加拿大宣布将对美国商品加征报复性关税，卡尼同时说这轮贸易谈判已经破裂，相关措施将于 9 月 8 日开始。此前双方还在围绕关税安排继续磋商，此次决定把分歧直接推到加税对抗。受影响的将是双边贸易中的进口商、相关企业和消费者，货流与采购成本都会受到冲击。</p>
+</div>
+<div class='event'>
+<h3>2. 美国国际贸易法院裁定 10%普遍关税违法</h3>
+<p>8 月 22 日，Google News 收录的 News On AIR 报道显示，美国国际贸易法院裁定特朗普政府对多国进口征收的 10%普遍关税违法。此前这类关税已经按商品征收，此次裁定把争议从执行层面推到合法性审查。后续影响将落在美国对相关进口的征税安排，以及印度等受波及国家的贸易应对上。</p>
+</div>
+<div class='event'>
+<h3>3. USTR 举行涉华海事物流造船 301 听证</h3>
+<p>8 月 23 日，USTR 举行公开听证，讨论对中国海事、物流和造船业“谋求主导地位”的 301 调查拟采取措施。此前材料只显示调查和拟议动作，此次听证把程序推进到公开陈述阶段。受影响的将是相关产业链企业、美国贸易决策机构和依赖海运的市场主体。</p>
+</div>
+<ul class='headline-list'>
+<li>加拿大总理称将对美国新关税实施“美元对美元”对等回应。</li>
+<li>USTR 就欧盟宣布报复性关税发表声明。</li>
+<li>USTR 就针对中国海事物流造船业的 301 调查征求意见。</li>
+</ul>
+</body>
+</html>
