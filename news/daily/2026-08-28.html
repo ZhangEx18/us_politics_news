@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月28日 日报 — 2026-08-28</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月28日 日报</h1>
+<div class='date'>2026-08-28</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>特朗普签令要求联邦机构停用部分外国电网设备</li>
+<li>美中经贸官员在华盛顿会谈结果公布</li>
+<li>FTC 就 Cox Media Group 等公司“主动监听”营销指控敲定和解命令</li>
+<li>FTC 就 Zillow-Redfin 协议达成反垄断解决命令</li>
+<li>邮寄选票限制生效后再遭诉讼</li>
+<li>叙利亚总统任命前库尔德武装指挥官为顾问</li>
+<li>NVIDIA 开始交付面向智能体的 Vera CPU</li>
+<li>美国参议院确认 Greer 出任贸易代表</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 特朗普签令要求联邦机构停用部分外国电网设备</h3>
+<p>8 月 28 日，特朗普签署行政令，要求美国能源电网禁止使用部分外国设备，输入材料只说明这项限制已被写入行政命令。此前电网设备采购未见这一具体限制，此次动作把联邦层面的约束直接推到电力基础设施供应链。后续受影响的将是电网运营方、设备供应商和相关监管部门。</p>
+</div>
+<div class='event'>
+<h3>2. 邮寄选票限制生效后再遭诉讼</h3>
+<p>8 月 27 日，美国邮政表示邮寄选票限制已经生效，相关规则在最高法院支持后又引发新诉讼，输入材料仅能确认这一程序变化。此前争议停留在规则是否有效，此次进入“已生效”阶段后，争点转向具体适用。后续直接受到影响的是选民、州选举管理部门和邮寄投票制度。</p>
+</div>
+<div class='event'>
+<h3>3. 特朗普要求联邦机构将安大略湖改称“美国湖”</h3>
+<p>8 月 27 日，特朗普签署行政令，要求联邦机构把安大略湖改称“美国湖”，多家来源都在标题中记录了这一改名命令。此前联邦机构并未按这一名称行事，此次行政令把名称使用问题直接交到政府系统内部。后续受影响的是联邦部门、地图和文书使用场景，以及围绕命名的公众争议。</p>
+</div>
+<div class='event'>
+<h3>4. 波多黎各一帮派遭联邦打击，80 余人被起诉</h3>
+<p>8 月 27 日，司法部宣布对波多黎各一伙帮派展开联邦打击，并起诉 80 余人，输入材料只确认了这次执法行动和起诉规模。此前案件处理分散在地方或单案层面，此次联邦层级集中出手后，案件重心转向统一起诉。后续直接承受影响的是被告、当地治安执法和波多黎各社区。</p>
+</div>
+<div class='event'>
+<h3>5. 特朗普称邮寄选票裁决对共和党有利</h3>
+<p>8 月 27 日，特朗普称最高法院关于邮寄选票的裁决对共和党“great”，输入材料只记录了他的表态，没有提供更多判决细节。此前这类争议更多围绕选举程序本身，此次公开定调后，焦点转到党派如何利用裁决结果。后续受影响的是共和党选战策略、州级选举规则和依赖邮寄投票的选民。</p>
+</div>
+<div class='event'>
+<h3>6. 部分 1 月 6 日骚乱参与者寻求新的联邦赔付路径</h3>
+<p>8 月 27 日，部分 1 月 6 日骚乱参与者开始寻求来自特朗普政府的新的联邦赔付路径，输入材料只说明他们在推进这一申请思路。此前相关赔付主张并未沿着这条路径展开，此次转向把争议重新带回联邦预算和行政处理环节。后续直接相关的是特朗普政府、申请者和围绕赔付合法性的诉讼方。</p>
+</div>
+<div class='event'>
+<h3>7. 特朗普赴德州为帕克斯顿助选</h3>
+<p>8 月 27 日，特朗普前往德州为帕克斯顿助选，输入材料同时提到共和党对参议院席位翻盘的担忧。此前这场竞争的压力更多停留在党内预警层面，此次总统亲自站台后，竞选资源被进一步集中到德州。后续受影响的是帕克斯顿的选情、共和党参议院布局和德州选民。</p>
+</div>
+<div class='event'>
+<h3>8. 法官质疑肯尼迪中心迅速恢复特朗普名字</h3>
+<p>8 月 27 日，一名法官质疑肯尼迪中心为何如此迅速把特朗普名字恢复到建筑上，输入材料只提供了这一司法追问。此前更名安排如何推进并不清楚，此次法官介入后，争议从行政动作转到程序正当性。后续直接受到影响的是肯尼迪中心、特朗普相关命名安排和可能介入的当事人。</p>
+</div>
+<ul class='headline-list'>
+<li>民主党议员启动对特朗普小儿子投资机构近期暴涨的调查。</li>
+<li>众议院 SAVE Act 相关法案页面更新。</li>
+<li>FEC 将于 9 月 16 日举办独立支出与选前沟通网络研讨会。</li>
+<li>FTC 公布 2027 年电话营销商访问国家拒接来电登记的费用。</li>
+<li>众议院提出终止教育部的法案。</li>
+<li>众议院跨州隐蔽携枪互认法案更新。</li>
+<li>众议院女子与女孩体育保护法案更新。</li>
+<li>众议院 Life at Conception Act 页面更新。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 美中经贸官员在华盛顿会谈结果公布</h3>
+<p>8 月 28 日，美国贸易代表办公室发布了美国贸易代表格里尔与中国副总理何立峰会谈的结果通报。通报只确认双方进行了会面，并公布了会谈结果，没有在输入材料中展开更多议题细节。此前外界只能看到会晤信息，此次通报把接触推进到官方发布层面。对美中高层经贸沟通来说，后续关注点会集中在两国主管部门是否继续保持对话。</p>
+</div>
+<div class='event'>
+<h3>2. 叙利亚总统任命前库尔德武装指挥官为顾问</h3>
+<p>8 月 27 日，叙利亚总统任命前库尔德主导的叙利亚民主力量指挥官马兹卢姆·阿卜迪为总统顾问。输入材料只确认了这项任命，没有提供更多职责范围或配套安排。此前阿卜迪与总统府之间没有出现在这条材料里的正式职位关系，此次任命把他纳入了总统顾问体系。对叙利亚国内政治和库尔德相关议题来说，接下来要看这一安排会如何影响双方接触。</p>
+</div>
+<div class='event'>
+<h3>3. 欧洲美军爱国者拦截弹库存被指严重短缺</h3>
+<p>8 月 28 日，多家英文报道和转述称，美国军方在欧洲的爱国者导弹拦截弹库存已接近“危急”水平。材料把短缺与伊朗战争联系在一起，但没有提供具体库存数字或补充的官方说明。此前外界更多看到的是地区防空需求，此次说法把压力集中到美军在欧洲的补给能力。对欧洲盟友、防空部署和美国军工补充节奏来说，焦点会落在拦截弹是否需要优先调拨。</p>
+</div>
+<div class='event'>
+<h3>4. 外媒披露中情局局长克里姆林宫之行新细节</h3>
+<p>8 月 27 日，英文转述材料披露了美国中情局局长克里姆林宫之行的新细节。输入只说明相关细节是在特朗普首次表态后浮出，没有给出会谈内容或双方具体承诺。此前公众只能看到这次访问本身，此次信息更新把它推进到更具体的外交与安全接触层面。对俄乌战事相关的美俄沟通来说，接下来受影响的是白宫、克里姆林宫和盟友对接触边界的判断。</p>
+</div>
+<div class='event'>
+<h3>5. 俄方再度警告英国不要加深援乌</h3>
+<p>8 月 28 日，俄方在英文报道转述中警告英国“玩火”，并将矛头指向其对乌克兰的支持。输入材料没有给出具体威胁措施，只显示俄方把英国援乌与报复风险连到了一起。此前相关表态更多停留在互相指责，此次警告把紧张关系再次推到公开层面。对英国政府、北约盟友和乌克兰军援链条来说，接下来要看这种口头升级是否会影响援助节奏。</p>
+</div>
+<div class='event'>
+<h3>6. 联合国称黎南军事活动持续、平民风险上升</h3>
+<p>8 月 27 日，联合国新闻称黎巴嫩南部的军事活动仍在继续，平民风险随之上升。材料没有给出交战双方的完整动作链，只确认了地区紧张态势仍未缓和。此前外界看到的是局势反复，此次表述说明风险仍然直接落在当地居民身上。对黎巴嫩南部居民、联合国机构和相关安全方来说，后续压力集中在平民保护和现场活动空间。</p>
+</div>
+<div class='event'>
+<h3>7. 加沙和平方案特使批评以军打击和哈马斯行动</h3>
+<p>8 月 27 日，BBC 报道称加沙和平方案相关特使批评了以色列空袭和哈马斯行动。输入材料同时提到，若停火崩溃，将对地区造成不可逆影响，但没有展开具体机制。此前停火讨论仍停留在维持阶段，此次批评把压力重新压回冲突双方。对加沙停火安排、地区调停方和相关平民来说，后续关键是停火能否继续维持。</p>
+</div>
+<div class='event'>
+<h3>8. 乌方称俄军开始使用更远射程的伊斯坎德尔导弹</h3>
+<p>8 月 28 日，英文转述材料称乌克兰情报部门表示，俄军开始使用更远射程的伊斯坎德尔弹道导弹。输入材料只提供了这一判断，没有给出具体打击目标、次数或独立核实结果。此前外界对俄军打击能力的讨论多停留在既有型号，这次说法把关注点移到射程变化上。对乌克兰防空、前线部署和周边安全来说，重点会转向是否需要重新评估拦截范围。</p>
+</div>
+<ul class='headline-list'>
+<li>特朗普淡化俄方对北约发动打击的担忧。</li>
+<li>海地 Kenscoff 发生致命帮派袭击，造成 47 人死亡。</li>
+<li>加沙遭袭致 3 人死亡，以色列重申将因放飞风筝等行为升级威胁。</li>
+<li>拉多万·姆拉迪奇死亡，涉及波黑战争与战争罪判决。</li>
+<li>赞比亚反对派领袖因叛国指控接受询问，选后争议持续发酵。</li>
+<li>以色列空袭黎巴嫩南部，造成一名新婚女子死亡、多人受伤。</li>
+<li>UNRWA 称以方接管卡兰迪亚培训中心影响巴勒斯坦青年。</li>
+<li>报道称边境州政商界持续反对对加拿大发起贸易战。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. FTC 就 Zillow-Redfin 协议达成反垄断解决命令</h3>
+<p>8 月 28 日，FTC 就 Zillow-Redfin 协议中的反垄断担忧达成解决命令，公开材料只说明双方围绕该交易的竞争问题已被处理。此前相关担忧停留在审查阶段，此次命令把争议从质疑转入正式处置。后续直接受影响的是两家公司及房地产线上交易相关市场，交易推进将受这份命令约束。</p>
+</div>
+<div class='event'>
+<h3>2. 美联储对 Banco Popular 前员工采取执法行动</h3>
+<p>8 月 27 日，美联储对 Banco Popular de Puerto Rico 前员工采取执法行动，公开通报只披露了这一处理结果。此前相关事项未在输入材料中展开，此次行动把问题从内部人事层面推进到监管处置。后续受影响的是银行从业人员和金融机构合规管理，执法信号会传导到类似岗位。</p>
+</div>
+<div class='event'>
+<h3>3. 美国扩大对近 60 个伊朗关联实体制裁</h3>
+<p>8 月 27 日，输入材料显示美国对近 60 个伊朗关联实体实施广泛制裁，覆盖多类行业。此前相关对象未在这组材料中被列明，此次制裁把限制范围直接落到更多实体身上。后续受影响的是相关企业、交易对手和跨境结算链条，合规审查压力会同步上升。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 叫停近 2 亿美元信用修复欺诈计划</h3>
+<p>8 月 28 日，FTC 叫停一项涉近 2 亿美元的信用修复欺诈计划，公开通报只确认了这一执法结果。此前相关行为已被指向消费者损失，此次行动把案件从投诉层面推进到正式制止。后续直接受影响的是消费者和信用修复行业，相关营销与收费做法会面对更强监管压力。</p>
+</div>
+<div class='event'>
+<h3>5. Greer 就欧盟报复性关税发表声明</h3>
+<p>8 月 28 日，Jamieson Greer 就欧盟宣布报复性关税发表声明，USTR 公开材料只提供了这一回应。此前相关摩擦已进入关税对抗阶段，此次声明把争议集中到双方已公布的报复性措施上。后续受影响的是美国与欧盟的贸易关系，以及相关出口企业和进口商的成本预期。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 就个性化定价执法政策声明公开征求意见。</li>
+<li>FTC 称 Doxo 将支付 210 万美元了结误导消费者指控。</li>
+<li>USTR 就中国航运、物流和造船领域的 301 调查拟议措施举行听证。</li>
+</ul>
+</body>
+</html>
