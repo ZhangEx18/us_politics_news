@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月30日 日报 — 2026-08-30</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月30日 日报</h1>
+<div class='date'>2026-08-30</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>联邦法官阻止政府因批评以色列驱逐学生</li>
+<li>乌克兰多地遭俄军致命空袭，基辅与仓库袭击造成多人死亡</li>
+<li>FTC 就 AI 营销‘主动监听’服务与三家公司敲定最终命令</li>
+<li>FTC 就个性化定价执法政策声明征求意见</li>
+<li>FTC 放弃 disparate impact 执法思路</li>
+<li>美国对委内瑞拉石油协议引发争议</li>
+<li>索尼音乐和华纳版权公司起诉 Anthropic</li>
+<li>FTC 阻止 Loctite 与 Liquid Nails 建筑胶黏剂并购</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 联邦法官阻止政府因批评以色列驱逐学生</h3>
+<p>2026 年 8 月 29 日，联邦法官裁定，政府不能因学生批评以色列而将其驱逐出境。输入材料显示，这起裁定针对的是特朗普政府对亲巴学生的驱逐努力，相关报道也以同一方向描述该结果。此前政府试图以这一理由推进驱逐，此次裁定把边界收回到言论保护一侧。接下来受影响的是校园里的学生、移民执法部门和围绕抗议表达的联邦政策执行。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 放弃 disparate impact 执法思路</h3>
+<p>2026 年 8 月 30 日，FTC 表示将放弃 disparate impact 执法思路。输入材料只明确给出这一执法方向的调整，没有提供更具体的适用行业、案件或替代标准。此前该机构如果采用这一思路，执法重点会落在结果差异上，此次表态则把重心改回更直接的执法路径。接下来受影响的是接受 FTC 监管的企业，以及依赖该机构执法预期的合规团队。</p>
+</div>
+<div class='event'>
+<h3>3. ICE 7 月逮捕接近 5 万，执法范围继续扩大</h3>
+<p>2026 年 8 月 29 日，NPR 报道称 ICE 在 7 月的逮捕接近 5 万，且执法范围继续扩大。输入材料没有给出更细的地区分布或个案细节，只能确认逮捕规模上升这一事实。此前移民执法的覆盖面已在扩大，此次数据把这种扩张具体落到逮捕数量上。接下来受到影响的是移民社区、地方执法协作和联邦移民政策的执行节奏。</p>
+</div>
+<div class='event'>
+<h3>4. FAA 拟解雇两名空管员</h3>
+<p>2026 年 8 月 30 日，FAA 拟解雇两名空管员，报道将其放在拉瓜迪亚致命空难之后讨论。输入材料没有说明两人的具体职责，也没有交代程序进展，只能确认这一人事动作正在推进。此前安全责任与人手问题已被放在同一张桌上，此次动作把争议集中到具体岗位问责上。接下来受影响的是 FAA 内部用人安排、空管体系士气以及围绕空难后的安全审视。</p>
+</div>
+<div class='event'>
+<h3>5. 沃伦指责特朗普在加密政策制定期间获利</h3>
+<p>2026 年 8 月 29 日，沃伦指责特朗普在政府制定加密政策时从中获利。输入材料只提供了这一指控，没有给出具体交易、政策条文或调查结论，因此只能按指控层面表述。此前围绕加密政策的争论主要集中在规则本身，此次把焦点推到总统个人利益上。接下来受影响的是白宫的政策信誉、国会的监督压力和加密行业的游说环境。</p>
+</div>
+<div class='event'>
+<h3>6. 乔治亚州国会选区挑战面临更高举证门槛</h3>
+<p>2026 年 8 月 30 日，Fox News 报道称，在新的最高法院规则下，民主党挑战乔治亚州国会选区将面临更高举证门槛。输入材料没有给出该规则的具体内容，也没有说明案件下一步排期，只能确认诉讼门槛上升。此前选区挑战主要围绕地图本身展开，此次变化把争点前移到原告如何证明案件上。接下来受影响的是民主党诉讼策略、乔治亚州选区格局和国会席位竞争。</p>
+</div>
+<div class='event'>
+<h3>7. 前白宫速记员因特朗普讲话下注被判赔 17.2 万美元</h3>
+<p>2026 年 8 月 29 日，BBC 报道称，前白宫速记员因利用特朗普讲话信息下注，被判赔 17.2 万美元。输入材料没有说明下注细节或案件程序，只能确认法院作出了赔付裁定。此前相关行为发生在白宫信息流内部，此次判决把后果落到个人经济责任上。接下来受影响的是白宫工作人员合规要求、博彩相关监管讨论和公众对内部信息使用的审视。</p>
+</div>
+<div class='event'>
+<h3>8. FEC 将于 9 月 16 日举办独立支出网络研讨会</h3>
+<p>2026 年 8 月 30 日，FEC 宣布将于 9 月 16 日举办独立支出与选前沟通网络研讨会。输入材料只说明了活动安排，没有提供议程细节或针对对象，因此只能写成公开培训信息。此前相关规则分散在执法和申报实践中，此次研讨会把说明工作集中到公开场合。接下来受影响的是竞选团队、政治委员会和选举合规人员。</p>
+</div>
+<div class='event'>
+<h3>9. H.R. 22 SAVE Act 列入国会法案页面</h3>
+<p>2026 年 8 月 30 日，GovTrack 页面列出 H.R. 22 为 SAVE Act，并注明其涉及选民登记资格要求。输入材料只有法案页面摘录，没有提供法案文本、推进动作或审议结果，因此只能按页面列示写。此前相关讨论更多停留在名字和编号层面，此次材料把议题限定在选民登记资格要求上。接下来受影响的是国会选举立法讨论、州级登记流程和选民资格审查。</p>
+</div>
+<ul class='headline-list'>
+<li>Milo Yiannopoulos 因签证逾期被遣返出境。</li>
+<li>H.R. 28 涉及女子和女孩体育参赛规则。</li>
+<li>H.R. 38 提出全国范围携枪互认立法。</li>
+<li>H.R. 899 提议终止教育部。</li>
+<li>H.R. 25 为 FairTax Act，提出税制替代方案。</li>
+<li>Leavitt 结束白宫新闻秘书任期，预计仍在特朗普阵营。</li>
+<li>美国称右翼活动人士米洛·扬诺普洛斯已被遣返英国。</li>
+<li>H.R. 722 为生命始于受孕相关立法。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 乌克兰多地遭俄军致命空袭，基辅与仓库袭击造成多人死亡</h3>
+<p>8 月 30 日，输入材料显示俄军空袭基辅及乌克兰多地，基辅一处仓库和一处军火库袭击都造成了死亡，部分报道提到死亡人数达到 37 人。此前相关消息分散出现在不同媒体摘录中，此次集中指向同一轮打击，说明袭击已从单点伤亡扩展为多地致命事件。后续受到直接影响的是基辅居民、被疏散人群以及乌克兰的军事与民用基础设施。</p>
+</div>
+<div class='event'>
+<h3>2. 美国对委内瑞拉石油协议引发争议</h3>
+<p>8 月 29 日，输入材料显示特朗普达成一项让美国获得委内瑞拉巨大石油储量准入的协议，PBS 和 Bloomberg 的摘要都把这件事列为当天焦点。此前美国与委内瑞拉之间更多是制裁和对抗叙事，此次协议把焦点转到石油准入安排本身。后续会直接影响委内瑞拉政治分歧两侧，以及围绕能源控制权的相关利益方。</p>
+</div>
+<div class='event'>
+<h3>3. 美国欢迎墨西哥就生物技术玉米争端采取行动</h3>
+<p>8 月 30 日，USTR 公开材料显示美国欢迎墨西哥采取行动，推动解决 USMCA 生物技术玉米争端。文件只提供了这一进展，没有披露更细的争点或结果，因此只能写成双方围绕争端出现了新的处理动作。后续首先影响的是美墨贸易谈判中的农业部门和相关企业。</p>
+</div>
+<div class='event'>
+<h3>4. 扎波罗热核电站外部供电中断超过一周</h3>
+<p>8 月 30 日，Al Jazeera 报道称乌克兰扎波罗热核电站已连续一周多失去外部供电，只能依赖应急柴油。此前该站仍被视作需要稳定外部电力支撑的核设施，此次中断把风险集中到备用供电能否持续维持运行。后续直接受影响的是核电站运转安全，以及周边地区的民用安全。</p>
+</div>
+<div class='event'>
+<h3>5. 以军在约旦河西岸拘捕六名巴勒斯坦人</h3>
+<p>8 月 30 日，Al Jazeera 视频稿称以军在约旦河西岸定居者暴力后逮捕六名巴勒斯坦人。材料只说明了逮捕发生在定居者暴力之后，没有提供更完整的冲突经过或法律处理结果，因此应按这一层级写实。后续首先影响的是约旦河西岸当地居民，以及以巴之间本已紧张的治安局势。</p>
+</div>
+<div class='event'>
+<h3>6. 土耳其就黑海袭击召见乌克兰大使</h3>
+<p>8 月 29 日，Al Jazeera 报道称土耳其就黑海袭击事件召见乌克兰大使。材料没有提供袭击的更多细节，只能确认土方已对相关事件作出外交回应。此前这类摩擦多停留在海上安全层面，此次召见把问题直接带到土乌外交沟通渠道。后续主要影响土耳其与乌克兰之间的外交互动，以及黑海航运安全讨论。</p>
+</div>
+<ul class='headline-list'>
+<li>加沙癌症药物告罄，医院称以军空袭仍在持续。</li>
+<li>伊朗称不会急于重开霍尔木兹，并重申对美国制裁保持强硬。</li>
+<li>芬兰总统称俄罗斯不会对乌克兰使用核武器或攻击北约。</li>
+<li>美国新制裁加剧伊朗经济压力并刺激抗议。</li>
+<li>约旦河西岸以色列定居者袭击新闻团队，造成记者和一名巴勒斯坦女子受伤。</li>
+<li>土耳其和索马里部队解救被劫持货船，行动中 14 名海盗被击毙。</li>
+<li>尼泊尔和西藏洪灾持续搜救，失踪人数接近 3000。</li>
+<li>厄瓜多尔前总统因腐败案被监禁。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. FTC 就 AI 营销‘主动监听’服务与三家公司敲定最终命令</h3>
+<p>2026 年 8 月 30 日，FTC 完成了与 Cox Media Group 和另外两家公司的最终命令，案件围绕它们被指在名为“Active Listening”的 AI 营销服务上误导客户展开，来源材料只写到双方达成最终命令。此前相关指控仍停留在执法程序阶段，此次文件落地把争议从调查推进到正式处置。对依赖数据营销的企业和广告客户来说，这类命令会直接影响其产品表述、合规审查和对外销售方式。</p>
+</div>
+<div class='event'>
+<h3>2. 索尼音乐和华纳版权公司起诉 Anthropic</h3>
+<p>2026 年 8 月 30 日，The Verge 报道称 Sony Music 和 Warner Chappell 正在起诉 Anthropic，摘要仅说明诉讼事由与版权侵权有关。此前这一争议主要停留在潜在冲突层面，此次进入诉讼阶段，说明音乐版权方已把分歧提交司法程序。对生成式 AI 公司、版权持有人和内容授权市场来说，案件将直接影响训练数据、授权边界和后续谈判姿态。</p>
+</div>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. FTC 就个性化定价执法政策声明征求意见</h3>
+<p>2026 年 8 月 30 日，FTC 就一份关于个性化定价的执法政策声明征求公众意见，材料只显示这是一项公开征询，没有提供声明全文或最终规则。此前相关表述停留在政策草案或执法口径层面，此次动作把讨论推进到正式收集反馈的阶段。对电商平台、广告技术和依赖价格差异化的零售商来说，后续关注点在于 FTC 如何界定可接受的定价做法。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 阻止 Loctite 与 Liquid Nails 建筑胶黏剂并购</h3>
+<p>2026 年 8 月 30 日，FTC 发布声明称其阻止了 Loctite 与 Liquid Nails 的建筑胶黏剂并购，输入材料只确认了这一执法结果。此前两家公司若推进整合，市场会进入更高集中度的状态，此次行动把交易直接挡在完成前。受影响的对象是建筑胶黏剂行业的企业和下游消费者，后续竞争格局仍将维持在并购前的状态。</p>
+</div>
+<div class='event'>
+<h3>3. USTR 就不公平和非互惠外国贸易做法征求公众意见</h3>
+<p>2026 年 8 月 30 日，USTR 就“不公平和非互惠外国贸易做法”公开征求公众意见，页面材料只说明了征询这一动作，没有列出具体国家、商品或措施。此前相关问题多停留在原则性讨论，此次公开征询把焦点收拢到可提交意见的正式程序上。后续影响主要落在贸易伙伴、出口企业和依赖跨境订单的产业链，具体指向要等待后续文件继续披露。</p>
+</div>
+<div class='event'>
+<h3>4. USTR 就 2025 年 Special 301 评审举行公开听证</h3>
+<p>2026 年 8 月 30 日，USTR 就 2025 年 Special 301 评审举行公开听证，输入材料只说明听证已经安排，并未提供讨论对象或具体结论。此前评审主要停留在书面提交或程序推进阶段，此次听证把相关争议带入公开口头陈述环节。后续会直接影响贸易伙伴、知识产权相关企业和依赖海外市场准入的行业，但现阶段只能确认程序本身。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 就 Ascension Health-AmSurg 交易批准最终同意令。</li>
+<li>FTC 向受 Grubhub 误导广告影响的司机和食客发放 2380 万美元以上退款。</li>
+<li>FTC 提交法庭之友意见书，主张保护生物药市场竞争。</li>
+</ul>
+</body>
+</html>
