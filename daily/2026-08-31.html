@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年8月31日 日报 — 2026-08-31</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年8月31日 日报</h1>
+<div class='date'>2026-08-31</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>德州联邦法院审理特朗普政策议程相关案件</li>
+<li>FTC 敲定与 Cox Media Group 等公司和解命令，结束对 AI 营销‘主动聆听’误导指…</li>
+<li>FTC 阻止 Loctite 与 Liquid Nails 建筑胶黏剂并购</li>
+<li>美国农业部据报收起两项环孢子虫研究</li>
+<li>罗曼空间望远镜启程前往深空</li>
+<li>FTC 为 Ascension Health-AmSurg 交易批准最终同意令</li>
+<li>阿博特阻止德州新增 Flock 摄像头拨款</li>
+<li>12TB Steam 泄露披露《半条命 2：第三章》废弃素材</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 德州联邦法院审理特朗普政策议程相关案件</h3>
+<p>8 月 31 日，纽约时报报道，特朗普的政策议程正在德州一所联邦法院接受关键审理。现有材料只说明案件进入了关键节点，没有给出争点细节或裁定结果。此前相关政策更多是在行政与立法层面推进，此次审理把压力集中到联邦法院这一路径上。接下来受影响的主要是白宫政策推进节奏、国会相关议题处理，以及依赖这些政策安排的联邦部门和州政府。</p>
+</div>
+<div class='event'>
+<h3>2. 美国农业部据报收起两项环孢子虫研究</h3>
+<p>8 月 30 日，据《卫报》报道，美国农业部在人员调动和资金削减背景下搁置了两项环孢子虫研究项目。输入材料没有说明项目是否被正式取消，也没有给出后续安排。此前这些研究属于持续推进的公共卫生和食源性疾病工作，此次暂停把不确定性集中到具体研究项目本身。接下来受影响的主要是农业部研究人员、食源性疾病监测工作，以及依赖相关数据的公共卫生部门。</p>
+</div>
+<div class='event'>
+<h3>3. 阿博特阻止德州新增 Flock 摄像头拨款</h3>
+<p>8 月 30 日，The Verge 报道，德州州长阿博特阻止了州政府为更多 Flock 摄像头提供资金。材料只显示拨款被挡下，没有提供金额、范围或具体执行细节。此前相关采购由州政府继续推进，此次冻结把扩张动作直接按住。接下来受影响的是德州州政府的采购安排、执法机构的部署节奏，以及围绕摄像头扩张的地方公共预算。</p>
+</div>
+<div class='event'>
+<h3>4. FTC 公布 2027 年勿扰名单访问费用</h3>
+<p>8 月 31 日，FTC 发布了 2027 年电话推销商访问国家勿扰名单的费用安排。输入材料只说明费用已公布，没有提供具体金额或费率结构。此前相关访问规则已存在，此次公布把 2027 年的收费条件提前摆明。接下来受影响的是电话推销商的合规成本、依赖名单管理的营销业务，以及消费者接到推销电话的监管环境。</p>
+</div>
+<div class='event'>
+<h3>5. FTC 放弃 disparate impact 做法</h3>
+<p>8 月 31 日，FTC 发布声明称将放弃“disparate impact”相关做法。输入材料没有说明具体适用场景、替代标准或已经完成的案件影响。此前相关处理方式可能出现在执法或审查框架中，此次表态把政策口径改到另一侧。接下来受影响的是接受 FTC 监管的企业、被审查的就业和消费相关案件，以及围绕执法标准的法律争议。</p>
+</div>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. FTC 敲定与 Cox Media Group 等公司和解命令，结束对 AI 营销‘主动聆听’误导指控</h3>
+<p>8 月 31 日，FTC 敲定与 Cox Media Group 及另外两家公司的命令，了结其被指在 AI 驱动的营销服务‘Active Listening’上误导客户的指控。此前，相关争议停留在执法和指控层面，此次命令把案件推进到正式收束阶段。对广告技术公司和依赖数据营销的企业来说，这类处理会直接影响它们如何描述 AI 能力、销售话术和对外披露。</p>
+</div>
+<div class='event'>
+<h3>2. 罗曼空间望远镜启程前往深空</h3>
+<p>8 月 30 日，NASA 发射了以天文学家南希·格雷斯·罗曼命名的深空望远镜，NPR 的报道记录了它开始进入深空旅程。此前这类任务停留在发射前准备，此次升空把项目从地面建设推进到在轨任务阶段。对天文学研究者、NASA 任务团队和后续观测计划而言，接下来关注的是它能否进入既定运行状态并承担观测工作。</p>
+</div>
+<div class='event'>
+<h3>3. 12TB Steam 泄露披露《半条命 2：第三章》废弃素材</h3>
+<p>8 月 31 日，The Verge 报道称，一起规模达 12TB 的 Steam 泄露包含了《Half-Life 2: Episode 3》的废弃素材。此前外界对该项目只能停留在零散传闻，此次泄露把相关开发痕迹以具体素材形式摆到台面上。对玩家、档案整理者和游戏媒体来说，后续影响主要在于这些材料如何被核实、传播和解读。</p>
+</div>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. FTC 阻止 Loctite 与 Liquid Nails 建筑胶黏剂并购</h3>
+<p>8 月 31 日，FTC 发布声明称已阻止 Loctite 与 Liquid Nails 建筑胶黏剂并购。此前这笔交易仍在推进，此次执法直接切断了两家胶黏剂业务的合并路径。对相关企业而言，交易结构和后续整合安排需要重新调整，建筑胶黏剂市场的竞争格局也因此暂时维持原状。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 为 Ascension Health-AmSurg 交易批准最终同意令</h3>
+<p>8 月 31 日，FTC 表示已就 Ascension Health-AmSurg 交易批准最终同意令。此前该交易仍面临反垄断审查，此次批准把争议收束到正式命令层面。对两家公司来说，交易推进方式已经从审查阶段转入执行阶段，医疗服务相关的并购流程也随之进入下一步。</p>
+</div>
+<ul class='headline-list'>
+<li>FTC 向受 Grubhub 误导性广告影响的司机和食客发放超过 2380 万美元。</li>
+<li>Shein 赴港上市前估值收缩，CEO 财富大幅缩水。</li>
+<li>FTC 提交支持生物药市场竞争的法庭之友意见书。</li>
+</ul>
+</body>
+</html>
