@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年9月1日 日报 — 2026-09-01</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年9月1日 日报</h1>
+<div class='date'>2026-09-01</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>最高法院允许白宫舞厅工程继续施工</li>
+<li>波兰就无人机工厂火灾启动恐袭调查</li>
+<li>FTC 和多州起诉亚马逊秘密广告加价方案</li>
+<li>美国国际贸易法院裁定特朗普政府 10%普遍关税违法</li>
+<li>首席大法官对白宫舞厅裁定表示异议</li>
+<li>本-格维尔与定居者进入阿克萨清真寺</li>
+<li>FTC 就 AI 营销服务误导指控敲定三家公司命令</li>
+<li>美国公布与中国副总理何立峰会面通报</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 最高法院允许白宫舞厅工程继续施工</h3>
+<p>9 月 1 日，最高法院允许白宫舞厅工程在诉讼期间继续施工，相关报道和法院消息都指向这一结果。此前工程已因挑战进入法律程序，此次裁定让施工不必先停下。围绕白宫建筑项目的争议因此从是否能继续推进，转到后续诉讼本身。直接受影响的是白宫项目推进节奏、反对方的诉讼策略，以及关注行政权边界的国会和选民。</p>
+</div>
+<div class='event'>
+<h3>2. 首席大法官对白宫舞厅裁定表示异议 <span class="followup">持续跟踪</span></h3>
+<p>9 月 1 日，围绕白宫舞厅施工继续推进的裁定，首席大法官罗伯茨公开表示异议。输入材料显示，最高法院以 5 比 4 允许工程继续，而他对这一结果提出反对。此前法院内部对该案没有公开分歧，此次异议把争议从工程本身延伸到司法分权问题。后续受影响的是法院内部立场、白宫与诉讼方的论战焦点，以及国会对行政权与司法权关系的审视。</p>
+</div>
+<div class='event'>
+<h3>3. 联邦贸易委员会叫停涉嫌骗取近 2 亿美元的信用修复骗局</h3>
+<p>8 月 31 日，联邦贸易委员会发布执法通报，叫停一个涉嫌骗取消费者近 2 亿美元的信用修复骗局。输入材料只确认了执法动作和涉案金额，没有提供更多案情细节。此前相关消费者投诉和执法程序处于分散状态，此次通报把问题集中到一项联邦执法行动上。直接受影响的是受骗消费者、信用修复行业，以及正在接受联邦监管审查的相关企业。</p>
+</div>
+<div class='event'>
+<h3>4. 联邦贸易委员会公布 2027 年勿扰名单访问费用</h3>
+<p>9 月 1 日，联邦贸易委员会公布 2027 年电话营销者访问全国勿扰名单的费用。输入材料只说明了费用公布这一动作，没有给出更完整的收费结构。此前电话营销合规成本没有在这条材料中被展开，此次公布把规则落到下一年度的执行安排上。直接受影响的是电话营销行业、合规团队，以及依赖勿扰名单保护隐私的消费者。</p>
+</div>
+<div class='event'>
+<h3>5. 参议院确认贾米森·格里尔出任美国贸易代表</h3>
+<p>9 月 1 日，参议院确认 Jamieson Greer 出任美国贸易代表。输入材料只提供了确认结果，没有展开他的政策主张或投票细节。此前这一职位处于待确认状态，此次表决让人事任命完成。直接受影响的是白宫贸易团队、国会涉贸议程，以及与美国贸易政策相关的企业和行业。</p>
+</div>
+<div class='event'>
+<h3>6. 杰弗里斯对参院通过的俄罗斯制裁法案表示严重担忧</h3>
+<p>9 月 1 日，杰弗里斯对参议院通过的俄罗斯制裁法案表示严重担忧。输入材料没有提供法案条文、修正内容或后续表决安排，只能确认他对已通过版本持保留态度。此前该法案在参院的程序已经推进到通过阶段，此次表态把分歧转到众议院和党内协调上。直接受影响的是众议院领导层、参众两院的涉俄立法进度，以及与制裁相关的企业和政策部门。</p>
+</div>
+<div class='event'>
+<h3>7. 得州大县拟减少投票站引发抗议</h3>
+<p>8 月 31 日，得州一个大县计划减少投票站，随后引发民主党抗议。输入材料没有给出削减幅度或最终决定，只能确认这是一项正在推进的选举管理调整。此前投票站布局保持现状，此次计划把争议集中到选民便利和选举管理安排上。直接受影响的是当地选民、民主党组织，以及负责选务的县级官员。</p>
+</div>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 波兰就无人机工厂火灾启动恐袭调查</h3>
+<p>9 月 1 日，波兰就一家向乌克兰供应无人机的工厂火灾启动恐袭调查，Al Jazeera 的标题和摘要都指向这一处理动作。此前材料只说明发生了火灾，此次进入恐袭方向调查，说明案件已从单纯事故处置转入安全事件核查。对波兰的反恐部门和涉乌供应链来说，后续焦点会落在火灾成因与工厂恢复运行上。</p>
+</div>
+<div class='event'>
+<h3>2. 本-格维尔与定居者进入阿克萨清真寺</h3>
+<p>9 月 1 日，Al Jazeera 报道称，以色列极右翼部长本-格维尔与定居者进入阿克萨清真寺，相关视频稿和新闻稿都给出同一事件。此前这里更多是围绕宗教与主权敏感性的长期争议，此次进入让现场紧张点再次集中到耶路撒冷旧城。对以色列政府、巴勒斯坦方面和当地安全机构而言，这类动作会直接牵动现场秩序与外交表态。</p>
+</div>
+<div class='event'>
+<h3>3. 普京与习近平在上合峰会期间重申俄中关系</h3>
+<p>9 月 1 日，Al Jazeera 报道称，普京与习近平在“不可预测”的国际环境下重申俄中关系，标题直接点出会谈主轴。此前两国互动常被放在双边合作框架中，此次表态把重点放在对外部环境的共同判断上。对俄罗斯、中国以及关注欧亚安全的各方来说，这次会面主要影响的是后续双边协调的公开姿态。</p>
+</div>
+<div class='event'>
+<h3>4. 黎巴嫩请求希腊协助落实与以色列协议 <span class="followup">持续跟踪</span></h3>
+<p>9 月 1 日，Al Jazeera 报道称，黎巴嫩请求希腊协助推动与以色列的美方框架协议落实，事件本身是一次第三方介入的外交请求。此前协议已存在，但材料显示落实仍需外部协助，此次把执行环节从双边接触扩展到希腊。对黎巴嫩、以色列以及参与协调的欧洲一方来说，接下来关键在于协议执行的具体推进方式。</p>
+</div>
+<div class='event'>
+<h3>5. 特朗普称将在新一轮交火后强硬回击伊朗 <span class="followup">持续跟踪</span></h3>
+<p>8 月 31 日，France24 报道称，特朗普在美伊数周来首次交火后表示将“强硬回击”伊朗。此前双方处于一段相对平静期，此次交火把局势重新推回对抗轨道。对美国、伊朗以及地区安全相关方来说，后续关注点会集中在是否出现更多交火和更强烈的公开回应。</p>
+</div>
+<div class='event'>
+<h3>6. 法国与瑞典签署 43 亿欧元护卫舰协议</h3>
+<p>9 月 1 日，France24 报道称，马克龙在瑞典敲定一项价值 43 亿欧元的法国护卫舰协议，标题只给出这一采购结果。此前相关合作若处于谈判阶段，此次签署把合作推进到正式成交。对法国、瑞典以及军工供应链来说，接下来关注的是合同执行和交付安排。</p>
+</div>
+<div class='event'>
+<h3>7. 约旦河西岸拆屋与定居点扩张并行</h3>
+<p>9 月 1 日，Al Jazeera 报道称，约旦河西岸一边发生巴勒斯坦住房拆除，一边有以色列前哨扩张，两个动作被放在同一条报道中。此前争议主要围绕土地和居住空间，此次材料显示冲突同时压到拆屋与扩张两个环节。对巴勒斯坦家庭、定居者和当地治理机构而言，直接后果是居住安排与地面控制进一步收紧。</p>
+</div>
+<div class='event'>
+<h3>8. 特朗普称伊朗袭击恢复后将强硬回应 <span class="followup">持续跟踪</span></h3>
+<p>8 月 31 日，France24 报道称，在一个月平静期后袭击重新出现，特朗普威胁将对伊朗“强硬回击”。此前局势曾短暂降温，此次袭击恢复后，双方又回到公开对峙状态。对美国和伊朗而言，后续影响集中在是否把交火升级为更广泛的安全对抗。</p>
+</div>
+<div class='event'>
+<h3>9. 乌克兰居民悼念在俄军袭击中身亡的社区领袖</h3>
+<p>9 月 1 日，Al Jazeera 报道称，乌克兰民众正在悼念在俄军对 Myla 的袭击中死亡的一名社区领袖。此前冲突新闻多集中于军事打击本身，此次材料把焦点落到平民社区失去地方领袖的后果上。对乌克兰当地居民和社区组织来说，直接影响是地方公共事务和社会凝聚力承压。</p>
+</div>
+<div class='event'>
+<h3>10. 莫迪在会见普京时呼吁尽快结束乌克兰战争</h3>
+<p>9 月 1 日，Al Jazeera 报道称，印度总理莫迪在与普京会谈时呼吁尽快结束乌克兰战争。此前围绕战争的外交通道分散，此次会谈把停战诉求直接带到俄印高层对话里。对印度、俄罗斯和关注乌克兰局势的各方来说，接下来重点是这类表态能否进入后续外交接触。</p>
+</div>
+<ul class='headline-list'>
+<li>特朗普称赞中国在霍尔木兹海峡危机中保持相对克制。</li>
+<li>巴西与美国同意就关税问题恢复新一轮会谈。</li>
+<li>西岸局势中，NBC 采访团队与巴勒斯坦人遭袭。</li>
+<li>美国外交官在对伊战争背景下返回中东使馆。</li>
+<li>西岸农民在定居者破坏后修复温室和作物。</li>
+<li>据转述，特朗普特使或将访问乌克兰，泽连斯基称外交仍陷僵局。</li>
+<li>乌克兰将游说美国，推动涉俄制裁法案。</li>
+<li>哥伦比亚打击武装组织行动中有 3 名未成年人死亡。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. FTC 和多州起诉亚马逊秘密广告加价方案</h3>
+<p>9 月 1 日，FTC 和多个州就亚马逊的秘密广告加价方案提起诉讼，输入材料显示指控指向广告费用被隐藏加收。此前相关说法主要停留在外部指控层面，此次进入正式起诉后，争议从商业做法上升到监管和司法程序。后续将直接影响亚马逊广告业务，也会牵动平台广告主对计费透明度的判断。</p>
+</div>
+<div class='event'>
+<h3>2. FTC 就 AI 营销服务误导指控敲定三家公司命令</h3>
+<p>9 月 1 日，FTC 敲定了与 Cox Media Group 和另外两家公司相关的最终命令，输入材料显示案件围绕“主动监听”AI 营销服务是否误导客户。此前这些指控处于处理过程中，此次命令落地后，争议从调查和指控阶段进入结案阶段。后续将影响依赖广告技术和数据营销服务的企业，也会让客户更关注产品说明是否与实际功能一致。</p>
+</div>
+<div class='event'>
+<h3>3. OpenAI 称 Polimill 正构建日本下一代公共 AI 基础设施</h3>
+<p>8 月 31 日，OpenAI 博文介绍 Polimill 正在用其模型搭建日本下一代公共 AI 基础设施。此前输入材料只显示这是一个项目介绍，此次公开材料把应用场景直接落到公共基础设施建设上。后续将影响日本公共部门的 AI 采用方式，也会让相关平台建设和模型部署更受关注。</p>
+</div>
+<div class='event'>
+<h3>4. 苹果在对 OpenAI 的商业秘密诉讼中补充更多指控 <span class="followup">持续跟踪</span></h3>
+<p>8 月 31 日，苹果在对 OpenAI 的商业秘密诉讼中补充了更多指控，输入材料显示这是围绕既有案件的追加内容。此前争议已进入诉讼阶段，此次补充后，双方对商业秘密的争点进一步收拢到法院程序中。后续将直接影响两家公司的法律对抗，也会牵动 AI 行业对知识产权边界的判断。</p>
+</div>
+<div class='event'>
+<h3>5. 五角大楼中央 AI 门户接入 ChatGPT、Grok 和 Gemini</h3>
+<p>8 月 31 日，TechCrunch 报道称五角大楼中央 AI 门户将接入 ChatGPT、Grok 和 Gemini。此前相关能力分散在不同工具中，此次把多个模型放到同一入口后，使用方式被集中到一个平台。后续将影响国防部门的 AI 工具采购和接入流程，也会让模型供应商在政府市场的竞争更直接。</p>
+</div>
+<div class='event'>
+<h3>6. Yanwei Semiconductor 完成约 2.23 亿美元 B 轮融资</h3>
+<p>9 月 1 日，Dealroom 页面显示 Yanwei Semiconductor 完成约 2.23 亿美元 B 轮融资，输入材料称其跻身中国较大的芯片融资交易之一。此前这类信息通常只作为单笔融资披露，此次融资规模把公司推进到更受关注的芯片融资序列。后续将影响该公司的扩产和研发节奏，也会让半导体投资者继续关注中国芯片融资热度。</p>
+</div>
+<ul class='headline-list'>
+<li>微软表示正在测试修复，处理新一轮持续数小时的 Outlook 故障。</li>
+<li>报道称韩国半导体城镇因芯片奖金带动消费支出最多上涨 4%。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 美国国际贸易法院裁定特朗普政府 10%普遍关税违法</h3>
+<p>9 月 1 日，美国国际贸易法院裁定特朗普政府对来自印度及其他国家进口商品征收的 10%普遍关税违法，输入材料只给出了这一裁定结果。此前该关税已被普遍征收，此次裁定把争议集中到这项统一加征措施本身。对进口商、受该关税覆盖的企业以及相关贸易安排而言，后续处理将围绕这项关税是否继续执行展开。</p>
+</div>
+<div class='event'>
+<h3>2. 美国公布与中国副总理何立峰会面通报</h3>
+<p>9 月 1 日，USTR 发布了美国驻华盛顿贸易代表格里尔与中国副总理何立峰会面的通报，输入材料未提供更多会谈内容。此前外界只能看到相关接触的结果性通报，此次公开材料把这次会面本身单独列出。对美中经贸沟通而言，影响对象是双边谈判和相关部门的后续接触安排。</p>
+</div>
+<div class='event'>
+<h3>3. 美国就中国半导体行业 301 调查举行公开听证</h3>
+<p>9 月 1 日，USTR 就针对中国半导体产业的 301 调查举行公开听证，输入材料显示议题聚焦于中国相关做法、政策和实践。此前调查处于程序推进阶段，此次听证把争议推进到公开陈述和意见汇集环节。对半导体企业和相关供应链来说，后续受影响的重点在于美国贸易措施的下一步处理。</p>
+</div>
+<div class='event'>
+<h3>4. USTR 就中国海事、物流和造船领域 301 调查拟议措施征求公众意见</h3>
+<p>9 月 1 日，USTR 就中国海事、物流和造船领域 301 调查的拟议措施征求公众意见，文件显示相关措施仍处在征询阶段。此前程序只停留在调查框架内，此次征求意见把政策讨论推进到收集外部反馈的环节。对相关产业链而言，后续关注点在于这些拟议措施会如何影响企业经营安排。</p>
+</div>
+<div class='event'>
+<h3>5. 美国欢迎墨西哥采取措施化解 USMCA 生物技术玉米争端</h3>
+<p>9 月 1 日，USTR 表示美国欢迎墨西哥采取措施化解 USMCA 生物技术玉米争端，输入材料只确认了这一表态。此前争端已存在，此次表态说明双方围绕该问题出现了推进解决的动作。对美国和墨西哥的农业贸易关系来说，后续影响集中在生物技术玉米争端的处理进程。</p>
+</div>
+<div class='event'>
+<h3>6. FTC 就 Zillow 与 Redfin 协议获得化解反垄断担忧的命令</h3>
+<p>9 月 1 日，FTC 就 Zillow 与 Redfin 协议获得一项化解反垄断担忧的命令，输入材料未提供该命令的更多条款。此前相关交易的反垄断问题处于审查之中，此次命令把争议收束到具体协议安排上。对两家公司和房地产相关市场来说，后续影响取决于该命令如何约束交易执行。</p>
+</div>
+<ul class='headline-list'>
+<li>USTR 就欧盟宣布报复性关税发表声明。</li>
+<li>USTR 公布 2025 年 Special 301 审查公开听证会。</li>
+<li>FTC 批准 Ascension Health 与 AmSurg 交易的最终同意令。</li>
+</ul>
+</body>
+</html>
