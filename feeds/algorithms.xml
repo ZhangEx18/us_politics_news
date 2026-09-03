@@ -5,8 +5,127 @@
     <link>.</link>
     <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 02 Sep 2026 07:46:05 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 04 Sep 2026 07:46:08 +0800</lastBuildDate>
     <item>
+      <title>2026-09-04 每日算法专题</title>
+      <link>algorithms/daily/2026-09-04.html</link>
+      <description><![CDATA[如何在数组中为每个元素快速找到它右侧第一个更大的元素，并把朴素的双循环优化到线性时间？]]></description>
+      <content:encoded><![CDATA[<article>
+<h2>如何在数组中为每个元素快速找到它右侧第一个更大的元素，并把朴素的双循环优化到线性时间？</h2>
+<h3>直觉理解</h3>
+<p>如果从左到右扫描数组，很多元素在未来都会被“更大的数”一次性解决掉。与其让每个元素都去右边逐个比较，不如维护一个栈，专门保存那些“还没等到答案”的元素。这个栈保持一个单调性：栈顶到栈底对应的值通常是递增或递减的，具体取决于题目方向。当前元素一旦比栈顶大，就说明它就是栈顶元素的下一个更大元素；把栈顶弹出后继续比，直到栈里不再满足条件。这样，每个元素最多进栈一次、出栈一次，原本看起来要反复比较的工作，被集中在一次扫描里完成。单调栈的本质不是“记住所有信息”，而是只保留对未来有用的候选项，把已经失去竞争力的元素及时丢掉。</p>
+<h3>算法思路</h3>
+<p>这类问题的标准目标是：对数组中的每个位置 i，找到它右边第一个比它大的数；如果不存在，就返回某个默认值，比如 -1。最直接的做法是对每个 i 向右枚举，直到遇到更大的数。这样最坏情况下会退化为 O(n^2)，例如数组单调递减时，每个位置都要扫到末尾。
+
+单调栈的做法是从左到右扫描数组，栈中保存“还没有找到下一个更大元素”的下标或数值。为了让当前元素能高效地解决旧问题，栈需要维护一种单调结构。以“下一个更大元素”为例，通常维护一个单调递减栈：栈顶元素对应的值最小，当前数 x 一来，只要 x 大于栈顶元素，就说明 x 是栈顶元素右侧第一个更大的数，直接记录答案并弹栈。弹出后继续比较，直到栈空或者栈顶不再小于 x。随后把 x 自己入栈，等待未来更大的数来解决它。
+
+这个过程的关键在于“每个元素只会被处理常数次”。它入栈一次，未来如果被某个更大的数弹出，也只弹出一次，所以总操作是线性的。实现时通常有两种写法：一种是栈里放下标，便于在答案数组里回填位置；另一种是栈里放数值，适合只关心值本身的场景。对于算法竞赛和通用模板，放下标更稳妥，因为它可以自然处理重复值和更复杂的映射关系。
+
+写代码时可以按这个框架组织：先创建一个答案数组，默认全设为 -1；然后遍历数组。对于当前值 nums[i]，只要栈不空且 nums[i] 大于栈顶下标对应的值，就把栈顶位置的答案更新为 nums[i]，并弹出。循环结束后，把 i 入栈。遍历完所有元素后，栈中剩下的位置说明右边没有更大的元素，它们的答案保持默认值即可。这个套路不仅适用于“下一个更大元素”，也能迁移到“下一个更小元素”“柱状图面积”“每日温度”等一系列问题，只是单调方向和比较符号会变化。
+
+下面给出完整 Python 示例，并附一个 C++ 对照版本。Python 代码里包含简单测试用例，方便直接运行验证。</p>
+<h3>Python 示例</h3>
+<pre><code>from typing import List
+
+
+def next_greater_elements(nums: List[int]) -&gt; List[int]:
+    """返回每个元素右侧第一个更大的元素，没有则为 -1。
+
+    使用单调递减栈，栈中存放下标。
+    栈顶对应的值越小，越容易被当前元素解决。
+    """
+    n = len(nums)
+    ans = [-1] * n
+    stack: List[int] = []  # 存放下标
+
+    for i, x in enumerate(nums):
+        # 只要当前元素更大，就可以成为栈顶元素的下一个更大元素
+        while stack and nums[stack[-1]] &lt; x:
+            idx = stack.pop()
+            ans[idx] = x
+        stack.append(i)
+
+    return ans
+
+
+def _run_tests() -&gt; None:
+    # 基础样例
+    nums1 = [2, 1, 2, 4, 3]
+    expected1 = [4, 2, 4, -1, -1]
+    assert next_greater_elements(nums1) == expected1
+
+    # 严格递增
+    nums2 = [1, 2, 3, 4]
+    expected2 = [2, 3, 4, -1]
+    assert next_greater_elements(nums2) == expected2
+
+    # 严格递减
+    nums3 = [4, 3, 2, 1]
+    expected3 = [-1, -1, -1, -1]
+    assert next_greater_elements(nums3) == expected3
+
+    # 存在重复元素
+    nums4 = [1, 1, 2, 1]
+    expected4 = [2, 2, -1, -1]
+    assert next_greater_elements(nums4) == expected4
+
+    # 只有一个元素
+    nums5 = [10]
+    expected5 = [-1]
+    assert next_greater_elements(nums5) == expected5
+
+    print("所有测试通过")
+
+
+if __name__ == "__main__":
+    _run_tests()
+    # 额外演示
+    demo = [2, 7, 3, 5, 4, 6, 8]
+    print("输入:", demo)
+    print("输出:", next_greater_elements(demo))
+</code></pre>
+<h3>C++ 对照</h3>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+vector&lt;int&gt; nextGreaterElements(const vector&lt;int&gt;&amp; nums) {
+    int n = (int)nums.size();
+    vector&lt;int&gt; ans(n, -1);
+    stack&lt;int&gt; st; // 存放下标
+
+    for (int i = 0; i &lt; n; ++i) {
+        while (!st.empty() &amp;&amp; nums[st.top()] &lt; nums[i]) {
+            ans[st.top()] = nums[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return ans;
+}
+
+int main() {
+    vector&lt;int&gt; nums = {2, 1, 2, 4, 3};
+    vector&lt;int&gt; ans = nextGreaterElements(nums);
+
+    for (int x : ans) cout &lt;&lt; x &lt;&lt; ' ';
+    cout &lt;&lt; '\n';
+
+    return 0;
+}
+</code></pre>
+<h3>复杂度分析</h3>
+<p>每个元素最多入栈一次、出栈一次，因此总时间复杂度是 O(n)。答案数组和栈都只需要线性额外空间，所以空间复杂度是 O(n)。相比暴力双循环的 O(n^2)，单调栈把重复比较压缩成了顺序扫描。</p>
+<h3>易错点</h3>
+<ol>
+<li>把栈里存值和存下标混在一起。修复方法：优先存下标，回填答案更稳，尤其遇到重复元素时不容易出错。</li>
+<li>比较符号写反，导致维护的是错误方向的单调性。修复方法：先明确你要找的是“右侧第一个更大”还是“更小”，再决定 while 条件是 `&lt;` 还是 `&gt;`。</li>
+<li>忘记初始化默认答案，或者在循环结束后误以为栈里剩下的元素还能找到答案。修复方法：先把答案数组全设为 -1，栈清空后剩余元素直接保持默认值。</li>
+</ol>
+</article>]]></content:encoded>
+      <pubDate>Fri, 04 Sep 2026 07:45:39 +0800</pubDate>
+      <guid isPermaLink="false">algorithms/daily/2026-09-04</guid>
+    </item>
+<item>
       <title>2026-09-02 每日算法专题</title>
       <link>algorithms/daily/2026-09-02.html</link>
       <description><![CDATA[如何在数组中快速找到每个元素右侧第一个比它大的元素，并把暴力的双重循环优化到线性时间？]]></description>
@@ -1467,225 +1586,6 @@ int main() {
 </article>]]></content:encoded>
       <pubDate>Tue, 04 Aug 2026 07:45:23 +0800</pubDate>
       <guid isPermaLink="false">algorithms/daily/2026-08-04</guid>
-    </item>
-<item>
-      <title>2026-08-03 每日算法专题</title>
-      <link>algorithms/daily/2026-08-03.html</link>
-      <description><![CDATA[如何在数组中快速找到每个元素右侧第一个比它大的元素，并把暴力双循环优化到线性时间？]]></description>
-      <content:encoded><![CDATA[<article>
-<h2>如何在数组中快速找到每个元素右侧第一个比它大的元素，并把暴力双循环优化到线性时间？</h2>
-<h3>直觉理解</h3>
-<p>如果你用暴力法做“下一个更大元素”，就会让每个数去右边一个个找，像在一条长队里反复回头问“你比我大吗”。单调栈的想法是反过来：我们不让每个元素都重新搜索，而是维护一个“还没等到更大元素的人”的候选队列。这个队列从栈底到栈顶保持单调递减，这样新来的元素一旦更大，就能一次性把它左边那些比它小的人都解决掉。因为每个元素最多进栈一次、出栈一次，所以虽然看起来像在不断比较，整体却只做了线性数量的工作。它的本质不是“神奇地跳过比较”，而是把重复比较压缩成了有序的弹栈过程。只要你接受一个事实：栈顶永远是当前最有可能被下一个更大元素击中的对象，整个算法就很自然了。</p>
-<h3>算法思路</h3>
-<p>这类题最经典的场景是：给定一个数组，求每个位置右边第一个比它大的数。暴力做法是对每个位置向右扫描，复杂度是 O(n^2)。单调栈的目标是把“向右扫很多次”变成“每个元素只处理一次”。
-
-做法是维护一个栈，栈里存的是元素下标，而不是元素值。栈对应的元素值从栈底到栈顶保持严格递减。遍历数组时，当前元素记为 `x`。只要栈不空，并且 `x` 比栈顶下标对应的元素更大，就说明 `x` 正好是那个栈顶元素的“下一个更大元素”。于是我们把栈顶弹出，并记录答案为 `x`。然后继续比较，直到栈顶元素已经不小于 `x`，或者栈空为止。最后把当前下标压入栈中，等待未来更大的元素来解决它。
-
-为什么这样是对的？因为栈里保存的都是“暂时还没找到答案”的元素，而且它们按递减顺序排列。当前元素如果能解决某个较小元素，那么它也一定能解决所有比这个较小元素更靠后的、更小的元素，弹栈过程就像一串连续的连锁反应。反过来，栈中剩下的元素都比当前值大，它们不能被当前值解决，只能等待后面的元素。
-
-如果题目问的是“右侧第一个更大元素”，就按这个顺序从左到右遍历即可。若题目要求“环形数组”，可以把数组遍历两遍，用取模模拟循环；若要求“左侧第一个更大元素”，则把遍历方向反过来，单调栈思路仍然相同。核心永远是：维护单调性，让每个元素只被压栈和弹栈一次。
-
-下面的 Python 示例给出标准版本：输入一个数组，返回每个位置右侧第一个更大元素；如果不存在，则记为 `-1`。代码中用 `stack` 存下标，`ans` 存答案，遍历过程中不断弹出已经被当前元素“击败”的下标。为了方便理解，还附带了简单测试用例，直接运行即可查看结果。</p>
-<h3>Python 示例</h3>
-<pre><code>from typing import List
-
-
-def next_greater_elements(nums: List[int]) -&gt; List[int]:
-    """返回每个元素右侧第一个更大元素；不存在则返回 -1。"""
-    n = len(nums)
-    ans = [-1] * n
-    stack = []  # 栈中存下标，保证对应的 nums 值从栈底到栈顶单调递减
-
-    for i, x in enumerate(nums):
-        # 当前元素 x 可以作为栈顶元素的“下一个更大元素”
-        while stack and nums[stack[-1]] &lt; x:
-            idx = stack.pop()
-            ans[idx] = x
-        # 当前下标入栈，等待后面的更大元素
-        stack.append(i)
-
-    return ans
-
-
-if __name__ == "__main__":
-    tests = [
-        [2, 1, 2, 4, 3],
-        [1, 3, 4, 2],
-        [5, 4, 3, 2, 1],
-        [1, 2, 3, 4],
-        [2, 2, 2],
-    ]
-
-    for arr in tests:
-        print("nums =", arr)
-        print("ans  =", next_greater_elements(arr))
-        print("-")
-</code></pre>
-<h3>C++ 对照</h3>
-<pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-
-vector&lt;int&gt; nextGreaterElements(const vector&lt;int&gt;&amp; nums) {
-    int n = (int)nums.size();
-    vector&lt;int&gt; ans(n, -1);
-    vector&lt;int&gt; st; // 存下标，栈中对应值保持单调递减
-
-    for (int i = 0; i &lt; n; ++i) {
-        while (!st.empty() &amp;&amp; nums[st.back()] &lt; nums[i]) {
-            ans[st.back()] = nums[i];
-            st.pop_back();
-        }
-        st.push_back(i);
-    }
-
-    return ans;
-}
-
-int main() {
-    vector&lt;vector&lt;int&gt;&gt; tests = {
-        {2, 1, 2, 4, 3},
-        {1, 3, 4, 2},
-        {5, 4, 3, 2, 1},
-        {1, 2, 3, 4},
-        {2, 2, 2}
-    };
-
-    for (const auto&amp; arr : tests) {
-        auto ans = nextGreaterElements(arr);
-        cout &lt;&lt; "nums = ";
-        for (int x : arr) cout &lt;&lt; x &lt;&lt; ' ';
-        cout &lt;&lt; "\nans  = ";
-        for (int x : ans) cout &lt;&lt; x &lt;&lt; ' ';
-        cout &lt;&lt; "\n-\n";
-    }
-
-    return 0;
-}</code></pre>
-<h3>复杂度分析</h3>
-<p>每个元素最多入栈一次、出栈一次，因此总时间复杂度是 O(n)。栈中最多保存 n 个下标，额外空间复杂度是 O(n)。相比暴力双循环的 O(n^2)，单调栈能把重复比较压缩成一次线性扫描。</p>
-<h3>易错点</h3>
-<ol>
-<li>把栈里存值而不是存下标，导致无法准确写回对应位置的答案。修复方法：栈里存下标，比较时再访问 nums[下标]。</li>
-<li>把弹栈条件写成 `&lt;=` 或 `&lt;` 但没有想清楚题意，导致相等元素被错误弹出或保留。修复方法：如果题目要求“严格更大”，通常用 `&lt;`；如果要求“更大或等于”，再改成 `&lt;=`。</li>
-<li>只想到从左到右遍历，却忘了答案是“右侧第一个更大元素”，于是把已经出现过的左边元素误当成答案。修复方法：确认方向，右侧问题就从左到右扫描并在未来元素到来时结算。</li>
-</ol>
-</article>]]></content:encoded>
-      <pubDate>Mon, 03 Aug 2026 07:45:27 +0800</pubDate>
-      <guid isPermaLink="false">algorithms/daily/2026-08-03</guid>
-    </item>
-<item>
-      <title>2026-08-02 每日算法专题</title>
-      <link>algorithms/daily/2026-08-02.html</link>
-      <description><![CDATA[如何把“对每个元素向右暴力找第一个更大值”的双重循环，优化成一次遍历的线性算法？]]></description>
-      <content:encoded><![CDATA[<article>
-<h2>如何把“对每个元素向右暴力找第一个更大值”的双重循环，优化成一次遍历的线性算法？</h2>
-<h3>直觉理解</h3>
-<p>下一个更大元素的问题，本质上是在问：每个数右边第一个比它大的数是谁。最直接的想法是对每个位置都往右扫一遍，但这样会重复比较很多次。单调栈的核心技巧，就是把这些“已经看过、暂时还没找到答案”的元素按某种顺序保存起来，让新来的元素一次性解决一批旧问题。对于下一个更大元素，我们维护一个“从栈底到栈顶单调递减”的栈，这样栈顶永远是当前最小心、最容易被新元素击败的那个。只要来一个更大的数，就不断把比它小的栈顶弹出，并且这个新数正好就是它们的下一个更大元素。每个元素最多入栈一次、出栈一次，所以整体是线性的。它像是在排队：后面来了一个更强的人，前面所有比他弱、又还没等到答案的人就都可以当场得到结果了。</p>
-<h3>算法思路</h3>
-<p>我们先把问题抽象成“对数组中每个位置，找到右侧第一个严格大于它的元素”。如果直接枚举，外层固定一个位置，内层往右找第一个更大值，最坏情况下会做成 O(n^2)。单调栈的思路是反过来想：不要等每个元素自己去找答案，而是让“新出现的元素”来处理一批还没答案的旧元素。
-
-具体做法是维护一个栈，栈里放的是“还没找到下一个更大元素”的数值或下标，并保证栈内元素从栈底到栈顶单调递减。这样栈顶元素是当前最小的“待解决对象”。当我们遍历到一个新元素 x 时，只要 x 比栈顶元素大，就说明 x 是栈顶元素右边遇到的第一个更大元素，可以立刻记录答案，并把栈顶弹出。然后继续判断新的栈顶，直到栈为空或者栈顶不再小于 x。处理完之后，把 x 入栈，等待未来更大的元素来解决它。
-
-如果题目是经典的“下一个更大元素”，通常可以返回每个位置的答案数组，初始化为 -1，表示右侧不存在更大元素。遍历结束后，所有还留在栈里的元素都没有更大的右侧元素，它们的答案自然保持 -1。这个算法的关键在于：虽然看起来有 while 循环，但每个元素最多只会被压入栈一次、弹出栈一次，因此总操作次数是 O(n)，不是 O(n^2)。
-
-实际写代码时，推荐栈里存下标而不是值。这样一方面可以直接回写答案数组，另一方面当数组中有重复值时也更稳妥。若要求“严格更大”，弹栈条件用 `&lt;`；如果题目允许“下一个更大或相等”，则条件要相应改成 `&lt;=`。这个细节会直接影响结果，是单调栈题里最常见的分界线。</p>
-<h3>Python 示例</h3>
-<pre><code>from typing import List
-
-
-def next_greater_elements(nums: List[int]) -&gt; List[int]:
-    """返回每个元素右侧第一个严格更大的元素；若不存在则为 -1。"""
-    n = len(nums)
-    ans = [-1] * n
-    stack = []  # 存下标，栈内对应的 nums 值单调递减
-
-    for i, x in enumerate(nums):
-        # 当前元素 x 可以解决所有比它小的栈顶元素
-        while stack and nums[stack[-1]] &lt; x:
-            j = stack.pop()
-            ans[j] = x
-        stack.append(i)
-
-    return ans
-
-
-def _run_tests():
-    tests = [
-        ([2, 1, 2, 4, 3], [4, 2, 4, -1, -1]),
-        ([1, 2, 3, 4], [2, 3, 4, -1]),
-        ([4, 3, 2, 1], [-1, -1, -1, -1]),
-        ([1, 1, 1], [-1, -1, -1]),
-        ([1, 3, 2, 4, 2, 5], [3, 4, 4, 5, 5, -1]),
-    ]
-
-    for nums, expected in tests:
-        result = next_greater_elements(nums)
-        assert result == expected, f"输入 {nums}，期望 {expected}，得到 {result}"
-
-    print("所有测试用例通过")
-
-
-if __name__ == "__main__":
-    _run_tests()
-</code></pre>
-<h3>C++ 对照</h3>
-<pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-
-vector&lt;int&gt; nextGreaterElements(const vector&lt;int&gt;&amp; nums) {
-    int n = (int)nums.size();
-    vector&lt;int&gt; ans(n, -1);
-    stack&lt;int&gt; st; // 存下标，保持对应值单调递减
-
-    for (int i = 0; i &lt; n; ++i) {
-        while (!st.empty() &amp;&amp; nums[st.top()] &lt; nums[i]) {
-            int j = st.top();
-            st.pop();
-            ans[j] = nums[i];
-        }
-        st.push(i);
-    }
-    return ans;
-}
-
-int main() {
-    vector&lt;vector&lt;int&gt;&gt; tests = {
-        {2, 1, 2, 4, 3},
-        {1, 2, 3, 4},
-        {4, 3, 2, 1},
-        {1, 1, 1},
-        {1, 3, 2, 4, 2, 5}
-    };
-
-    vector&lt;vector&lt;int&gt;&gt; expected = {
-        {4, 2, 4, -1, -1},
-        {2, 3, 4, -1},
-        {-1, -1, -1, -1},
-        {-1, -1, -1},
-        {3, 4, 4, 5, 5, -1}
-    };
-
-    for (size_t t = 0; t &lt; tests.size(); ++t) {
-        auto result = nextGreaterElements(tests[t]);
-        assert(result == expected[t]);
-    }
-
-    cout &lt;&lt; "所有测试用例通过" &lt;&lt; endl;
-    return 0;
-}
-</code></pre>
-<h3>复杂度分析</h3>
-<p>时间复杂度是 O(n)。每个元素最多入栈一次、出栈一次，虽然内部有 while 循环，但总弹栈次数是线性的。空间复杂度是 O(n)，主要来自答案数组和辅助栈。相比暴力枚举的 O(n^2)，单调栈把重复比较压缩掉了。</p>
-<h3>易错点</h3>
-<ol>
-<li>把栈里存“值”而不是“下标”，导致无法准确回填答案数组，尤其在有重复元素时会混淆位置；修复方法是优先存下标，再通过下标访问原数组。</li>
-<li>把弹栈条件写成 `&lt;=` 或 `&lt;` 搞错，导致“严格更大”和“更大或相等”的语义混淆；修复方法是先确认题目要求，再决定是否允许相等元素弹出。</li>
-<li>以为 while 循环一定是 O(n^2)，忽略了每个元素只会被弹一次；修复方法是用“总入栈次数 + 总出栈次数”来分析，而不是只看单层循环。</li>
-<li>忘记给默认答案设为 -1，导致没有更大元素的位置保留了错误初值；修复方法是在开始时统一初始化答案数组。</li>
-</ol>
-</article>]]></content:encoded>
-      <pubDate>Sun, 02 Aug 2026 07:45:36 +0800</pubDate>
-      <guid isPermaLink="false">algorithms/daily/2026-08-02</guid>
     </item>
   </channel>
 </rss>
