@@ -89,12 +89,18 @@ def test_publish_product_workflow_steps():
     step_names = [step.get("name") for step in publish_job["steps"]]
 
     assert "Read product config" in step_names
+    assert "Check AI provider" in step_names
     assert "Restore published pages state" in step_names
     assert "Run product pipeline" in step_names
     assert "Build site indexes" in step_names
     assert "Validate output" in step_names
     assert "Deploy to GitHub Pages" in step_names
     assert "Persist state database" in step_names
+
+    preflight_index = step_names.index("Check AI provider")
+    restore_index = step_names.index("Restore state database")
+    pipeline_index = step_names.index("Run product pipeline")
+    assert preflight_index < restore_index < pipeline_index
 
 
 def test_publish_product_workflow_reads_config_dynamically():
