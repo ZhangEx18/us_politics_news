@@ -78,6 +78,21 @@ def test_publish_product_workflow_has_required_inputs():
     assert workflow_call["inputs"]["report_type"]["type"] == "string"
 
 
+def test_publish_product_workflow_force_rescore_input():
+    workflow = _load_workflow("publish-product.yml")
+    dispatch = _workflow_triggers(workflow)["workflow_dispatch"]
+    workflow_call = _workflow_triggers(workflow)["workflow_call"]
+
+    assert dispatch["inputs"]["force_rescore"]["type"] == "boolean"
+    assert workflow_call["inputs"]["force_rescore"]["type"] == "boolean"
+
+    run_step = next(
+        step for step in workflow["jobs"]["publish"]["steps"]
+        if step.get("name") == "Run product pipeline"
+    )
+    assert "REUSE_REPORT_EVENTS" in run_step["env"]
+
+
 def test_publish_product_workflow_concurrency():
     workflow = _load_workflow("publish-product.yml")
     assert "publish-" in workflow["concurrency"]["group"]

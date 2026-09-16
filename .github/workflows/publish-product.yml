@@ -17,6 +17,16 @@ on:
         required: false
         default: false
         type: boolean
+      force_rescore:
+        description: '强制重新评分（忽略事件库复用，用于验证 prompt/模型变更）'
+        required: false
+        default: false
+        type: boolean
+      force_rescore:
+        description: '强制重新评分（忽略事件库复用，用于验证 prompt/模型变更）'
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       product_key:
@@ -29,6 +39,11 @@ on:
         type: string
       digest_only:
         description: '仅对 news/daily 有效：使用数据库现有文章重生成，不重新抓取'
+        required: false
+        default: false
+        type: boolean
+      force_rescore:
+        description: '强制重新评分（忽略事件库复用，用于验证 prompt/模型变更）'
         required: false
         default: false
         type: boolean
@@ -151,6 +166,7 @@ jobs:
           python3 src/run_product.py $ARGS
         env:
           RSSHUB_BASE_URL: http://localhost:1200
+          REUSE_REPORT_EVENTS: ${{ inputs.force_rescore && 'false' || 'true' }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
           AI_MODEL: ${{ secrets.AI_MODEL }}

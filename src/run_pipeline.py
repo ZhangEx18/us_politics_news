@@ -1272,6 +1272,17 @@ def _build_and_log_digest_report(
     return stats
 
 
+def _reuse_events_enabled(runtime_cfg: dict) -> bool:
+    """是否复用事件库；REUSE_REPORT_EVENTS 环境变量可强制覆盖（false=强制重评分）。"""
+    enabled = bool(runtime_cfg.get("reuse_report_events", True))
+    override = os.getenv("REUSE_REPORT_EVENTS")
+    if override is not None and override.strip():
+        enabled = override.strip().lower() not in {"0", "false", "no"}
+    if not enabled:
+        print("   事件库复用已禁用（REUSE_REPORT_EVENTS），本次强制重新评分")
+    return enabled
+
+
 def _run_digest_phase(
     config: dict,
     db: NewsDatabase,
@@ -1369,7 +1380,7 @@ def _run_digest_phase(
     }
     print(f"   候选池记录: {len(candidates)} 条")
 
-    reuse_events_cfg = runtime_cfg.get("reuse_report_events", True)
+    reuse_events_cfg = _reuse_events_enabled(runtime_cfg)
     next_report_date = (datetime.strptime(report_date, "%Y-%m-%d") + timedelta(days=1)).date().isoformat()
     stored_events = (
         db.fetch_report_events(report_date, next_report_date, report_type=report_type)
