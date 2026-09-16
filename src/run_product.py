@@ -21,22 +21,14 @@ def _validate_report_type(config: dict, report_type: str) -> None:
         raise ValueError(f"product {config.get('product_key')} 不支持 report_type={report_type}")
 
 
-def run_product(
-    product_key: str,
-    report_type: str,
-    hours: int = 24,
-    digest_only: bool = False,
-    evening: bool = False,
-) -> dict:
+def run_product(product_key: str, report_type: str, hours: int = 24, digest_only: bool = False) -> dict:
     config = load_product_config(product_key)
     _validate_report_type(config, report_type)
     content_type = config.get("content_type")
 
     if content_type == "news_digest":
         if report_type == "daily":
-            if digest_only:
-                return run_digest_only(hours=hours, report_type=report_type)
-            return run_pipeline(hours=hours, report_type=report_type, evening=evening)
+            return run_digest_only(hours=hours, report_type=report_type) if digest_only else run_pipeline(hours=hours, report_type=report_type)
         raise ValueError(f"news 暂停 report_type={report_type}")
 
     if content_type == "topic_lesson":
@@ -54,19 +46,9 @@ def main() -> None:
     parser.add_argument("--report-type", default="daily", choices=["daily", "weekly", "monthly"])
     parser.add_argument("--hours", type=int, default=24)
     parser.add_argument("--digest-only", action="store_true")
-    parser.add_argument("--evening", action="store_true", help="晚报模式：窗口延展到当前时刻")
     args = parser.parse_args()
 
-    stats = run_product(
-        args.product,
-        args.report_type,
-        hours=args.hours,
-        digest_only=args.digest_only,
-        evening=args.evening,
-    )
-    if stats.get("skipped"):
-        print(f"[跳过] {stats.get('skipped')}: new_events={stats.get('new_events')}")
-        return
+    stats = run_product(args.product, args.report_type, hours=args.hours, digest_only=args.digest_only)
     if stats.get("total_selected", stats.get("total_fetched", 1)) == 0:
         raise SystemExit(1)
     print(stats)
