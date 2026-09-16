@@ -588,6 +588,8 @@ def _audit_daily_content(
         "old_body_dates": 0,
         "fallback_boilerplate": 0,
         "truncated_titles": 0,
+        "meta_commentary": 0,
+        "pipeline_leak": 0,
     }
     allowed = set(allowed_dates or [])
 
@@ -612,6 +614,10 @@ def _audit_daily_content(
                 metrics["old_body_dates"] += 1
             if "现有材料未提供更多可核验细节" in body:
                 metrics["fallback_boilerplate"] += 1
+            if _META_COMMENTARY_RE.search(body):
+                metrics["meta_commentary"] += 1
+            if _PIPELINE_LEAK_RE.search(body):
+                metrics["pipeline_leak"] += 1
 
     return metrics
 
@@ -852,6 +858,24 @@ _FORBIDDEN_PHRASES: list[str] = [
     "增添了变数", "存在不确定性", "产生深远影响", "仍需观察",
     "对于读者来说", "值得关注的是",
 ]
+
+# 元评论句式（描述报道本身而非事实）
+_META_COMMENTARY_RE = re.compile(
+    r"(报道把|讨论焦点|此次被证实的是|此次公布的是|此次变化集中在"
+    r"|这次\S{0,6}(表态|警告|召见|发布)\S{0,4}把|把\S{0,8}列为\S{0,6}对象"
+    r"|报道将|报道把这一)"
+)
+
+# 管道/采集信息泄漏（系统元数据写进正文）
+_PIPELINE_LEAK_RE = re.compile(
+    r"(聚合条目|收录了这条|转载自|抓取|来源层级|多来源收录|Google News 聚合)"
+)
+
+# 观点/分析稿标题（不进要点列表）
+_OPINION_TITLE_RE = re.compile(r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么)")
+
+# 公关语（标题命中时降权/剔除）
+_PROMO_WORD_RE = re.compile(r"(新洞察|赋能|重磅|颠覆|引爆|震撼)")
 
 
 def _sanitize_event_text(text: str) -> tuple[str, list[str]]:
@@ -1222,6 +1246,8 @@ def _normalize_headline_only_by_column(
         cryptic_dropped = 0
         unreadable_dropped = 0
         body_from_title = 0
+        opinion_dropped = 0
+        promo_dropped = 0
 
         for item in items:
             title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
@@ -1230,6 +1256,12 @@ def _normalize_headline_only_by_column(
                 continue
             if _is_cryptic_headline_only_title(title_zh):
                 cryptic_dropped += 1
+                continue
+            if _OPINION_TITLE_RE.search(title_zh):
+                opinion_dropped += 1
+                continue
+            if _PROMO_WORD_RE.search(title_zh):
+                promo_dropped += 1
                 continue
 
             reader_body = _build_headline_only_reader_body(item)
@@ -1253,6 +1285,8 @@ def _normalize_headline_only_by_column(
             "headline_cryptic_dropped": cryptic_dropped,
             "headline_reader_body_missing": unreadable_dropped,
             "headline_body_from_title": body_from_title,
+            "headline_opinion_dropped": opinion_dropped,
+            "headline_promo_dropped": promo_dropped,
         }
 
     return normalized_columns, metrics

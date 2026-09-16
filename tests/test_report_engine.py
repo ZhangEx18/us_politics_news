@@ -217,6 +217,8 @@ def test_audit_daily_content_counts_common_content_problems():
         "old_body_dates": 1,
         "fallback_boilerplate": 1,
         "truncated_titles": 1,
+        "meta_commentary": 0,
+        "pipeline_leak": 0,
     }
 
 
@@ -1419,3 +1421,37 @@ def test_ai_expand_fallback_events_requires_recent_candidates():
 
     assert expanded["technology"] == []
     assert metrics == {}
+
+
+# ── WP1: 元评论/管道泄漏审计 + 观点稿过滤 ──
+
+
+def test_audit_daily_content_counts_meta_commentary_and_pipeline_leak():
+    columns = {
+        "us_politics": {
+            "detailed_events": [
+                {"title_zh": "测试事件", "reader_body": "9 月 16 日，事实一。报道把这一动作定位为重要进展。"},
+                {"title_zh": "另一事件", "reader_body": "9 月 16 日，事实二。同一日 Google News 聚合条目也收录了这条 BBC 稿件。"},
+            ]
+        }
+    }
+
+    metrics = _audit_daily_content(columns, ["2026-09-15", "2026-09-16"], 2026)
+
+    assert metrics["meta_commentary"] == 1
+    assert metrics["pipeline_leak"] == 1
+
+
+def test_normalize_headline_drops_opinion_and_promo_titles():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "us_politics": [
+            {"title_zh": "尽管有警告，特朗普为何仍全力押注人工智能", "reader_body": "分析稿。"},
+            {"title_zh": "Google 发布新工具，提供 AI 新洞察", "reader_body": "公关稿。"},
+            {"title_zh": "众议院通过决议", "summary": "众议院通过决议。", "content": "众议院通过决议。"},
+        ]
+    })
+
+    kept_titles = [item["title_zh"] for item in normalized["us_politics"]]
+    assert kept_titles == ["众议院通过决议"]
+    assert metrics["us_politics"]["headline_opinion_dropped"] == 1
+    assert metrics["us_politics"]["headline_promo_dropped"] == 1
