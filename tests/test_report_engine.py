@@ -1344,3 +1344,78 @@ def test_normalize_headline_prefers_chinese_body():
     })
 
     assert normalized["us_politics"][0]["reader_body"] == "参议院通过预算案，程序性表决过关。"
+
+
+# ── AI 兜底扩写（重点解析过短/英文候选） ──
+
+
+def test_ai_expand_fallback_events_fills_short_columns():
+    import report_engine
+
+    column_results = {"us_politics": []}
+    column_candidates = {
+        "us_politics": [
+            {
+                "title": "Iran war live: Republicans rebel",
+                "link": "https://example.com/a",
+                "summary": "众议院再次就伊朗战争权力决议投票。",
+                "freshness_status": "today",
+                "event_date": "2026-09-16",
+            }
+        ]
+    }
+    columns_cfg = {"us_politics": {"min_items": 3}}
+
+    async def fake_bodies(entries, ai_config):
+        return {entries[0]["link"]: "9 月 16 日，众议院再次就伊朗战争权力决议投票。表决结果与后续程序仍待确认，相关条款将影响总统动武权限。"}
+
+    with patch.object(report_engine, "generate_fallback_bodies", fake_bodies):
+        expanded, metrics = report_engine._ai_expand_fallback_events(
+            column_results, column_candidates, columns_cfg, {},
+        )
+
+    events = expanded["us_politics"]
+    assert len(events) == 1
+    assert events[0]["reader_body"].startswith("9 月 16 日")
+    assert metrics["us_politics"]["ai_fallback_added"] == 1
+
+
+def test_ai_expand_fallback_events_skips_full_columns():
+    import report_engine
+
+    column_results = {"us_politics": [{"title_zh": "已有解析", "reader_body": "正文"}]}
+    columns_cfg = {"us_politics": {"min_items": 1}}
+
+    async def fake_bodies(entries, ai_config):  # pragma: no cover - 不应被调用
+        raise AssertionError("columns 已满足 min_items 时不应调用 AI")
+
+    with patch.object(report_engine, "generate_fallback_bodies", fake_bodies):
+        expanded, metrics = report_engine._ai_expand_fallback_events(
+            column_results, {}, columns_cfg, {},
+        )
+
+    assert metrics == {}
+    assert expanded["us_politics"][0]["title_zh"] == "已有解析"
+
+
+def test_ai_expand_fallback_events_requires_recent_candidates():
+    import report_engine
+
+    column_results = {"technology": []}
+    column_candidates = {
+        "technology": [
+            {"title": "Old news", "link": "https://example.com/old", "freshness_status": "old_background"},
+        ]
+    }
+    columns_cfg = {"technology": {"min_items": 3}}
+
+    async def fake_bodies(entries, ai_config):  # pragma: no cover - 不应被调用
+        raise AssertionError("无可选候选时不应调用 AI")
+
+    with patch.object(report_engine, "generate_fallback_bodies", fake_bodies):
+        expanded, metrics = report_engine._ai_expand_fallback_events(
+            column_results, column_candidates, columns_cfg, {},
+        )
+
+    assert expanded["technology"] == []
+    assert metrics == {}

@@ -1443,6 +1443,60 @@ async def translate_headline_titles(
     return translated[:len(cleaned_titles)]
 
 
+FALLBACK_BODY_PROMPT_TEMPLATE = """你是中文新闻编辑。请把下面的候选新闻改写成日报的简讯正文。
+
+## 要求
+- 中文，2-3 句，总长 100-180 字
+- 第一句必须包含事件日期，格式 "M 月 D 日"（使用给定 event_date 的月日）
+- 优先使用候选 summary（中文摘要）与 content（原文片段，可能为英文）里的具体事实，可用中文转述
+- 信息不足以写满时，补充该事件的影响范围或后续关注点；禁止重复同一句话凑字数
+- 只写候选信息里能确认的事实，不确定的细节不要编造
+- 禁止输出英文原文、URL；禁止复述"来源为/链接为"等字段
+- 禁止使用"据报道、据悉、值得关注的是、现有材料未提供更多可核验细节"等套话
+- 不要输出标题，只输出正文
+
+## 候选列表
+{entries_json}
+
+## 输出（严格 JSON，link 原样返回）
+{{"items": [{{"link": "原链接", "body": "中文简讯正文"}}]}}
+"""
+
+
+async def generate_fallback_bodies(entries: list[dict], ai_config: dict) -> dict[str, str]:
+    """把评分候选扩写成中文简讯正文，用于栏目重点解析兜底。"""
+    if not entries:
+        return {}
+    prompt = FALLBACK_BODY_PROMPT_TEMPLATE.replace(
+        "{entries_json}",
+        json.dumps(entries, ensure_ascii=False, indent=2),
+    )
+    try:
+        response = await _call_llm(
+            prompt,
+            {**ai_config, "temperature": 0.2},
+            timeout=_timeout_for(ai_config, "meta", 120),
+        )
+        parsed = _parse_jsonish_object(response)
+    except Exception as exc:  # noqa: BLE001 - 兜底失败时降级为无正文
+        _ai_log(f"兜底正文生成失败: {type(exc).__name__}: {str(exc)[:80]}")
+        return {}
+
+    items = parsed.get("items")
+    if not isinstance(items, list):
+        return {}
+
+    bodies: dict[str, str] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        link = str(item.get("link") or "").strip()
+        body = re.sub(r"\s+", " ", str(item.get("body") or "")).strip()
+        if link and body:
+            bodies[link] = body
+    return bodies
+
+
 def has_ai_config() -> bool:
     """检查是否配置了 AI API Key（无 key 时返回 False，不抛异常）"""
     try:

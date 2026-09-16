@@ -75,3 +75,29 @@ def test_load_ai_config_reads_fallback(monkeypatch):
     assert config["fallback"]["base_url"] == "https://backup.example"
     assert config["fallback"]["model"] == "backup-model"
     assert config["fallback"]["api_key"] == "primary-key"
+
+
+def test_generate_fallback_bodies_parses_items(monkeypatch):
+    async def fake_call(prompt, config, timeout=120):
+        return '{"items": [{"link": "https://a.com", "body": "9 月 16 日，众议院推进决议。"}]}'
+
+    monkeypatch.setattr(ai_analyzer, "_call_llm", fake_call)
+
+    bodies = asyncio.run(ai_analyzer.generate_fallback_bodies(
+        [{"link": "https://a.com", "title": "T", "summary": "摘要", "event_date": "2026-09-16"}], {},
+    ))
+
+    assert bodies == {"https://a.com": "9 月 16 日，众议院推进决议。"}
+
+
+def test_generate_fallback_bodies_returns_empty_on_error(monkeypatch):
+    async def fake_call(prompt, config, timeout=120):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(ai_analyzer, "_call_llm", fake_call)
+
+    bodies = asyncio.run(ai_analyzer.generate_fallback_bodies(
+        [{"link": "https://a.com", "title": "T"}], {},
+    ))
+
+    assert bodies == {}
