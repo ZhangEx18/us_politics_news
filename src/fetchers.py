@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 from html import unescape
 from typing import List, Optional
 from urllib.parse import urljoin
+from zoneinfo import ZoneInfo
 import aiohttp
 import feedparser
 
@@ -92,6 +93,80 @@ def _build_item_metadata(source_cfg: dict, entry_tags: list[str] | None = None) 
                 merged_tags.append(tag)
         metadata["tags"] = merged_tags
     return metadata
+
+
+_CN_TZ = ZoneInfo("Asia/Shanghai")
+
+_URL_DATE_PATTERNS = (
+    r"/(20\d{2})[/-](\d{1,2})[/-](\d{1,2})(?:[/-]|$)",
+    r"/(20\d{2})(\d{2})(\d{2})(?:[/-]|$)",
+)
+
+_PUBLISHED_AT_PATTERNS = (
+    r'<meta[^>]+(?:property|name)=["\'](?:article:published_time|og:published_time|published_time|publishdate|pubdate|weibo:article:create_at)["\'][^>]*content=["\']([^"\']+)',
+    r'<meta[^>]+content=["\']([^"\']+)["\'][^>]*(?:property|name)=["\'](?:article:published_time|publishdate|pubdate)["\']',
+    r"<time[^>]+datetime=[\"']([^\"']+)[\"']",
+    r'"datePublished"\s*:\s*"([^"]+)"',
+    r'"pubDate"\s*:\s*"([^"]+)"',
+    r'"published_at"\s*:\s*"([^"]+)"',
+)
+
+
+def _parse_datetime_text(raw: str) -> Optional[datetime]:
+    """解析常见日期格式（ISO / RFC2822 / 中文日期 / 时间戳）。"""
+    text = str(raw or "").strip()
+    if not text:
+        return None
+    if re.fullmatch(r"\d{10}|\d{13}", text):
+        seconds = int(text) / (1000 if len(text) == 13 else 1)
+        return datetime.fromtimestamp(seconds, tz=_CN_TZ)
+    normalized = text.replace("年", "-").replace("月", "-").replace("日", " ")
+    normalized = normalized.replace("/", "-").strip()
+    try:
+        dt = datetime.fromisoformat(normalized.replace("Z", "+00:00"))
+    except ValueError:
+        match = re.search(
+            r"(20\d{2})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{1,2}))?", normalized
+        )
+        if not match:
+            return None
+        try:
+            dt = datetime(
+                int(match.group(1)), int(match.group(2)), int(match.group(3)),
+                int(match.group(4) or 0), int(match.group(5) or 0),
+            )
+        except ValueError:
+            return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=_CN_TZ)
+    return dt
+
+
+def _extract_date_from_url(url: str) -> Optional[datetime]:
+    """从 URL 路径提取发布日期（/2026/09/16/、/20260916/ 等）。"""
+    for pattern in _URL_DATE_PATTERNS:
+        match = re.search(pattern, str(url or ""))
+        if not match:
+            continue
+        try:
+            return datetime(
+                int(match.group(1)), int(match.group(2)), int(match.group(3)), tzinfo=_CN_TZ
+            )
+        except ValueError:
+            continue
+    return None
+
+
+def _extract_published_at_from_html(raw_html: str) -> Optional[datetime]:
+    """从详情页 meta / time / JSON-LD 提取发布时间。"""
+    for pattern in _PUBLISHED_AT_PATTERNS:
+        match = re.search(pattern, str(raw_html or ""), flags=re.IGNORECASE)
+        if not match:
+            continue
+        parsed = _parse_datetime_text(match.group(1))
+        if parsed:
+            return parsed
+    return None
 
 
 def _extract_html_text(raw_html: str) -> str:
@@ -397,28 +472,6 @@ class CustomFeedFetcher(BaseFetcher):
         """对公告/记录类页面做保守解析，优先抓取带链接标题的块。"""
         return await self._fetch_china_media_article_list(source_cfg, since)
 
-    async def _build_custom_item_content(
-        self,
-        source_cfg: dict,
-        link: str,
-        title: str,
-        page_text: str,
-        summary_limit: int,
-    ) -> str:
-        snippet = _build_contextual_snippet(page_text, title, summary_limit)
-        fetcher_key = str(source_cfg.get("fetcher_key", "")).strip()
-        if fetcher_key not in {"legislative_or_public_records", "intl_org_feed"}:
-            return snippet
-
-        try:
-            detail_html = await self._get(link, timeout=aiohttp.ClientTimeout(total=30))
-        except Exception:
-            return snippet
-
-        detail_text = _extract_html_text(detail_html)
-        detail_snippet = _build_contextual_snippet(detail_text, title, summary_limit)
-        return detail_snippet or snippet
-
     async def _fetch_china_media_article_list(self, source_cfg: dict, since: datetime) -> List[ContentItem]:
         html = await self._get(source_cfg["url"], timeout=aiohttp.ClientTimeout(total=30))
         selectors = source_cfg.get("custom", {}).get("item_patterns") or [
@@ -426,6 +479,10 @@ class CustomFeedFetcher(BaseFetcher):
         ]
         summary_limit = int(source_cfg.get("custom", {}).get("summary_chars", 240))
         max_items = int(source_cfg.get("custom", {}).get("max_items", 12))
+        fetcher_key = str(source_cfg.get("fetcher_key", "")).strip()
+        fetch_detail = bool(source_cfg.get("custom", {}).get("fetch_detail", True))
+        detail_always = fetcher_key in {"legislative_or_public_records", "intl_org_feed"}
+        since_utc = (since if since.tzinfo else since.replace(tzinfo=timezone.utc)).astimezone(timezone.utc)
 
         extracted: list[ContentItem] = []
         seen_links: set[str] = set()
@@ -442,13 +499,24 @@ class CustomFeedFetcher(BaseFetcher):
                     continue
                 seen_links.add(normalized_link)
                 native_id = self._hash_id(link)
-                snippet = await self._build_custom_item_content(
-                    source_cfg=source_cfg,
-                    link=link,
-                    title=title,
-                    page_text=page_text,
-                    summary_limit=summary_limit,
-                )
+
+                published_at = _extract_date_from_url(link)
+                snippet = _build_contextual_snippet(page_text, title, summary_limit)
+                if fetch_detail and (detail_always or published_at is None):
+                    detail_html = None
+                    try:
+                        detail_html = await self._get(link, timeout=aiohttp.ClientTimeout(total=20))
+                    except Exception:
+                        detail_html = None
+                    if detail_html:
+                        if published_at is None:
+                            published_at = _extract_published_at_from_html(detail_html)
+                        detail_text = _extract_html_text(detail_html)
+                        snippet = _build_contextual_snippet(detail_text, title, summary_limit) or snippet
+
+                if published_at is not None and published_at.astimezone(timezone.utc) < since_utc:
+                    continue
+
                 extracted.append(ContentItem(
                     id=self._generate_id("custom", source_cfg["name"].replace(" ", "_"), native_id),
                     source_type=SourceType.CUSTOM,
@@ -456,7 +524,7 @@ class CustomFeedFetcher(BaseFetcher):
                     url=link,
                     content=snippet,
                     source_name=source_cfg["name"],
-                    published_at=None,
+                    published_at=published_at,
                     column=source_cfg.get("column", ""),
                     source_tier=source_cfg.get("source_tier", 4),
                     source_url_normalized=normalized_link,
