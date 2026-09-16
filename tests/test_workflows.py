@@ -26,9 +26,11 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     schedule = _workflow_triggers(workflow)["schedule"]
 
     assert list(_workflow_triggers(workflow)) == ["schedule", "workflow_dispatch"]
-    assert schedule == [{"cron": "30 23 * * *"}]
+    assert schedule == [{"cron": "30 23 * * *"}, {"cron": "30 10 * * *"}]
     assert "digest_only" in dispatch["inputs"]
     assert dispatch["inputs"]["digest_only"]["type"] == "boolean"
+    assert "evening" in dispatch["inputs"]
+    assert dispatch["inputs"]["evening"]["type"] == "boolean"
     assert "concurrency" not in workflow
 
     delegate_job = workflow["jobs"]["delegate"]
@@ -36,7 +38,7 @@ def test_daily_rss_publish_is_thin_wrapper_to_publish_product():
     assert delegate_job["with"]["product_key"] == "news"
     assert delegate_job["with"]["report_type"] == "daily"
     assert delegate_job["with"]["digest_only"] is False
-    assert "inputs" not in str(delegate_job["with"])
+    assert "evening" in delegate_job["with"]
     assert delegate_job["secrets"] == "inherit"
 
 
@@ -76,6 +78,8 @@ def test_publish_product_workflow_has_required_inputs():
     assert set(dispatch["inputs"]["report_type"]["options"]) == {"daily"}
     assert workflow_call["inputs"]["product_key"]["type"] == "string"
     assert workflow_call["inputs"]["report_type"]["type"] == "string"
+    assert dispatch["inputs"]["evening"]["type"] == "boolean"
+    assert workflow_call["inputs"]["evening"]["type"] == "boolean"
 
 
 def test_publish_product_workflow_concurrency():
@@ -143,6 +147,7 @@ def test_publish_product_workflow_uses_run_product():
     assert "python3 src/run_product.py" in run_step["run"]
     assert "--product" in run_step["run"]
     assert "--report-type" in run_step["run"]
+    assert "--evening" in run_step["run"]
 
 
 def test_publish_product_sync_legacy_aliases_uses_heredoc_python():

@@ -874,15 +874,29 @@ def _write_metrics_file(output_root: str, metrics: dict) -> str:
     return path
 
 
-def run_pipeline(hours: int = 24, report_type: str = "daily", report_date: str | None = None) -> dict:
-    """完整流程：抓取 + 评分 + 分栏 digest"""
+def run_pipeline(
+    hours: int = 24,
+    report_type: str = "daily",
+    report_date: str | None = None,
+    evening: bool = False,
+) -> dict:
+    """完整流程：抓取 + 评分 + 分栏 digest
+
+    evening=True 时窗口延展到当前时刻（晚报再生成），并在新增事件不足时跳过发布。
+    """
     start_time = datetime.now()
     config = _load_config()
     since, until, report_date = (
         _get_report_window_for_date(report_date, config=config)
         if report_date else _get_report_window(config=config)
     )
-    print(f"日报窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}")
+    schedule_cfg = _load_schedule_config(config)
+    local_tz = ZoneInfo(schedule_cfg["timezone"])
+    now_local = datetime.now(local_tz)
+    if evening and now_local > until:
+        until = now_local
+    print(f"日报窗口: {since.strftime('%m-%d %H:%M')} → {until.strftime('%m-%d %H:%M')}"
+          + ("（晚报）" if evening else ""))
     publish_cfg = config.get("publish", {})
     storage_cfg = config.get("storage", {})
     digest_cfg = config.get("digest", {})
@@ -966,6 +980,7 @@ def run_pipeline(hours: int = 24, report_type: str = "daily", report_date: str |
         report_type=report_type,
         product_key=config.get("product_key", "news"),
         site_root=site_root,
+        evening=evening,
         pipeline_context={
             "sources": sources,
             "freshness": freshness_stats,
@@ -1284,6 +1299,7 @@ def _run_digest_phase(
     report_type: str = "daily",
     product_key: str = "news",
     site_root: str = "docs/news",
+    evening: bool = False,
     pipeline_context: dict | None = None,
 ) -> dict:
     """步骤 4-13：评分 + 分栏 digest + 输出"""
@@ -1587,6 +1603,40 @@ def _run_digest_phase(
                 metrics=phase_metrics,
             )
             sys.exit(1)
+    if evening and report_type == "daily":
+        existing_events = db.fetch_report_events(report_date)
+        existing_keys = {event.event_key for event in existing_events if event.event_key}
+        new_event_count = sum(
+            1 for entry in hard_news_scored
+            if (entry.get("event_key") or "").strip() not in existing_keys
+        )
+        min_new_events = int(runtime_cfg.get("evening_min_new_events", 5))
+        phase_metrics["evening_new_events"] = new_event_count
+        phase_metrics["evening_min_new_events"] = min_new_events
+        if existing_events and new_event_count < min_new_events:
+            print(
+                f"\n[跳过] 晚报新增事件 {new_event_count} < {min_new_events}，保留晨报版本"
+            )
+            _log_digest_run(
+                db,
+                report_key=report_date,
+                report_type=report_type,
+                status="evening_skipped",
+                window_since=window_since,
+                window_until=window_until,
+                input_count=len(merged_items),
+                candidate_count=len(candidates),
+                selected_count=len(hard_news_scored),
+                ai_duration_seconds=ai_duration,
+                error_count=len(score_errors),
+                metrics=phase_metrics,
+            )
+            return {
+                "total_fetched": len(merged_items),
+                "total_selected": 0,
+                "skipped": "evening_no_new_events",
+                "new_events": new_event_count,
+            }
     event_upserts = db.upsert_report_events(
         _scored_entries_to_report_events(hard_news_scored, report_date, report_type)
     )
