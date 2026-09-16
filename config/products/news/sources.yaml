@@ -44,6 +44,7 @@
   column: us_politics
   source_tier: 1
   language: en
+  max_candidates_per_run: 3
   enabled: true
 - name: BBC US & Canada
   url: http://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml
@@ -269,6 +270,7 @@
   column: global_affairs
   source_tier: 1
   language: en
+  max_candidates_per_run: 3
   enabled: true
 - name: The Guardian World
   url: https://www.theguardian.com/world/rss
@@ -892,6 +894,7 @@
   column: us_politics
   source_tier: 1
   language: en
+  max_candidates_per_run: 2
   tags:
   - policy
   custom:
@@ -943,6 +946,7 @@
   column: us_politics
   source_tier: 1
   language: en
+  max_candidates_per_run: 2
   tags:
   - official
   - election
@@ -959,6 +963,7 @@
   column: global_affairs
   source_tier: 1
   language: en
+  max_candidates_per_run: 2
   tags:
   - official
   - diplomacy
@@ -970,6 +975,7 @@
   column: technology
   source_tier: 1
   language: en
+  max_candidates_per_run: 2
   tags:
   - official
   - regulation
@@ -982,6 +988,7 @@
   column: technology
   source_tier: 1
   language: en
+  max_candidates_per_run: 2
   tags:
   - official
   - regulation
@@ -999,6 +1006,7 @@
   column: economy
   source_tier: 1
   language: en
+  max_candidates_per_run: 2
   tags:
   - official
   - trade
@@ -1016,6 +1024,7 @@
   column: economy
   source_tier: 1
   language: en
+  max_candidates_per_run: 2
   tags:
   - official
   - macro_data
