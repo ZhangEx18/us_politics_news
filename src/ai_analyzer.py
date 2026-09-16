@@ -11,6 +11,7 @@ import json
 import os
 import re
 import time
+import uuid
 from pathlib import Path
 from typing import Optional
 
@@ -20,6 +21,10 @@ from dotenv import load_dotenv
 # 加载 .env
 _project_root = Path(__file__).resolve().parent.parent
 load_dotenv(_project_root / ".env")
+
+# OpenCode Zen Go 要求自定义 User-Agent + 稳定会话标识
+_CLIENT_USER_AGENT = "us-politics-news-crawler/1.0"
+_SESSION_ID = uuid.uuid4().hex
 
 # ── AI 配置 ──
 
@@ -33,8 +38,8 @@ def _load_ai_config() -> dict:
         )
     return {
         "api_key": api_key,
-        "base_url": os.getenv("AI_BASE_URL") or "https://open.bigmodel.cn/api/paas/v4",
-        "model": os.getenv("AI_MODEL") or "glm-4.7",
+        "base_url": os.getenv("AI_BASE_URL") or "https://opencode.ai/zen/go/v1",
+        "model": os.getenv("AI_MODEL") or "deepseek-v4.1-flash",
     }
 
 
@@ -59,7 +64,10 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
     headers = {
         "Authorization": f"Bearer {config['api_key']}",
         "Content-Type": "application/json",
+        "User-Agent": _CLIENT_USER_AGENT,
     }
+    if "opencode.ai" in config["base_url"]:
+        headers["x-opencode-session"] = _SESSION_ID
     payload = {
         "model": config["model"],
         "messages": [{"role": "user", "content": prompt}],
@@ -91,6 +99,16 @@ def _timeout_for(config: dict, scope: str, default: int) -> int:
 def _ai_log(message: str) -> None:
     """统一 AI 阶段日志，确保长任务在本地和 CI 都能及时看到进度。"""
     print(f"  [AI] {message}", flush=True)
+
+
+def _format_iso_date_for_reader(value: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    match = re.search(r"(20\d{2})-(\d{1,2})-(\d{1,2})", text)
+    if not match:
+        return ""
+    return f"{int(match.group(2))} 月 {int(match.group(3))} 日"
 
 
 # ── JSON 解析工具 ──
@@ -267,6 +285,9 @@ def _merge_scores(entries: list[dict], scores: list[dict]) -> list[dict]:
             "freshness_status": s.get("freshness_status", entry.get("freshness_status", "")),
             "source_tier": entry.get("source_tier", s.get("source_tier", 4)),
             "language": entry.get("language", s.get("language", "")),
+            "information_gain": s.get("information_gain", entry.get("information_gain", "")),
+            "event_stage": s.get("event_stage", entry.get("event_stage", "")),
+            "verifiability": s.get("verifiability", entry.get("verifiability", "")),
         })
     return merged
 
@@ -353,6 +374,9 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
 - `is_hard_news`: 布尔值，是否属于硬新闻
 - `tags`: 字符串数组（1-3 个，每个 2-12 字符，必须是具体关键词，禁止空泛标签）
 - `summary`: 一句话客观摘要（50 字内）
+- `information_gain`: 信息增量（0-1）
+- `event_stage`: 事件阶段（首发 / 跟进 / 总结 / 回应）
+- `verifiability`: 可验证性（0-1）
 
 ## 输出格式（严格只输出 JSON，以 "{{" 开始，以 "}}" 结尾）
 
@@ -1123,13 +1147,17 @@ async def generate_column_digest(
     # 简化事件数据给 LLM
     events_for_llm = []
     for e in events:
+        freshness_date = str(e.get("freshness_date") or "").strip()
+        event_date = str(e.get("event_date") or "").strip()
         events_for_llm.append({
             "title": e.get("title", ""),
             "source": e.get("source", ""),
             "score": e.get("score", 0),
             "summary": e.get("summary", ""),
-            "freshness_date": e.get("freshness_date", ""),
-            "event_date": e.get("event_date", ""),
+            "freshness_date": freshness_date,
+            "event_date": event_date,
+            "freshness_date_formatted": _format_iso_date_for_reader(freshness_date),
+            "event_date_formatted": _format_iso_date_for_reader(event_date),
             "freshness_status": e.get("freshness_status", ""),
             "evidence": _build_digest_evidence(e)[:int(ai_config.get("digest_content_chars", 1000))],
             "source_links": e.get("source_links", []),

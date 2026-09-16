@@ -152,6 +152,25 @@ def test_sanitize_or_validate_events_drops_body_date_outside_daily_window():
     assert any("正文日期不在日报窗口: 2026-06-03" in issue for issue in issues)
 
 
+def test_sanitize_or_validate_events_rewrites_body_date_when_event_date_in_window():
+    events = [{
+        "title_zh": "旧事件",
+        "reader_body": "6 月 3 日，USTR 公布一项旧程序安排。该安排已不属于本期日报窗口。",
+        "event_date": "2026-07-03",
+        "freshness_date": "2026-07-03",
+    }]
+
+    cleaned, issues = sanitize_or_validate_events(events, {
+        "require_date_in_body": True,
+        "allowed_body_dates": ["2026-07-02", "2026-07-03"],
+        "body_date_year": 2026,
+    })
+
+    assert len(cleaned) == 1
+    assert cleaned[0]["reader_body"].startswith("7 月 3 日")
+    assert any("正文日期已重写" in issue for issue in issues)
+
+
 def test_dedupe_daily_column_events_removes_similar_titles_and_event_keys():
     results, metrics = _dedupe_daily_column_events({
         "us_politics": [
@@ -729,13 +748,16 @@ def test_build_report_daily_falls_back_when_digest_outputs_empty_columns(tmp_pat
         stats = build_report(spec, scored_events, config, {}, _DummyDb(), phase_metrics={"columns": {}, "ai": {}})
 
     columns = save_report.call_args.args[1]
-    assert all(columns[col_key]["detailed_events"] for col_key in spec.column_quotas)
+    assert all(
+        columns[col_key]["detailed_events"] or columns[col_key]["headline_only_events"]
+        for col_key in spec.column_quotas
+    )
     assert columns["us_politics"]["detailed_events"][0]["title_zh"].startswith("白宫与国会")
     assert columns["technology"]["detailed_events"][0]["title_zh"].startswith("监管机构")
     assert stats["metrics"]["columns"]["us_politics"]["detailed_fallback_added"] == 1
     assert stats["metrics"]["columns"]["technology"]["detailed_translation_failed"] == 1
     assert stats["metrics"]["columns"]["technology"]["detailed_fallback_added"] == 1
-    assert stats["total_selected"] == 4
+    assert stats["total_selected"] == 3
 
 
 def test_normalize_headline_only_by_column_keeps_bill_items_with_clear_summary():
