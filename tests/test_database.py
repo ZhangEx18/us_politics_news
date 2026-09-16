@@ -194,7 +194,7 @@ def test_build_source_health_summary_detects_single_source_bias_and_empty_column
             "scored_count": 3,
             "strong_scored_count": 2,
             "active_days": 2,
-            "latest_seen_at": "2026-06-27T00:30:00+00:00",
+            "latest_seen_at": datetime.now(timezone.utc).isoformat(),
             "fetch_mode": "rss",
             "configured_column": "us_politics",
             "configured_source_tier": 1,
