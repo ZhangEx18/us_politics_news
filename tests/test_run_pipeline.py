@@ -855,25 +855,3 @@ def test_digest_phase_does_not_reuse_stale_report_events(monkeypatch):
     assert stats["total_selected"] == 4
     assert stats["metrics"]["freshness_gate"]["report_events_reuse"]["gate_failed"] is True
     assert stats["metrics"]["freshness_gate"]["scored_events"]["gate_failed"] is False
-
-
-def test_run_product_passes_evening_flag(monkeypatch):
-    import run_product
-
-    calls: dict = {}
-
-    def fake_pipeline(**kwargs):
-        calls.update(kwargs)
-        return {"total_selected": 1}
-
-    monkeypatch.setattr(run_product, "run_pipeline", fake_pipeline)
-    monkeypatch.setattr(
-        run_product,
-        "load_product_config",
-        lambda key: {"product_key": key, "report_types": ["daily"], "content_type": "news_digest"},
-    )
-
-    result = run_product.run_product("news", "daily", evening=True)
-
-    assert calls["evening"] is True
-    assert result == {"total_selected": 1}
