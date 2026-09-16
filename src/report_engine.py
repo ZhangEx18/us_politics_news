@@ -9,6 +9,7 @@ import asyncio
 import re
 from difflib import SequenceMatcher
 from dataclasses import dataclass, field
+from functools import lru_cache
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -879,11 +880,31 @@ _PIPELINE_LEAK_RE = re.compile(
 # 观点/分析稿标题（不进要点列表）
 _OPINION_TITLE_RE = re.compile(
     r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么"
-    r"|关键所在|关键在哪|^分析|^前瞻|^复盘|^影评|^书评)"
+    r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评)"
 )
 
 # 公关语（标题命中时剔除）
 _PROMO_WORD_RE = re.compile(r"(新洞察|赋能|重磅|颠覆|引爆|震撼|重新构想|重新定义|再想象|以 .{0,10} 重新)")
+
+
+@lru_cache(maxsize=1)
+def _soft_news_regex() -> re.Pattern:
+    """软新闻关键词（配置 + 中文兜底），用于要点列表过滤。"""
+    keywords: list[str] = []
+    try:
+        from config import load_config
+
+        keywords = [
+            str(item)
+            for item in (load_config().get("rules", {}).get("soft_news_keywords") or [])
+            if str(item).strip()
+        ]
+    except Exception:
+        keywords = []
+    terms = [re.escape(item) for item in keywords]
+    if not terms:
+        terms = [re.escape(item) for item in ("celebrity", "sports", "爱犬", "宠物")]
+    return re.compile("|".join(terms), re.IGNORECASE)
 
 
 def _glossary_name_bigrams() -> set[str]:
@@ -1301,6 +1322,7 @@ def _normalize_headline_only_by_column(
         opinion_dropped = 0
         promo_dropped = 0
         duplicate_dropped = 0
+        soft_dropped = 0
         # 跨栏目去重：与所有栏目的明细标题比较，避免同一事件在不同栏目重复出现
         existing_titles = [
             title
@@ -1321,6 +1343,10 @@ def _normalize_headline_only_by_column(
                 continue
             if _PROMO_WORD_RE.search(title_zh):
                 promo_dropped += 1
+                continue
+            if _soft_news_regex().search(title_zh):
+                print(f"   [要点软新闻] {col_key}: {title_zh[:36]}")
+                soft_dropped += 1
                 continue
             if any(_same_event_titles(title_zh, existing) for existing in existing_titles):
                 print(f"   [要点去重] {col_key}: {title_zh[:40]}")
@@ -1353,6 +1379,7 @@ def _normalize_headline_only_by_column(
             "headline_opinion_dropped": opinion_dropped,
             "headline_promo_dropped": promo_dropped,
             "headline_duplicate_dropped": duplicate_dropped,
+            "headline_soft_dropped": soft_dropped,
         }
 
     return normalized_columns, metrics
