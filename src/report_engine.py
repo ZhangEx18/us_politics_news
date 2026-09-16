@@ -1367,7 +1367,7 @@ async def _translate_headline_only_by_column(
         if not items:
             translated_columns[col_key] = []
             continue
-        titles = [str(item.get("title") or "").strip() for item in items if str(item.get("title") or "").strip()]
+        titles = [str(item.get("title") or "").strip() for item in items]
         try:
             translated_titles = await translate_headline_titles(titles, ai_config)
         except Exception:
