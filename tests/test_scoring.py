@@ -532,3 +532,37 @@ def test_event_keys_mergeable_requires_same_date():
     assert _event_keys_mergeable("crypto_bill_a_20260916", "crypto_bill_b_20260916")
     assert not _event_keys_mergeable("crypto_bill_a_20260916", "crypto_bill_b_20260917")
     assert not _event_keys_mergeable("crypto_bill_a_20260916", "crypto_bill_b")
+
+
+def test_column_digest_retries_on_non_json_response(monkeypatch):
+    import ai_analyzer
+
+    responses = [
+        "Let me analyze the four candidates. 1. first item is valid...",  # 模型跑偏
+        '{"events": [{"title_zh": "测试标题", "reader_body": "9 月 16 日，测试事实。", '
+        '"core_facts": "9 月 16 日，测试事实。", "source_links": [], "is_followup": false}]}',
+    ]
+
+    async def fake_call(prompt, config, timeout=120):
+        if "追加约束" in prompt or "只输出 JSON 对象（以 { 开头" in prompt:
+            return responses[-1]
+        return responses.pop(0)
+
+    monkeypatch.setattr(ai_analyzer, "_call_llm", fake_call)
+
+    result = asyncio.run(ai_analyzer.generate_column_digest(
+        column_key="technology",
+        column_label="科技前沿",
+        events=[{
+            "title": "Test event",
+            "summary": "测试摘要。",
+            "source": "Example",
+            "freshness_date": "2026-09-16",
+            "event_date": "2026-09-16",
+        }],
+        history_context="",
+        ai_config={"api_key": "k", "base_url": "https://example.com", "model": "m"},
+    ))
+
+    assert len(result) == 1
+    assert result[0]["title_zh"] == "测试标题"

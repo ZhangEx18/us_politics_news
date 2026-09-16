@@ -1598,7 +1598,23 @@ async def generate_column_digest(
     try:
         parsed = _parse_jsonish_object(response)
     except ValueError as exc:
-        raise RuntimeError(f"generate_column_digest JSON 解析失败: {response[:300]}") from exc
+        # 模型偶发输出分析文本而非 JSON：追加约束后重试一次
+        _ai_log("栏目写作返回非 JSON，追加约束后重试一次")
+        retry_prompt = (
+            prompt
+            + "\n\n注意：只输出 JSON 对象（以 { 开头、以 } 结尾），不要输出任何分析、说明或过程文字。"
+        )
+        response = await _call_llm(
+            retry_prompt,
+            {**ai_config, "temperature": 0.2, "max_tokens": 16000, "json_object": True},
+            timeout=_timeout_for(ai_config, "digest", 180),
+        )
+        try:
+            parsed = _parse_jsonish_object(response)
+        except ValueError as retry_exc:
+            raise RuntimeError(
+                f"generate_column_digest JSON 解析失败: {response[:300]}"
+            ) from retry_exc
 
     # 提取 events 数组
     if isinstance(parsed, dict) and isinstance(parsed.get("events"), list):
