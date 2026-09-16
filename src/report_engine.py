@@ -15,6 +15,7 @@ from zoneinfo import ZoneInfo
 from ai_analyzer import (
     generate_column_digest,
     generate_daily_overview,
+    generate_fallback_bodies,
     generate_periodical_overview,
     merge_events,
     translate_headline_titles,
@@ -718,6 +719,82 @@ def _fill_underrepresented_columns(
     return filled, metrics
 
 
+def _ai_expand_fallback_events(
+    column_results: dict[str, list[dict]],
+    column_candidates: dict[str, list[dict]],
+    columns_cfg: dict[str, dict],
+    ai_config: dict,
+    max_per_column: int = 2,
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
+    """栏目重点解析不足时，用 AI 把候选扩写成中文简讯正文。"""
+    expanded: dict[str, list[dict]] = {key: list(value) for key, value in column_results.items()}
+    metrics: dict[str, dict[str, int]] = {}
+
+    for col_key, col_cfg in columns_cfg.items():
+        min_items = int(col_cfg.get("min_items", 3) or 3)
+        current = expanded.get(col_key, [])
+        deficit = min_items - len(current)
+        if deficit <= 0:
+            continue
+
+        used_titles = {
+            _normalize_event_title(event.get("title_zh") or event.get("title"))
+            for event in current
+        }
+        picks: list[dict] = []
+        for candidate in column_candidates.get(col_key, []):
+            link = str(candidate.get("link") or "").strip()
+            if not link:
+                continue
+            title = str(candidate.get("title_zh") or candidate.get("title") or "").strip()
+            if not title or _normalize_event_title(title) in used_titles:
+                continue
+            if str(candidate.get("freshness_status") or "") not in {"today", "recent_followup"}:
+                continue
+            picks.append(candidate)
+            if len(picks) >= min(deficit, max_per_column):
+                break
+
+        if not picks:
+            continue
+
+        entries = [
+            {
+                "link": candidate.get("link"),
+                "title": candidate.get("title"),
+                "summary": candidate.get("summary"),
+                "content": str(candidate.get("content") or "")[:500],
+                "source": candidate.get("source"),
+                "event_date": candidate.get("event_date") or candidate.get("freshness_date"),
+            }
+            for candidate in picks
+        ]
+        bodies = asyncio.run(generate_fallback_bodies(entries, ai_config))
+
+        added = 0
+        for candidate in picks:
+            body = bodies.get(str(candidate.get("link") or "").strip())
+            if not body:
+                continue
+            title = str(candidate.get("title_zh") or "").strip()
+            if not _contains_meaningful_cjk(title):
+                summary = str(candidate.get("summary") or "").strip()
+                title = summary[:36].rstrip(" ，,。；;:：") or body[:36]
+            expanded.setdefault(col_key, []).append({
+                **candidate,
+                "title_zh": title,
+                "reader_body": body,
+                "core_facts": body,
+                "summary": body,
+            })
+            added += 1
+
+        if added:
+            metrics.setdefault(col_key, {})["ai_fallback_added"] = added
+
+    return expanded, metrics
+
+
 def _limit_same_org_events(events: list[dict], max_per_org: int) -> list[dict]:
     """限制同一机构/主体的事件数量，超出的降级为丢弃。"""
     if not events or max_per_org <= 0:
@@ -1419,6 +1496,12 @@ def build_report(
             column_results, column_candidates, columns_cfg,
         )
         for col_key, column_metrics in fill_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        # AI 兜底扩写：规则兜底失败（摘要过短/英文候选）时，用 AI 生成简讯正文
+        column_results, ai_fallback_metrics = _ai_expand_fallback_events(
+            column_results, column_candidates, columns_cfg, ai_config,
+        )
+        for col_key, column_metrics in ai_fallback_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
         column_results, dedupe_metrics = _dedupe_daily_column_events(column_results)
         for col_key, column_metrics in dedupe_metrics.items():
