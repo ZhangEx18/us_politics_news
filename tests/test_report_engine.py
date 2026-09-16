@@ -1520,3 +1520,15 @@ def test_merge_headline_metrics_accumulates():
 
     assert metrics["us_politics"]["headline_opinion_dropped"] == 3
     assert metrics["us_politics"]["headline_promo_dropped"] == 3
+
+
+def test_normalize_headline_keeps_empty_text_items_using_title():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "technology": [
+            {"title_zh": "谷歌称部分 Pixel 手机用户遭零日攻击", "summary": "", "content": ""},
+        ]
+    })
+
+    assert normalized["technology"][0]["reader_body"] == "谷歌称部分 Pixel 手机用户遭零日攻击"
+    assert metrics["technology"]["headline_body_from_title"] == 1
+    assert metrics["technology"]["headline_reader_body_missing"] == 0
