@@ -201,3 +201,31 @@ def test_select_daily_column_items_limits_source_share():
     sources = [item["source"] for item in detailed + headline]
     assert sources.count("FTC Press Releases") <= 2
     assert metrics["source_quota_dropped"] > 0
+
+
+def test_prefilter_reserves_cn_source_slots():
+    from run_pipeline import _prefilter_items_for_scoring
+
+    now = datetime(2026, 9, 16, 12, 0, tzinfo=timezone.utc)
+    items = []
+    for i in range(20):
+        items.append(ContentItem(
+            id=f"test:tier1-{i}", source_type=SourceType.RSS,
+            title=f"Major wire story {i}", url=f"https://example.com/wire-{i}",
+            content="A" * 300, source_name=f"Wire {i}", column="us_politics",
+            source_tier=1, score=50, published_at=now - timedelta(hours=1),
+        ))
+    for i in range(3):
+        items.append(ContentItem(
+            id=f"test:cn-{i}", source_type=SourceType.RSS,
+            title=f"中文源新闻 {i}", url=f"https://example.com/cn-{i}",
+            content="B" * 300, source_name=f"财新测试 {i}", column="us_politics",
+            source_tier=2, score=40, published_at=now - timedelta(hours=2),
+            metadata={"language": "zh", "tags": ["cn_source"]},
+        ))
+    columns_cfg = {"us_politics": {"prefilter_items": 5}}
+
+    selected = _prefilter_items_for_scoring(items, columns_cfg, now=now)
+
+    cn_items = [item for item in selected["us_politics"] if "cn_source" in (item.metadata.get("tags") or [])]
+    assert len(cn_items) >= 2
