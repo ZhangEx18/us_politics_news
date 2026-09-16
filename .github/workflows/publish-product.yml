@@ -22,11 +22,6 @@ on:
         required: false
         default: false
         type: boolean
-      force_rescore:
-        description: '强制重新评分（忽略事件库复用，用于验证 prompt/模型变更）'
-        required: false
-        default: false
-        type: boolean
   workflow_call:
     inputs:
       product_key:
