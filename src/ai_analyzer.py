@@ -12,6 +12,7 @@ import os
 import re
 import time
 import uuid
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Optional
 
@@ -720,24 +721,77 @@ async def score_batch(
 # ── merge_events ──
 
 
+def _normalize_event_title(title: str) -> str:
+    return re.sub(r"[^0-9A-Za-z\u4e00-\u9fff]+", "", str(title or "")).lower()
+
+
+def _titles_similar(left: str, right: str) -> bool:
+    if not left or not right:
+        return False
+    if left == right:
+        return True
+    if min(len(left), len(right)) < 8:
+        return False
+    return SequenceMatcher(None, left, right).ratio() >= 0.85
+
+
+def _merge_event_group(group: list[dict], event_key: str) -> dict:
+    """把一个事件组内的多条报道合并为一条（最高分为主条目）。"""
+    group.sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
+    primary = group[0]
+
+    seen_links: set[str] = set()
+    source_links: list[dict] = []
+    evidence_blocks: list[str] = []
+
+    for item in group:
+        link = item.get("link", "")
+        if link and link not in seen_links:
+            seen_links.add(link)
+            source_links.append({
+                "title": item.get("title", ""),
+                "url": link,
+            })
+        summary = (item.get("summary") or "").strip()
+        content = (item.get("content") or "").strip()
+        evidence_parts = []
+        if summary:
+            evidence_parts.append(f"摘要：{summary}")
+        if content:
+            evidence_parts.append(f"原文片段：{content[:1200]}")
+        evidence = "\n".join(evidence_parts).strip()
+        if evidence and evidence not in evidence_blocks:
+            evidence_blocks.append(evidence)
+
+    all_tags: list[str] = []
+    seen_tags: set[str] = set()
+    for item in group:
+        for tag in item.get("tags", []):
+            if tag and tag not in seen_tags:
+                seen_tags.add(tag)
+                all_tags.append(tag)
+
+    return {
+        **primary,
+        "event_key": event_key or str(primary.get("event_key") or ""),
+        "source_links": source_links,
+        "content": "\n\n".join(evidence_blocks),
+        "tags": all_tags[:5],
+    }
+
+
 def merge_events(items: list[dict]) -> list[dict]:
-    """按 event_key 合并同一事件多源报道。
+    """按 event_key + 标题相似度合并同一事件的多源报道。
 
     - 同一 event_key 的多条合并为一条
+    - event_key 缺失或不同、但主标题高度相似的条目也合并
     - 保留最高分的作为主条目
     - 合并所有来源链接到 source_links
     - 合并所有 summary 到 content
-
-    Args:
-        items: score_batch 返回的 dict 列表（含 event_key, link, source, score, summary 等）
-
-    Returns:
-        合并后的 dict 列表，每条含 source_links: [{title, url}, ...]
     """
     if not items:
         return []
 
-    # 按 event_key 分组
     groups: dict[str, list[dict]] = {}
     no_key: list[dict] = []
 
@@ -748,57 +802,34 @@ def merge_events(items: list[dict]) -> list[dict]:
         else:
             no_key.append(item)
 
-    merged: list[dict] = []
+    def _primary_norm(bucket: list[dict]) -> str:
+        best = max(bucket, key=lambda x: x.get("score", 0) or 0)
+        return _normalize_event_title(best.get("title", ""))
 
-    for event_key, group in groups.items():
-        # 按 score 降序，最高分作为主条目
-        group.sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
-        primary = group[0]
+    clusters: list[dict] = []
+    for key in sorted(groups):
+        bucket = list(groups[key])
+        norm = _primary_norm(bucket)
+        target = next(
+            (c for c in clusters if c["key"] == key or _titles_similar(norm, c["norm"])),
+            None,
+        )
+        if target is None:
+            clusters.append({"key": key, "items": bucket, "norm": norm})
+        else:
+            target["items"].extend(bucket)
+            target["norm"] = _primary_norm(target["items"])
 
-        # 收集所有来源链接（去重）
-        seen_links: set[str] = set()
-        source_links: list[dict] = []
-        evidence_blocks: list[str] = []
+    for item in no_key:
+        norm = _normalize_event_title(item.get("title", ""))
+        target = next((c for c in clusters if _titles_similar(norm, c["norm"])), None)
+        if target is None:
+            clusters.append({"key": "", "items": [item], "norm": norm})
+        else:
+            target["items"].append(item)
+            target["norm"] = _primary_norm(target["items"])
 
-        for item in group:
-            link = item.get("link", "")
-            if link and link not in seen_links:
-                seen_links.add(link)
-                source_links.append({
-                    "title": item.get("title", ""),
-                    "url": link,
-                })
-            summary = (item.get("summary") or "").strip()
-            content = (item.get("content") or "").strip()
-            evidence_parts = []
-            if summary:
-                evidence_parts.append(f"摘要：{summary}")
-            if content:
-                evidence_parts.append(f"原文片段：{content[:1200]}")
-            evidence = "\n".join(evidence_parts).strip()
-            if evidence and evidence not in evidence_blocks:
-                evidence_blocks.append(evidence)
-
-        # 合并 tags（去重保序）
-        all_tags: list[str] = []
-        seen_tags: set[str] = set()
-        for item in group:
-            for tag in item.get("tags", []):
-                if tag and tag not in seen_tags:
-                    seen_tags.add(tag)
-                    all_tags.append(tag)
-
-        merged.append({
-            **primary,
-            "event_key": event_key,
-            "source_links": source_links,
-            "content": "\n\n".join(evidence_blocks),
-            "tags": all_tags[:5],
-        })
-
-    # 无 event_key 的条目保持原样
-    merged.extend(no_key)
-    return merged
+    return [_merge_event_group(cluster["items"], cluster["key"]) for cluster in clusters]
 
 
 # ── generate_column_digest ──

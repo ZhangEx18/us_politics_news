@@ -387,3 +387,42 @@ def test_entry_newsworthiness_gate_rejects_routine_and_low_value():
     assert coerce_unit_interval("0.7") == 0.7
     assert coerce_unit_interval(None) is None
     assert coerce_unit_interval("abc") is None
+
+
+def test_merge_events_clusters_similar_titles_across_columns():
+    items = [
+        {
+            "link": "https://example.com/a",
+            "title": "Senate Democrats block cryptocurrency regulation bill",
+            "source": "PBS NewsHour",
+            "score": 82,
+            "summary": "参议院民主党阻止加密法案。",
+            "event_key": "senate_crypto_bill_20260916",
+            "column": "us_politics",
+        },
+        {
+            "link": "https://example.com/b",
+            "title": "Senate Democrats block cryptocurrency regulation act",
+            "source": "SCMP",
+            "score": 80,
+            "summary": "参议院否决加密监管法案，香港业界关注。",
+            "event_key": "crypto_bill_blocked_20260916",
+            "column": "technology",
+        },
+        {
+            "link": "https://example.com/c",
+            "title": "Fed holds interest rates steady",
+            "source": "CNBC",
+            "score": 87,
+            "summary": "美联储维持利率不变。",
+            "event_key": "fed_rate_20260916",
+            "column": "economy",
+        },
+    ]
+
+    merged = merge_events(items)
+
+    assert len(merged) == 2
+    crypto = next(item for item in merged if "crypto" in item["title"].lower())
+    assert len(crypto["source_links"]) == 2
+    assert crypto["score"] == 82
