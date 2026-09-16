@@ -426,3 +426,49 @@ def test_merge_events_clusters_similar_titles_across_columns():
     crypto = next(item for item in merged if "crypto" in item["title"].lower())
     assert len(crypto["source_links"]) == 2
     assert crypto["score"] == 82
+
+
+# ── 新闻价值五维与推导（P0 优化） ──
+
+
+def test_merge_scores_derives_newsworthiness_from_five_dimensions():
+    entries = [{"link": "https://example.com/a", "title": "T", "source": "S"}]
+    scores = [{
+        "link": "https://example.com/a",
+        "score": 85,
+        "column": "us_politics",
+        "is_hard_news": True,
+        "impact": 0.8,
+        "prominence": 0.9,
+        "timeliness": 0.9,
+        "novelty": 0.7,
+        "conflict": 0.5,
+    }]
+
+    merged = _merge_scores(entries, scores)
+
+    # 加权：0.35*0.8 + 0.2*0.9 + 0.2*0.9 + 0.15*0.7 + 0.1*0.5 = 0.28+0.18+0.18+0.105+0.05 = 0.795
+    assert merged[0]["newsworthiness"] == 0.795
+    assert merged[0]["impact"] == 0.8
+    assert merged[0]["novelty"] == 0.7
+
+
+def test_derive_newsworthiness_falls_back_without_dimensions():
+    from ai_analyzer import derive_newsworthiness
+
+    assert derive_newsworthiness({}, 0.6) == 0.6
+    assert derive_newsworthiness({}, None) == ""
+    # 部分维度也可推导
+    value = derive_newsworthiness({"impact": 1.0, "timeliness": 1.0})
+    assert value == 1.0
+
+
+def test_build_llm_payload_includes_max_tokens():
+    from ai_analyzer import _build_llm_payload
+
+    payload = _build_llm_payload("hi", {"model": "m", "temperature": 0, "max_tokens": 2000})
+    assert payload["max_tokens"] == 2000
+    assert payload["temperature"] == 0
+
+    payload_no_cap = _build_llm_payload("hi", {"model": "m"})
+    assert "max_tokens" not in payload_no_cap

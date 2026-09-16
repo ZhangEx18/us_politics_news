@@ -84,6 +84,19 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
         return await _call_llm_once(prompt, {**fallback, "_is_fallback": True}, timeout)
 
 
+def _build_llm_payload(prompt: str, config: dict) -> dict:
+    """构造 OpenAI 兼容请求体，支持 max_tokens 上限。"""
+    payload = {
+        "model": config["model"],
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": float(config.get("temperature", 0.3)),
+    }
+    max_tokens = config.get("max_tokens")
+    if max_tokens:
+        payload["max_tokens"] = int(max_tokens)
+    return payload
+
+
 async def _call_llm_once(prompt: str, config: dict, timeout: int = 120) -> str:
     """调用 OpenAI 兼容 API（兼容推理模型 content / reasoning_content）"""
     headers = {
@@ -93,11 +106,7 @@ async def _call_llm_once(prompt: str, config: dict, timeout: int = 120) -> str:
     }
     if "opencode.ai" in config["base_url"]:
         headers["x-opencode-session"] = _SESSION_ID
-    payload = {
-        "model": config["model"],
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": float(config.get("temperature", 0.3)),
-    }
+    payload = _build_llm_payload(prompt, config)
     base_url = config["base_url"].rstrip("/")
     if base_url == "https://openrouter.ai/api":
         base_url = f"{base_url}/v1"
@@ -296,7 +305,7 @@ def _merge_scores(entries: list[dict], scores: list[dict]) -> list[dict]:
             except (ValueError, TypeError):
                 score_val = 0
         column_val = s.get("column", entry.get("column", ""))
-        merged.append({
+        merged_item = {
             **entry,
             "score": score_val,
             "column": column_val,
@@ -313,10 +322,19 @@ def _merge_scores(entries: list[dict], scores: list[dict]) -> list[dict]:
             "information_gain": s.get("information_gain", entry.get("information_gain", "")),
             "event_stage": s.get("event_stage", entry.get("event_stage", "")),
             "verifiability": s.get("verifiability", entry.get("verifiability", "")),
-            "newsworthiness": s.get("newsworthiness", entry.get("newsworthiness", "")),
+            "impact": s.get("impact", entry.get("impact", "")),
+            "prominence": s.get("prominence", entry.get("prominence", "")),
+            "timeliness": s.get("timeliness", entry.get("timeliness", "")),
+            "novelty": s.get("novelty", entry.get("novelty", "")),
+            "conflict": s.get("conflict", entry.get("conflict", "")),
             "routine": s.get("routine", entry.get("routine", "")),
             "impact_scope": s.get("impact_scope", entry.get("impact_scope", "")),
-        })
+        }
+        merged_item["newsworthiness"] = derive_newsworthiness(
+            merged_item,
+            s.get("newsworthiness") or entry.get("newsworthiness"),
+        )
+        merged.append(merged_item)
     return merged
 
 
@@ -331,6 +349,30 @@ def coerce_unit_interval(value: object) -> Optional[float]:
     if number > 1.0:
         number = number / 100.0
     return max(0.0, min(1.0, number))
+
+
+NEWSWORTHINESS_WEIGHTS: dict[str, float] = {
+    "impact": 0.35,
+    "prominence": 0.2,
+    "timeliness": 0.2,
+    "novelty": 0.15,
+    "conflict": 0.1,
+}
+
+
+def derive_newsworthiness(item: dict, fallback: object = None) -> float | str:
+    """由新闻价值五维加权推导 newsworthiness；维度缺失时回退模型原值。"""
+    dims = {
+        key: coerce_unit_interval(item.get(key))
+        for key in NEWSWORTHINESS_WEIGHTS
+    }
+    dims = {key: value for key, value in dims.items() if value is not None}
+    if not dims:
+        fallback_value = coerce_unit_interval(fallback)
+        return fallback_value if fallback_value is not None else ""
+    total_weight = sum(NEWSWORTHINESS_WEIGHTS[key] for key in dims)
+    value = sum(NEWSWORTHINESS_WEIGHTS[key] * dim for key, dim in dims.items()) / total_weight
+    return round(value, 3)
 
 
 def entry_newsworthiness_ok(
@@ -355,25 +397,32 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
 
 ## 评分标准（0-100）
 
-**核心约束（先判这三条，再进入分档）**：
-1. 90+ 必须同时满足：(a) 主题与美国政局 / 国际局势 / 科技前沿 / 经济走势强相关；(b) 来源为当事方官方账号或官方博客（非 KOL / 媒体转述）；(c) 属于首发
-2. 非硬新闻、非核心主题（娱乐、体育、生活方式等）无论多重大，上限 79 分
-3. 重磅新闻若来源是 KOL / 媒体转述，上限 89 分
-
-**分档**：
-- 【90-100】核心领域 + 官方首发 + 里程碑级事件
+**分档（按事实强度和新闻价值，不按来源是否官方）**：
+- 【90-100】里程碑级：制度性变化、战争/停火、最高法院里程碑裁决、重大政策转折（需 impact≥0.8 且 timeliness≥0.8）
 - 【80-89】重要政策、司法、外交、战争、财报、宏观或产业进展
 - 【70-79】一般硬新闻，事实成立但增量有限
 - 【60-69】二手信息、一般性新闻
 - 【<60】低价值内容：纯情绪、广告、闲聊、评论、荐股单
 
-## 新闻价值三维（每条必须输出）
+**信息量上限（先判）**：如果输入 content 少于 120 字符、或缺少可用于判断日期的信息，`score` 上限 69，`is_hard_news` 必须为 false。
 
-- `newsworthiness`（0-1）：事件本身的新闻价值。1 = 制度性变化、战争、里程碑裁决、重大政策转折；0.5 = 常规但真实的新政策/诉讼/宏观数据；<0.4 = 例行程序、日常公告、可预期安排
-- `routine`（0-1）：例行程度。0.8-1.0 = 定期发布的程序性公告（评论期起止、听证排期、费用表、拟议预算、FAQ、撤回旧文件、例行会议安排）；0 = 突发事件或不可预期的新动作
-- `impact_scope`：影响范围，必须是 `local` / `national` / `global` 之一
+## 新闻价值五维（每条必须输出，0-1）
 
-重要：官方来源不等于高新闻价值。机构例行公告要如实标注高 `routine`、低 `newsworthiness`，不要因为来源权威就抬分。
+- `impact`（影响力）：1 = 制度性变化/战争/全国性后果；0.5 = 行业或群体级；0.2 = 个案
+- `prominence`（主体显著性）：1 = 总统/最高法院/央行级主体；0.5 = 部长/大公司/国际组织；0.2 = 地方/个人
+- `timeliness`（时效）：1 = 当日首发；0.5 = 当日跟进或前一日进展；0.2 = 旧事重提
+- `novelty`（新奇度）：1 = 首次披露；0.5 = 已知事实的新进展；0.1 = 重复报道
+- `conflict`（冲突性）：1 = 明确对抗/诉讼/战争；0.3 = 政策分歧；0 = 无冲突
+- `routine`（例行程度）：0.8-1.0 = 程序性公告（评论期起止、听证排期、费用表、拟议预算、FAQ、撤回旧文件）；0 = 突发事件
+
+重要：官方来源不等于高新闻价值。机构例行公告要如实标注高 `routine`、低 `impact` 和低 `novelty`，不要因为来源权威就抬分。
+
+## 示例（判断基准，不得照抄到输出）
+
+正例：某国最高法院裁定一项全国性行政令违宪并立即生效 → impact 0.9、prominence 0.9、timeliness 0.9、novelty 0.8 → 90 分以上
+正例：某国央行意外加息 50 个基点 → impact 0.7、prominence 0.8、timeliness 0.9、novelty 0.7 → 80-89 分
+负例：某监管机构宣布延长公众评论期 30 天 → impact 0.1、prominence 0.4、timeliness 0.5、novelty 0.1、routine 0.9 → 60 分以下，is_hard_news=false
+负例：某公司博客发布产品功能更新 → impact 0.2、prominence 0.5、timeliness 0.6、novelty 0.3 → 65 分以下，is_hard_news=false
 
 ## 硬新闻准入
 
@@ -437,13 +486,12 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
 - `content_kind`: 内容类型（policy / judiciary / election / diplomacy / security / regulation / market / macro / corporate / analysis / opinion / media_reaction / watchlist）
 - `is_hard_news`: 布尔值，是否属于硬新闻
 - `tags`: 字符串数组（1-3 个，每个 2-12 字符，必须是具体关键词，禁止空泛标签）
-- `summary`: 一句话客观摘要（50 字内）
+- `summary`: 一句话客观摘要（50 字内，必须含"谁 + 做了什么"，禁止以"据报道"开头）
 - `information_gain`: 信息增量（0-1）
 - `event_stage`: 事件阶段（首发 / 跟进 / 总结 / 回应）
 - `verifiability`: 可验证性（0-1）
-- `newsworthiness`: 新闻价值（0-1）
+- `impact` / `prominence` / `timeliness` / `novelty` / `conflict`: 新闻价值五维（0-1）
 - `routine`: 例行程度（0-1）
-- `impact_scope`: 影响范围（local / national / global）
 
 ## 输出格式（严格只输出 JSON，以 "{{" 开始，以 "}}" 结尾）
 
@@ -460,13 +508,16 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
       "content_kind": "judiciary",
       "is_hard_news": true,
       "tags": ["具体标签1", "具体标签2"],
-      "summary": "一句话摘要。",
+      "summary": "一句话摘要（谁做了什么）。",
       "information_gain": 0.7,
       "event_stage": "首发",
       "verifiability": 0.8,
-      "newsworthiness": 0.8,
-      "routine": 0.1,
-      "impact_scope": "national"
+      "impact": 0.8,
+      "prominence": 0.9,
+      "timeliness": 0.9,
+      "novelty": 0.7,
+      "conflict": 0.5,
+      "routine": 0.1
     }}
   ]
 }}
@@ -514,7 +565,7 @@ async def _score_single_batch(
     try:
         response = await _call_llm(
             prompt,
-            config,
+            {**config, "temperature": 0, "max_tokens": 16000},
             timeout=_timeout_for(config, "score", 120),
         )
         results = _parse_score_response(response)
@@ -916,38 +967,56 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 
 每条事件必须包含以下字段：
 - **title_zh**：中文标题，简洁准确
-- **reader_body**：Reader 专用正文，按”事实 → 变化 → 后果”结构写成单段 2-4 句，目标 60-120 字
+- **reader_body**：Reader 专用正文，倒金字塔三句版（导语 → 细节 → 可选影响），2-4 句，目标 60-120 字
 - **core_facts**：站内兼容字段，使用与 reader_body 一致的内容
 - **source_links**：相关阅读，格式 [{{“title”: “来源名”, “url”: “https://...”}}]
 - **is_followup**：布尔值，是否为历史事件的持续跟踪
 
 ## reader_body 写作规范（核心）
 
-每条 reader_body 必须按以下逻辑链组织，写成一段连贯叙述：
+按新闻倒金字塔写作，默认三句，每句一个事实：
 
-**第 1-2 句：发生了什么（事实）**
-- 直接陈述主体、动作、结果
-- 首句必须出现明确日期表达，例如“6 月 26 日”或“6 月 27 日”；日期必须来自输入里的 event_date 或 freshness_date，不得自造
-- 只使用输入中已有的具体数字、机构、人名、金额、比例、时间、地点；输入没有就不要补
-- 禁止用”据报道””据悉””有消息称”开头
-- 如果 evidence 中显示来源层级较低、标题为英文、或只有页面摘录，首句必须带归因而不是下定论
+**第 1 句（导语）：What + Who + When**
+- 最重要的事实放最前，日期置句首："9 月 16 日，……"
+- 只写输入材料能确认的 action 和主体；日期必须来自 event_date 或 freshness_date
+- 禁止用"据报道""据悉""有消息称"开头；媒体转述用"某媒体称"放在句中
 
-**第 3 句：这改变了什么（变化）**
-- 说清”以前怎样，现在怎样”
-- 用对比句式，例如”此前……此次裁定意味着……”
-- 给一个锚点定位事件在大图景中的位置
-- 只有输入材料支撑前后对比时才写变化；否则用一句解释事件本身的直接含义
+**第 2 句（细节）：关键数字或第二个事实**
+- 补充最重要数字（金额/票数/人数/比例）或第二个可核实事实，可含 Where/Why
+- 输入没有数字就不写，不得估算
 
-**第 4 句：接下来影响谁（后果）**
-- 指向具体对象：选民、党派、法院、国会、市场、消费者、企业、产业链、地区安全
-- 必须有具体方向，不能以”存在不确定性””增添了变数”收尾
-- 可以保留分歧，但要说清分歧点在哪
-- 不得把“可能”“或将”写成确定结果；不得编造市场反应、国会反应或监管后续
+**第 3 句（可选）：只写材料支持的影响或后续**
+- 必须能在输入材料中找到依据；否则直接省略，只写两句
+- 不得用"意味着""将受……影响""值得关注"等推断句式
 
-## 抽象结构示例（只展示句式，禁止复用示例中的任何实体或事实）
+## 硬规则
 
-标题：某机构就某事项作出正式决定
-正文：某机构在某时间对某事项作出正式决定，输入材料显示该决定直接涉及某类对象。此前相关规则或安排处于某种状态，此次动作把变化集中到某个明确环节。后续影响应只写输入材料已经说明的对象和方向，不能额外补写数字、市场反应或政治后果。
+1. **一段只写一个事实**：每句只承载一个信息点，禁止一句里堆多个动作/数字/主体
+2. **不发议论**：只陈述事实，不评论、不推断、不总结
+3. **5W1H 完备性**：Who/What/When 必须齐全；Where/Why/How 有则写，没有不补
+
+## 数字与称谓规范
+
+- 数字：金额/人数用阿拉伯数字；万、亿不混写（"3.8 亿"不写"3亿8千万"）；百分比保留一位小数
+- 称谓：首次"职务+全名"（美国总统特朗普），后文用姓（特朗普）；机构首次用全称（美国联邦贸易委员会），后文可用简称（FTC）
+- 时间：统一"9 月 16 日"格式，跨年补年份；不写"昨天/今天"
+
+## 常见错误（禁止模仿，示例为虚构）
+
+❌ 「9 月 16 日，多家媒体报道，某国议会通过决议，7 名议员赞成，相关条款同时提出，此前争议集中在授权问题。」
+→ 一句堆 4 个事实。正确写法：拆成 2-3 句，每句一个事实。
+
+❌ 「接下来，某国总统的权限和部长的职位将受这一程序影响。」
+→ 无材料支撑的推断。材料没有写影响就不要写第三句。
+
+❌ 「此次裁决意味着该国行政与立法关系进入新阶段。」
+→ 议论。"意味着"属于禁止词。
+
+❌ 「某机构发布新规，将减少 20% 的财政拨款。」
+→ 材料只写了"拟议规则变更"，"将减少 20%"是把草案写成已生效。禁止事实升级。
+
+✅ 正确示例（虚构）：
+「9 月 16 日，某国最高法院裁定一项全国性行政令违宪并立即生效。该裁决以 6 比 3 通过，涉及 12 个州的执行安排。裁决书要求行政部门在 30 日内提交整改方案。」
 
 ## 禁止清单
 
@@ -960,6 +1029,16 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 **禁止的套话**：对于读者来说、值得关注的是
 **禁止的标签**：核心事实：、背景脉络：、背景与影响：、可能影响：、为什么值得关注：
 **禁止的事实升级**：把“报道显示 / 页面列出 / 文件写明 / 草案提出”直接改写成“已经实施 / 已经生效 / 已被证实”
+
+## 输出前自检（逐条打勾，任何一条不通过就重写）
+
+1. 每句是否只含一个事实？
+2. 导语是否包含 Who + What + When？
+3. 是否出现输入材料中没有的数字、人名或机构？
+4. 是否出现评论/推断词（意味着/凸显/标志着/将受……影响）？
+5. 第三句（如有）是否能在输入材料中找到依据？
+6. 正文是否 2-4 句、目标 60-120 字？
+7. 是否使用了输入中不存在的实体或数字？
 
 ## 本栏总字数目标
 
@@ -986,7 +1065,7 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
   “events”: [
     {{
       “title_zh”: “中文标题”,
-      “reader_body”: “事实 → 变化 → 后果单段正文，60-120 字。”,
+      “reader_body”: “9 月 16 日，导语事实一句。关键数字或第二事实一句。可选影响一句（无依据则省略）。”,
       “core_facts”: “与 reader_body 一致。”,
       “source_links”: [{{“title”: “来源名”, “url”: “https://...”}}],
       “is_followup”: false
@@ -1002,7 +1081,7 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 3. source_links 必须保留原文链接，不要编造
 4. 只输出硬新闻，不要输出评论稿和观察名单
 5. 同一主线事件不要拆成多个近义条目
-6. reader_body 必须讲一个完整的故事：发生了什么、改变了什么、谁会受到影响
+6. reader_body 按倒金字塔三句版写作：导语（Who+What+When）→ 细节 → 可选影响；每句一个事实
 7. 禁止输出”核心事实：””背景与影响：””为什么值得关注：”等标签
 8. 每句一个事实，不堆砌；同一主语不连续出现超过 2 次
 9. 不得复用抽象示例中的实体、数字或表述；示例不是新闻素材
@@ -1186,10 +1265,12 @@ DAILY_OVERVIEW_PROMPT_TEMPLATE = """你是一位资深中文新闻主编。请�
 
 ## 写作要求
 
-- 必须写成**整篇总览**，不要按栏目顺序依次点名罗列。
-- 必须优先提炼跨栏目主线，说明这些事件如何共同构成当天的政治/外交/科技/经济画面。
-- 能写具体动作就不要写抽象判断，能写具体对象就不要写空泛概括。
-- 保持中文硬新闻口吻，克制、具体、连贯。
+- summary 必须先写当天最重要的一件事（含主体+动作），再串联主线，最后点出后续观察方向（最重要在前）
+- 必须写成**整篇总览**，不要按栏目顺序依次点名罗列
+- 不得与栏目正文重复：同一事实只能用更高抽象层级概括，禁止照抄 reader_body 句子
+- 必须优先提炼跨栏目主线，说明这些事件如何共同构成当天的政治/外交/科技/经济画面
+- 能写具体动作就不要写抽象判断，能写具体对象就不要写空泛概括
+- 保持中文硬新闻口吻，克制、具体、连贯
 
 ## 输出格式
 
@@ -1282,7 +1363,7 @@ async def generate_column_digest(
 
     response = await _call_llm(
         prompt,
-        ai_config,
+        {**ai_config, "temperature": 0.3, "max_tokens": 16000},
         timeout=_timeout_for(ai_config, "digest", 180),
     )
 
@@ -1335,7 +1416,7 @@ async def generate_periodical_overview(
 
     response = await _call_llm(
         prompt,
-        ai_config,
+        {**ai_config, "temperature": 0.3, "max_tokens": 16000},
         timeout=_timeout_for(ai_config, "digest", 180),
     )
     try:
@@ -1393,7 +1474,7 @@ async def generate_daily_overview(
 
     response = await _call_llm(
         prompt,
-        ai_config,
+        {**ai_config, "temperature": 0.3, "max_tokens": 8000},
         timeout=_timeout_for(ai_config, "digest", 180),
     )
     try:
@@ -1419,7 +1500,7 @@ async def translate_headline_titles(
     )
     response = await _call_llm(
         prompt,
-        {**ai_config, "temperature": 0},
+        {**ai_config, "temperature": 0, "max_tokens": 4000},
         timeout=_timeout_for(ai_config, "meta", 120),
     )
 
@@ -1447,12 +1528,13 @@ FALLBACK_BODY_PROMPT_TEMPLATE = """你是中文新闻编辑。请把下面的候
 
 ## 要求
 - 中文，2-3 句，总长 50-120 字
-- 第一句必须包含事件日期，格式 "M 月 D 日"（使用给定 event_date 的月日）
+- 倒金字塔：第 1 句导语写最重要事实（Who+What+When，日期置句首 "M 月 D 日"）；第 2 句补关键数字或第二事实；第 3 句仅在材料支持时写影响，否则省略
+- 每句只写一个事实；只陈述事实，不评论、不推断
 - 优先使用候选 summary（中文摘要）与 content（原文片段，可能为英文）里的具体事实，可用中文转述
 - 信息有限时写短即可，禁止重复或凑字数
-- 只写候选信息里能确认的事实，不确定的细节不要编造
 - 禁止输出英文原文、URL；禁止复述"来源为/链接为"等字段
 - 禁止使用"据报道、据悉、值得关注的是、现有材料未提供更多可核验细节"等套话
+- 数字与称谓：金额/人数用阿拉伯数字，万/亿不混写；首次"职务+全名"，后文用姓
 - 不要输出标题，只输出正文
 
 ## 候选列表
@@ -1474,7 +1556,7 @@ async def generate_fallback_bodies(entries: list[dict], ai_config: dict) -> dict
     try:
         response = await _call_llm(
             prompt,
-            {**ai_config, "temperature": 0.2},
+            {**ai_config, "temperature": 0.2, "max_tokens": 4000},
             timeout=_timeout_for(ai_config, "meta", 120),
         )
         parsed = _parse_jsonish_object(response)
