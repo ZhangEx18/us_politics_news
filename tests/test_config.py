@@ -76,7 +76,7 @@ def test_digest_targets_match_publish_constraints():
     assert llm.get("digest_timeout_seconds") == 240
     assert llm.get("digest_content_chars") == 1000
     assert llm.get("meta_timeout_seconds") == 120
-    assert digest.get("total_min_items") == 34
+    assert digest.get("total_min_items") == 31
     assert digest.get("total_target_items") == 56
     assert digest.get("total_max_items") == 56
     assert config.get("analysis", {}).get("freshness_hours") == 30
@@ -103,7 +103,7 @@ def test_digest_targets_match_publish_constraints():
     assert columns["technology"]["headline_items"] == 3
     assert columns["technology"]["prefilter_items"] == 35
 
-    assert columns["economy"]["min_items"] == 7
+    assert columns["economy"]["min_items"] == 4
     assert columns["economy"]["target_items"] == 7
     assert columns["economy"]["max_items"] == 7
     assert columns["economy"]["headline_items"] == 3

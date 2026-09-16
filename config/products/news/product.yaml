@@ -63,12 +63,12 @@ digest:
       prefilter_items: 35
     economy:
       label: "经济走势"
-      min_items: 7
+      min_items: 4
       target_items: 7
       max_items: 7
       headline_items: 3
       prefilter_items: 35
-  total_min_items: 34
+  total_min_items: 31
   total_target_items: 56
   total_max_items: 56
 

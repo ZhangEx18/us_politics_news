@@ -712,7 +712,7 @@
   column: economy
   source_tier: 2
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16：理财/建议类专栏为主，硬新闻产出低
 - name: Yahoo Finance
   url: https://finance.yahoo.com/news/rssindex
   fetch_mode: rss
@@ -1371,4 +1371,40 @@
   language: en
   max_candidates_per_run: 2
   tags: [wire, axios]
+  enabled: true
+- name: Google News - Bloomberg Markets
+  url: https://news.google.com/rss/search?q=site:bloomberg.com+markets&hl=en&gl=US
+  fetch_mode: google_news
+  column: economy
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, bloomberg]
+  enabled: true
+- name: Google News - FT Economy
+  url: https://news.google.com/rss/search?q=site:ft.com+economy&hl=en&gl=US
+  fetch_mode: google_news
+  column: economy
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, ft]
+  enabled: true
+- name: Google News - WSJ Markets
+  url: https://news.google.com/rss/search?q=site:wsj.com+markets&hl=en&gl=US
+  fetch_mode: google_news
+  column: economy
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, wsj]
+  enabled: true
+- name: Google News - Reuters Business
+  url: https://news.google.com/rss/search?q=site:reuters.com+business&hl=en&gl=US
+  fetch_mode: google_news
+  column: economy
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, reuters]
   enabled: true
