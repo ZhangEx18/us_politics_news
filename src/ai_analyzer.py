@@ -75,18 +75,98 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
     try:
         return await _call_llm_once(prompt, config, timeout)
     except Exception as exc:
+        message = str(exc)
+        if config.get("json_schema") and "错误 400" in message:
+            _ai_log("response_format 不被支持，降级为普通 JSON 模式重试")
+            return await _call_llm(prompt, {**config, "json_schema": None}, timeout)
         fallback = config.get("fallback")
         if not fallback or config.get("_is_fallback"):
             raise
         _ai_log(
-            f"主通道失败({type(exc).__name__}: {str(exc)[:80]})，"
+            f"主通道失败({type(exc).__name__}: {message[:80]})，"
             f"切换备用通道 {fallback.get('model')}"
         )
-        return await _call_llm_once(prompt, {**fallback, "_is_fallback": True}, timeout)
+        return await _call_llm_once(
+            prompt,
+            {**fallback, "_is_fallback": True, "json_schema": config.get("json_schema")},
+            timeout,
+        )
+
+
+_SCORE_ITEM_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": [
+        "link", "score", "column", "event_key", "event_date", "freshness_status",
+        "content_kind", "is_hard_news", "tags", "summary",
+        "impact", "prominence", "timeliness", "novelty", "conflict", "routine",
+    ],
+    "properties": {
+        "link": {"type": "string"},
+        "score": {"type": "integer", "minimum": 0, "maximum": 100},
+        "column": {"type": "string", "enum": ["us_politics", "global_affairs", "technology", "economy"]},
+        "event_key": {"type": "string"},
+        "event_date": {"type": "string"},
+        "freshness_status": {
+            "type": "string",
+            "enum": ["today", "recent_followup", "old_background", "unknown_date"],
+        },
+        "content_kind": {"type": "string"},
+        "is_hard_news": {"type": "boolean"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "summary": {"type": "string"},
+        "impact": {"type": "number", "minimum": 0, "maximum": 1},
+        "prominence": {"type": "number", "minimum": 0, "maximum": 1},
+        "timeliness": {"type": "number", "minimum": 0, "maximum": 1},
+        "novelty": {"type": "number", "minimum": 0, "maximum": 1},
+        "conflict": {"type": "number", "minimum": 0, "maximum": 1},
+        "routine": {"type": "number", "minimum": 0, "maximum": 1},
+    },
+}
+
+SCORE_JSON_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["items"],
+    "properties": {"items": {"type": "array", "items": _SCORE_ITEM_SCHEMA}},
+}
+
+_DIGEST_EVENT_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["title_zh", "reader_body", "core_facts", "source_links", "is_followup"],
+    "properties": {
+        "title_zh": {"type": "string"},
+        "reader_body": {"type": "string"},
+        "core_facts": {"type": "string"},
+        "source_links": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["title", "url"],
+                "properties": {"title": {"type": "string"}, "url": {"type": "string"}},
+            },
+        },
+        "is_followup": {"type": "boolean"},
+    },
+}
+
+DIGEST_JSON_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["events"],
+    "properties": {"events": {"type": "array", "items": _DIGEST_EVENT_SCHEMA}},
+}
+
+JSON_SCHEMAS: dict[str, dict] = {
+    "score_items": SCORE_JSON_SCHEMA,
+    "digest_events": DIGEST_JSON_SCHEMA,
+}
 
 
 def _build_llm_payload(prompt: str, config: dict) -> dict:
-    """构造 OpenAI 兼容请求体，支持 max_tokens 上限。"""
+    """构造 OpenAI 兼容请求体，支持 max_tokens 与 json_schema 强约束。"""
     payload = {
         "model": config["model"],
         "messages": [{"role": "user", "content": prompt}],
@@ -95,6 +175,16 @@ def _build_llm_payload(prompt: str, config: dict) -> dict:
     max_tokens = config.get("max_tokens")
     if max_tokens:
         payload["max_tokens"] = int(max_tokens)
+    schema_name = config.get("json_schema")
+    if schema_name and schema_name in JSON_SCHEMAS:
+        payload["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": schema_name,
+                "strict": True,
+                "schema": JSON_SCHEMAS[schema_name],
+            },
+        }
     return payload
 
 
@@ -475,7 +565,7 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
 - 【60-69】二手信息、一般性新闻
 - 【<60】低价值内容：纯情绪、广告、闲聊、评论、荐股单
 
-**信息量上限（先判）**：如果输入 content 少于 120 字符、或缺少可用于判断日期的信息，`score` 上限 69，`is_hard_news` 必须为 false。
+**信息量上限（先判）**：如果输入 content 少于 80 字符、或缺少可用于判断日期的信息，`score` 上限 69，`is_hard_news` 必须为 false。
 
 ## 新闻价值五维（每条必须输出，0-1）
 
@@ -636,7 +726,7 @@ async def _score_single_batch(
     try:
         response = await _call_llm(
             prompt,
-            {**config, "temperature": 0, "max_tokens": 16000},
+            {**config, "temperature": 0, "max_tokens": 16000, "json_schema": "score_items"},
             timeout=_timeout_for(config, "score", 120),
         )
         results = _parse_score_response(response)
@@ -1448,7 +1538,7 @@ async def generate_column_digest(
 
     response = await _call_llm(
         prompt,
-        {**ai_config, "temperature": 0.3, "max_tokens": 16000},
+        {**ai_config, "temperature": 0.3, "max_tokens": 16000, "json_schema": "digest_events"},
         timeout=_timeout_for(ai_config, "digest", 180),
     )
 
