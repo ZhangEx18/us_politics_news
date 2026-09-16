@@ -1532,3 +1532,22 @@ def test_normalize_headline_keeps_empty_text_items_using_title():
     assert normalized["technology"][0]["reader_body"] == "谷歌称部分 Pixel 手机用户遭零日攻击"
     assert metrics["technology"]["headline_body_from_title"] == 1
     assert metrics["technology"]["headline_reader_body_missing"] == 0
+
+
+def test_normalize_headline_dedupes_across_columns():
+    """要点与其它栏目的明细重复时也应被丢弃（跨栏目去重）。"""
+    normalized, metrics = _normalize_headline_only_by_column(
+        {
+            "us_politics": [
+                {"title_zh": "欧盟邀请加拿大成为史上首个“准成员”", "summary": "欧盟邀请加拿大成为准成员。"},
+                {"title_zh": "美国众议院通过拨款法案", "summary": "众议院通过拨款法案。"},
+            ]
+        },
+        detailed_titles={
+            "global_affairs": ["欧盟委员会主席冯德莱恩邀请加拿大成为欧盟史上首个“准成员”"],
+        },
+    )
+
+    kept_titles = [item["title_zh"] for item in normalized["us_politics"]]
+    assert kept_titles == ["美国众议院通过拨款法案"]
+    assert metrics["us_politics"]["headline_duplicate_dropped"] == 1
