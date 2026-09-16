@@ -1551,3 +1551,30 @@ def test_normalize_headline_dedupes_across_columns():
     kept_titles = [item["title_zh"] for item in normalized["us_politics"]]
     assert kept_titles == ["美国众议院通过拨款法案"]
     assert metrics["us_politics"]["headline_duplicate_dropped"] == 1
+
+
+def test_normalize_headline_drops_soft_news():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "us_politics": [
+            {"title_zh": "奥巴马夫妇爱犬桑尼去世：“热情又漂亮”", "summary": "奥巴马夫妇的爱犬去世。"},
+            {"title_zh": "众议院通过拨款法案", "summary": "众议院通过拨款法案。"},
+        ]
+    })
+
+    kept_titles = [item["title_zh"] for item in normalized["us_politics"]]
+    assert kept_titles == ["众议院通过拨款法案"]
+    assert metrics["us_politics"]["headline_soft_dropped"] == 1
+
+
+def test_normalize_headline_drops_opinion_variants_added():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "global_affairs": [
+            {"title_zh": "世界齐聚纽约：联合国大会高级别周有何利害关系", "summary": "预告稿。"},
+            {"title_zh": "俄非关系：莫斯科在非洲影响力日益增强", "summary": "综述稿。"},
+        ]
+    })
+
+    kept_titles = [item["title_zh"] for item in normalized["global_affairs"]]
+    # “有何利害关系”命中观点规则被丢弃；“俄非关系…”为综述类，暂未覆盖（记录为残留）
+    assert kept_titles == ["俄非关系：莫斯科在非洲影响力日益增强"]
+    assert metrics["global_affairs"]["headline_opinion_dropped"] == 1
