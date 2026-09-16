@@ -1120,6 +1120,15 @@ def _build_headline_only_reader_body(item: dict) -> str:
     return ""
 
 
+def _body_needs_translation(item: dict) -> bool:
+    """判断条目正文是否为未翻译的英文（此时可用已翻译标题兜底展示）。"""
+    for field in ("summary", "content"):
+        text = re.sub(r"\s+", " ", str(item.get(field, "") or "")).strip()
+        if text and _looks_like_english_fragment(text):
+            return True
+    return False
+
+
 def _normalize_headline_only_by_column(
     column_headline_only: dict[str, list[dict]],
 ) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
@@ -1130,6 +1139,7 @@ def _normalize_headline_only_by_column(
         kept: list[dict] = []
         cryptic_dropped = 0
         unreadable_dropped = 0
+        body_from_title = 0
 
         for item in items:
             title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
@@ -1141,12 +1151,14 @@ def _normalize_headline_only_by_column(
                 continue
 
             reader_body = _build_headline_only_reader_body(item)
-            if not reader_body:
-                unreadable_dropped += 1
-                continue
-            if not re.search(r"[\u4e00-\u9fff]", reader_body):
-                unreadable_dropped += 1
-                continue
+            if not reader_body or not re.search(r"[\u4e00-\u9fff]", reader_body):
+                if _body_needs_translation(item):
+                    # 正文未翻译：回退到已翻译标题，渲染层可直接展示
+                    reader_body = title_zh
+                    body_from_title += 1
+                else:
+                    unreadable_dropped += 1
+                    continue
 
             kept.append({
                 **item,
@@ -1158,6 +1170,7 @@ def _normalize_headline_only_by_column(
         metrics[col_key] = {
             "headline_cryptic_dropped": cryptic_dropped,
             "headline_reader_body_missing": unreadable_dropped,
+            "headline_body_from_title": body_from_title,
         }
 
     return normalized_columns, metrics
