@@ -472,3 +472,63 @@ def test_build_llm_payload_includes_max_tokens():
 
     payload_no_cap = _build_llm_payload("hi", {"model": "m"})
     assert "max_tokens" not in payload_no_cap
+
+
+# ── WP4: 事件合并增强（跨表述 event_key 兜底） ──
+
+
+def test_merge_events_merges_shared_key_tokens_same_date():
+    items = [
+        {
+            "link": "https://example.com/a",
+            "title": "Senate Democrats block crypto regulation bill",
+            "score": 82,
+            "summary": "参议院民主党阻止加密法案。",
+            "event_key": "senate_crypto_bill_20260916",
+            "column": "us_politics",
+        },
+        {
+            "link": "https://example.com/b",
+            "title": "US crypto bill blocked, Hong Kong industry reacts",
+            "score": 80,
+            "summary": "美国加密法案受阻，香港业界关注。",
+            "event_key": "crypto_bill_blocked_20260916",
+            "column": "technology",
+        },
+    ]
+
+    merged = merge_events(items)
+
+    assert len(merged) == 1
+    assert len(merged[0]["source_links"]) == 2
+
+
+def test_merge_events_does_not_merge_single_shared_token():
+    items = [
+        {
+            "link": "https://example.com/a",
+            "title": "Trump announces new tariff plan",
+            "score": 80,
+            "summary": "特朗普宣布新关税计划。",
+            "event_key": "trump_tariff_20260916",
+        },
+        {
+            "link": "https://example.com/b",
+            "title": "EU prepares tariff response",
+            "score": 78,
+            "summary": "欧盟准备关税回应。",
+            "event_key": "eu_tariff_20260916",
+        },
+    ]
+
+    merged = merge_events(items)
+
+    assert len(merged) == 2
+
+
+def test_event_keys_mergeable_requires_same_date():
+    from ai_analyzer import _event_keys_mergeable
+
+    assert _event_keys_mergeable("crypto_bill_a_20260916", "crypto_bill_b_20260916")
+    assert not _event_keys_mergeable("crypto_bill_a_20260916", "crypto_bill_b_20260917")
+    assert not _event_keys_mergeable("crypto_bill_a_20260916", "crypto_bill_b")

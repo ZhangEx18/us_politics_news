@@ -971,6 +971,32 @@ def _titles_similar(left: str, right: str) -> bool:
     return SequenceMatcher(None, left, right).ratio() >= 0.85
 
 
+def _event_key_parts(event_key: str) -> tuple[set[str], str]:
+    """拆 event_key 为（关键词集合，日期后缀）。"""
+    tokens: set[str] = set()
+    date = ""
+    for part in str(event_key or "").lower().split("_"):
+        part = part.strip()
+        if not part:
+            continue
+        if re.fullmatch(r"20\d{6}", part):
+            date = part
+        else:
+            tokens.add(part)
+    return tokens, date
+
+
+def _event_keys_mergeable(key_a: str, key_b: str) -> bool:
+    """同日期 + 共享 ≥2 个关键词的 event_key 视为同一事件（跨表述/跨栏目兜底）。"""
+    if not key_a or not key_b:
+        return False
+    tokens_a, date_a = _event_key_parts(key_a)
+    tokens_b, date_b = _event_key_parts(key_b)
+    if not date_a or date_a != date_b:
+        return False
+    return len(tokens_a & tokens_b) >= 2
+
+
 def _merge_event_group(group: list[dict], event_key: str) -> dict:
     """把一个事件组内的多条报道合并为一条（最高分为主条目）。"""
     group.sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
@@ -1047,7 +1073,13 @@ def merge_events(items: list[dict]) -> list[dict]:
         bucket = list(groups[key])
         norm = _primary_norm(bucket)
         target = next(
-            (c for c in clusters if c["key"] == key or _titles_similar(norm, c["norm"])),
+            (
+                c
+                for c in clusters
+                if c["key"] == key
+                or _titles_similar(norm, c["norm"])
+                or _event_keys_mergeable(key, c["key"])
+            ),
             None,
         )
         if target is None:
@@ -1118,6 +1150,7 @@ COLUMN_DIGEST_PROMPT_TEMPLATE = """你是一位顶级的新闻日报主编。你
 - 如果一个事件缺少足够事实支撑，必须从 events 中丢弃，不要为了凑数生成。
 - 如果输入主要来自媒体转述、聚合页面、法案列表页或标题摘录，必须显式收缩表述力度，只写“文件显示 / 页面列出 / 报道称 / 公开材料显示”等可归因句式。
 - 任何未经官方确认、仅由媒体报道的说法，不得写成既定事实；必须保留“据某媒体报道”或“报道显示”这类归因。
+- 同一事件多个来源数字不一致时（如死亡人数、金额）：主来源数字写入正文，同时以“另有报道为 X”保留其他数字，不得只保留一个。
 - 对法案、决议、行政文件类条目，如果输入没有提供法案内容、推进动作或影响对象，只能丢弃，不能靠编号或名称扩写。
 
 ## 栏目定义
