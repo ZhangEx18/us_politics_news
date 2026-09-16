@@ -566,3 +566,27 @@ def test_column_digest_retries_on_non_json_response(monkeypatch):
 
     assert len(result) == 1
     assert result[0]["title_zh"] == "测试标题"
+
+
+def test_translate_headline_titles_preserves_positions_with_empty_titles(monkeypatch):
+    import ai_analyzer
+
+    captured: dict = {}
+
+    async def fake_call(prompt, config, timeout=120):
+        captured["prompt"] = prompt
+        # 只为两个非空标题返回译文
+        return '{"items": [{"title_zh": "赫格塞思面临弹劾投票"}, {"title_zh": "清晰法案在参议院受阻"}]}'
+
+    monkeypatch.setattr(ai_analyzer, "_call_llm", fake_call)
+
+    titles = ["Hegseth faces impeachment vote", "", "Clarity Act blocked in Senate"]
+    result = asyncio.run(ai_analyzer.translate_headline_titles(titles, {"api_key": "k"}))
+
+    assert len(result) == 3
+    assert result[0] == "赫格塞思面临弹劾投票"
+    assert result[1] == ""
+    assert result[2] == "清晰法案在参议院受阻"
+    # 空标题不应进入请求
+    assert "Hegseth" in captured["prompt"]
+    assert captured["prompt"].count('""') == 0

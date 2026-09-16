@@ -1733,16 +1733,18 @@ async def translate_headline_titles(
     titles: list[str],
     ai_config: dict,
 ) -> list[str]:
-    """将次要新闻标题批量翻译为中文。"""
-    cleaned_titles = [str(title).strip() for title in titles if str(title).strip()]
-    if not cleaned_titles:
-        return []
+    """将次要新闻标题批量翻译为中文；保持与输入等长（空标题位置原样返回空串）。"""
+    cleaned_titles = [str(title).strip() for title in titles]
+    indexed_titles = [(idx, title) for idx, title in enumerate(cleaned_titles) if title]
+    if not indexed_titles:
+        return ["" for _ in cleaned_titles]
+    pending_titles = [title for _, title in indexed_titles]
 
     prompt = HEADLINE_TRANSLATION_PROMPT_TEMPLATE.replace(
         "{titles_json}",
-        json.dumps(cleaned_titles, ensure_ascii=False, indent=2),
+        json.dumps(pending_titles, ensure_ascii=False, indent=2),
     )
-    hint = glossary_hint(json.dumps(cleaned_titles, ensure_ascii=False))
+    hint = glossary_hint(json.dumps(pending_titles, ensure_ascii=False))
     if hint:
         prompt += hint
     response = await _call_llm(
@@ -1766,9 +1768,14 @@ async def translate_headline_titles(
             continue
         translated.append(str(item.get("title_zh", "")).strip())
 
-    if len(translated) < len(cleaned_titles):
-        translated.extend([""] * (len(cleaned_titles) - len(translated)))
-    return translated[:len(cleaned_titles)]
+    if len(translated) < len(pending_titles):
+        translated.extend([""] * (len(pending_titles) - len(translated)))
+    translated = translated[:len(pending_titles)]
+
+    result = ["" for _ in cleaned_titles]
+    for (idx, _), value in zip(indexed_titles, translated):
+        result[idx] = value
+    return result
 
 
 FALLBACK_BODY_PROMPT_TEMPLATE = """你是中文新闻编辑。请把下面的候选新闻改写成日报的简讯正文。
