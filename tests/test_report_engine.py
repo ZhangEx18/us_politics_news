@@ -1510,3 +1510,13 @@ def test_same_event_titles_not_fooled_by_shared_glossary_names():
         "加沙城一栋建筑倒塌，至少 20 人死亡",
         "救援人员：加沙一栋战损建筑倒塌致 21 死，含 8 名儿童",
     )
+
+
+def test_merge_headline_metrics_accumulates():
+    from report_engine import _merge_headline_metrics
+
+    metrics = {"us_politics": {"headline_opinion_dropped": 2}}
+    _merge_headline_metrics(metrics, "us_politics", {"headline_opinion_dropped": 1, "headline_promo_dropped": 3})
+
+    assert metrics["us_politics"]["headline_opinion_dropped"] == 3
+    assert metrics["us_politics"]["headline_promo_dropped"] == 3
