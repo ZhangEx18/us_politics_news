@@ -31,17 +31,26 @@ _SESSION_ID = uuid.uuid4().hex
 
 
 def _load_ai_config() -> dict:
-    """从环境变量加载 AI 配置，无 key 时 raise"""
+    """从环境变量加载 AI 配置，无 key 时 raise；支持配置备用通道。"""
     api_key = os.getenv("AI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
     if not api_key:
         raise RuntimeError(
             "未配置 AI_API_KEY 环境变量，请在 .env 或系统环境变量中设置"
         )
-    return {
+    config = {
         "api_key": api_key,
         "base_url": os.getenv("AI_BASE_URL") or "https://opencode.ai/zen/go/v1",
         "model": os.getenv("AI_MODEL") or "deepseek-v4.1-flash",
     }
+    fallback_base_url = os.getenv("AI_FALLBACK_BASE_URL", "").strip()
+    fallback_model = os.getenv("AI_FALLBACK_MODEL", "").strip()
+    if fallback_base_url and fallback_model:
+        config["fallback"] = {
+            "api_key": os.getenv("AI_FALLBACK_API_KEY", "").strip() or api_key,
+            "base_url": fallback_base_url,
+            "model": fallback_model,
+        }
+    return config
 
 
 # ── Prompt 加载 ──
@@ -61,6 +70,21 @@ def _load_prompt(path: str, **kwargs) -> str:
 
 
 async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
+    """调用 LLM；主通道失败时自动切换备用通道（config["fallback"]）。"""
+    try:
+        return await _call_llm_once(prompt, config, timeout)
+    except Exception as exc:
+        fallback = config.get("fallback")
+        if not fallback or config.get("_is_fallback"):
+            raise
+        _ai_log(
+            f"主通道失败({type(exc).__name__}: {str(exc)[:80]})，"
+            f"切换备用通道 {fallback.get('model')}"
+        )
+        return await _call_llm_once(prompt, {**fallback, "_is_fallback": True}, timeout)
+
+
+async def _call_llm_once(prompt: str, config: dict, timeout: int = 120) -> str:
     """调用 OpenAI 兼容 API（兼容推理模型 content / reasoning_content）"""
     headers = {
         "Authorization": f"Bearer {config['api_key']}",

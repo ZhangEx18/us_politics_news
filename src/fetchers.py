@@ -192,6 +192,57 @@ def _extract_html_text(raw_html: str) -> str:
     return text
 
 
+def _extract_article_with_trafilatura(raw_html: str) -> tuple[str, Optional[datetime]]:
+    """通用正文抽取（trafilatura）；未安装或失败时返回空。"""
+    try:
+        import trafilatura
+    except ImportError:
+        return "", None
+    try:
+        text = trafilatura.extract(raw_html, include_comments=False, include_tables=False) or ""
+    except Exception:
+        text = ""
+    published = None
+    try:
+        metadata = trafilatura.extract_metadata(raw_html)
+        if metadata is not None and getattr(metadata, "date", None):
+            published = _parse_datetime_text(str(metadata.date))
+    except Exception:
+        published = None
+    return str(text).strip(), published
+
+
+def _extract_article_with_gne(raw_html: str) -> tuple[str, Optional[datetime]]:
+    """中文正文抽取（GeneralNewsExtractor）；未安装或失败时返回空。"""
+    try:
+        from gne import GeneralNewsExtractor
+    except ImportError:
+        return "", None
+    try:
+        result = GeneralNewsExtractor().extract(raw_html, with_body_html=False)
+    except Exception:
+        return "", None
+    if not isinstance(result, dict):
+        return "", None
+    text = str(result.get("content") or "").strip()
+    published = _parse_datetime_text(str(result.get("publish_time") or ""))
+    return text, published
+
+
+def _extract_article_content(raw_html: str, *, prefer_chinese: bool) -> tuple[str, Optional[datetime]]:
+    """按语言偏好选择抽取器，双路互相兜底。"""
+    extractors = (
+        (_extract_article_with_gne, _extract_article_with_trafilatura)
+        if prefer_chinese
+        else (_extract_article_with_trafilatura, _extract_article_with_gne)
+    )
+    for extractor in extractors:
+        text, published = extractor(raw_html)
+        if text:
+            return text, published
+    return "", None
+
+
 def _build_contextual_snippet(page_text: str, title: str, limit: int) -> str:
     text = re.sub(r"\s+", " ", str(page_text or "")).strip()
     if not text:
@@ -437,7 +488,7 @@ class GoogleNewsFetcher(BaseFetcher):
                         title=title,
                         url=link,
                         content=content[:500],
-                        source_name="Google News",
+                        source_name=feed_cfg["name"],
                         published_at=published,
                         column=feed_cfg.get("column", ""),
                         source_tier=4,
@@ -492,7 +543,6 @@ class CustomFeedFetcher(BaseFetcher):
         max_items = int(source_cfg.get("custom", {}).get("max_items", 12))
         fetcher_key = str(source_cfg.get("fetcher_key", "")).strip()
         fetch_detail = bool(source_cfg.get("custom", {}).get("fetch_detail", True))
-        detail_always = fetcher_key in {"legislative_or_public_records", "intl_org_feed"}
         article_pattern = source_cfg.get("custom", {}).get("article_url_pattern")
         article_re = re.compile(article_pattern) if article_pattern else None
         since_utc = (since if since.tzinfo else since.replace(tzinfo=timezone.utc)).astimezone(timezone.utc)
@@ -518,7 +568,7 @@ class CustomFeedFetcher(BaseFetcher):
 
                 published_at = _extract_date_from_url(link)
                 snippet = _build_contextual_snippet(page_text, title, summary_limit)
-                if fetch_detail and (detail_always or published_at is None):
+                if fetch_detail:
                     detail_html = None
                     try:
                         detail_html = await self._get(link, timeout=aiohttp.ClientTimeout(total=20))
@@ -527,7 +577,16 @@ class CustomFeedFetcher(BaseFetcher):
                     if detail_html:
                         if published_at is None:
                             published_at = _extract_published_at_from_html(detail_html)
-                        detail_text = _extract_html_text(detail_html)
+                        prefer_chinese = str(source_cfg.get("language", "")).startswith("zh")
+                        article_text, article_date = _extract_article_content(
+                            detail_html, prefer_chinese=prefer_chinese
+                        )
+                        if published_at is None and article_date is not None:
+                            # 抽取器偶尔会从 URL 年份捏造日期（如 /2025/ → 2025-01-01），
+                            # 只接受落在抓取窗口内的日期，其余留空交给后续今日性过滤
+                            if article_date.date() >= since_cn_date:
+                                published_at = article_date
+                        detail_text = article_text or _extract_html_text(detail_html)
                         snippet = _build_contextual_snippet(detail_text, title, summary_limit) or snippet
 
                 if published_at is not None and published_at.date() < since_cn_date:
