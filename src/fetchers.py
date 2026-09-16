@@ -564,9 +564,15 @@ async def fetch_all_sources(since: datetime, sources: list[dict]) -> List[Conten
     ]
 
     headers = {"User-Agent": "Mozilla/5.0 (compatible; USPoliticsNews/2.0)"}
-    # 禁用 SSL 验证以兼容证书过期的 RSS 源
+    # 禁用 SSL 验证以兼容证书过期的 RSS 源；放宽头部行长度以兼容超长 CSP 响应
     connector = aiohttp.TCPConnector(ssl=False)
-    async with aiohttp.ClientSession(headers=headers, trust_env=True, connector=connector) as session:
+    async with aiohttp.ClientSession(
+        headers=headers,
+        trust_env=True,
+        connector=connector,
+        max_line_size=65536,
+        max_field_size=65536,
+    ) as session:
         tasks = []
         for name, fetcher in fetchers:
             fetcher.session = session

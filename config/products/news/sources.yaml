@@ -1236,3 +1236,83 @@
   - macro
   - supply_chain
   enabled: true
+
+# ── 官方一手/聚合源（2026-09-16 P0 新增）──
+- name: White House News
+  url: https://www.whitehouse.gov/news/feed/
+  fetch_mode: rss
+  column: us_politics
+  source_tier: 1
+  language: en
+  max_candidates_per_run: 2
+  tags:
+  - official
+  - white_house
+  enabled: true
+- name: White House Presidential Actions
+  url: https://www.whitehouse.gov/presidential-actions/feed/
+  fetch_mode: rss
+  column: us_politics
+  source_tier: 1
+  language: en
+  max_candidates_per_run: 2
+  tags:
+  - official
+  - executive_order
+  enabled: true
+- name: U.S. State Department
+  url: https://www.state.gov/rss-feed/press-releases/feed/
+  fetch_mode: rss
+  column: global_affairs
+  source_tier: 1
+  language: en
+  max_candidates_per_run: 2
+  tags:
+  - official
+  - diplomacy
+  enabled: true
+- name: U.S. Department of Defense
+  url: "https://www.defense.gov/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=945&max=20"
+  fetch_mode: rss
+  column: global_affairs
+  source_tier: 1
+  language: en
+  max_candidates_per_run: 2
+  tags:
+  - official
+  - defense
+  enabled: true
+- name: SCOTUSblog
+  url: https://www.scotusblog.com/feed/
+  fetch_mode: rss
+  column: us_politics
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags:
+  - judiciary
+  - supreme_court
+  enabled: true
+- name: SEC Press Releases
+  url: https://www.sec.gov/news/pressreleases.rss
+  fetch_mode: rss
+  column: economy
+  source_tier: 1
+  language: en
+  max_candidates_per_run: 2
+  tags:
+  - official
+  - regulation
+  - markets
+  enabled: true
+- name: Federal Register
+  url: "https://www.federalregister.gov/api/v1/documents.rss?per_page=20&order=newest"
+  fetch_mode: rss
+  column: us_politics
+  source_tier: 1
+  language: en
+  max_candidates_per_run: 2
+  tags:
+  - official
+  - regulation
+  enabled: true
