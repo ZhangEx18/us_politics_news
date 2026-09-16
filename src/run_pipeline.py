@@ -65,6 +65,7 @@ DEFAULT_FETCH_AT = "07:00"
 DEFAULT_PUBLISH_AT = "07:45"
 DEFAULT_MAX_CANDIDATES_PER_SOURCE = 3
 ROUTINE_SIGNAL_MULTIPLIER = 0.3
+CN_SOURCE_RESERVE = 2  # 每栏保底的中文源候选数
 
 
 def _load_config() -> dict:
@@ -543,7 +544,24 @@ def _prefilter_items_for_scoring(
             result.extend(tier4[:remaining])
 
         ranked = sorted(result[:limit], key=lambda item: _prefilter_signal(item, now), reverse=True)
-        selected[col_key] = _cap_items_per_source(ranked)
+        capped = _cap_items_per_source(ranked)
+
+        # 中文源保底：避免中文源在预筛中与 tier1 源竞争时被整体挤出
+        cn_reserve = int(columns_cfg.get(col_key, {}).get("cn_reserve", CN_SOURCE_RESERVE))
+        cn_current = [item for item in capped if _is_cn_source_item(item)]
+        if cn_reserve > 0 and len(cn_current) < cn_reserve:
+            capped_ids = {id(item) for item in capped}
+            cn_pool = sorted(
+                (
+                    item
+                    for item in all_items
+                    if _is_cn_source_item(item) and id(item) not in capped_ids
+                ),
+                key=lambda item: _prefilter_signal(item, now),
+                reverse=True,
+            )
+            capped.extend(cn_pool[: cn_reserve - len(cn_current)])
+        selected[col_key] = capped
     return selected
 
 
