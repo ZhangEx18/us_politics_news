@@ -31,7 +31,7 @@ def test_config_loads_successfully():
     assert isinstance(config, dict), "config.yaml 应解析为字典"
 
 
-def test_ai_config_defaults_to_bigmodel_when_optional_env_empty(monkeypatch):
+def test_ai_config_defaults_to_opencode_zen_go_when_optional_env_empty(monkeypatch):
     from ai_analyzer import _load_ai_config
 
     monkeypatch.setenv("AI_API_KEY", "test-key")
@@ -40,8 +40,8 @@ def test_ai_config_defaults_to_bigmodel_when_optional_env_empty(monkeypatch):
 
     config = _load_ai_config()
 
-    assert config["base_url"] == "https://open.bigmodel.cn/api/paas/v4"
-    assert config["model"] == "glm-4.7"
+    assert config["base_url"] == "https://opencode.ai/zen/go/v1"
+    assert config["model"] == "deepseek-v4.1-flash"
 
 
 def test_digest_columns_contains_four_columns():

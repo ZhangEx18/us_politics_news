@@ -3,7 +3,7 @@
 import os
 import re
 import tempfile
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from feed_builder import (
@@ -232,19 +232,23 @@ def test_merge_items_replaces_same_date():
 
 
 def test_merge_items_keeps_different_dates():
-    item_today = _build_item_xml("2026-06-18", "Today", "Today", "<p>Today</p>", "")
-    item_yesterday = _build_item_xml("2026-06-17", "Yesterday", "Yesterday", "<p>Yesterday</p>", "")
+    today = datetime.now().strftime("%Y-%m-%d")
+    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    item_today = _build_item_xml(today, "Today", "Today", "<p>Today</p>", "")
+    item_yesterday = _build_item_xml(yesterday, "Yesterday", "Yesterday", "<p>Yesterday</p>", "")
     result = _merge_items(item_today, [item_yesterday])
     assert len(result) == 2
 
 
 def test_merge_items_dedup_mixed_list():
-    new = _build_item_xml("2026-06-18", "New", "New", "<p>New</p>", "")
-    old_same = _build_item_xml("2026-06-18", "Old Same", "Old Same", "<p>Old Same</p>", "")
-    old_other = _build_item_xml("2026-06-17", "Old Other", "Old Other", "<p>Old Other</p>", "")
+    today = datetime.now().strftime("%Y-%m-%d")
+    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    new = _build_item_xml(today, "New", "New", "<p>New</p>", "")
+    old_same = _build_item_xml(today, "Old Same", "Old Same", "<p>Old Same</p>", "")
+    old_other = _build_item_xml(yesterday, "Old Other", "Old Other", "<p>Old Other</p>", "")
     result = _merge_items(new, [old_same, old_other])
     dates = [_extract_item_date(r) for r in result]
-    assert dates.count("2026-06-18") == 1
+    assert dates.count(today) == 1
     assert len(result) == 2
 
 
