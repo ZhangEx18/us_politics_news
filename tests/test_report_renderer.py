@@ -112,8 +112,8 @@ def test_render_reader_headline_only_prefers_reader_body():
         assert "国会两院继续拉锯。" in output
 
 
-def test_render_reader_skips_headline_only_column():
-    """只有 headline_only_events 的栏目在 Reader 中不显示。"""
+def test_render_reader_shows_headline_only_column():
+    """只有 headline_only_events 的栏目在 Reader 中也要显示。"""
     meta = {"title": "测试", "highlights": [], "date": "2026-06-19"}
     columns = {
         "us_politics": {
@@ -125,8 +125,9 @@ def test_render_reader_skips_headline_only_column():
         "economy": {"detailed_events": [], "headline_only_events": []},
     }
     html = render_reader_content(meta, columns, report_type="daily")
-    assert "标题 B" not in html
-    assert "<h2>一、美国政局</h2>" not in html
+    assert "标题 B" in html
+    assert "<h2>一、美国政局</h2>" in html
+    assert "<li>标题 B</li>" in html
 
 
 def test_render_weekly_no_headline_only():

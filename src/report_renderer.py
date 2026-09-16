@@ -444,7 +444,7 @@ footer {
         col_data = columns.get(col_key, {})
         detailed, headline_only, analysis = _normalize_column_sections(col_data)
 
-        if not detailed:
+        if not detailed and not headline_only:
             continue
 
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})
@@ -611,7 +611,7 @@ def render_reader_content(
         col_data = columns.get(col_key, {})
         detailed, headline_only, analysis = _normalize_column_sections(col_data)
 
-        if not detailed:
+        if not detailed and not headline_only:
             continue
 
         meta_col = COLUMN_META.get(col_key, {"heading": col_key, "icon": ""})

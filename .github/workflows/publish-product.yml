@@ -87,6 +87,13 @@ jobs:
           print(f"feed_path={feed_path}")
           PY
 
+      - name: Check AI provider
+        run: python3 scripts/check_ai_provider.py
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+
       - name: Restore state database
         run: |
           DB_PATH="${{ steps.config.outputs.db_path }}"

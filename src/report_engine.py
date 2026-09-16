@@ -796,6 +796,64 @@ def _first_body_date(text: str, default_year: int | None = None) -> str:
     return ""
 
 
+def _body_date_allowed(body: str, allowed_body_dates: set[str], body_date_year: int | None) -> bool:
+    first_date = _first_body_date(body, int(body_date_year) if body_date_year else None)
+    return not (first_date and allowed_body_dates and first_date not in allowed_body_dates)
+
+
+def _rewrite_body_date(body: str, allowed_body_dates: set[str], body_date_year: int | None) -> tuple[str, bool]:
+    """把正文首个日期改成允许窗口内的日期，仅在正文里已经存在日期表达时使用。"""
+    first_date = _first_body_date(body, int(body_date_year) if body_date_year else None)
+    if not first_date or not allowed_body_dates or first_date in allowed_body_dates:
+        return body, False
+
+    replacement_date = sorted(allowed_body_dates)[-1]
+    try:
+        dt = datetime.fromisoformat(replacement_date)
+    except ValueError:
+        return body, False
+    replacement_text = f"{dt.month} 月 {dt.day} 日"
+
+    patterns = [
+        r"(20\d{2})-(\d{1,2})-(\d{1,2})",
+        r"(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日",
+        r"(\d{1,2})\s*月\s*(\d{1,2})\s*日",
+    ]
+    rewritten = body
+    for pattern in patterns:
+        rewritten, count = re.subn(pattern, replacement_text, rewritten, count=1)
+        if count:
+            return rewritten, True
+    return body, False
+
+
+def _structured_event_date_in_window(event: dict, allowed_body_dates: set[str]) -> bool:
+    if not allowed_body_dates:
+        return True
+    for field in ("event_date", "freshness_date"):
+        value = str(event.get(field) or "").strip()
+        if value and value in allowed_body_dates:
+            return True
+    return False
+
+
+def _event_to_headline_only(event: dict) -> dict | None:
+    title = str(event.get("title_zh") or event.get("title") or "").strip()
+    if not title:
+        return None
+    reader_body = _build_headline_only_reader_body(event)
+    if not reader_body:
+        reader_body = title
+    return {
+        **event,
+        "title_zh": title,
+        "reader_body": reader_body,
+        "core_facts": reader_body,
+        "summary": reader_body,
+        "content": reader_body,
+    }
+
+
 def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
     """验证单个事件的质量门禁。gate_config 为 None 时使用默认阈值。"""
     cfg = gate_config or {}
@@ -841,6 +899,10 @@ def sanitize_or_validate_events(
     """清理并验证事件列表。gate_config 传给 _validate_event 用于阈值配置。"""
     all_issues: list[str] = []
     cleaned_events: list[dict] = []
+    allowed_body_dates = {str(d) for d in (gate_config or {}).get("allowed_body_dates", []) if str(d)}
+    body_date_year = (gate_config or {}).get("body_date_year")
+    require_date_in_body = bool((gate_config or {}).get("require_date_in_body", False))
+
     for i, event in enumerate(events):
         title = event.get("title_zh", f"事件{i+1}")
         body = str(event.get("reader_body", "")).strip()
@@ -851,7 +913,23 @@ def sanitize_or_validate_events(
             event = {**event, "reader_body": cleaned_body}
             if event.get("core_facts") == body:
                 event["core_facts"] = cleaned_body
-        validate_issues = _validate_event(event, gate_config)
+
+        if require_date_in_body and not _body_date_allowed(cleaned_body, allowed_body_dates, body_date_year):
+            if not _structured_event_date_in_window(event, allowed_body_dates):
+                validate_issues = _validate_event(event, gate_config)
+            else:
+                first_date = _first_body_date(cleaned_body, int(body_date_year) if body_date_year else None)
+                rewritten_body, rewritten = _rewrite_body_date(cleaned_body, allowed_body_dates, body_date_year)
+                if rewritten:
+                    event = {**event, "reader_body": rewritten_body}
+                    if event.get("core_facts") == cleaned_body:
+                        event["core_facts"] = rewritten_body
+                    cleaned_body = rewritten_body
+                    replacement_date = sorted(allowed_body_dates)[-1]
+                    all_issues.append(f"[{title}] 正文日期已重写: {first_date} -> {replacement_date}")
+                validate_issues = _validate_event(event, gate_config)
+        else:
+            validate_issues = _validate_event(event, gate_config)
         for issue in validate_issues:
             all_issues.append(f"[{title}] {issue}")
         if any("正文日期不在日报窗口" in issue for issue in validate_issues):
@@ -1301,12 +1379,45 @@ def build_report(
         events = column_results[col_key]
         if not events:
             continue
-        cleaned, issues = sanitize_or_validate_events(events, gate_config)
-        if issues:
-            for issue in issues:
-                print(f"   [{col_key}] {issue}")
-            total_issues += len(issues)
-        column_results[col_key] = cleaned
+        cleaned_events: list[dict] = []
+        downgraded_events: list[dict] = []
+        issues_count = 0
+        for event in events:
+            cleaned, issues = sanitize_or_validate_events([event], gate_config)
+            if issues:
+                for issue in issues:
+                    print(f"   [{col_key}] {issue}")
+                issues_count += len(issues)
+            if not cleaned:
+                fallback_event = _event_to_headline_only(event)
+                if fallback_event:
+                    downgraded_events.append(fallback_event)
+                continue
+
+            validated_event = cleaned[0]
+            has_fatal_issue = any(
+                token in issue
+                for issue in issues
+                for token in ("正文日期不在日报窗口", "句数不足", "句数过多", "字数过少", "字数过多", "reader_body 为空")
+            )
+            if has_fatal_issue:
+                fallback_event = _event_to_headline_only(validated_event)
+                if fallback_event:
+                    downgraded_events.append(fallback_event)
+                continue
+
+            cleaned_events.append(validated_event)
+
+        if downgraded_events:
+            metrics["columns"].setdefault(col_key, {})["detailed_downgraded_to_headline_only"] = len(downgraded_events)
+            column_headline_only.setdefault(col_key, []).extend(downgraded_events)
+        column_results[col_key] = cleaned_events
+        total_issues += issues_count
+
+    if spec.report_type == "daily":
+        column_headline_only, post_downgrade_headline_metrics = _normalize_headline_only_by_column(column_headline_only)
+        for col_key, column_metrics in post_downgrade_headline_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
     print(f"   {'全部通过' if not total_issues else f'{total_issues} 个质量问题（已清理）'}")
 
     # ── 组装 columns ──
