@@ -312,3 +312,22 @@ def test_save_to_db_preserves_item_fetched_at(tmp_path):
     rows = db.fetch_since(datetime(2026, 6, 10, tzinfo=timezone.utc))
     assert len(rows) == 1
     assert rows[0].fetched_at == fetched_at
+
+
+def test_extract_date_from_url_handles_common_layouts():
+    from fetchers import _extract_date_from_url
+
+    assert _extract_date_from_url("https://www.caixin.com/2026-09-16/10234.html").date().isoformat() == "2026-09-16"
+    assert _extract_date_from_url("https://example.com/2026/09/15/story").date().isoformat() == "2026-09-15"
+    assert _extract_date_from_url("https://example.com/20260915/abc").date().isoformat() == "2026-09-15"
+    assert _extract_date_from_url("https://example.com/no-date") is None
+
+
+def test_extract_published_at_from_html_reads_meta_and_jsonld():
+    from fetchers import _extract_published_at_from_html
+
+    html = '<meta property="article:published_time" content="2026-09-16T08:30:00+08:00">'
+    assert _extract_published_at_from_html(html).date().isoformat() == "2026-09-16"
+    html2 = '<script type="application/ld+json">{"datePublished":"2026-09-15T20:00:00Z"}</script>'
+    assert _extract_published_at_from_html(html2).date().isoformat() == "2026-09-15"
+    assert _extract_published_at_from_html("<html></html>") is None
