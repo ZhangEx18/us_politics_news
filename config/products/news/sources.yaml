@@ -13,7 +13,7 @@
   tags:
   - official_wire
   - policy
-  enabled: true
+  enabled: false  # 2026-09-16 失效：403/无路由
 - name: Reuters Politics
   url: https://www.reutersagency.com/feed/?best-topics=politicalgeneral&post_type=reuters-best
   fetch_mode: rss
@@ -23,7 +23,7 @@
   tags:
   - official_wire
   - policy
-  enabled: true
+  enabled: false  # 2026-09-16 失效：404（Reuters 停官方 RSS）
 - name: NPR Politics
   url: https://feeds.npr.org/1014/rss.xml
   fetch_mode: rss
@@ -80,14 +80,14 @@
   column: us_politics
   source_tier: 2
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：feed 冻结(最新 2022-12)
 - name: NBC News Politics
   url: https://feeds.nbcnews.com/nbcnews/politics
   fetch_mode: rss
   column: us_politics
   source_tier: 2
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：feed 空
 - name: ABC News Politics
   url: https://abcnews.go.com/abcnews/politicsheadlines
   fetch_mode: rss
@@ -115,14 +115,14 @@
   column: us_politics
   source_tier: 2
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：404
 - name: USA Today Politics
   url: https://rss.usatoday.com/News/Politics
   fetch_mode: rss
   column: us_politics
   source_tier: 2
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：feed 空
 - name: The Guardian US
   url: https://www.theguardian.com/us-news/rss
   fetch_mode: rss
@@ -136,14 +136,14 @@
   column: us_politics
   source_tier: 2
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：503
 - name: The New Yorker - Politics
   url: https://www.newyorker.com/feed/news/news-desk/politics/rss
   fetch_mode: rss
   column: us_politics
   source_tier: 2
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：404
 - name: Brookings - Governance
   url: https://www.brookings.edu/topic/governance/feed/
   fetch_mode: rss
@@ -253,7 +253,7 @@
   tags:
   - official_wire
   - geopolitics
-  enabled: true
+  enabled: false  # 2026-09-16 失效：404
 - name: AP News - World
   url: https://rsshub.app/apnews/topics/world-news
   fetch_mode: rsshub
@@ -263,7 +263,7 @@
   tags:
   - official_wire
   - geopolitics
-  enabled: true
+  enabled: false  # 2026-09-16 失效：403/无路由
 - name: Al Jazeera
   url: https://www.aljazeera.com/xml/rss/all.xml
   fetch_mode: rss
@@ -497,14 +497,14 @@
   column: technology
   source_tier: 1
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：404（AI 源改为 AIHOT）
 - name: Meta AI Blog
   url: https://ai.meta.com/blog/rss/
   fetch_mode: rss
   column: technology
   source_tier: 1
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：404（AI 源改为 AIHOT）
 - name: NVIDIA Blog
   url: https://blogs.nvidia.com/feed/
   fetch_mode: rss
@@ -677,7 +677,7 @@
   column: economy
   source_tier: 1
   language: en
-  enabled: true
+  enabled: false  # 2026-09-16 失效：403（数据中心 IP 拒绝）
 - name: World Bank
   url: https://blogs.worldbank.org/rss.xml
   fetch_mode: rss
@@ -1315,4 +1315,60 @@
   tags:
   - official
   - regulation
+  enabled: true
+
+# ── wire 层兜底（2026-09-16 新增：Reuters/AP/CNN/Axios 官方 RSS 已失效，改用 site: 查询）──
+- name: Google News - Reuters Politics
+  url: https://news.google.com/rss/search?q=site:reuters.com+politics&hl=en&gl=US
+  fetch_mode: google_news
+  column: us_politics
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, reuters]
+  enabled: true
+- name: Google News - Reuters World
+  url: https://news.google.com/rss/search?q=site:reuters.com+world&hl=en&gl=US
+  fetch_mode: google_news
+  column: global_affairs
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, reuters]
+  enabled: true
+- name: Google News - AP Politics
+  url: https://news.google.com/rss/search?q=site:apnews.com+politics&hl=en&gl=US
+  fetch_mode: google_news
+  column: us_politics
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, ap]
+  enabled: true
+- name: Google News - AP World
+  url: https://news.google.com/rss/search?q=site:apnews.com+world&hl=en&gl=US
+  fetch_mode: google_news
+  column: global_affairs
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, ap]
+  enabled: true
+- name: Google News - CNN Politics
+  url: https://news.google.com/rss/search?q=site:cnn.com+politics&hl=en&gl=US
+  fetch_mode: google_news
+  column: us_politics
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, cnn]
+  enabled: true
+- name: Google News - Axios
+  url: https://news.google.com/rss/search?q=site:axios.com&hl=en&gl=US
+  fetch_mode: google_news
+  column: us_politics
+  source_tier: 2
+  language: en
+  max_candidates_per_run: 2
+  tags: [wire, axios]
   enabled: true

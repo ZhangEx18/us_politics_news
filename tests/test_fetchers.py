@@ -385,3 +385,56 @@ def test_custom_fetcher_filters_non_article_links_and_uses_dates(monkeypatch):
 
     assert [item.title for item in items] == ["今天发生的重要新闻摘要"]
     assert items[0].published_at.date().isoformat() == "2026-09-16"
+
+
+def test_extract_article_content_prefers_chinese_extractor(monkeypatch):
+    from fetchers import _extract_article_content
+
+    calls: list[str] = []
+
+    def fake_gne(html):
+        calls.append("gne")
+        return "中文正文内容。", None
+
+    def fake_traf(html):
+        calls.append("traf")
+        return "english body", None
+
+    monkeypatch.setattr("fetchers._extract_article_with_gne", fake_gne)
+    monkeypatch.setattr("fetchers._extract_article_with_trafilatura", fake_traf)
+
+    text, _ = _extract_article_content("<html/>", prefer_chinese=True)
+
+    assert text == "中文正文内容。"
+    assert calls == ["gne"]
+
+
+def test_extract_article_content_falls_back_between_extractors(monkeypatch):
+    from fetchers import _extract_article_content
+
+    calls: list[str] = []
+
+    def fake_gne(html):
+        calls.append("gne")
+        return "", None
+
+    def fake_traf(html):
+        calls.append("traf")
+        return "fallback body", None
+
+    monkeypatch.setattr("fetchers._extract_article_with_gne", fake_gne)
+    monkeypatch.setattr("fetchers._extract_article_with_trafilatura", fake_traf)
+
+    text, _ = _extract_article_content("<html/>", prefer_chinese=True)
+
+    assert text == "fallback body"
+    assert calls == ["gne", "traf"]
+
+
+def test_extract_article_content_returns_empty_on_junk_html():
+    from fetchers import _extract_article_content
+
+    text, published = _extract_article_content("<html></html>", prefer_chinese=False)
+
+    assert text == ""
+    assert published is None
