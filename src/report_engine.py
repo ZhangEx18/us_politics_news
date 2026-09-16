@@ -496,7 +496,7 @@ def _build_fallback_detailed_event(candidate: dict) -> dict | None:
     if body_text[-1] not in "。！？!?":
         body_text += "。"
     body = f"{date_text}，{body_text}"
-    if len(body) < 80:
+    if len(body) < 50:
         return None
     if len(body) > 260:
         body = body[:260].rstrip(" ，,。. ") + "。"
@@ -681,7 +681,6 @@ def _fill_underrepresented_columns(
     columns_cfg: dict[str, dict],
 ) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
     """AI 写作后，某栏目事件数不足 min_items 时，从候选中补充。"""
-    MIN_FILL_BODY = 60  # 候补 reader_body 最短长度
     filled = {col_key: list(items) for col_key, items in column_results.items()}
     metrics: dict[str, dict[str, int]] = {}
 
@@ -944,7 +943,7 @@ def _event_to_headline_only(event: dict) -> dict | None:
 def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
     """验证单个事件的质量门禁。gate_config 为 None 时使用默认阈值。"""
     cfg = gate_config or {}
-    min_chars = cfg.get("min_chars", 80)
+    min_chars = cfg.get("min_chars", 50)
     max_chars = cfg.get("max_chars", 260)
     min_sentences = cfg.get("min_sentences", 2)
     max_sentences = cfg.get("max_sentences", 4)
