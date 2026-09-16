@@ -288,8 +288,39 @@ def _merge_scores(entries: list[dict], scores: list[dict]) -> list[dict]:
             "information_gain": s.get("information_gain", entry.get("information_gain", "")),
             "event_stage": s.get("event_stage", entry.get("event_stage", "")),
             "verifiability": s.get("verifiability", entry.get("verifiability", "")),
+            "newsworthiness": s.get("newsworthiness", entry.get("newsworthiness", "")),
+            "routine": s.get("routine", entry.get("routine", "")),
+            "impact_scope": s.get("impact_scope", entry.get("impact_scope", "")),
         })
     return merged
+
+
+def coerce_unit_interval(value: object) -> Optional[float]:
+    """把 0-1 评分字段归一化为 float；无法解析时返回 None。"""
+    if value is None or value == "":
+        return None
+    try:
+        number = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    if number > 1.0:
+        number = number / 100.0
+    return max(0.0, min(1.0, number))
+
+
+def entry_newsworthiness_ok(
+    entry: dict,
+    min_newsworthiness: float = 0.5,
+    max_routine: float = 0.6,
+) -> bool:
+    """新闻价值门槛：例行度过高或价值过低则剔除；字段缺失时放行（兼容历史数据）。"""
+    routine = coerce_unit_interval(entry.get("routine"))
+    if routine is not None and routine >= max_routine:
+        return False
+    newsworthiness = coerce_unit_interval(entry.get("newsworthiness"))
+    if newsworthiness is not None and newsworthiness < min_newsworthiness:
+        return False
+    return True
 
 
 # ── score_batch ──
@@ -310,6 +341,14 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
 - 【70-79】一般硬新闻，事实成立但增量有限
 - 【60-69】二手信息、一般性新闻
 - 【<60】低价值内容：纯情绪、广告、闲聊、评论、荐股单
+
+## 新闻价值三维（每条必须输出）
+
+- `newsworthiness`（0-1）：事件本身的新闻价值。1 = 制度性变化、战争、里程碑裁决、重大政策转折；0.5 = 常规但真实的新政策/诉讼/宏观数据；<0.4 = 例行程序、日常公告、可预期安排
+- `routine`（0-1）：例行程度。0.8-1.0 = 定期发布的程序性公告（评论期起止、听证排期、费用表、拟议预算、FAQ、撤回旧文件、例行会议安排）；0 = 突发事件或不可预期的新动作
+- `impact_scope`：影响范围，必须是 `local` / `national` / `global` 之一
+
+重要：官方来源不等于高新闻价值。机构例行公告要如实标注高 `routine`、低 `newsworthiness`，不要因为来源权威就抬分。
 
 ## 硬新闻准入
 
@@ -377,6 +416,9 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
 - `information_gain`: 信息增量（0-1）
 - `event_stage`: 事件阶段（首发 / 跟进 / 总结 / 回应）
 - `verifiability`: 可验证性（0-1）
+- `newsworthiness`: 新闻价值（0-1）
+- `routine`: 例行程度（0-1）
+- `impact_scope`: 影响范围（local / national / global）
 
 ## 输出格式（严格只输出 JSON，以 "{{" 开始，以 "}}" 结尾）
 
@@ -393,7 +435,13 @@ SCORE_PROMPT_TEMPLATE = """你是一个专业且严苛的新闻主编。请对�
       "content_kind": "judiciary",
       "is_hard_news": true,
       "tags": ["具体标签1", "具体标签2"],
-      "summary": "一句话摘要。"
+      "summary": "一句话摘要。",
+      "information_gain": 0.7,
+      "event_stage": "首发",
+      "verifiability": 0.8,
+      "newsworthiness": 0.8,
+      "routine": 0.1,
+      "impact_scope": "national"
     }}
   ]
 }}

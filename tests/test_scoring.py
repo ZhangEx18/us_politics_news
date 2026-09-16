@@ -350,3 +350,40 @@ def test_build_digest_evidence_excludes_raw_article_content():
     assert "来源层级：3" in evidence
     assert "来源标题：Agency announces rule；Companies face compliance deadline" in evidence
     assert "原文长片段" not in evidence
+
+
+# ── 新闻价值维度（改造3） ──
+
+
+def test_merge_scores_carries_newsworthiness_dimensions():
+    entries = [{"link": "https://example.com/a", "title": "T", "source": "S"}]
+    scores = [{
+        "link": "https://example.com/a",
+        "score": 80,
+        "column": "us_politics",
+        "is_hard_news": True,
+        "newsworthiness": 0.9,
+        "routine": 0.1,
+        "impact_scope": "national",
+    }]
+
+    merged = _merge_scores(entries, scores)
+
+    assert merged[0]["newsworthiness"] == 0.9
+    assert merged[0]["routine"] == 0.1
+    assert merged[0]["impact_scope"] == "national"
+
+
+def test_entry_newsworthiness_gate_rejects_routine_and_low_value():
+    from ai_analyzer import coerce_unit_interval, entry_newsworthiness_ok
+
+    assert entry_newsworthiness_ok({"newsworthiness": 0.8, "routine": 0.1})
+    assert not entry_newsworthiness_ok({"newsworthiness": 0.8, "routine": 0.8})
+    assert not entry_newsworthiness_ok({"newsworthiness": 0.3, "routine": 0.1})
+    # 百分制容错
+    assert entry_newsworthiness_ok({"newsworthiness": 80, "routine": 10})
+    # 字段缺失时放行（兼容历史事件库）
+    assert entry_newsworthiness_ok({})
+    assert coerce_unit_interval("0.7") == 0.7
+    assert coerce_unit_interval(None) is None
+    assert coerce_unit_interval("abc") is None
