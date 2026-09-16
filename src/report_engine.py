@@ -1222,6 +1222,10 @@ def _prepare_report_inputs(
 ) -> ReportPreparation:
     print(f"\n[合并] 事件级合并...")
     merged_events = merge_events(scored_events)
+    events_merged_duplicates = len(scored_events) - len(merged_events)
+    metrics["events_merged_duplicates"] = events_merged_duplicates
+    if events_merged_duplicates:
+        print(f"   合并同事件重复: {events_merged_duplicates} 条")
     by_column_counts: dict[str, int] = {}
     for event in merged_events:
         column_key = event.get("column", "unknown")
