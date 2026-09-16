@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "观察日报：高层运行时架构",
+    "locale": "zh-CN",
+    "output": "docs/runtime-architecture.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/ZhangEx18/us_politics_news",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "74f137f13c7d4fdc641f0b6f51f6dbe2ce583fda"
+    },
+    "views": [
+      {
+        "id": "publish-path",
+        "label": "自动发布链路",
+        "focus": ["cron", "actions", "pipeline", "sources", "ai", "state", "artifacts", "pages", "readers"],
+        "note": "从定时触发到日报、RSS 发布，再到 Reader 消费。"
+      },
+      {
+        "id": "local-operations",
+        "label": "本地运维入口",
+        "focus": ["operator", "dashboard", "pipeline", "state", "artifacts"],
+        "note": "本地 FastAPI 控制台读取状态、展示报告并触发 pipeline。"
+      },
+      {
+        "id": "data-and-ai",
+        "label": "数据与 AI",
+        "focus": ["sources", "pipeline", "ai", "state", "artifacts"],
+        "note": "抓取、评分、写作、持久化和渲染构成核心数据运行时。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "sources",
+      "type": "external",
+      "label": "新闻源",
+      "sublabel": "RSS / APIs / RSSHub",
+      "tag": "多源并发抓取",
+      "sources": [
+        { "path": "config/products/news/sources.yaml" },
+        { "path": "src/fetchers.py" }
+      ],
+      "pos": [40, 320],
+      "size": [180, 76]
+    },
+    {
+      "id": "cron",
+      "type": "cloud",
+      "label": "Cloudflare Cron",
+      "sublabel": "每日定时触发",
+      "tag": "23:30 UTC",
+      "sources": [
+        { "path": "cloudflare/daily-rss-trigger.js" },
+        { "path": "wrangler.toml" }
+      ],
+      "pos": [60, 120],
+      "size": [170, 70]
+    },
+    {
+      "id": "actions",
+      "type": "cloud",
+      "label": "GitHub Actions",
+      "sublabel": "workflow_dispatch",
+      "tag": "CI 发布编排",
+      "sources": [
+        { "path": ".github/workflows/publish-product.yml" },
+        { "path": ".github/workflows/daily-rss-publish.yml" }
+      ],
+      "pos": [320, 120],
+      "size": [180, 70]
+    },
+    {
+      "id": "pipeline",
+      "type": "backend",
+      "label": "Python 新闻 Pipeline",
+      "sublabel": "抓取 · 评分 · 写作 · 渲染",
+      "tag": "run_product.py",
+      "sources": [
+        { "path": "src/run_product.py" },
+        { "path": "src/run_pipeline.py" },
+        { "path": "src/report_renderer.py" }
+      ],
+      "pos": [300, 320],
+      "size": [220, 86]
+    },
+    {
+      "id": "ai",
+      "type": "external",
+      "label": "AI Provider",
+      "sublabel": "评分与中文写作",
+      "tag": "AI_API_KEY",
+      "sources": [
+        { "path": "src/ai_analyzer.py" },
+        { "path": "config/base.yaml" }
+      ],
+      "pos": [300, 520],
+      "size": [180, 76]
+    },
+    {
+      "id": "state",
+      "type": "database",
+      "label": "SQLite 状态库",
+      "sublabel": "文章 · 评分 · 运行记录",
+      "tag": "news.db",
+      "sources": [
+        { "path": "src/database.py" }
+      ],
+      "pos": [620, 520],
+      "size": [190, 76]
+    },
+    {
+      "id": "artifacts",
+      "type": "backend",
+      "label": "日报与 Feed 产物",
+      "sublabel": "Markdown · HTML · RSS",
+      "tag": "docs/",
+      "sources": [
+        { "path": "src/report_renderer.py" },
+        { "path": "src/feed_builder.py" }
+      ],
+      "pos": [620, 320],
+      "size": [190, 76]
+    },
+    {
+      "id": "pages",
+      "type": "cloud",
+      "label": "GitHub Pages",
+      "sublabel": "静态站点托管",
+      "tag": "docs/ 发布",
+      "sources": [
+        { "path": ".github/workflows/publish-product.yml" },
+        { "path": "README.md" }
+      ],
+      "pos": [920, 320],
+      "size": [180, 76]
+    },
+    {
+      "id": "readers",
+      "type": "external",
+      "label": "读者 / Reader",
+      "sublabel": "浏览器与 RSS 客户端",
+      "tag": "HTTPS / RSS",
+      "sources": [
+        { "path": "README.md" }
+      ],
+      "pos": [1170, 320],
+      "size": [170, 76]
+    },
+    {
+      "id": "operator",
+      "type": "external",
+      "label": "本地操作者",
+      "sublabel": "开发者 / 运维",
+      "pos": [40, 680],
+      "size": [170, 70]
+    },
+    {
+      "id": "dashboard",
+      "type": "backend",
+      "label": "FastAPI 控制台",
+      "sublabel": "Dashboard :8080",
+      "tag": "/dashboard",
+      "sources": [
+        { "path": "src/api_server.py" },
+        { "path": "docs/dashboard.html" }
+      ],
+      "pos": [900, 630],
+      "size": [190, 76]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "云端自动发布",
+      "wraps": ["cron", "actions", "pages"],
+      "pad": 24
+    },
+    {
+      "kind": "region",
+      "label": "Python 运行时与本地状态",
+      "wraps": ["pipeline", "ai", "state", "artifacts", "dashboard"],
+      "pad": 24
+    }
+  ],
+  "connections": [
+    {
+      "id": "cron-dispatches-actions",
+      "from": "cron",
+      "to": "actions",
+      "label": "workflow_dispatch",
+      "variant": "emphasis"
+    },
+    {
+      "id": "actions-runs-pipeline",
+      "from": "actions",
+      "to": "pipeline",
+      "label": "run_product.py",
+      "labelDy": 24,
+      "variant": "emphasis"
+    },
+    {
+      "id": "sources-feed-pipeline",
+      "from": "sources",
+      "to": "pipeline",
+      "label": "抓取文章",
+      "variant": "emphasis"
+    },
+    {
+      "id": "pipeline-calls-ai",
+      "from": "pipeline",
+      "to": "ai",
+      "label": "调用 AI",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "pipeline-persists-state",
+      "from": "pipeline",
+      "to": "state",
+      "label": "查询 / 持久化",
+      "labelDx": 76
+    },
+    {
+      "id": "pipeline-builds-artifacts",
+      "from": "pipeline",
+      "to": "artifacts",
+      "label": "生成日报与 Feed",
+      "variant": "emphasis"
+    },
+    {
+      "id": "artifacts-to-pages",
+      "from": "artifacts",
+      "to": "pages",
+      "label": "静态产物"
+    },
+    {
+      "id": "pages-serves-readers",
+      "from": "pages",
+      "to": "readers",
+      "label": "HTTPS / RSS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "operator-opens-dashboard",
+      "from": "operator",
+      "to": "dashboard",
+      "label": "localhost:8080"
+    },
+    {
+      "id": "dashboard-reads-state",
+      "from": "dashboard",
+      "to": "state",
+      "label": "状态 / 统计",
+      "variant": "dashed"
+    },
+    {
+      "id": "dashboard-triggers-pipeline",
+      "from": "dashboard",
+      "to": "pipeline",
+      "label": "手动运行",
+      "labelDy": 80,
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "自动发布",
+      "items": [
+        "Cloudflare Cron 仅负责触发 workflow_dispatch",
+        "GitHub Actions 编排抓取、生成、校验与 Pages 发布"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "核心运行时",
+      "items": [
+        "Python pipeline 汇聚多源新闻并调用 AI 评分与写作",
+        "SQLite 保存文章、评分与运行记录，产物写入 docs/"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "本地控制",
+      "items": [
+        "FastAPI :8080 提供状态、统计、报告和手动运行接口",
+        "Dashboard 同时服务控制台页面与已生成报告"
+      ]
+    }
+  ]
+}

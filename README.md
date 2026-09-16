@@ -93,11 +93,11 @@ flowchart TD
 
 | 步骤 | 说明 |
 |------|------|
-| 并发抓取 | RSS / RSSHub / Google News / Custom 等抓取器异步并发，统一返回 ContentItem；custom 源自动抽取发布时间（URL / meta / JSON-LD），超窗旧文直接跳过 |
+| 并发抓取 | RSS / RSSHub / Google News / Custom 等抓取器异步并发，统一返回 ContentItem；custom 源自动抽取发布时间（URL / meta / JSON-LD），正文走 trafilatura（通用）+ GeneralNewsExtractor（中文），超窗旧文直接跳过 |
 | 跨源 URL 去重 | 同一 URL 多源 -> 保留内容最丰富的，合并 metadata |
 | 例行公告过滤 | 规则识别评论期/听证/拟议预算/费用/FAQ 等例行公告，预筛降权且选择阶段剔除 |
 | 预筛与来源配额 | 按来源等级+时效+信息密度排序；单源候选数上限（官方源 2-3 条），避免单一来源霸榜 |
-| AI 评分 | 输出 0-100 分 + 新闻价值三维（`newsworthiness` / `routine` / `impact_scope`）；`routine>=0.6` 或 `newsworthiness<0.5` 剔除 |
+| AI 评分 | 输出 0-100 分 + 新闻价值三维（`newsworthiness` / `routine` / `impact_scope`）；`routine>=0.6` 或 `newsworthiness<0.5` 剔除；主通道失败自动切换备用模型（`AI_FALLBACK_*`） |
 | 源健康/窗口门禁 | 日报检查今日性、来源覆盖和窗口健康 |
 | 事件合并 | `event_key` + 标题相似度（>=0.85）双路聚类，跨栏目同事件合并为一条 |
 | AI 写作 | 生成中文栏目正文、要点与周期性总览 |
@@ -215,7 +215,7 @@ news 产品主配置，控制发布路径、定时配置、数据库位置和四
 
 ### config/products/news/sources.yaml
 
-news 产品新闻源配置（当前 145 个源，启用 133 个），按四大维度分类，每个源包含：
+news 产品新闻源配置（当前 158 个源，启用 133 个），按四大维度分类，每个源包含：
 
 ```yaml
 - name: "源名称"
@@ -245,6 +245,11 @@ news 产品新闻源配置（当前 145 个源，启用 133 个），按四大�
 
 AI 资讯另有 [AIHOT](https://aihot.news) 精选源（`https://aihot.news/feed/all.xml`，科技栏）。
 
+官方一手源：White House（新闻稿 + 总统行动）、U.S. State Department、Dept of Defense、SCOTUSblog、SEC、Federal Register。
+
+失效源处理（2026-09-16）：Reuters/AP/CNN/Axios 等 13 个官方 RSS 已失效的源标记 `enabled: false`，
+改用 Google News `site:` 查询兜底（`Google News - Reuters/AP/CNN/Axios`，tier2，单源 cap 2）。
+
 ### .env
 
 环境变量通过 `.env` 文件管理，支持 `${VAR_NAME}` 在 YAML 中引用：
@@ -255,11 +260,24 @@ AI 资讯另有 [AIHOT](https://aihot.news) 精选源（`https://aihot.news/feed
 | `AI_PROVIDER` | openai / deepseek / moonshot 等 | 否（默认 openai） |
 | `AI_BASE_URL` | API 端点 | 否（默认 OpenCode Zen Go `https://opencode.ai/zen/go/v1`） |
 | `AI_MODEL` | 模型名称 | 否（默认 `deepseek-v4.1-flash`） |
+| `AI_FALLBACK_BASE_URL` | 备用通道 API 端点（主通道失败自动切换） | 否 |
+| `AI_FALLBACK_MODEL` | 备用模型名称（当前 `glm-5.3-flash`） | 否 |
+| `AI_FALLBACK_API_KEY` | 备用通道 Key（留空复用主 Key） | 否 |
 | `RSSHUB_BASE_URL` | 自托管 RSSHub 基址（中文源） | 否（默认回退 `https://rsshub.app`；CI 内为 `http://localhost:1200`） |
 | `NEWSAPI_KEY` | NewsAPI 密钥 | 否 |
 | `TIANAPI_KEY` | TianAPI 密钥 | 否 |
 
 运行前可用 `python3 scripts/check_ai_provider.py` 预检 AI 端点连通性；CI 中该检查是发布流水线的第一步。
+
+健康与质量约束：
+
+- **AI 韧性**：评分/写作调用失败会先切备用通道（记录在日志），仍失败则按 `min_score_coverage` 门禁失败退出，不会静默发劣质日报。
+- **源健康**：源连续多日零产出应人工复核；当前零产出源清单与失效源处理见 `reports/2026-09-16-source-and-architecture-review.md`。
+
+## 架构与评审文档
+
+- 运行时架构图（可交互）：[`docs/runtime-architecture.html`](https://zhangex18.github.io/us_politics_news/runtime-architecture.html)
+- 信息源与架构深度评审报告：[`reports/2026-09-16-source-and-architecture-review.md`](reports/2026-09-16-source-and-architecture-review.md)
 
 ## 定时运行
 
