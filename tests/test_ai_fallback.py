@@ -160,3 +160,38 @@ def test_digest_prompt_injects_glossary_hint(monkeypatch):
         pass
 
     assert "赫格塞思 = Hegseth" in captured.get("prompt", "")
+
+
+# ── WP2: JSON Schema 强约束 ──
+
+
+def test_build_llm_payload_includes_json_schema():
+    from ai_analyzer import _build_llm_payload
+
+    payload = _build_llm_payload("hi", {"model": "m", "json_schema": "score_items"})
+
+    response_format = payload.get("response_format")
+    assert response_format is not None
+    assert response_format["type"] == "json_schema"
+    assert response_format["json_schema"]["name"] == "score_items"
+    assert response_format["json_schema"]["strict"] is True
+    assert response_format["json_schema"]["schema"]["type"] == "object"
+
+
+def test_call_llm_degrades_when_schema_unsupported(monkeypatch):
+    calls: list = []
+
+    async def fake_once(prompt, config, timeout=120):
+        calls.append(config.get("json_schema"))
+        if config.get("json_schema"):
+            raise RuntimeError('LLM API 错误 400: {"error":"response_format unsupported"}')
+        return "ok"
+
+    monkeypatch.setattr(ai_analyzer, "_call_llm_once", fake_once)
+
+    result = asyncio.run(ai_analyzer._call_llm(
+        "p", {"api_key": "k", "base_url": "u", "model": "m", "json_schema": "score_items"},
+    ))
+
+    assert result == "ok"
+    assert calls == ["score_items", None]
