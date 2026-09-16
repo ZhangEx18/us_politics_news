@@ -182,9 +182,11 @@ def test_call_llm_degrades_when_schema_unsupported(monkeypatch):
     calls: list = []
 
     async def fake_once(prompt, config, timeout=120):
-        calls.append(config.get("json_schema"))
+        calls.append((config.get("json_schema"), bool(config.get("json_object"))))
         if config.get("json_schema"):
             raise RuntimeError('LLM API 错误 400: {"error":"response_format unsupported"}')
+        if config.get("json_object"):
+            raise RuntimeError('LLM API 错误 400: {"error":"json_object unsupported"}')
         return "ok"
 
     monkeypatch.setattr(ai_analyzer, "_call_llm_once", fake_once)
@@ -194,4 +196,31 @@ def test_call_llm_degrades_when_schema_unsupported(monkeypatch):
     ))
 
     assert result == "ok"
-    assert calls == ["score_items", None]
+    assert calls == [("score_items", False), (None, True), (None, False)]
+
+
+def test_build_llm_payload_supports_json_object():
+    from ai_analyzer import _build_llm_payload
+
+    payload = _build_llm_payload("hi", {"model": "m", "json_object": True})
+
+    assert payload["response_format"] == {"type": "json_object"}
+
+
+def test_call_llm_retries_with_larger_cap_on_truncation(monkeypatch):
+    caps: list = []
+
+    async def fake_once(prompt, config, timeout=120):
+        caps.append(config.get("max_tokens"))
+        if len(caps) == 1:
+            raise RuntimeError("输出被 max_tokens 截断（推理 token 占满预算，cap=4000）")
+        return "ok"
+
+    monkeypatch.setattr(ai_analyzer, "_call_llm_once", fake_once)
+
+    result = asyncio.run(ai_analyzer._call_llm(
+        "p", {"api_key": "k", "base_url": "u", "model": "m", "max_tokens": 4000},
+    ))
+
+    assert result == "ok"
+    assert caps == [4000, 8000]
