@@ -2,10 +2,16 @@ name: Daily RSS Publish
 on:
   schedule:
     - cron: '30 23 * * *'
+    - cron: '30 10 * * *'
   workflow_dispatch:
     inputs:
       digest_only:
         description: '仅使用数据库中的现有文章重生成日报，不重新抓取'
+        required: false
+        default: false
+        type: boolean
+      evening:
+        description: '晚报模式：窗口延展到当前时刻，新增事件不足时跳过'
         required: false
         default: false
         type: boolean
@@ -20,4 +26,5 @@ jobs:
       product_key: news
       report_type: daily
       digest_only: false
+      evening: ${{ github.event.schedule == '30 10 * * *' || inputs.evening == true }}
     secrets: inherit

@@ -17,6 +17,11 @@ on:
         required: false
         default: false
         type: boolean
+      evening:
+        description: '晚报模式：窗口延展到当前时刻，新增事件不足时跳过'
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       product_key:
@@ -29,6 +34,11 @@ on:
         type: string
       digest_only:
         description: '仅对 news/daily 有效：使用数据库现有文章重生成，不重新抓取'
+        required: false
+        default: false
+        type: boolean
+      evening:
+        description: '晚报模式：窗口延展到当前时刻，新增事件不足时跳过'
         required: false
         default: false
         type: boolean
@@ -123,11 +133,16 @@ jobs:
           PRODUCT="${{ inputs.product_key }}"
           REPORT_TYPE="${{ inputs.report_type }}"
           DIGEST_ONLY="${{ inputs.digest_only }}"
+          EVENING="${{ inputs.evening }}"
 
           ARGS="--product $PRODUCT --report-type $REPORT_TYPE"
 
           if [ "$DIGEST_ONLY" = "true" ] && [ "$REPORT_TYPE" = "daily" ]; then
             ARGS="$ARGS --digest-only"
+          fi
+
+          if [ "$EVENING" = "true" ]; then
+            ARGS="$ARGS --evening"
           fi
 
           python3 src/run_product.py $ARGS
