@@ -438,3 +438,42 @@ def test_extract_article_content_returns_empty_on_junk_html():
 
     assert text == ""
     assert published is None
+
+
+def test_google_news_titles_unescape_html_entities(monkeypatch):
+    import asyncio
+    from datetime import datetime, timezone
+
+    from fetchers import GoogleNewsFetcher
+
+    feed = """<?xml version="1.0"?>
+    <rss version="2.0"><channel><title>t</title>
+    <item>
+      <title>Google tests &amp;quot;Deep Think Mathematica&amp;quot; model</title>
+      <link>https://news.google.com/rss/articles/abc</link>
+      <description>A &amp;amp; B test</description>
+      <pubDate>Wed, 16 Sep 2026 04:00:00 GMT</pubDate>
+      <guid>abc</guid>
+    </item>
+    </channel></rss>"""
+
+    source = {
+        "name": "Google News - Test",
+        "url": "https://news.google.com/rss/search?q=test",
+        "fetch_mode": "google_news",
+        "column": "technology",
+        "enabled": True,
+    }
+
+    async def fake_get(self, url, **kwargs):
+        return feed
+
+    monkeypatch.setattr(GoogleNewsFetcher, "_get", fake_get)
+    fetcher = GoogleNewsFetcher([source])
+
+    items = asyncio.run(fetcher.fetch(datetime(2026, 9, 15, tzinfo=timezone.utc)))
+
+    assert len(items) == 1
+    assert "&quot;" not in items[0].title
+    assert '"Deep Think Mathematica"' in items[0].title
+    assert "&amp;" not in items[0].content

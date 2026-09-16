@@ -306,9 +306,9 @@ class RSSFetcher(BaseFetcher):
                     if published and published < since_utc:
                         continue
 
-                    title = entry.get("title", "").strip()
+                    title = unescape(entry.get("title", "")).strip()
                     link = entry.get("link", "").strip()
-                    content = self._extract_content(entry)
+                    content = unescape(self._extract_content(entry))
                     content = re.sub(r"<[^>]+>", "", content)
 
                     entry_id = entry.get("id", entry.get("link", ""))
@@ -470,9 +470,9 @@ class GoogleNewsFetcher(BaseFetcher):
                 text = await self._get(feed_cfg["url"], timeout=aiohttp.ClientTimeout(total=60))
                 data = feedparser.parse(text)
                 for entry in data.entries:
-                    title = entry.get("title", "").strip()
+                    title = unescape(entry.get("title", "")).strip()
                     link = entry.get("link", "").strip()
-                    content = re.sub(r"<[^>]+>", "", entry.get("summary", ""))
+                    content = unescape(re.sub(r"<[^>]+>", "", entry.get("summary", "")))
                     entry_hash = self._hash_id(entry.get("id", link))
                     # 解析 Google News 的发布时间
                     published = None
