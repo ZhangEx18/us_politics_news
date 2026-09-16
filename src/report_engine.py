@@ -1324,11 +1324,13 @@ def _normalize_headline_only_by_column(
 
             reader_body = _build_headline_only_reader_body(item)
             if not reader_body or not re.search(r"[\u4e00-\u9fff]", reader_body):
-                if _body_needs_translation(item):
-                    # 正文未翻译：回退到已翻译标题，渲染层可直接展示
+                has_text = any(str(item.get(field) or "").strip() for field in ("summary", "content"))
+                if _body_needs_translation(item) or not has_text:
+                    # 正文缺失或未翻译：回退到已翻译标题，渲染层可直接展示
                     reader_body = title_zh
                     body_from_title += 1
                 else:
+                    print(f"   [要点丢弃] {col_key}: {title_zh[:36]}（正文不可用）")
                     unreadable_dropped += 1
                     continue
 
