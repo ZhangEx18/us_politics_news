@@ -110,3 +110,26 @@ cases:
       max_chars: 160
       must_have_date: true
       no_latin_ratio: 0.05
+
+  - id: digest_no_attribution_tail
+    type: digest
+    description: 第二句不得是归因尾巴（报道称/当日报道了/新闻稿显示/该机构）
+    input:
+      events:
+        - title: Senate advances college sports bill
+          source: PBS NewsHour
+          source_tier: 2
+          summary: 参议院以 74 比 24 票结束辩论，推进《大学体育法案》。
+          content: The Senate voted 74-24 to end debate and advance the College Sports Bill, which aims to curb excessive spending and transfer chaos in college sports.
+          event_date: "2026-09-15"
+          freshness_date: "2026-09-15"
+    expect:
+      banned_regex:
+        - "当日报道了"
+        - "当日发布"
+        - "这一说法由"
+        - "新闻稿显示"
+        - "该机构"
+        - "报道了这一"
+      max_sentence_chars: 60
+      must_have_date: true
