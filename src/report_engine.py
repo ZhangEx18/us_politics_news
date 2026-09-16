@@ -1525,6 +1525,12 @@ def build_report(
         column_results, detailed_metrics = _normalize_detailed_events_to_chinese(column_results)
         for col_key, column_metrics in detailed_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        # AI 兜底扩写优先：摘要过短/英文候选时用 AI 生成简讯正文（质量高于规则兜底）
+        column_results, ai_fallback_metrics = _ai_expand_fallback_events(
+            column_results, column_candidates, columns_cfg, ai_config,
+        )
+        for col_key, column_metrics in ai_fallback_metrics.items():
+            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
         column_results, fallback_metrics = _ensure_daily_detailed_events(column_results, column_candidates)
         for col_key, column_metrics in fallback_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
@@ -1533,12 +1539,6 @@ def build_report(
             column_results, column_candidates, columns_cfg,
         )
         for col_key, column_metrics in fill_metrics.items():
-            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
-        # AI 兜底扩写：规则兜底失败（摘要过短/英文候选）时，用 AI 生成简讯正文
-        column_results, ai_fallback_metrics = _ai_expand_fallback_events(
-            column_results, column_candidates, columns_cfg, ai_config,
-        )
-        for col_key, column_metrics in ai_fallback_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
         column_results, dedupe_metrics = _dedupe_daily_column_events(column_results)
         for col_key, column_metrics in dedupe_metrics.items():
