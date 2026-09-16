@@ -855,3 +855,18 @@ def test_digest_phase_does_not_reuse_stale_report_events(monkeypatch):
     assert stats["total_selected"] == 4
     assert stats["metrics"]["freshness_gate"]["report_events_reuse"]["gate_failed"] is True
     assert stats["metrics"]["freshness_gate"]["scored_events"]["gate_failed"] is False
+
+
+def test_reuse_events_enabled_respects_env_override(monkeypatch):
+    from run_pipeline import _reuse_events_enabled
+
+    monkeypatch.delenv("REUSE_REPORT_EVENTS", raising=False)
+    assert _reuse_events_enabled({}) is True
+    assert _reuse_events_enabled({"reuse_report_events": False}) is False
+
+    monkeypatch.setenv("REUSE_REPORT_EVENTS", "false")
+    assert _reuse_events_enabled({}) is False
+    assert _reuse_events_enabled({"reuse_report_events": True}) is False
+
+    monkeypatch.setenv("REUSE_REPORT_EVENTS", "true")
+    assert _reuse_events_enabled({"reuse_report_events": False}) is True
