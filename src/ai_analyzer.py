@@ -13,6 +13,7 @@ import re
 import time
 import uuid
 from difflib import SequenceMatcher
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
@@ -128,6 +129,76 @@ async def _call_llm_once(prompt: str, config: dict, timeout: int = 120) -> str:
 def _timeout_for(config: dict, scope: str, default: int) -> int:
     """按调用场景读取超时配置。"""
     return int(config.get(f"{scope}_timeout_seconds") or config.get("timeout_seconds") or default)
+
+
+# ── 术语表（glossary） ──
+
+_GLOSSARY_PATH = _project_root / "config" / "glossary.yaml"
+_AUDITED_GLOSSARY_GROUPS = ("people", "laws")
+
+
+@lru_cache(maxsize=1)
+def _load_glossary() -> dict[str, dict[str, tuple[str, ...]]]:
+    """加载术语表：{group: {中文译名: (英文变体...)}}。"""
+    try:
+        import yaml
+
+        payload = yaml.safe_load(_GLOSSARY_PATH.read_text(encoding="utf-8")) or {}
+    except Exception:
+        return {}
+    groups: dict[str, dict[str, tuple[str, ...]]] = {}
+    for group, entries in payload.items():
+        if not isinstance(entries, dict):
+            continue
+        normalized: dict[str, tuple[str, ...]] = {}
+        for zh, variants in entries.items():
+            if isinstance(variants, str):
+                variants = [variants]
+            values = tuple(str(v).strip() for v in (variants or []) if str(v).strip())
+            if values:
+                normalized[str(zh).strip()] = values
+        if normalized:
+            groups[str(group)] = normalized
+    return groups
+
+
+def glossary_hint(*texts: str, limit: int = 12) -> str:
+    """扫描文本中命中的术语，生成注入 prompt 的中英对照表。"""
+    groups = _load_glossary()
+    if not groups:
+        return ""
+    haystack = " ".join(str(text or "") for text in texts).lower()
+    lines: list[str] = []
+    seen_zh: set[str] = set()
+    for entries in groups.values():
+        for zh, variants in entries.items():
+            if zh in seen_zh:
+                continue
+            hit = next((variant for variant in variants if variant.lower() in haystack), "")
+            if not hit:
+                continue
+            seen_zh.add(zh)
+            lines.append(f"- {zh} = {hit}")
+            if len(lines) >= limit:
+                return "\n## 术语对照（必须使用中文译名）\n" + "\n".join(lines) + "\n"
+    if not lines:
+        return ""
+    return "\n## 术语对照（必须使用中文译名）\n" + "\n".join(lines) + "\n"
+
+
+def count_untranslated_terms(text: str) -> int:
+    """统计正文中未中文化的专名（只审计 people/laws；品牌名保留英文不计）。"""
+    groups = _load_glossary()
+    content = str(text or "")
+    lowered = content.lower()
+    count = 0
+    for group in _AUDITED_GLOSSARY_GROUPS:
+        for zh, variants in groups.get(group, {}).items():
+            if zh in content:
+                continue
+            if any(variant.lower() in lowered for variant in variants):
+                count += 1
+    return count
 
 
 def _ai_log(message: str) -> None:
@@ -1369,10 +1440,11 @@ async def generate_column_digest(
     prompt = prompt.replace("{word_count_max}", str(word_count_max))
     prompt = prompt.replace("{history_section}", history_section)
     prompt = prompt.replace("{count}", str(len(events)))
-    prompt = prompt.replace(
-        "{events_json}",
-        json.dumps(events_for_llm, ensure_ascii=False, indent=2),
-    )
+    events_json_text = json.dumps(events_for_llm, ensure_ascii=False, indent=2)
+    prompt = prompt.replace("{events_json}", events_json_text)
+    hint = glossary_hint(events_json_text)
+    if hint:
+        prompt += hint
 
     response = await _call_llm(
         prompt,
@@ -1511,6 +1583,9 @@ async def translate_headline_titles(
         "{titles_json}",
         json.dumps(cleaned_titles, ensure_ascii=False, indent=2),
     )
+    hint = glossary_hint(json.dumps(cleaned_titles, ensure_ascii=False))
+    if hint:
+        prompt += hint
     response = await _call_llm(
         prompt,
         {**ai_config, "temperature": 0, "max_tokens": 4000},

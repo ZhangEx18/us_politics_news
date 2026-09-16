@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from ai_analyzer import (
+    count_untranslated_terms,
     generate_column_digest,
     generate_daily_overview,
     generate_fallback_bodies,
@@ -590,6 +591,7 @@ def _audit_daily_content(
         "truncated_titles": 0,
         "meta_commentary": 0,
         "pipeline_leak": 0,
+        "untranslated_terms": 0,
     }
     allowed = set(allowed_dates or [])
 
@@ -618,6 +620,8 @@ def _audit_daily_content(
                 metrics["meta_commentary"] += 1
             if _PIPELINE_LEAK_RE.search(body):
                 metrics["pipeline_leak"] += 1
+            if count_untranslated_terms(f"{title} {body}"):
+                metrics["untranslated_terms"] += 1
 
     return metrics
 

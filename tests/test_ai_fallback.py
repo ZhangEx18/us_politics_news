@@ -101,3 +101,62 @@ def test_generate_fallback_bodies_returns_empty_on_error(monkeypatch):
     ))
 
     assert bodies == {}
+
+
+# ── WP3: glossary 术语表 ──
+
+
+def test_glossary_hint_injects_matched_terms():
+    from ai_analyzer import glossary_hint
+
+    hint = glossary_hint("Hegseth faces impeachment vote; Clarity Act blocked in Senate")
+
+    assert "赫格塞思 = Hegseth" in hint
+    assert "清晰法案 = Clarity Act" in hint
+
+
+def test_glossary_hint_empty_when_no_match():
+    from ai_analyzer import glossary_hint
+
+    assert glossary_hint("nothing here matches the glossary") == ""
+
+
+def test_count_untranslated_terms_flags_missing_chinese():
+    from ai_analyzer import count_untranslated_terms
+
+    assert count_untranslated_terms("Trump met Xi Jinping") == 2
+    assert count_untranslated_terms("特朗普与习近平会面") == 0
+    # orgs 组（品牌/机构）不在审计范围
+    assert count_untranslated_terms("FTC sues Amazon") == 0
+
+
+def test_digest_prompt_injects_glossary_hint(monkeypatch):
+    import ai_analyzer
+
+    captured: dict = {}
+
+    async def fake_call(prompt, config, timeout=120):
+        captured["prompt"] = prompt
+        return '{"events": []}'
+
+    monkeypatch.setattr(ai_analyzer, "_call_llm", fake_call)
+
+    try:
+        asyncio.run(ai_analyzer.generate_column_digest(
+            column_key="us_politics",
+            column_label="美国政局",
+            events=[{
+                "title": "Hegseth faces impeachment vote",
+                "summary": "赫格塞思面临弹劾投票。",
+                "source": "NPR",
+                "source_tier": 1,
+                "freshness_date": "2026-09-16",
+                "event_date": "2026-09-16",
+            }],
+            history_context="",
+            ai_config={"api_key": "k", "base_url": "https://example.com", "model": "m"},
+        ))
+    except Exception:
+        pass
+
+    assert "赫格塞思 = Hegseth" in captured.get("prompt", "")

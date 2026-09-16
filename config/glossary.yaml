@@ -1,0 +1,49 @@
+# 术语表：中文译名 ← 英文原词/变体
+# 用途：注入日报写作与标题翻译 prompt，并在内容审计中检查未中文化的专名
+# 维护：发现新的高频专名时手工补录（每周审查日报时顺带）
+# 注意：品牌名（OpenAI / Google / Anthropic 等）按中文媒体惯例保留英文，不列入 people/laws
+
+people:
+  特朗普: [Trump, Donald Trump]
+  习近平: [Xi Jinping]
+  赫格塞思: [Hegseth, Pete Hegseth]
+  马西: [Massie, Thomas Massie]
+  冯德莱恩: [von der Leyen, Ursula von der Leyen]
+  鲁比奥: [Rubio, Marco Rubio]
+  李家超: [John Lee]
+  内塔尼亚胡: [Netanyahu]
+  普京: [Putin, Vladimir Putin]
+  泽连斯基: [Zelensky, Volodymyr Zelensky]
+  鲍威尔: [Powell, Jerome Powell]
+
+laws:
+  清晰法案: [Clarity Act]
+  战争权力决议: [War Powers Resolution]
+  SAVE 法案: [SAVE Act]
+  301 条款: [Section 301]
+  通胀削减法案: [Inflation Reduction Act]
+
+orgs:
+  美国联邦贸易委员会: [FTC, Federal Trade Commission]
+  美国证券交易委员会: [SEC, Securities and Exchange Commission]
+  美国国家标准与技术研究院: [NIST]
+  最高法院: [Supreme Court, SCOTUS]
+  美联储: [Federal Reserve, Fed]
+  北约: [NATO]
+  欧盟委员会: [European Commission]
+  欧洲议会: [European Parliament]
+  国务院: [State Department]
+  国防部: [Pentagon, Defense Department]
+  白宫: [White House]
+  国会: [Congress]
+
+medias:
+  半岛电视台: [Al Jazeera]
+  南华早报: [South China Morning Post, SCMP]
+  纽约时报: [New York Times, NYT]
+  华盛顿邮报: [Washington Post]
+  卫报: [The Guardian, Guardian]
+  路透社: [Reuters]
+  美联社: [Associated Press, AP]
+  财富: [Fortune]
+  金融时报: [Financial Times]
