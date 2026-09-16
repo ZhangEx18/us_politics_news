@@ -1315,3 +1315,32 @@ def test_build_report_periodical_overview_failure_falls_back_to_empty_payload(tm
     assert columns["us_politics"]["analysis"] == "美国事件正文"
     assert feed_meta["overview"]["themes"] == ["美国事件"]
     assert stats["metrics"]["ai"]["overview_failure"] == "overview timeout"
+
+
+def test_normalize_headline_falls_back_to_title_when_body_untranslated():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "us_politics": [{
+            "title": "Senate passes budget bill",
+            "title_zh": "参议院通过预算案",
+            "summary": "The Senate passed the budget bill on Tuesday.",
+            "content": "The Senate passed the budget bill on Tuesday.",
+        }],
+    })
+
+    assert len(normalized["us_politics"]) == 1
+    assert normalized["us_politics"][0]["reader_body"] == "参议院通过预算案"
+    assert metrics["us_politics"]["headline_body_from_title"] == 1
+    assert metrics["us_politics"]["headline_reader_body_missing"] == 0
+
+
+def test_normalize_headline_prefers_chinese_body():
+    normalized, _ = _normalize_headline_only_by_column({
+        "us_politics": [{
+            "title": "Senate passes budget bill",
+            "title_zh": "参议院通过预算案",
+            "summary": "参议院通过预算案，程序性表决过关。",
+            "content": "参议院通过预算案，程序性表决过关。",
+        }],
+    })
+
+    assert normalized["us_politics"][0]["reader_body"] == "参议院通过预算案，程序性表决过关。"
