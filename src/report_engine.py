@@ -1279,6 +1279,13 @@ def _body_needs_translation(item: dict) -> bool:
     return False
 
 
+def _merge_headline_metrics(column_metrics_map: dict, col_key: str, new_metrics: dict) -> None:
+    """累加合并要点过滤计数（第二次 normalize 不应覆盖第一次的丢弃数）。"""
+    target = column_metrics_map.setdefault(col_key, {})
+    for key, value in new_metrics.items():
+        target[key] = int(target.get(key, 0)) + int(value)
+
+
 def _normalize_headline_only_by_column(
     column_headline_only: dict[str, list[dict]],
     detailed_titles: dict[str, list[str]] | None = None,
@@ -1311,6 +1318,7 @@ def _normalize_headline_only_by_column(
                 promo_dropped += 1
                 continue
             if any(_same_event_titles(title_zh, existing) for existing in existing_titles):
+                print(f"   [要点去重] {col_key}: {title_zh[:40]}")
                 duplicate_dropped += 1
                 continue
 
@@ -1574,7 +1582,7 @@ def build_report(
             column_headline_only, detailed_titles=detailed_title_map,
         )
         for col_key, column_metrics in normalized_metrics.items():
-            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+            _merge_headline_metrics(metrics["columns"], col_key, column_metrics)
         column_results, detailed_metrics = _normalize_detailed_events_to_chinese(column_results)
         for col_key, column_metrics in detailed_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
@@ -1667,7 +1675,7 @@ def build_report(
             column_headline_only, detailed_titles=detailed_title_map,
         )
         for col_key, column_metrics in post_downgrade_headline_metrics.items():
-            metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+            _merge_headline_metrics(metrics["columns"], col_key, column_metrics)
         for col_key in list(column_headline_only.keys()):
             before = len(column_headline_only[col_key])
             column_headline_only[col_key] = _limit_same_org_events(
