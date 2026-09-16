@@ -26,10 +26,15 @@ from report_renderer import COLUMN_ORDER, save_daily_report
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 
-# 选择阶段配额：防止单一来源霸占栏目
-MAX_EVENTS_PER_SOURCE_PER_COLUMN = 2
-MAX_EVENTS_PER_SOURCE_TOTAL = 3
+# 选择阶段配额：防止单一来源霸占栏目（单栏 ≤30%，全报 ≤4 条）
+MAX_EVENTS_PER_SOURCE_TOTAL = 4
 MAX_HEADLINE_PER_ORG = 2
+
+
+def _source_column_cap(max_items: int, target_items: int) -> int:
+    """单源单栏上限：栏目规模 30%，至少 2 条。"""
+    size = max_items if max_items > 0 else target_items
+    return max(2, int(round(size * 0.3)))
 
 
 # ── 报告规格 ──
@@ -989,6 +994,7 @@ def _select_daily_column_items(
     used: set[str] = set()
     column_source_counts: dict[str, int] = {}
     total_counts = global_source_counts if global_source_counts is not None else {}
+    column_cap = _source_column_cap(max_items, target_items)
     metrics = {
         "detailed_filled_from_low_score": 0,
         "headline_filled_from_low_score": 0,
@@ -1000,7 +1006,7 @@ def _select_daily_column_items(
         source = str(item.get("source") or "").strip()
         if not source:
             return True
-        if column_source_counts.get(source, 0) >= MAX_EVENTS_PER_SOURCE_PER_COLUMN:
+        if column_source_counts.get(source, 0) >= column_cap:
             return False
         return total_counts.get(source, 0) < MAX_EVENTS_PER_SOURCE_TOTAL
 
