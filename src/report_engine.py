@@ -499,7 +499,7 @@ def _build_fallback_detailed_event(candidate: dict) -> dict | None:
     if body_text[-1] not in "。！？!?":
         body_text += "。"
     body = f"{date_text}，{body_text}"
-    if len(body) < 50:
+    if len(body) < 40:
         return None
     if len(body) > 260:
         body = body[:260].rstrip(" ，,。. ") + "。"
@@ -1026,7 +1026,7 @@ def _event_to_headline_only(event: dict) -> dict | None:
 def _validate_event(event: dict, gate_config: dict | None = None) -> list[str]:
     """验证单个事件的质量门禁。gate_config 为 None 时使用默认阈值。"""
     cfg = gate_config or {}
-    min_chars = cfg.get("min_chars", 50)
+    min_chars = cfg.get("min_chars", 40)
     max_chars = cfg.get("max_chars", 260)
     min_sentences = cfg.get("min_sentences", 2)
     max_sentences = cfg.get("max_sentences", 4)

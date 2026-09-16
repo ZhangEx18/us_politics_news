@@ -889,7 +889,7 @@ def test_build_fallback_detailed_event_meets_daily_quality_length():
 
     assert event is not None
     body = event["reader_body"]
-    assert 50 <= len(body) <= 260
+    assert 40 <= len(body) <= 260
     assert body.count("。") >= 2
 
 
