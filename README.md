@@ -41,6 +41,10 @@ python3 src/run_product.py --product news --report-type daily --digest-only
 
 这些 workflow 会恢复已发布归档、更新产品 feed、重建首页，然后发布到 GitHub Pages。
 
+发布作业会启动一个 **RSSHub 服务容器**（`diygod/rsshub`，`localhost:1200`）用于中文源路由抓取，
+公共实例 `rsshub.app` 对数据中心 IP 返回 403，因此 CI 内必须自带实例。本地/VPS 自托管方式见
+[`deploy/rsshub/README.md`](deploy/rsshub/README.md)。
+
 Reader 订阅地址：
 
 ```
@@ -89,12 +93,15 @@ flowchart TD
 
 | 步骤 | 说明 |
 |------|------|
-| 并发抓取 | RSS / RSSHub / Google News / Custom 等抓取器异步并发，统一返回 ContentItem |
+| 并发抓取 | RSS / RSSHub / Google News / Custom 等抓取器异步并发，统一返回 ContentItem；custom 源自动抽取发布时间（URL / meta / JSON-LD），超窗旧文直接跳过 |
 | 跨源 URL 去重 | 同一 URL 多源 -> 保留内容最丰富的，合并 metadata |
-| AI 评分 | 来源权重 + 主题优先级 + 关键词命中 + AI 深度分析 |
+| 例行公告过滤 | 规则识别评论期/听证/拟议预算/费用/FAQ 等例行公告，预筛降权且选择阶段剔除 |
+| 预筛与来源配额 | 按来源等级+时效+信息密度排序；单源候选数上限（官方源 2-3 条），避免单一来源霸榜 |
+| AI 评分 | 输出 0-100 分 + 新闻价值三维（`newsworthiness` / `routine` / `impact_scope`）；`routine>=0.6` 或 `newsworthiness<0.5` 剔除 |
 | 源健康/窗口门禁 | 日报检查今日性、来源覆盖和窗口健康 |
-| 事件合并 | 语义相似度识别同一事件的不同报道 |
+| 事件合并 | `event_key` + 标题相似度（>=0.85）双路聚类，跨栏目同事件合并为一条 |
 | AI 写作 | 生成中文栏目正文、要点与周期性总览 |
+| 选择配额 | 单源单栏 <=30% 栏目规模、全报 <=4 条；要点列表同机构 <=2 条 |
 | 渲染报告 | Markdown + HTML + Reader 友好 HTML 片段 |
 | 生成 Feed | RSS 2.0 全文，Reader 订阅 |
 
@@ -150,28 +157,31 @@ flowchart TD
 
 ```
 ├── src/
-│   ├── __init__.py
 │   ├── run_product.py        # 多 product 统一入口（推荐）
-│   ├── run_pipeline.py       # news/daily pipeline
+│   ├── run_pipeline.py       # news/daily pipeline（抓取→预筛→评分→门禁）
+│   ├── content_policy.py     # 例行公告等文本政策规则
 │   ├── models.py             # Pydantic 数据模型
 │   ├── database.py           # SQLite 存储层
-│   ├── fetchers.py           # 异步并发抓取 + 去重
-│   ├── scoring.py            # 规则评分 + 推荐理由
-│   ├── ai_analyzer.py        # AI 深度分析
-│   ├── topic_rules.py        # 主题分类规则
+│   ├── fetchers.py           # 异步并发抓取 + 日期抽取 + 去重
+│   ├── ai_analyzer.py        # AI 评分 / 事件合并 / 栏目写作
+│   ├── report_engine.py      # 报告编排（配额、降级、质量门禁）
 │   ├── report_renderer.py    # 日报渲染（Markdown + HTML）
 │   └── feed_builder.py       # RSS Feed 生成
 ├── config/
 │   ├── config.yaml           # 默认指向 news product 的兼容入口
 │   ├── base.yaml             # 共享基础配置
 │   └── products/news/sources.yaml  # news 产品新闻源配置
+├── deploy/
+│   └── rsshub/               # RSSHub 自托管（docker-compose + 说明）
 ├── scripts/
+│   ├── check_ai_provider.py  # AI 端点预检（CI 第一步）
 │   ├── daily_run.sh          # 本地定时脚本（旧入口）
 │   └── publish_daily.sh      # 仅用数据库补跑日报并可推送
 ├── docs/
 │   ├── news/daily/           # news/daily 输出（运行后生成）
 │   ├── feeds/news.xml        # news 产品 Feed（运行后生成）
 │   └── ...                   # 兼容别名、algorithms 等
+├── tests/                    # pytest 回归测试
 ├── data/                     # SQLite 数据库 + 历史抓取数据
 ├── .env.example              # 环境变量模板
 └── requirements.txt
@@ -205,19 +215,35 @@ news 产品主配置，控制发布路径、定时配置、数据库位置和四
 
 ### config/products/news/sources.yaml
 
-news 产品新闻源配置，按四大维度分类，每个源包含：
+news 产品新闻源配置（当前 145 个源，启用 133 个），按四大维度分类，每个源包含：
 
 ```yaml
 - name: "源名称"
-  url: "https://..."
+  url: "https://..."            # 支持 ${RSSHUB_BASE_URL} 变量引用
   fetch_mode: rss | rsshub | google_news | custom | hacker_news
   fetcher_key: china_media_article_list   # 仅 custom 必填
   column: us_politics | global_affairs | technology | economy
   source_tier: 1 | 2 | 3 | 4    # 1=官方一线 2=主流 3=专业智库 4=聚合
   language: en | zh | multi
+  max_candidates_per_run: 3     # 可选：单源每次进入候选池的条数上限
+  timeout_seconds: 90           # 可选：单源抓取超时（默认 60s）
   tags: [cn_source, policy, macro]
   enabled: true | false
+  custom:                        # 仅 custom
+    item_patterns: [...]
+    article_url_pattern: '20\d{2}-\d{1,2}-\d{1,2}'   # 可选：只保留文章链接，过滤栏目导航
+    max_items: 12
+    summary_chars: 220
 ```
+
+中文源（11 个）分两类：
+
+| 类型 | 源 | 说明 |
+|------|----|------|
+| RSSHub 路由 | FT中文网、联合早报、观察者网、量子位、36氪、华尔街见闻 | 走 `${RSSHUB_BASE_URL}`，CI 用内置 service 容器，本地见 `deploy/rsshub/` |
+| 直连解析 | 财新国际×3 | 列表页直连 + `article_url_pattern` 只收带日期的文章链接 |
+
+AI 资讯另有 [AIHOT](https://aihot.news) 精选源（`https://aihot.news/feed/all.xml`，科技栏）。
 
 ### .env
 
@@ -227,10 +253,13 @@ news 产品新闻源配置，按四大维度分类，每个源包含：
 |------|------|------|
 | `AI_API_KEY` | AI 服务 API Key | 是 |
 | `AI_PROVIDER` | openai / deepseek / moonshot 等 | 否（默认 openai） |
-| `AI_BASE_URL` | API 端点 | 否（默认智谱 `https://open.bigmodel.cn/api/paas/v4`） |
-| `AI_MODEL` | 模型名称 | 否（默认 `glm-4.7`） |
+| `AI_BASE_URL` | API 端点 | 否（默认 OpenCode Zen Go `https://opencode.ai/zen/go/v1`） |
+| `AI_MODEL` | 模型名称 | 否（默认 `deepseek-v4.1-flash`） |
+| `RSSHUB_BASE_URL` | 自托管 RSSHub 基址（中文源） | 否（默认回退 `https://rsshub.app`；CI 内为 `http://localhost:1200`） |
 | `NEWSAPI_KEY` | NewsAPI 密钥 | 否 |
 | `TIANAPI_KEY` | TianAPI 密钥 | 否 |
+
+运行前可用 `python3 scripts/check_ai_provider.py` 预检 AI 端点连通性；CI 中该检查是发布流水线的第一步。
 
 ## 定时运行
 
