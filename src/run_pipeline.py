@@ -32,7 +32,7 @@ os.chdir(_project_root)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_project_root, "scripts"))
 
-from ai_analyzer import score_batch, _load_ai_config
+from ai_analyzer import score_batch, _load_ai_config, entry_newsworthiness_ok
 from config import (
     load_config,
     load_product_config,
@@ -1543,15 +1543,22 @@ def _run_digest_phase(
     hard_news_scored = [entry for entry in scored_dicts if _is_hard_news_entry(entry)]
     filtered_hard: list[dict] = []
     routine_notice_dropped = 0
+    low_value_dropped = 0
     for entry in hard_news_scored:
         if is_routine_notice(entry.get("title"), entry.get("summary"), entry.get("content")):
             routine_notice_dropped += 1
             continue
+        if not entry_newsworthiness_ok(entry):
+            low_value_dropped += 1
+            continue
         filtered_hard.append(entry)
     hard_news_scored = filtered_hard
     phase_metrics["routine_notice_dropped"] = routine_notice_dropped
+    phase_metrics["low_newsworthiness_dropped"] = low_value_dropped
     if routine_notice_dropped:
         print(f"   例行公告剔除: {routine_notice_dropped} 条")
+    if low_value_dropped:
+        print(f"   低新闻价值剔除: {low_value_dropped} 条")
     if report_type == "daily":
         hard_news_scored, scored_freshness = _filter_scored_entries_by_freshness(
             hard_news_scored,
