@@ -1385,9 +1385,7 @@ def _run_digest_phase(
     }
     print(f"   候选池记录: {len(candidates)} 条")
 
-    reuse_events_cfg = bool(runtime_cfg.get("reuse_report_events", True)) and not evening
-    if evening:
-        print("   晚报模式：不复用事件库，重新评分以纳入当日新事件")
+    reuse_events_cfg = runtime_cfg.get("reuse_report_events", True)
     next_report_date = (datetime.strptime(report_date, "%Y-%m-%d") + timedelta(days=1)).date().isoformat()
     stored_events = (
         db.fetch_report_events(report_date, next_report_date, report_type=report_type)
