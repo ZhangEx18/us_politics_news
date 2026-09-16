@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from ai_analyzer import (
+    _load_glossary,
     count_untranslated_terms,
     generate_column_digest,
     generate_daily_overview,
@@ -876,10 +877,43 @@ _PIPELINE_LEAK_RE = re.compile(
 )
 
 # 观点/分析稿标题（不进要点列表）
-_OPINION_TITLE_RE = re.compile(r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么)")
+_OPINION_TITLE_RE = re.compile(
+    r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么"
+    r"|关键所在|关键在哪|^分析|^前瞻|^复盘|^影评|^书评)"
+)
 
-# 公关语（标题命中时降权/剔除）
-_PROMO_WORD_RE = re.compile(r"(新洞察|赋能|重磅|颠覆|引爆|震撼)")
+# 公关语（标题命中时剔除）
+_PROMO_WORD_RE = re.compile(r"(新洞察|赋能|重磅|颠覆|引爆|震撼|重新构想|重新定义|再想象|以 .{0,10} 重新)")
+
+
+def _glossary_name_bigrams() -> set[str]:
+    """术语表中人名/机构/法案的中文双字片段（用于排除专名造成的误判）。"""
+    try:
+        groups = _load_glossary()
+    except NameError:  # pragma: no cover - 防御
+        return set()
+    fragments: set[str] = set()
+    for group in ("people", "orgs", "laws"):
+        for zh in groups.get(group, {}):
+            normalized = re.sub(r"[^0-9A-Za-z\u4e00-\u9fff]+", "", str(zh)).lower()
+            for i in range(len(normalized) - 1):
+                fragments.add(normalized[i:i + 2])
+    return fragments
+
+
+def _same_event_titles(left: str, right: str, ratio_floor: float = 0.45) -> bool:
+    """判断两条标题是否同一事件：相似度 + 有效双字组重合（排除专名碎片）。"""
+    norm_left = _normalize_event_title(left)
+    norm_right = _normalize_event_title(right)
+    if not norm_left or not norm_right or min(len(norm_left), len(norm_right)) < 8:
+        return False
+    if SequenceMatcher(None, norm_left, norm_right).ratio() < ratio_floor:
+        return False
+    stop = _glossary_name_bigrams()
+    bigrams_left = {norm_left[i:i + 2] for i in range(len(norm_left) - 1)}
+    bigrams_right = {norm_right[i:i + 2] for i in range(len(norm_right) - 1)}
+    shared = (bigrams_left & bigrams_right) - stop
+    return len(shared) >= 3
 
 
 def _sanitize_event_text(text: str) -> tuple[str, list[str]]:
@@ -1197,6 +1231,12 @@ def _is_cryptic_headline_only_title(title: str) -> bool:
         return True
     if re.fullmatch(r"(第?\s*\d+\s*(号|項|案|法案|决议|決議))", text):
         return True
+    if (
+        re.search(r"(第\s*\d+\s*号|H\.?\s?R\.?\s?\d+|S\.?\s?\d+)", text)
+        and re.search(r"(法案|决议|決議|修正案|草案)", text)
+        and not re.search(r"(通过|否决|签署|提出|提交|表决|推进|撤回|批准|驳回|生效|废除)", text)
+    ):
+        return True
     if re.fullmatch(r"(法案|决议|決議|修正案|草案)\s*[A-Z0-9.\-]{1,16}", text):
         return True
     if re.fullmatch(r"[a-z]{2,10}", compact_lower):
@@ -1241,6 +1281,7 @@ def _body_needs_translation(item: dict) -> bool:
 
 def _normalize_headline_only_by_column(
     column_headline_only: dict[str, list[dict]],
+    detailed_titles: dict[str, list[str]] | None = None,
 ) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
     normalized_columns: dict[str, list[dict]] = {}
     metrics: dict[str, dict[str, int]] = {}
@@ -1252,6 +1293,8 @@ def _normalize_headline_only_by_column(
         body_from_title = 0
         opinion_dropped = 0
         promo_dropped = 0
+        duplicate_dropped = 0
+        existing_titles = list((detailed_titles or {}).get(col_key, []))
 
         for item in items:
             title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
@@ -1266,6 +1309,9 @@ def _normalize_headline_only_by_column(
                 continue
             if _PROMO_WORD_RE.search(title_zh):
                 promo_dropped += 1
+                continue
+            if any(_same_event_titles(title_zh, existing) for existing in existing_titles):
+                duplicate_dropped += 1
                 continue
 
             reader_body = _build_headline_only_reader_body(item)
@@ -1291,6 +1337,7 @@ def _normalize_headline_only_by_column(
             "headline_body_from_title": body_from_title,
             "headline_opinion_dropped": opinion_dropped,
             "headline_promo_dropped": promo_dropped,
+            "headline_duplicate_dropped": duplicate_dropped,
         }
 
     return normalized_columns, metrics
@@ -1519,7 +1566,13 @@ def build_report(
         )
         for col_key, translated_metrics in headline_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(translated_metrics)
-        column_headline_only, normalized_metrics = _normalize_headline_only_by_column(column_headline_only)
+        detailed_title_map = {
+            key: [str(ev.get("title_zh") or ev.get("title") or "") for ev in events]
+            for key, events in column_results.items()
+        }
+        column_headline_only, normalized_metrics = _normalize_headline_only_by_column(
+            column_headline_only, detailed_titles=detailed_title_map,
+        )
         for col_key, column_metrics in normalized_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
         column_results, detailed_metrics = _normalize_detailed_events_to_chinese(column_results)
@@ -1606,7 +1659,13 @@ def build_report(
         total_issues += issues_count
 
     if spec.report_type == "daily":
-        column_headline_only, post_downgrade_headline_metrics = _normalize_headline_only_by_column(column_headline_only)
+        detailed_title_map = {
+            key: [str(ev.get("title_zh") or ev.get("title") or "") for ev in events]
+            for key, events in column_results.items()
+        }
+        column_headline_only, post_downgrade_headline_metrics = _normalize_headline_only_by_column(
+            column_headline_only, detailed_titles=detailed_title_map,
+        )
         for col_key, column_metrics in post_downgrade_headline_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
         for col_key in list(column_headline_only.keys()):

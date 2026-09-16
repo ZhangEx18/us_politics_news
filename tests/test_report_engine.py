@@ -1456,3 +1456,57 @@ def test_normalize_headline_drops_opinion_and_promo_titles():
     assert kept_titles == ["众议院通过决议"]
     assert metrics["us_politics"]["headline_opinion_dropped"] == 1
     assert metrics["us_politics"]["headline_promo_dropped"] == 1
+
+
+# ── 要点过滤补强（观点/公关/法案编号/跨层重复） ──
+
+
+def test_normalize_headline_drops_analysis_and_promo_variants():
+    normalized, metrics = _normalize_headline_only_by_column({
+        "global_affairs": [
+            {"title_zh": "分析最高法院关于邮寄投票的裁决及特朗普的反应", "summary": "分析稿。"},
+            {"title_zh": "世界齐聚纽约：联合国大会高级别周的关键所在", "summary": "预告稿。"},
+            {"title_zh": "以 AI 重新构想广告", "summary": "公关稿。"},
+            {"title_zh": "众议院第 22 号法案：SAVE 法案", "summary": "法案条目。"},
+            {"title_zh": "波兰在无人机袭击后重申支持乌克兰", "summary": "波兰重申对乌克兰的支持。"},
+        ]
+    })
+
+    kept_titles = [item["title_zh"] for item in normalized["global_affairs"]]
+    assert kept_titles == ["波兰在无人机袭击后重申支持乌克兰"]
+    assert metrics["global_affairs"]["headline_opinion_dropped"] == 2
+    assert metrics["global_affairs"]["headline_promo_dropped"] == 1
+    assert metrics["global_affairs"]["headline_cryptic_dropped"] == 1
+
+
+def test_normalize_headline_drops_cross_level_duplicate():
+    normalized, metrics = _normalize_headline_only_by_column(
+        {
+            "global_affairs": [
+                {"title_zh": "救援人员：加沙一栋战损建筑倒塌致 21 死，含 8 名儿童", "summary": "救援人员称，加沙一栋战损建筑倒塌。"},
+                {"title_zh": "欧盟邀请加拿大成为首个联系国成员", "summary": "欧盟邀请加拿大成为联系国成员。"},
+            ]
+        },
+        detailed_titles={
+            "global_affairs": ["加沙城一栋建筑倒塌，至少 20 人死亡"],
+        },
+    )
+
+    kept_titles = [item["title_zh"] for item in normalized["global_affairs"]]
+    assert kept_titles == ["欧盟邀请加拿大成为首个联系国成员"]
+    assert metrics["global_affairs"]["headline_duplicate_dropped"] == 1
+
+
+def test_same_event_titles_not_fooled_by_shared_glossary_names():
+    from report_engine import _same_event_titles
+
+    # 同主体不同事件：不得判定为重复（特朗普在术语表中，其双字片段应被排除）
+    assert not _same_event_titles(
+        "特朗普与习近平讨论关税",
+        "特朗普与普京讨论乌克兰",
+    )
+    # 同事件不同表述：应判定为重复
+    assert _same_event_titles(
+        "加沙城一栋建筑倒塌，至少 20 人死亡",
+        "救援人员：加沙一栋战损建筑倒塌致 21 死，含 8 名儿童",
+    )
