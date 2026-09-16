@@ -76,9 +76,21 @@ async def _call_llm(prompt: str, config: dict, timeout: int = 120) -> str:
         return await _call_llm_once(prompt, config, timeout)
     except Exception as exc:
         message = str(exc)
-        if config.get("json_schema") and "错误 400" in message:
-            _ai_log("response_format 不被支持，降级为普通 JSON 模式重试")
-            return await _call_llm(prompt, {**config, "json_schema": None}, timeout)
+        if "max_tokens 截断" in message:
+            current_cap = int(config.get("max_tokens") or 0)
+            new_cap = min(max(current_cap * 2, current_cap + 2000), 32000)
+            if current_cap and new_cap > current_cap:
+                _ai_log(f"输出被截断，max_tokens 提升至 {new_cap} 重试")
+                return await _call_llm(prompt, {**config, "max_tokens": new_cap}, timeout)
+        if "错误 400" in message:
+            if config.get("json_schema"):
+                _ai_log("json_schema 不被支持，降级为 json_object 重试")
+                return await _call_llm(
+                    prompt, {**config, "json_schema": None, "json_object": True}, timeout,
+                )
+            if config.get("json_object"):
+                _ai_log("json_object 不被支持，降级为普通模式重试")
+                return await _call_llm(prompt, {**config, "json_object": False}, timeout)
         fallback = config.get("fallback")
         if not fallback or config.get("_is_fallback"):
             raise
@@ -185,6 +197,8 @@ def _build_llm_payload(prompt: str, config: dict) -> dict:
                 "schema": JSON_SCHEMAS[schema_name],
             },
         }
+    elif config.get("json_object"):
+        payload["response_format"] = {"type": "json_object"}
     return payload
 
 
@@ -212,8 +226,14 @@ async def _call_llm_once(prompt: str, config: dict, timeout: int = 120) -> str:
                 body = await resp.text()
                 raise RuntimeError(f"LLM API 错误 {resp.status}: {body[:300]}")
             data = await resp.json()
-            msg = data["choices"][0]["message"]
-            return msg.get("content") or msg.get("reasoning_content", "")
+            choice = data["choices"][0]
+            msg = choice["message"]
+            content = str(msg.get("content") or "").strip()
+            if not content and choice.get("finish_reason") == "length":
+                raise RuntimeError(
+                    f"输出被 max_tokens 截断（推理 token 占满预算，cap={payload.get('max_tokens')}）"
+                )
+            return content or msg.get("reasoning_content", "")
 
 
 def _timeout_for(config: dict, scope: str, default: int) -> int:
@@ -726,7 +746,7 @@ async def _score_single_batch(
     try:
         response = await _call_llm(
             prompt,
-            {**config, "temperature": 0, "max_tokens": 16000, "json_schema": "score_items"},
+            {**config, "temperature": 0, "max_tokens": 16000, "json_object": True},
             timeout=_timeout_for(config, "score", 120),
         )
         results = _parse_score_response(response)
@@ -1571,7 +1591,7 @@ async def generate_column_digest(
 
     response = await _call_llm(
         prompt,
-        {**ai_config, "temperature": 0.3, "max_tokens": 16000, "json_schema": "digest_events"},
+        {**ai_config, "temperature": 0.3, "max_tokens": 16000, "json_object": True},
         timeout=_timeout_for(ai_config, "digest", 180),
     )
 
@@ -1624,7 +1644,7 @@ async def generate_periodical_overview(
 
     response = await _call_llm(
         prompt,
-        {**ai_config, "temperature": 0.3, "max_tokens": 16000},
+        {**ai_config, "temperature": 0.3, "max_tokens": 16000, "json_object": True},
         timeout=_timeout_for(ai_config, "digest", 180),
     )
     try:
@@ -1682,7 +1702,7 @@ async def generate_daily_overview(
 
     response = await _call_llm(
         prompt,
-        {**ai_config, "temperature": 0.3, "max_tokens": 8000},
+        {**ai_config, "temperature": 0.3, "max_tokens": 8000, "json_object": True},
         timeout=_timeout_for(ai_config, "digest", 180),
     )
     try:
@@ -1711,7 +1731,7 @@ async def translate_headline_titles(
         prompt += hint
     response = await _call_llm(
         prompt,
-        {**ai_config, "temperature": 0, "max_tokens": 4000},
+        {**ai_config, "temperature": 0, "max_tokens": 8000, "json_object": True},
         timeout=_timeout_for(ai_config, "meta", 120),
     )
 
@@ -1767,7 +1787,7 @@ async def generate_fallback_bodies(entries: list[dict], ai_config: dict) -> dict
     try:
         response = await _call_llm(
             prompt,
-            {**ai_config, "temperature": 0.2, "max_tokens": 4000},
+            {**ai_config, "temperature": 0.2, "max_tokens": 8000, "json_object": True},
             timeout=_timeout_for(ai_config, "meta", 120),
         )
         parsed = _parse_jsonish_object(response)

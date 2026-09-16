@@ -1,0 +1,112 @@
+# Prompt 回归集：每次修改 prompt/schema 后必须跑一遍
+# 用法：python3 scripts/prompt_regression.py --live [--case <id>]
+# 说明：用例来自线上真实事故与审查发现，断言均为硬指标（不依赖 LLM judge）
+
+cases:
+  - id: routine_notice
+    type: score
+    description: 例行公告必须低分且非硬新闻
+    input:
+      entries:
+        - link: https://example.com/routine
+          title: FTC Seeks Public Comment on Proposed Policy Statement
+          source: FTC Press Releases
+          published: "2026-09-16"
+          fetched: "2026-09-16"
+          freshness_date: "2026-09-16"
+          content: The Federal Trade Commission is seeking public comment on a proposed policy statement regarding consumer data practices. Comments are due in 30 days.
+    expect:
+      score_max: 69
+      is_hard_news: false
+      routine_min: 0.6
+
+  - id: major_ruling
+    type: score
+    description: 重大裁决必须高分且可推导高新闻价值
+    input:
+      entries:
+        - link: https://example.com/ruling
+          title: Supreme Court strikes down national executive order
+          source: SCOTUSblog
+          published: "2026-09-16"
+          fetched: "2026-09-16"
+          freshness_date: "2026-09-16"
+          content: The Supreme Court ruled 6-3 that a national executive order is unconstitutional, ordering the administration to submit a compliance plan within 30 days. The ruling affects 12 states and multiple federal agencies.
+    expect:
+      score_min: 85
+      newsworthiness_min: 0.75
+      is_hard_news: true
+
+  - id: score_separation
+    type: score_pair
+    description: 例行公告与重大新闻的分差必须 >= 20
+    inputs:
+      - [routine_notice, major_ruling]
+    expect:
+      min_score_gap: 20
+
+  - id: digest_no_meta_commentary
+    type: digest
+    description: 正文不得出现元评论/管道信息/条件预测
+    input:
+      events:
+        - title: House votes for a third time to end Iran war
+          source: PBS NewsHour
+          source_tier: 1
+          summary: 美国众议院第三次通过结束伊朗战争的战争权力决议，7 名共和党人投赞成票。
+          content: The House voted for a third time to end the Iran war, with 7 Republicans joining Democrats. The House disclosed the war has cost 38 billion dollars.
+          event_date: "2026-09-16"
+          freshness_date: "2026-09-16"
+    expect:
+      banned_regex:
+        - "报道把"
+        - "讨论焦点"
+        - "此次被证实的是"
+        - "聚合条目"
+        - "若.{0,10}将"
+      banned_phrases: [意味着, 凸显了, 值得关注的是]
+      must_have_date: true
+
+  - id: digest_one_fact_per_sentence
+    type: digest
+    description: 每句不超过 60 字（一句一事实的操作化检查）
+    input:
+      events:
+        - title: Senate Democrats block crypto regulation bill
+          source: PBS NewsHour
+          source_tier: 2
+          summary: 参议院民主党阻止加密货币监管法案，程序性表决 49 比 50 未通过。
+          content: Senate Democrats blocked the crypto regulation bill in a procedural vote of 49-50. Democrats also demanded more restrictions on Trump's investments.
+          event_date: "2026-09-15"
+          freshness_date: "2026-09-15"
+    expect:
+      max_sentence_chars: 60
+      max_sentences: 4
+
+  - id: translate_glossary
+    type: translate
+    description: 术语表内的人名/法案必须中文化
+    input:
+      titles:
+        - Hegseth faces impeachment vote in the House
+        - Clarity Act blocked in Senate
+    expect:
+      must_contain:
+        - 赫格塞思
+        - 清晰法案
+
+  - id: fallback_short_summary
+    type: fallback
+    description: 短摘要兜底必须中文、含日期、50-120 字
+    input:
+      entries:
+        - link: https://example.com/fallback
+          title: House votes to end Iran war
+          summary: 众议院再次通过结束伊朗战争的决议。
+          source: PBS NewsHour
+          event_date: "2026-09-16"
+    expect:
+      min_chars: 50
+      max_chars: 160
+      must_have_date: true
+      no_latin_ratio: 0.05
