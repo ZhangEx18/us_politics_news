@@ -198,12 +198,13 @@ def test_pre_llm_filter_chinese_keywords():
 # ── Prompt 检查 ──
 
 
-def test_prompt_contains_fact_change_consequence():
-    """确认 prompt 包含'事实 → 变化 → 后果'结构要求。"""
+def test_prompt_contains_inverted_pyramid_structure():
+    """确认 prompt 包含倒金字塔结构要求（导语 → 细节 → 可选影响）。"""
     from ai_analyzer import COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "事实" in COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "变化" in COLUMN_DIGEST_PROMPT_TEMPLATE
-    assert "后果" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "倒金字塔" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "导语" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "一段只写一个事实" in COLUMN_DIGEST_PROMPT_TEMPLATE
+    assert "不发议论" in COLUMN_DIGEST_PROMPT_TEMPLATE
 
 
 def test_prompt_contains_evidence_boundary():
