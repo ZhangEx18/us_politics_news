@@ -1301,7 +1301,12 @@ def _normalize_headline_only_by_column(
         opinion_dropped = 0
         promo_dropped = 0
         duplicate_dropped = 0
-        existing_titles = list((detailed_titles or {}).get(col_key, []))
+        # 跨栏目去重：与所有栏目的明细标题比较，避免同一事件在不同栏目重复出现
+        existing_titles = [
+            title
+            for titles in (detailed_titles or {}).values()
+            for title in titles
+        ]
 
         for item in items:
             title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
