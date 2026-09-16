@@ -1069,6 +1069,7 @@
   column: us_politics
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - analysis
@@ -1077,58 +1078,47 @@
     item_patterns:
     - <a[^>]+href="(?P<href>https?://[^\"]*caixin[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
     - <a[^>]+href="(?P<href>https?://[^\"]*caixin[^\"]+)"[^>]*>(?P<title>[^<]{8,120})</a>
+    article_url_pattern: '20\d{2}-\d{1,2}-\d{1,2}'
     max_items: 12
     summary_chars: 220
   enabled: true
 - name: FT 中文网 - 国际政治
-  url: https://www.ftchinese.com/channel/world.html
-  fetch_mode: custom
-  fetcher_key: china_media_article_list
+  timeout_seconds: 90
+  url: ${RSSHUB_BASE_URL}/ftchinese/simplified/news
+  fetch_mode: rsshub
   column: global_affairs
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - analysis
   - policy
-  custom:
-    item_patterns:
-    - <a[^>]+href="(?P<href>/story/[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
-    max_items: 10
-    summary_chars: 220
   enabled: true
 - name: 联合早报 - 国际
-  url: https://www.zaobao.com.sg/realtime/world
-  fetch_mode: custom
-  fetcher_key: china_media_article_list
+  timeout_seconds: 90
+  url: ${RSSHUB_BASE_URL}/zaobao/realtime/world
+  fetch_mode: rsshub
   column: global_affairs
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - geopolitics
-  custom:
-    item_patterns:
-    - <a[^>]+href="(?P<href>/realtime/[^\"]+)"[^>]*>(?P<title>[^<]{8,120})</a>
-    max_items: 12
-    summary_chars: 220
   enabled: true
 - name: 观察者网 - 国际
-  url: https://www.guancha.cn/internation?s=dhguoji
-  fetch_mode: custom
-  fetcher_key: china_media_article_list
+  timeout_seconds: 90
+  url: ${RSSHUB_BASE_URL}/guancha/home
+  fetch_mode: rsshub
   column: global_affairs
   source_tier: 3
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - analysis
   - geopolitics
-  custom:
-    item_patterns:
-    - <a[^>]+href="(?P<href>/internation/[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
-    max_items: 12
-    summary_chars: 220
   enabled: true
 - name: 财新国际 - 全球事务
   url: https://international.caixin.com/
@@ -1137,6 +1127,7 @@
   column: global_affairs
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - analysis
@@ -1145,15 +1136,18 @@
     item_patterns:
     - <a[^>]+href="(?P<href>https?://[^\"]*caixin[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
     - <a[^>]+href="(?P<href>https?://[^\"]*caixin[^\"]+)"[^>]*>(?P<title>[^<]{8,120})</a>
+    article_url_pattern: '20\d{2}-\d{1,2}-\d{1,2}'
     max_items: 12
     summary_chars: 220
   enabled: true
 - name: 36氪 - 科技
-  url: https://rsshub.app/36kr/newsflashes
+  timeout_seconds: 90
+  url: ${RSSHUB_BASE_URL}/36kr/hot-list
   fetch_mode: rsshub
   column: technology
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - china_tech
@@ -1173,39 +1167,42 @@
     - <a[^>]+href="(?P<href>https?://[^\"]*pingwest[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
     max_items: 12
     summary_chars: 220
-  enabled: true
+  enabled: false
 - name: 量子位
-  url: https://www.qbitai.com/
-  fetch_mode: custom
-  fetcher_key: china_tech_site
+  timeout_seconds: 90
+  url: ${RSSHUB_BASE_URL}/qbitai/category/%E8%B5%84%E8%AE%AF
+  fetch_mode: rsshub
   column: technology
   source_tier: 3
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - china_tech
-  custom:
-    item_patterns:
-    - <a[^>]+href="(?P<href>https?://[^\"]*qbitai[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
-    max_items: 12
-    summary_chars: 220
+  enabled: true
+- name: AIHOT - AI 资讯精选
+  url: https://aihot.news/feed/all.xml
+  fetch_mode: rss
+  column: technology
+  source_tier: 2
+  language: zh
+  max_candidates_per_run: 4
+  tags:
+  - ai_news
+  - aggregator
   enabled: true
 - name: 华尔街见闻 - 宏观/全球
-  url: https://wallstreetcn.com/news/global
-  fetch_mode: custom
-  fetcher_key: china_media_article_list
+  timeout_seconds: 90
+  url: ${RSSHUB_BASE_URL}/wallstreetcn/news/global
+  fetch_mode: rsshub
   column: economy
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - macro
   - supply_chain
-  custom:
-    item_patterns:
-    - <a[^>]+href="(?P<href>/articles/[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
-    max_items: 12
-    summary_chars: 220
   enabled: true
 - name: 财新 - 宏观/经济
   url: https://economy.caixin.com/
@@ -1214,6 +1211,7 @@
   column: economy
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - macro
@@ -1221,23 +1219,20 @@
     item_patterns:
     - <a[^>]+href="(?P<href>https?://[^\"]*caixin[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
     - <a[^>]+href="(?P<href>https?://[^\"]*caixin[^\"]+)"[^>]*>(?P<title>[^<]{8,120})</a>
+    article_url_pattern: '20\d{2}-\d{1,2}-\d{1,2}'
     max_items: 12
     summary_chars: 220
   enabled: true
 - name: FT 中文网 - 经济/贸易
-  url: https://www.ftchinese.com/channel/economy.html
-  fetch_mode: custom
-  fetcher_key: china_media_article_list
+  timeout_seconds: 90
+  url: ${RSSHUB_BASE_URL}/ftchinese/simplified/hotstoryby7day
+  fetch_mode: rsshub
   column: economy
   source_tier: 2
   language: zh
+  max_candidates_per_run: 3
   tags:
   - cn_source
   - macro
   - supply_chain
-  custom:
-    item_patterns:
-    - <a[^>]+href="(?P<href>/story/[^\"]+)"[^>]*title="(?P<title>[^\"]{8,160})"
-    max_items: 10
-    summary_chars: 220
   enabled: true

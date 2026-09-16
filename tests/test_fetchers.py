@@ -331,3 +331,57 @@ def test_extract_published_at_from_html_reads_meta_and_jsonld():
     html2 = '<script type="application/ld+json">{"datePublished":"2026-09-15T20:00:00Z"}</script>'
     assert _extract_published_at_from_html(html2).date().isoformat() == "2026-09-15"
     assert _extract_published_at_from_html("<html></html>") is None
+
+
+def test_substitute_env_vars_defaults_rsshub_base(monkeypatch):
+    from fetchers import _substitute_env_vars
+
+    monkeypatch.delenv("RSSHUB_BASE_URL", raising=False)
+    assert _substitute_env_vars("${RSSHUB_BASE_URL}/zaobao/realtime/world") == (
+        "https://rsshub.app/zaobao/realtime/world"
+    )
+
+    monkeypatch.setenv("RSSHUB_BASE_URL", "http://localhost:1200/")
+    assert _substitute_env_vars("${RSSHUB_BASE_URL}/guancha/home") == (
+        "http://localhost:1200/guancha/home"
+    )
+
+
+def test_custom_fetcher_filters_non_article_links_and_uses_dates(monkeypatch):
+    import asyncio
+    from datetime import datetime, timezone
+
+    from fetchers import CustomFeedFetcher
+
+    listing = """
+    <a href="https://www.caixin.com/subscribe/" title="订阅中心入口页面">订阅</a>
+    <a href="https://www.caixin.com/2026-09-16/102485230.html" title="今天发生的重要新闻摘要">今天</a>
+    <a href="https://www.caixin.com/2026-09-14/102485111.html" title="两天前的旧闻摘要内容">旧闻</a>
+    """
+    source = {
+        "name": "财新测试",
+        "url": "https://www.caixin.com/",
+        "fetch_mode": "custom",
+        "fetcher_key": "china_media_article_list",
+        "column": "economy",
+        "source_tier": 2,
+        "language": "zh",
+        "enabled": True,
+        "custom": {
+            "item_patterns": [r'<a[^>]+href="(?P<href>[^"]+)"[^>]*title="(?P<title>[^"]{4,120})"'],
+            "article_url_pattern": r"20\d{2}-\d{1,2}-\d{1,2}",
+            "max_items": 12,
+        },
+    }
+
+    async def fake_get(self, url, **kwargs):
+        return listing
+
+    monkeypatch.setattr(CustomFeedFetcher, "_get", fake_get)
+    fetcher = CustomFeedFetcher([source])
+    since = datetime(2026, 9, 16, 6, 0, tzinfo=timezone.utc)
+
+    items = asyncio.run(fetcher.handlers["china_media_article_list"](source, since))
+
+    assert [item.title for item in items] == ["今天发生的重要新闻摘要"]
+    assert items[0].published_at.date().isoformat() == "2026-09-16"

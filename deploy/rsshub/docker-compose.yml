@@ -1,0 +1,32 @@
+services:
+  rsshub:
+    image: diygod/rsshub:latest
+    container_name: uspn-rsshub
+    restart: unless-stopped
+    ports:
+      - "1200:1200"
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: memory
+      CACHE_EXPIRE: "600"
+      REQUEST_TIMEOUT: "60"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:1200/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # 可选：微信公众号 RSS（wewe-rss）
+  # 首次启动后访问 http://localhost:4000 扫码登录
+  # wewe-rss:
+  #   image: cooderl/wewe-rss:latest
+  #   container_name: uspn-wewe-rss
+  #   restart: unless-stopped
+  #   ports:
+  #     - "4000:4000"
+  #   environment:
+  #     DATABASE_URL: file:../data/wewe-rss.db
+  #     AUTH_CODE: change-me
+  #     FEED_MODE: fulltext
+  #   volumes:
+  #     - ./wewe-data:/app/data

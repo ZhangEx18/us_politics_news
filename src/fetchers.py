@@ -96,6 +96,20 @@ def _build_item_metadata(source_cfg: dict, entry_tags: list[str] | None = None) 
 
 
 _CN_TZ = ZoneInfo("Asia/Shanghai")
+RSSHUB_DEFAULT_BASE = "https://rsshub.app"
+
+
+def _substitute_env_vars(url: str) -> str:
+    """替换 URL 中的 ${VAR}；RSSHUB_BASE_URL 未配置时回退公共实例。"""
+
+    def _replace(match: re.Match[str]) -> str:
+        name = match.group(1)
+        if name == "RSSHUB_BASE_URL":
+            return (os.environ.get(name) or RSSHUB_DEFAULT_BASE).rstrip("/")
+        return os.environ.get(name, match.group(0)).strip()
+
+    return re.sub(r"\$\{(\w+)\}", _replace, str(url or ""))
+
 
 _URL_DATE_PATTERNS = (
     r"/(20\d{2})[/-](\d{1,2})[/-](\d{1,2})(?:[/-]|$)",
@@ -231,12 +245,9 @@ class RSSFetcher(BaseFetcher):
         since_utc = since_utc.astimezone(timezone.utc)
         for feed_cfg in self.feeds:
             try:
-                feed_url = re.sub(
-                    r"\$\{(\w+)\}",
-                    lambda m: os.environ.get(m.group(1), m.group(0)).strip(),
-                    feed_cfg["url"],
-                )
-                text = await self._get(feed_url, timeout=aiohttp.ClientTimeout(total=60))
+                feed_url = _substitute_env_vars(feed_cfg["url"])
+                timeout_seconds = int(feed_cfg.get("timeout_seconds") or 60)
+                text = await self._get(feed_url, timeout=aiohttp.ClientTimeout(total=timeout_seconds))
                 data = feedparser.parse(text)
 
                 for entry in data.entries:
@@ -482,7 +493,10 @@ class CustomFeedFetcher(BaseFetcher):
         fetcher_key = str(source_cfg.get("fetcher_key", "")).strip()
         fetch_detail = bool(source_cfg.get("custom", {}).get("fetch_detail", True))
         detail_always = fetcher_key in {"legislative_or_public_records", "intl_org_feed"}
+        article_pattern = source_cfg.get("custom", {}).get("article_url_pattern")
+        article_re = re.compile(article_pattern) if article_pattern else None
         since_utc = (since if since.tzinfo else since.replace(tzinfo=timezone.utc)).astimezone(timezone.utc)
+        since_cn_date = since_utc.astimezone(_CN_TZ).date()
 
         extracted: list[ContentItem] = []
         seen_links: set[str] = set()
@@ -494,6 +508,8 @@ class CustomFeedFetcher(BaseFetcher):
                 if not href or not title:
                     continue
                 link = urljoin(source_cfg["url"], href)
+                if article_re and not article_re.search(link):
+                    continue
                 normalized_link = normalize_url(link)
                 if normalized_link in seen_links:
                     continue
@@ -514,7 +530,7 @@ class CustomFeedFetcher(BaseFetcher):
                         detail_text = _extract_html_text(detail_html)
                         snippet = _build_contextual_snippet(detail_text, title, summary_limit) or snippet
 
-                if published_at is not None and published_at.astimezone(timezone.utc) < since_utc:
+                if published_at is not None and published_at.date() < since_cn_date:
                     continue
 
                 extracted.append(ContentItem(

@@ -237,3 +237,17 @@ def test_fetch_workflow_only_reads_and_writes_canonical_news_db():
     assert 'DB_PATH="data/products/news/news.db"' in persist_step["run"]
     assert "LEGACY_DB_PATH" not in persist_step["run"]
     assert 'git add "$DB_PATH" .gitignore' in persist_step["run"]
+
+
+def test_publish_product_workflow_runs_rsshub_service():
+    workflow = _load_workflow("publish-product.yml")
+    publish_job = workflow["jobs"]["publish"]
+
+    assert "rsshub" in publish_job["services"]
+    assert publish_job["services"]["rsshub"]["image"].startswith("diygod/rsshub")
+
+    run_step = next(
+        step for step in publish_job["steps"]
+        if step.get("name") == "Run product pipeline"
+    )
+    assert run_step["env"]["RSSHUB_BASE_URL"] == "http://localhost:1200"

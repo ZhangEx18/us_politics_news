@@ -44,6 +44,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    services:
+      rsshub:
+        image: diygod/rsshub:latest
+        ports:
+          - 1200:1200
+        env:
+          CACHE_TYPE: memory
     steps:
       - uses: actions/checkout@v5
         with:
@@ -118,6 +125,17 @@ jobs:
       - name: Restore published pages state
         run: python3 scripts/sync_pages_state.py restore
 
+      - name: Wait for RSSHub
+        run: |
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null --max-time 3 http://localhost:1200/; then
+              echo "RSSHub ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "RSSHub not ready, continue anyway"
+
       - name: Run product pipeline
         run: |
           PRODUCT="${{ inputs.product_key }}"
@@ -132,6 +150,7 @@ jobs:
 
           python3 src/run_product.py $ARGS
         env:
+          RSSHUB_BASE_URL: http://localhost:1200
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
           AI_MODEL: ${{ secrets.AI_MODEL }}
