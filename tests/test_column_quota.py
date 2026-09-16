@@ -103,3 +103,101 @@ def test_prefilter_items_prefers_higher_signal_items():
     assert len(selected["us_politics"]) == 2
     assert selected["us_politics"][0].id == "test:1"
     assert {item.id for item in selected["us_politics"]} == {"test:1", "test:3"}
+
+
+def test_prefilter_signal_demotes_routine_notice():
+    from run_pipeline import _prefilter_signal
+
+    now = datetime(2026, 9, 16, 12, 0, tzinfo=timezone.utc)
+    routine = ContentItem(
+        id="test:routine", source_type=SourceType.RSS,
+        title="FTC Seeks Public Comment on Proposed Policy Statement",
+        url="https://example.com/1", content="A" * 300, source_name="FTC",
+        column="us_politics", source_tier=1, score=50,
+        published_at=now - timedelta(hours=2),
+    )
+    news = ContentItem(
+        id="test:news", source_type=SourceType.RSS,
+        title="FTC, States Sue Amazon Over Secret Ad Surcharge Scheme",
+        url="https://example.com/2", content="A" * 300, source_name="FTC",
+        column="us_politics", source_tier=1, score=50,
+        published_at=now - timedelta(hours=2),
+    )
+    assert _prefilter_signal(routine, now) < _prefilter_signal(news, now)
+    assert _prefilter_signal(routine, now) <= 0.31 * _prefilter_signal(news, now)
+
+
+def test_prefilter_caps_candidates_per_source():
+    from run_pipeline import _prefilter_items_for_scoring
+
+    now = datetime(2026, 9, 16, 12, 0, tzinfo=timezone.utc)
+    items = [
+        ContentItem(
+            id=f"test:ftc-{i}", source_type=SourceType.CUSTOM,
+            title=f"FTC enforcement action {i}", url=f"https://example.com/ftc-{i}",
+            content="B" * 300, source_name="FTC Press Releases",
+            column="us_politics", source_tier=1, score=50,
+            published_at=now - timedelta(hours=1),
+        )
+        for i in range(8)
+    ]
+    columns_cfg = {"us_politics": {"prefilter_items": 25}}
+
+    selected = _prefilter_items_for_scoring(items, columns_cfg, now=now)
+
+    assert len(selected["us_politics"]) == 3
+
+
+def test_prefilter_respects_source_metadata_cap():
+    from run_pipeline import _prefilter_items_for_scoring
+
+    now = datetime(2026, 9, 16, 12, 0, tzinfo=timezone.utc)
+    items = [
+        ContentItem(
+            id=f"test:ftc-{i}", source_type=SourceType.CUSTOM,
+            title=f"FTC enforcement action {i}", url=f"https://example.com/ftc-{i}",
+            content="B" * 300, source_name="FTC Press Releases",
+            column="us_politics", source_tier=1, score=50,
+            published_at=now - timedelta(hours=1),
+            metadata={"max_candidates_per_run": 2},
+        )
+        for i in range(8)
+    ]
+    columns_cfg = {"us_politics": {"prefilter_items": 25}}
+
+    selected = _prefilter_items_for_scoring(items, columns_cfg, now=now)
+
+    assert len(selected["us_politics"]) == 2
+
+
+def test_select_daily_column_items_limits_source_share():
+    from report_engine import _select_daily_column_items
+
+    scored = [
+        {
+            "title": f"FTC action {i}",
+            "source": "FTC Press Releases",
+            "score": 80 - i,
+            "summary": f"FTC action summary {i}",
+        }
+        for i in range(6)
+    ]
+    scored.append({
+        "title": "Senate passes budget bill",
+        "source": "PBS NewsHour",
+        "score": 75,
+        "summary": "Senate passes budget bill summary",
+    })
+
+    detailed, headline, metrics = _select_daily_column_items(
+        scored_items=scored,
+        fallback_items=[],
+        target_items=5,
+        max_items=5,
+        headline_items=3,
+        min_score=65,
+    )
+
+    sources = [item["source"] for item in detailed + headline]
+    assert sources.count("FTC Press Releases") <= 2
+    assert metrics["source_quota_dropped"] > 0

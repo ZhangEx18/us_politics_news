@@ -54,6 +54,7 @@ from fetchers import (
     normalize_url,
 )
 from models import ContentItem
+from content_policy import is_routine_notice
 from report_engine import ReportSpec, build_report
 from report_titles import build_daily_title
 
@@ -62,6 +63,8 @@ DEFAULT_TZ = "Asia/Shanghai"
 DEFAULT_CUTOFF_HOUR = 7
 DEFAULT_FETCH_AT = "07:00"
 DEFAULT_PUBLISH_AT = "07:45"
+DEFAULT_MAX_CANDIDATES_PER_SOURCE = 3
+ROUTINE_SIGNAL_MULTIPLIER = 0.3
 
 
 def _load_config() -> dict:
@@ -424,7 +427,10 @@ def _prefilter_signal(item: ContentItem, now: datetime) -> float:
     else:
         content_bonus = 0
 
-    return (item.score or 0) + tier_bonus + recency_bonus + content_bonus + _keyword_bonus(item)
+    signal = (item.score or 0) + tier_bonus + recency_bonus + content_bonus + _keyword_bonus(item)
+    if is_routine_notice(item.title, item.content):
+        signal *= ROUTINE_SIGNAL_MULTIPLIER
+    return signal
 
 
 def _candidate_reason(item: ContentItem, now: datetime) -> str:
@@ -476,6 +482,21 @@ def _content_items_to_candidates(
     return candidates
 
 
+def _cap_items_per_source(items: list[ContentItem]) -> list[ContentItem]:
+    """限制单源候选数，避免高产出官方源挤占整栏候选池。"""
+    kept: list[ContentItem] = []
+    per_source: dict[str, int] = {}
+    for item in items:
+        metadata = item.metadata or {}
+        cap = int(metadata.get("max_candidates_per_run") or DEFAULT_MAX_CANDIDATES_PER_SOURCE)
+        used = per_source.get(item.source_name, 0)
+        if used >= cap:
+            continue
+        per_source[item.source_name] = used + 1
+        kept.append(item)
+    return kept
+
+
 def _prefilter_items_for_scoring(
     items: list[ContentItem],
     columns_cfg: dict[str, dict],
@@ -521,7 +542,8 @@ def _prefilter_items_for_scoring(
         if remaining:
             result.extend(tier4[:remaining])
 
-        selected[col_key] = result[:limit]
+        ranked = sorted(result[:limit], key=lambda item: _prefilter_signal(item, now), reverse=True)
+        selected[col_key] = _cap_items_per_source(ranked)
     return selected
 
 
@@ -1519,6 +1541,17 @@ def _run_digest_phase(
     # === 6. 硬新闻过滤 ===
     print("\n[6/13] 硬新闻过滤...")
     hard_news_scored = [entry for entry in scored_dicts if _is_hard_news_entry(entry)]
+    filtered_hard: list[dict] = []
+    routine_notice_dropped = 0
+    for entry in hard_news_scored:
+        if is_routine_notice(entry.get("title"), entry.get("summary"), entry.get("content")):
+            routine_notice_dropped += 1
+            continue
+        filtered_hard.append(entry)
+    hard_news_scored = filtered_hard
+    phase_metrics["routine_notice_dropped"] = routine_notice_dropped
+    if routine_notice_dropped:
+        print(f"   例行公告剔除: {routine_notice_dropped} 条")
     if report_type == "daily":
         hard_news_scored, scored_freshness = _filter_scored_entries_by_freshness(
             hard_news_scored,
@@ -1558,6 +1591,8 @@ def _run_digest_phase(
     for col_key, items in prefiltered_by_column.items():
         non_hard: list[dict] = []
         for item in items:
+            if is_routine_notice(item.title, item.content):
+                continue
             non_hard.append(_content_item_to_report_candidate(item))
         fallback_candidates_by_column[col_key] = non_hard
     # 按栏目统计

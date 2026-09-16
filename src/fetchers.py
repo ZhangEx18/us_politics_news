@@ -77,6 +77,12 @@ def _build_item_metadata(source_cfg: dict, entry_tags: list[str] | None = None) 
         "tags": list(source_cfg.get("tags", [])),
         "fetch_mode": _resolve_fetch_mode(source_cfg),
     }
+    cap = source_cfg.get("max_candidates_per_run")
+    if cap:
+        try:
+            metadata["max_candidates_per_run"] = int(cap)
+        except (TypeError, ValueError):
+            pass
     if entry_tags:
         merged_tags = []
         seen = set()

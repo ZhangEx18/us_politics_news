@@ -26,6 +26,11 @@ from report_renderer import COLUMN_ORDER, save_daily_report
 
 BEIJING_TZ = ZoneInfo("Asia/Shanghai")
 
+# 选择阶段配额：防止单一来源霸占栏目
+MAX_EVENTS_PER_SOURCE_PER_COLUMN = 2
+MAX_EVENTS_PER_SOURCE_TOTAL = 3
+MAX_HEADLINE_PER_ORG = 2
+
 
 # ── 报告规格 ──
 
@@ -974,18 +979,37 @@ def _select_daily_column_items(
     max_items: int,
     headline_items: int,
     min_score: float,
+    global_source_counts: dict[str, int] | None = None,
 ) -> tuple[list[dict], list[dict], dict[str, int]]:
-    """日报按数量优先补足主新闻和次要新闻。"""
+    """日报按数量优先补足主新闻和次要新闻，并限制单源占比。"""
     high_score = [item for item in scored_items if (item.get("score") or 0) >= min_score]
     low_score = [item for item in scored_items if (item.get("score") or 0) < min_score]
 
     detailed: list[dict] = []
     used: set[str] = set()
+    column_source_counts: dict[str, int] = {}
+    total_counts = global_source_counts if global_source_counts is not None else {}
     metrics = {
         "detailed_filled_from_low_score": 0,
         "headline_filled_from_low_score": 0,
         "headline_filled_from_non_hard_news": 0,
+        "source_quota_dropped": 0,
     }
+
+    def _source_allowed(item: dict) -> bool:
+        source = str(item.get("source") or "").strip()
+        if not source:
+            return True
+        if column_source_counts.get(source, 0) >= MAX_EVENTS_PER_SOURCE_PER_COLUMN:
+            return False
+        return total_counts.get(source, 0) < MAX_EVENTS_PER_SOURCE_TOTAL
+
+    def _mark_source(item: dict) -> None:
+        source = str(item.get("source") or "").strip()
+        if not source:
+            return
+        column_source_counts[source] = column_source_counts.get(source, 0) + 1
+        total_counts[source] = total_counts.get(source, 0) + 1
 
     detailed_target = max_items if max_items > 0 else target_items
     for pool_name, pool in (("high", high_score), ("low", low_score)):
@@ -993,8 +1017,12 @@ def _select_daily_column_items(
             identity = _event_identity(item)
             if not identity or identity in used:
                 continue
+            if not _source_allowed(item):
+                metrics["source_quota_dropped"] += 1
+                continue
             detailed.append(_to_candidate_dict(item))
             used.add(identity)
+            _mark_source(item)
             if pool_name == "low":
                 metrics["detailed_filled_from_low_score"] += 1
             if len(detailed) >= detailed_target:
@@ -1008,8 +1036,12 @@ def _select_daily_column_items(
             identity = _event_identity(item)
             if not identity or identity in used:
                 continue
+            if not _source_allowed(item):
+                metrics["source_quota_dropped"] += 1
+                continue
             headline.append(_to_candidate_dict(item))
             used.add(identity)
+            _mark_source(item)
             if pool_name == "low":
                 metrics["headline_filled_from_low_score"] += 1
             if pool_name == "non_hard":
@@ -1018,6 +1050,20 @@ def _select_daily_column_items(
                 break
         if len(headline) >= headline_items:
             break
+
+    # 配额不得清空栏目：若候选存在但全被配额挡下，强制保留最高分一条
+    if not detailed and not headline and headline_items + (max_items or target_items) > 0:
+        for pool in (high_score, low_score, fallback_items):
+            for item in pool:
+                identity = _event_identity(item)
+                if not identity or identity in used:
+                    continue
+                detailed.append(_to_candidate_dict(item))
+                used.add(identity)
+                metrics["source_quota_forced"] = metrics.get("source_quota_forced", 0) + 1
+                break
+            if detailed:
+                break
 
     metrics["detailed_filled"] = len(detailed)
     metrics["headline_filled"] = len(headline)
@@ -1210,6 +1256,7 @@ def _prepare_report_inputs(
     print(f"\n[候选] 每栏按配额选择...")
     column_candidates: dict[str, list[dict]] = {}
     column_headline_only: dict[str, list[dict]] = {}
+    global_source_counts: dict[str, int] = {}
     for column_key, column_cfg in spec.column_quotas.items():
         column_items = by_column.get(column_key, [])
         detailed_n = column_cfg.get("target_items", 5)
@@ -1224,6 +1271,7 @@ def _prepare_report_inputs(
                 max_items=max_n,
                 headline_items=headline_n,
                 min_score=spec.min_llm_score,
+                global_source_counts=global_source_counts,
             )
         else:
             detailed_items = [_to_candidate_dict(event) for event in column_items[:min(len(column_items), max_n)]]
@@ -1418,6 +1466,14 @@ def build_report(
         column_headline_only, post_downgrade_headline_metrics = _normalize_headline_only_by_column(column_headline_only)
         for col_key, column_metrics in post_downgrade_headline_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        for col_key in list(column_headline_only.keys()):
+            before = len(column_headline_only[col_key])
+            column_headline_only[col_key] = _limit_same_org_events(
+                column_headline_only[col_key], MAX_HEADLINE_PER_ORG
+            )
+            capped = before - len(column_headline_only[col_key])
+            if capped > 0:
+                metrics["columns"].setdefault(col_key, {})["headline_org_capped"] = capped
     print(f"   {'全部通过' if not total_issues else f'{total_issues} 个质量问题（已清理）'}")
 
     # ── 组装 columns ──
