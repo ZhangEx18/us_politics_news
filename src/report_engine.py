@@ -620,23 +620,42 @@ def _summarize_rejections(metrics: dict) -> dict[str, int]:
     return summary
 
 
-def _select_lead_event(columns: dict) -> dict | None:
-    """跨栏目选择当日头条：newsworthiness 优先，其次 score。"""
+def _select_lead_event(columns: dict, scored_events: list[dict] | None = None) -> dict | None:
+    """跨栏目选择当日头条：newsworthiness 优先，其次 score。
+
+    写作产物（明细事件）本身不带评分，按 event_key/标题关联评分记录后再比较。
+    """
+    score_map: dict[str, dict] = {}
+    for entry in scored_events or []:
+        for key in (entry.get("event_key"), entry.get("title_zh"), entry.get("title")):
+            normalized = _normalize_event_title(key)
+            if normalized and normalized not in score_map:
+                score_map[normalized] = entry
+
     best: dict | None = None
-    best_key = (-1.0, -1.0)
+    best_key = (0.0, 0.0)
     for col_key in COLUMN_ORDER:
         for event in columns.get(col_key, {}).get("detailed_events", []) or []:
-            newsworthiness = _to_float(event.get("newsworthiness"))
-            score = _to_float(event.get("score"))
+            title = str(event.get("title_zh") or event.get("title") or "").strip()
+            if not title:
+                continue
+            scored_entry: dict = {}
+            for key in (event.get("event_key"), title):
+                normalized = _normalize_event_title(key)
+                if normalized and normalized in score_map:
+                    scored_entry = score_map[normalized]
+                    break
+            newsworthiness = _to_float(scored_entry.get("newsworthiness"))
+            score = _to_float(scored_entry.get("score"))
             key = (newsworthiness, score)
-            if key > best_key:
+            if best is None or key > best_key:
                 best_key = key
                 best = {
                     "column": col_key,
-                    "title": str(event.get("title_zh") or event.get("title") or "").strip(),
+                    "title": title,
                     "body": str(event.get("reader_body") or event.get("core_facts") or "").strip(),
-                    "score": event.get("score"),
-                    "newsworthiness": event.get("newsworthiness"),
+                    "score": scored_entry.get("score"),
+                    "newsworthiness": scored_entry.get("newsworthiness"),
                 }
     return best if best and best.get("title") else None
 
@@ -1559,9 +1578,13 @@ async def _translate_headline_only_by_column(
             clean_title = str(title_zh).strip()
             fallback_reader_body = _build_headline_only_reader_body(item)
             if not clean_title and fallback_reader_body:
+                # 翻译缺失时用正文首句压缩成短标题（上限 22 字），避免整句正文当标题
+                compact_title = fallback_reader_body[:22].rstrip(" ，,。；;:：")
+                if len(fallback_reader_body) > 22:
+                    compact_title += "…"
                 translated_events.append({
                     **item,
-                    "title_zh": fallback_reader_body,
+                    "title_zh": compact_title or fallback_reader_body,
                     "reader_body": fallback_reader_body,
                 })
                 metrics[col_key]["headline_translated"] += 1
@@ -1951,7 +1974,7 @@ def build_report(
 
     # ── 保存报告 ──
     print(f"\n[保存] 生成文件...")
-    lead_event = _select_lead_event(columns) if spec.report_type == "daily" else None
+    lead_event = _select_lead_event(columns, scored_events) if spec.report_type == "daily" else None
     if lead_event:
         metrics["lead"] = lead_event
     meta = {
