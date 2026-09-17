@@ -5,8 +5,107 @@
     <link>.</link>
     <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 17 Sep 2026 07:47:00 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 18 Sep 2026 07:46:38 +0800</lastBuildDate>
     <item>
+      <title>2026-09-18 每日算法专题</title>
+      <link>algorithms/daily/2026-09-18.html</link>
+      <description><![CDATA[如何在线性时间内为数组中每个元素找到右侧第一个比它大的元素？]]></description>
+      <content:encoded><![CDATA[<article>
+<h2>如何在线性时间内为数组中每个元素找到右侧第一个比它大的元素？</h2>
+<h3>直觉理解</h3>
+<p>把数组想成一排人，每个元素向右看，想找第一个比自己高的人。暴力做法是每个人都向右一个个问，最坏 O(n^2)。单调栈换一种思路：只维护“还没找到更高者”的候选人。从左到右扫描时，栈里存下标，对应身高从栈底到栈顶递减，栈顶最矮。来一个新元素 x，如果它比栈顶高，那么对栈顶来说，x 就是右侧第一个更高的人，因为中间比栈顶高的元素早就把栈顶弹走了。于是不断弹出并记录答案，直到栈空或 x 不再高于栈顶。再把当前下标压栈。每个元素最多进栈一次、出栈一次，所以总时间是 O(n)。本质是：新来的更大元素会“遮住”栈里更矮的元素，让它们永远不可能成为更左边元素的答案，所以及时删除。</p>
+<h3>算法思路</h3>
+<p>以下采用从左到右遍历、栈存下标的写法。1. 初始化答案数组 ans，长度 n，全部填 -1，表示暂时没有找到下一个更大元素。2. 维护一个栈 stack，里面存下标，并保证 nums[stack[0]] &gt; nums[stack[1]] &gt; ... &gt; nums[stack[-1]]，即从栈底到栈顶对应值严格递减，栈顶是最小的“待处理者”。3. 遍历 i 从 0 到 n-1，令 x = nums[i]。当栈非空且 nums[stack[-1]] &lt; x 时，说明当前 x 是栈顶元素右侧第一个比它大的值：弹出栈顶下标 j，令 ans[j] = x。重复这个过程，因为 x 还可能继续成为栈中更矮元素的答案。4. 把 i 压入栈。注意比较用严格小于，符合“下一个更大”通常要求严格大于。5. 遍历结束后，栈中剩余下标在右侧没有更大元素，ans 保持 -1。正确性依赖两个事实：如果某元素被弹出，当前元素一定是它右侧第一个更大元素；如果它一直没被弹出，说明右侧没有更大元素。也可以从右往左写：栈保持递减，当前元素把栈顶所有小于等于它的值弹出，栈顶就是答案。两种方向等价，从左到右更适合需要回填下标的题。变种只需改比较方向或遍历次数，例如下一个更小元素、每日温度、循环数组。</p>
+<h3>Python 示例</h3>
+<pre><code>from typing import List
+
+def next_greater_element(nums: List[int]) -&gt; List[int]:
+    # 单调栈：栈中存下标，对应值从栈底到栈顶严格递减
+    n = len(nums)
+    ans = [-1] * n
+    stack = []
+
+    for i, x in enumerate(nums):
+        # 当前 x 比栈顶元素大，说明 x 是栈顶元素的下一个更大值
+        while stack and nums[stack[-1]] &lt; x:
+            j = stack.pop()
+            ans[j] = x
+        stack.append(i)
+
+    return ans
+
+
+def next_greater_element_brute(nums: List[int]) -&gt; List[int]:
+    # 暴力对照，仅用于测试
+    n = len(nums)
+    ans = [-1] * n
+    for i in range(n):
+        for j in range(i + 1, n):
+            if nums[j] &gt; nums[i]:
+                ans[i] = nums[j]
+                break
+    return ans
+
+
+if __name__ == '__main__':
+    test_cases = [
+        [2, 1, 2, 4, 3],
+        [1, 2, 3, 4],
+        [4, 3, 2, 1],
+        [5, 4, 3, 2, 6],
+        [1, 1, 1],
+    ]
+    for nums in test_cases:
+        got = next_greater_element(nums)
+        expected = next_greater_element_brute(nums)
+        print(f'{nums} -&gt; {got}，暴力验证：{got == expected}')
+</code></pre>
+<h3>C++ 对照</h3>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+vector&lt;int&gt; nextGreaterElement(const vector&lt;int&gt;&amp; nums) {
+    int n = nums.size();
+    vector&lt;int&gt; ans(n, -1);
+    vector&lt;int&gt; st; // 存下标
+    for (int i = 0; i &lt; n; ++i) {
+        while (!st.empty() &amp;&amp; nums[st.back()] &lt; nums[i]) {
+            ans[st.back()] = nums[i];
+            st.pop_back();
+        }
+        st.push_back(i);
+    }
+    return ans;
+}
+
+int main() {
+    vector&lt;vector&lt;int&gt;&gt; tests = {
+        {2, 1, 2, 4, 3},
+        {1, 2, 3, 4},
+        {4, 3, 2, 1}
+    };
+    for (auto&amp; nums : tests) {
+        auto ans = nextGreaterElement(nums);
+        for (int x : ans) cout &lt;&lt; x &lt;&lt; ' ';
+        cout &lt;&lt; endl;
+    }
+    return 0;
+}
+</code></pre>
+<h3>复杂度分析</h3>
+<p>时间复杂度 O(n)。虽然代码里有 while，但每个下标只会被压入栈一次、弹出栈一次，所以 while 的总执行次数不超过 n；外层循环也是 n 次，合计 O(n)。空间复杂度 O(n)。答案数组 ans 需要 O(n)，单调栈最坏情况下（例如数组严格递减）会同时保存 n 个下标。若从右往左实现，空间同样 O(n)。相比暴力双循环最坏 O(n^2)，单调栈把“重复向右寻找”的信息压缩到栈中，利用删除不可能答案的元素实现线性。</p>
+<h3>易错点</h3>
+<ol>
+<li>只把元素值存进栈，而不是下标。这样当当前元素成为答案时，不知道要回填哪个位置。修复：栈存下标，比较用 nums[stack[-1]]，赋值用 ans[j] = nums[i]。</li>
+<li>把 while 写成 if。当前元素可能连续大于多个栈顶元素，用 if 只会弹出一个，导致更深处元素的答案漏掉。修复：必须用 while 循环持续弹出，直到栈空或不再大于栈顶。</li>
+<li>比较符号与题意不符。找严格更大元素时，若写成 nums[stack[-1]] &lt;= x，会把相等的元素也弹出，把“等于”误判为“更大”。修复：严格更大用 &lt;，大于等于用 &lt;=；先明确题目要求。</li>
+<li>忘记初始化 ans 为 -1，或遍历结束后错误地给栈中剩余元素赋值。栈中剩余元素右侧没有更大元素，应保持 -1。修复：初始化 [-1] * n，结束后不处理栈。</li>
+</ol>
+</article>]]></content:encoded>
+      <pubDate>Fri, 18 Sep 2026 07:46:01 +0800</pubDate>
+      <guid isPermaLink="false">algorithms/daily/2026-09-18</guid>
+    </item>
+<item>
       <title>2026-09-17 每日算法专题</title>
       <link>algorithms/daily/2026-09-17.html</link>
       <description><![CDATA[如何在线性时间内求出数组中每个元素右侧第一个比它大的元素？]]></description>
