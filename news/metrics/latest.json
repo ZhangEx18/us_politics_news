@@ -1839,31 +1839,30 @@
         "2026-09-16",
         "2026-09-17"
       ],
-      "kept": 2149,
-      "dropped": 1294,
+      "kept": 2157,
+      "dropped": 1283,
       "dropped_by_column": {
         "us_politics": 259,
-        "global_affairs": 507,
-        "technology": 129,
-        "economy": 399
+        "global_affairs": 504,
+        "technology": 130,
+        "economy": 390
       }
     },
-    "raw_fetched": 3614,
-    "raw_merged": 2149
+    "raw_fetched": 3612,
+    "raw_merged": 2157
   },
-  "cn_source_fetched": 130,
-  "cn_source_selected": 3,
+  "cn_source_fetched": 132,
+  "cn_source_selected": 0,
   "cn_source_selected_by_column": {
-    "global_affairs": 2,
+    "global_affairs": 0,
     "economy": 0,
-    "technology": 1,
+    "technology": 0,
     "us_politics": 0
   },
   "columns": {
     "economy": {
-      "prefiltered": 17,
-      "hard_news_candidates": 17,
-      "hard_news_scored": 11,
+      "prefiltered": 13,
+      "hard_news_candidates": 13,
       "post_merge_scored": 4,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
@@ -1875,11 +1874,11 @@
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 1,
+      "headline_reader_body_missing": 0,
       "headline_body_from_title": 2,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 0,
+      "headline_duplicate_dropped": 1,
       "headline_soft_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
@@ -1890,25 +1889,24 @@
       "rendered_headline_only": 2
     },
     "global_affairs": {
-      "prefiltered": 26,
-      "hard_news_candidates": 26,
-      "hard_news_scored": 17,
-      "post_merge_scored": 14,
+      "prefiltered": 24,
+      "hard_news_candidates": 24,
+      "post_merge_scored": 20,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 4,
-      "source_quota_dropped": 0,
+      "headline_filled_from_non_hard_news": 0,
+      "source_quota_dropped": 1,
       "detailed_filled": 10,
       "headline_filled": 8,
-      "post_score_filtered": 14,
+      "post_score_filtered": 20,
       "headline_translated": 8,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 1,
-      "headline_body_from_title": 4,
+      "headline_reader_body_missing": 0,
+      "headline_body_from_title": 0,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 2,
+      "headline_duplicate_dropped": 1,
       "headline_soft_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
@@ -1917,12 +1915,11 @@
       "deduped_detailed": 0,
       "detailed_downgraded_to_headline_only": 1,
       "rendered_detailed": 9,
-      "rendered_headline_only": 6
+      "rendered_headline_only": 8
     },
     "technology": {
-      "prefiltered": 22,
-      "hard_news_candidates": 22,
-      "hard_news_scored": 3,
+      "prefiltered": 20,
+      "hard_news_candidates": 20,
       "post_merge_scored": 3,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
@@ -1938,51 +1935,49 @@
       "headline_body_from_title": 2,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
+      "headline_duplicate_dropped": 0,
+      "headline_soft_dropped": 0,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
+      "detailed_fallback_failed": 0,
+      "fill_added": 2,
+      "deduped_detailed": 2,
+      "rendered_detailed": 3,
+      "rendered_headline_only": 2
+    },
+    "us_politics": {
+      "prefiltered": 21,
+      "hard_news_candidates": 21,
+      "post_merge_scored": 6,
+      "detailed_filled_from_low_score": 1,
+      "headline_filled_from_low_score": 0,
+      "headline_filled_from_non_hard_news": 8,
+      "source_quota_dropped": 1,
+      "detailed_filled": 6,
+      "headline_filled": 8,
+      "post_score_filtered": 5,
+      "headline_translated": 8,
+      "headline_translation_failed": 0,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 2,
+      "headline_body_from_title": 6,
+      "headline_opinion_dropped": 1,
+      "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 2,
       "headline_soft_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 3,
+      "fill_added": 0,
       "deduped_detailed": 0,
-      "detailed_downgraded_to_headline_only": 3,
-      "rendered_detailed": 2,
-      "rendered_headline_only": 3
-    },
-    "us_politics": {
-      "prefiltered": 21,
-      "hard_news_candidates": 21,
-      "hard_news_scored": 5,
-      "post_merge_scored": 4,
-      "detailed_filled_from_low_score": 1,
-      "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 8,
-      "source_quota_dropped": 0,
-      "detailed_filled": 4,
-      "headline_filled": 8,
-      "post_score_filtered": 3,
-      "headline_translated": 8,
-      "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 1,
-      "headline_reader_body_missing": 2,
-      "headline_body_from_title": 6,
-      "headline_opinion_dropped": 1,
-      "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 1,
-      "headline_soft_dropped": 0,
-      "detailed_translation_failed": 0,
-      "detailed_fallback_added": 0,
-      "detailed_fallback_failed": 0,
-      "fill_added": 1,
-      "deduped_detailed": 1,
-      "rendered_detailed": 3,
+      "rendered_detailed": 4,
       "rendered_headline_only": 3
     }
   },
   "ai": {
     "score_errors": 0,
     "digest_failures": {},
-    "score_duration_seconds": 323.1
+    "score_duration_seconds": 0
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -1991,58 +1986,56 @@
         "2026-09-16",
         "2026-09-17"
       ],
-      "kept": 86,
+      "kept": 78,
       "dropped": 0,
       "dropped_by_column": {}
     },
-    "scored_events": {
-      "total": 36,
+    "report_events_reuse": {
+      "total": 42,
       "freshness_ratio": 1.0,
-      "today_count": 36,
+      "today_count": 42,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 36
+        "today": 42
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 36,
+      "fresh_after_gate": 42,
       "gate_failed": false
     },
     "before_render": {
-      "total": 36,
+      "total": 42,
       "freshness_ratio": 1.0,
-      "today_count": 36,
+      "today_count": 42,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 36
+        "today": 42
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 36,
+      "fresh_after_gate": 42,
       "gate_failed": false
     }
   },
   "candidate_pool": {
-    "upserted": 86,
-    "total": 86
+    "upserted": 78,
+    "total": 78
   },
-  "routine_notice_dropped": 0,
-  "low_newsworthiness_dropped": 8,
   "report_events": {
-    "upserted": 36,
-    "hard_news": 36
+    "reused": 42,
+    "source": "report_events"
   },
   "freshness_ratio": 1.0,
-  "today_count": 36,
+  "today_count": 42,
   "old_count": 0,
   "unknown_date_count": 0,
-  "events_merged_duplicates": 11,
+  "events_merged_duplicates": 9,
   "content_audit": {
     "duplicate_titles": 0,
     "old_body_dates": 0,
@@ -2055,15 +2048,21 @@
   },
   "candidates_archive": "docs/news/candidates/2026-09-17",
   "rejections": {
-    "low_newsworthiness": 8,
-    "duplicate_event": 17,
-    "unreadable_body": 5,
-    "cryptic_title": 1,
+    "duplicate_event": 15,
+    "source_quota": 2,
+    "unreadable_body": 3,
     "opinion_piece": 1
+  },
+  "lead": {
+    "column": "us_politics",
+    "title": "艾奥瓦州共和党众议员投票限制对伊动武权限",
+    "body": "9 月 16 日，据美联社报道，艾奥瓦州共和党联邦众议员在摇摆选区投票，支持限制特朗普继续对伊朗战争的能力。这些议员所在选区属于选情胶着的众议院选区。",
+    "score": null,
+    "newsworthiness": null
   },
   "report": {
     "title": "2026年9月17日 日报",
     "published_at": "2026-09-17T07:45:00+08:00",
-    "duration_seconds": 79.6
+    "duration_seconds": 78.6
   }
 }
