@@ -901,10 +901,16 @@ def _merge_event_group(group: list[dict], event_key: str) -> dict:
         link = item.get("link", "")
         if link and link not in seen_links:
             seen_links.add(link)
-            source_links.append({
+            link_entry = {
                 "title": item.get("title", ""),
                 "url": link,
-            })
+            }
+            source_name = str(item.get("source") or "")
+            if "Google News" in source_name:
+                link_entry["via"] = "Google News"
+            elif "AIHOT" in source_name:
+                link_entry["via"] = "AIHOT"
+            source_links.append(link_entry)
         summary = (item.get("summary") or "").strip()
         content = (item.get("content") or "").strip()
         evidence_parts = []
@@ -915,6 +921,9 @@ def _merge_event_group(group: list[dict], event_key: str) -> dict:
         evidence = "\n".join(evidence_parts).strip()
         if evidence and evidence not in evidence_blocks:
             evidence_blocks.append(evidence)
+
+    if source_links:
+        source_links[0]["primary"] = True
 
     all_tags: list[str] = []
     seen_tags: set[str] = set()

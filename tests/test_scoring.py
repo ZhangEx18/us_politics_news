@@ -590,3 +590,34 @@ def test_translate_headline_titles_preserves_positions_with_empty_titles(monkeyp
     # 空标题不应进入请求
     assert "Hegseth" in captured["prompt"]
     assert captured["prompt"].count('""') == 0
+
+
+# ── P0-3: 来源模型（via / primary） ──
+
+
+def test_merge_events_marks_primary_and_aggregator_via():
+    items = [
+        {
+            "link": "https://example.com/gnews",
+            "title": "Story via aggregator",
+            "source": "Google News - Reuters Politics",
+            "score": 85,
+            "summary": "聚合来源。",
+            "event_key": "story_20260917",
+        },
+        {
+            "link": "https://example.com/original",
+            "title": "Same story original",
+            "source": "Reuters",
+            "score": 80,
+            "summary": "原始来源。",
+            "event_key": "story_20260917",
+        },
+    ]
+
+    merged = merge_events(items)
+
+    links = merged[0]["source_links"]
+    assert links[0]["primary"] is True
+    via_entries = [link for link in links if "via" in link]
+    assert via_entries and via_entries[0]["via"] == "Google News"
