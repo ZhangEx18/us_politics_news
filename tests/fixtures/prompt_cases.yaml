@@ -97,7 +97,7 @@ cases:
 
   - id: fallback_short_summary
     type: fallback
-    description: 短摘要兜底必须中文、含日期、50-120 字
+    description: 短摘要兜底必须中文、含日期、40-160 字（对齐 quality_gate.min_chars）
     input:
       entries:
         - link: https://example.com/fallback
@@ -106,7 +106,7 @@ cases:
           source: PBS NewsHour
           event_date: "2026-09-16"
     expect:
-      min_chars: 50
+      min_chars: 40
       max_chars: 160
       must_have_date: true
       no_latin_ratio: 0.05
