@@ -1,16 +1,224 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>观察日报</title>
-    <link>.</link>
-    <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
-    <language>zh-cn</language>
-    <lastBuildDate>Wed, 16 Sep 2026 21:34:59 +0800</lastBuildDate>
-    <item>
-      <title>2026年9月16日 日报</title>
-      <link>news/daily/2026-09-16.html?v=ae8ff26a4814</link>
-      <description><![CDATA[]]></description>
-      <content:encoded><![CDATA[<article>
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年9月16日 日报 — 2026-09-16</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年9月16日 日报</h1>
+<div class='date'>2026-09-16</div>
+</header>
+<div class='highlights'>
 <h2>今日要点</h2>
 <ul>
 <li>特朗普特使促白俄罗斯释放 25 名政治犯 美方相应放松制裁</li>
@@ -22,48 +230,67 @@
 <li>消息人士称美国官员上周末在阿曼会见胡塞武装</li>
 <li>特朗普政府对南非实施新制裁 称涉歧视白人</li>
 </ul>
-<h2>一、美国政局</h2>
-<ul>
+</div>
+<h2> 一、美国政局</h2>
+<ul class='headline-list'>
 <li>众议院第 22 号法案：SAVE 法案</li>
 <li>【财新网】 随着通胀担忧升温，政府和企业融资需求持续膨胀，美国 10 年期国债收益率于 9 月 14 日升破 5%，一度上行至 5.01%。</li>
 <li>【财新网】 当地时间 9 月 14 日，美国国防部监察长发布了一份关于伊朗战争的特别报告，首次对美军在美伊战争中的装备和设施损失状况进行了正式统计。</li>
 <li>【财新网】 当地时间 9 月 14 日，英国苏格兰、威尔士和北爱尔兰三个地区的地区政府首席部长在威尔士首府卡迪夫举行罕见会晤。</li>
 </ul>
-<h2>二、国际局势</h2>
+<h2> 二、国际局势</h2>
+<div class='event'>
 <h3>1. 特朗普特使促白俄罗斯释放 25 名政治犯 美方相应放松制裁</h3>
 <p>9 月 16 日，路透社报道称，特朗普特使促成白俄罗斯释放 25 名政治犯，美方相应放松部分制裁。同一事件的另一来源标题显示，白俄罗斯以释放这 25 人换取美国放宽制裁，相关内容由特朗普特使对外说明。这一交换把此前以制裁和拘押相互施压的状态，转为人员释放与制裁松动同步推进的安排，直接受影响的是被释放人员及其家属，以及需要重新评估合规风险的对白俄罗斯业务方。输入材料未提供释放时间表与被放松制裁的具体清单。</p>
+</div>
+<div class='event'>
 <h3>2. 美国司法部指控俄罗斯试图在美欧暗杀乌克兰盟友</h3>
 <p>9 月 16 日，英国广播公司报道称，美国司法部指控俄罗斯试图在美国和欧洲暗杀乌克兰盟友。该报道只提供了指控方向，未列出涉案人员、具体国家或案件编号。这一指控以美国司法部名义提出，指向的是俄罗斯针对乌方支持者的行动，而非一般性的情报表述，因此直接牵动在美、在欧洲活动的乌克兰相关人士的安保安排，并把美俄之间的对抗延伸到司法指控层面。报道未提及俄方回应，也未说明是否已进入起诉程序。</p>
+</div>
+<div class='event'>
 <h3>3. 报道称美中就关税让步磋商 以延长现有贸易休战</h3>
 <p>9 月 16 日，彭博社报道称，中国与美国正讨论关税让步，目标是延长现行的贸易休战安排。报道只提到双方在讨论让步选项，未披露涉及的具体税目、幅度或时间表，讨论指向的是延长既有休战而非新增措施。若磋商落地，直接受影响的是两国进出口企业、跨境供应链以及被现行关税覆盖的商品；目前信息来自单一媒体报道，双方在输入材料中均未公布谈判细节或结果。</p>
+</div>
+<div class='event'>
 <h3>4. 消息人士称美国官员上周末在阿曼会见胡塞武装</h3>
 <p>9 月 16 日，路透社援引消息人士的话报道称，美国官员上周末在阿曼与伊朗支持的胡塞武装方面会面。报道未说明会谈议题、参与层级，也未说明是否达成任何安排。此次接触发生在阿曼这一第三方地点，接触方分别是美国官员与胡塞武装方面，涉及的是也门局势与红海方向的安全安排，以及与伊朗相关的沟通渠道。消息人士的说法尚未得到官方确认，会谈成果在输入材料中没有进一步信息。</p>
+</div>
+<div class='event'>
 <h3>5. 特朗普政府对南非实施新制裁 称涉歧视白人</h3>
 <p>9 月 16 日，美联社报道称，特朗普政府对南非实施新制裁，理由是指其涉嫌歧视白人。报道未列出具体制裁对象、措施种类与生效时间。此次行动以制裁形式落地，针对的是一国政府层面的政策争议，直接受影响的是南非政府及相关机构与美南双边往来；南非方面在输入材料中尚未作出回应，制裁清单与后续执行方式也没有进一步信息。</p>
+</div>
+<div class='event'>
 <h3>6. 俄无人机在乌克兰击中客车 致 5 人死亡至少 7 人受伤</h3>
 <p>9 月 16 日，美国广播公司新闻报道称，俄罗斯无人机在乌克兰击中一辆客车，造成 5 人死亡、至少 7 人受伤；半岛电视台的报道称袭击发生在前线附近。此次打击对象是一辆客车，而非军事设施或阵地。直接受影响的是前线周边地区的平民出行与人员流动，伤亡规模也构成近期单次袭击中较集中的一次；输入材料未提供袭击的具体地点、时间细节以及相关方回应。</p>
+</div>
+<div class='event'>
 <h3>7. 南苏丹任命新选举委员会主席 筹备 12 月选举</h3>
 <p>9 月 16 日，路透社报道称，南苏丹任命了新的选举委员会主席，为 12 月举行的选举做准备。输入材料只提供了任命与选举月份两项信息，未披露新任主席姓名、任命程序或投票的具体日期。选举委员会负责组织投票与选民登记，新主席到位后，选举筹备工作由该机构主导推进，直接影响 12 月投票的筹备进度与各参选方的登记安排；南苏丹此前的选举筹备情况在输入材料中没有说明。</p>
+</div>
+<div class='event'>
 <h3>8. 泰国在拟议通话前推动与美国达成贸易协议</h3>
 <p>9 月 16 日，泰国《民族报》报道称，泰国正推动与美国达成贸易协议，时点选在拟议中的 9 月 17 日或 18 日通话之前，报道提到 12.5% 的关税。输入材料未说明该税率的适用范围、协议涉及的商品或通话是否已最终确认。磋商推进与否，直接关系到泰国对美出口企业与其所在产业链的成本安排；通话日期目前仍属拟议安排，双方结果尚未在输入材料中公布。</p>
-<ul>
+</div>
+<ul class='headline-list'>
 <li>泽连斯基称中东战事为优先，削弱乌克兰防御优势。</li>
 <li>波兰国防官员警告俄罗斯正加强对北约的侵略。</li>
 <li>北约据报将取消空中警务，转而实施常设防御计划 12000。</li>
 <li>USTR 格里尔就欧盟宣布对美报复性关税发表声明批评欧盟，系 2025 年 3 月旧闻回溯。</li>
 <li>USTR 格里尔与中方副总理何立峰举行视频 introductory 会晤，交流中美经贸议题，系 2025 年 3 月旧闻。</li>
 </ul>
-<h2>三、科技前沿</h2>
+<h2> 三、科技前沿</h2>
+<div class='event'>
 <h3>1. Meta 据报计划 2027 年部署自研 AI 芯片 MTIA 450 Arke</h3>
 <p>9 月 16 日，qz.com 与 Pulse 2.0 的报道显示，Meta 计划在 2027 年部署新一代自研 AI 芯片 MTIA 450 Arke，并以该芯片削减 AI 相关成本。此前 Meta 的 AI 算力主要依靠对外采购，此次把降本节点明确落在 2027 年的自研芯片部署上。若按报道推进，变化将集中在 Meta 的 AI 基础设施支出与自研芯片进度；两家媒体均未披露节省金额、芯片规格与量产安排，表述指向计划而非已完成部署。</p>
+</div>
+<div class='event'>
 <h3>2. 微软承诺为学生制定全面 AI 隐私规则</h3>
 <p>9 月 16 日，美国媒体 Sentinel Colorado 报道称，微软承诺为学生制定全面的 AI 隐私规则。该报道把这一承诺放在科技公司如何处理学生数据的议题下，并直接提出其他科技巨头是否会跟进。按报道所述，受影响的一方是使用 AI 工具的学生与学校，另一方是被点名比较的其他科技公司；报道未给出规则文本、生效时间与适用范围。</p>
-<h2>四、经济走势</h2>
+</div>
+<h2> 四、经济走势</h2>
+<div class='event'>
 <h3>1. 冯德莱恩称欧盟将动用所有工具削减对华贸易逆差</h3>
 <p>9 月 16 日，路透社报道称，欧盟委员会主席冯德莱恩表示，欧盟将动用所有工具削减对华贸易逆差。报道没有列出具体工具、实施时间或涉及商品，因此目前能确认的是政策方向表态，而不是已出台的贸易措施。这一表态把削减对华贸易逆差与动用全部可用工具直接并列，具体政策工具仍待公布。后续若表态转为实际措施，中国出口企业、欧洲进口商以及中欧产业链相关行业将直接面对调整压力。</p>
-</article>]]></content:encoded>
-      <pubDate>Wed, 16 Sep 2026 07:45:00 +0800</pubDate>
-      <guid isPermaLink="false">news/daily/2026-09-16?v=ae8ff26a4814</guid>
-    </item>
-  </channel>
-</rss>
+</div>
+</body>
+</html>
