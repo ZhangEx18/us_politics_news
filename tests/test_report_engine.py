@@ -1643,7 +1643,12 @@ def test_select_lead_event_picks_top_newsworthiness():
         },
     }
 
-    lead = _select_lead_event(columns)
+    scored = [
+        {"title_zh": "普通事件", "score": 80, "newsworthiness": 0.6},
+        {"title_zh": "重大事件", "score": 88, "newsworthiness": 0.92},
+    ]
+
+    lead = _select_lead_event(columns, scored)
 
     assert lead is not None
     assert lead["title"] == "重大事件"
@@ -1703,3 +1708,26 @@ def test_summarize_rejections_aggregates_across_levels():
     assert summary["opinion_piece"] == 2
     assert summary["source_quota"] == 1
     assert summary["cryptic_title"] == 1
+
+
+def test_translate_headline_compacts_body_fallback_title():
+    """翻译缺失时用正文压缩成短标题，不得整句正文当标题。"""
+    import asyncio
+    from unittest.mock import patch
+
+    long_body = "澳工党政府在兰比及退伍军人强烈反对后，放弃对退伍军人联合医疗服务设 5000 澳元上限的计划。"
+
+    with patch(
+        "report_engine.translate_headline_titles",
+        new=AsyncMock(return_value=[""]),
+    ):
+        normalized, metrics = asyncio.run(_translate_headline_only_by_column(
+            {"technology": [{"title": "Australia drops plan", "summary": long_body, "content": long_body}]},
+            {},
+        ))
+
+    items = normalized["technology"]
+    assert len(items) == 1
+    title = items[0]["title_zh"]
+    assert len(title) <= 23
+    assert title.endswith("…")
