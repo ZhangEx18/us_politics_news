@@ -1505,7 +1505,7 @@ def _normalize_headline_only_by_column(
         ]
 
         for item in items:
-            title_zh = _compact_headline_title(str(item.get("title_zh") or item.get("title") or "").strip())
+            title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
             if _looks_like_english_fragment(title_zh):
                 unreadable_dropped += 1
                 continue
@@ -1541,7 +1541,7 @@ def _normalize_headline_only_by_column(
 
             kept.append({
                 **item,
-                "title_zh": title_zh,
+                "title_zh": _compact_headline_title(title_zh),
                 "reader_body": reader_body,
             })
 
