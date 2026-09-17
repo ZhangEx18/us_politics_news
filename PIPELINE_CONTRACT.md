@@ -70,6 +70,19 @@ fetch → filter(freshness) → prefilter → score → select → digest → va
 | `via` | 聚合发现路径（Google News / AIHOT），正文不得提及 |
 | `selection_reason` | 必填，由评分维度合成（score/nw/stage/slot） |
 | `newsworthiness` | 服务端由五维加权推导（0.35/0.2/0.2/0.15/0.1） |
+| 评分关联 | 写作产物不带评分：按 event_key → 标题 → 来源链接（归一化去 query/尾斜杠）回填 |
+
+评分关联口径（lead 选择与归档共用）：
+
+- 命中优先级：`event_key` 精确 → `title_zh`/`title` 归一化 → `source_links`/`sources` URL 归一化。
+- lead 取全报关联成功事件中 `(newsworthiness, score)` 最大者，写入 `metrics.lead`。
+- 关联失败时 lead 回退到首栏首条，`score/newsworthiness` 留空（可观测为 null）。
+
+跨天去重口径：
+
+- 数据源：近两日（`report_date-2` 起）`report_events`（`quality_status=ok`）。
+- 命中键：`event_key` 精确 ∪ 来源链接归一化；命中即拒（`repeated_story`），不再进入写作。
+- 范围：事件身份级匹配（同一事件同一来源）；同一议题的新进展（stage=进展）不视为重复。
 
 ---
 
@@ -85,6 +98,7 @@ fetch → filter(freshness) → prefilter → score → select → digest → va
 | `cryptic_title` | 标题不可读 | 标题规则 |
 | `unreadable_body` | 正文不可用 | 正文缺失且无法回退 |
 | `duplicate_event` | 同事件重复 | 事件合并 + 跨栏/跨层去重 |
+| `repeated_story` | 跨天已上稿 | 近两日 `report_events` 命中（event_key 或来源链接归一化） |
 | `source_quota` | 来源配额 | 单源单栏 ≤30%、全报 ≤4 |
 | `date_out_of_window` | 日期越窗 | 正文日期门禁 |
 | `body_too_short` | 正文过短 | 字数门禁（<40 字） |
@@ -121,4 +135,5 @@ fetch → filter(freshness) → prefilter → score → select → digest → va
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
+| 1.1 | 2026-09-17 | 新增 `repeated_story` 拒绝原因、评分关联与跨天去重口径 |
 | 1.0 | 2026-09-17 | 首版：阶段契约、数据结构、拒绝枚举、授权边界、完成语义 |
