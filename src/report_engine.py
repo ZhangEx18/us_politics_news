@@ -582,6 +582,34 @@ def _normalize_event_title(title: str) -> str:
     return re.sub(r"[^0-9A-Za-z\u4e00-\u9fff]+", "", str(title or "")).lower()
 
 
+def _select_lead_event(columns: dict) -> dict | None:
+    """跨栏目选择当日头条：newsworthiness 优先，其次 score。"""
+    best: dict | None = None
+    best_key = (-1.0, -1.0)
+    for col_key in COLUMN_ORDER:
+        for event in columns.get(col_key, {}).get("detailed_events", []) or []:
+            newsworthiness = _to_float(event.get("newsworthiness"))
+            score = _to_float(event.get("score"))
+            key = (newsworthiness, score)
+            if key > best_key:
+                best_key = key
+                best = {
+                    "column": col_key,
+                    "title": str(event.get("title_zh") or event.get("title") or "").strip(),
+                    "body": str(event.get("reader_body") or event.get("core_facts") or "").strip(),
+                    "score": event.get("score"),
+                    "newsworthiness": event.get("newsworthiness"),
+                }
+    return best if best and best.get("title") else None
+
+
+def _to_float(value: object) -> float:
+    try:
+        return float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return -1.0
+
+
 def _selection_reason(event: dict, slot: str) -> str:
     """为归档记录生成可审计的选择理由。"""
     parts: list[str] = []
@@ -1877,9 +1905,13 @@ def build_report(
 
     # ── 保存报告 ──
     print(f"\n[保存] 生成文件...")
+    lead_event = _select_lead_event(columns) if spec.report_type == "daily" else None
+    if lead_event:
+        metrics["lead"] = lead_event
     meta = {
         "title": spec.title,
         "lead": "" if spec.report_type == "daily" else overview_payload.get("summary", ""),
+        "lead_event": lead_event,
         "highlights": highlights,
         "date": spec.report_key,
         "require_non_empty_columns": bool(

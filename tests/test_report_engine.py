@@ -1622,3 +1622,51 @@ def test_write_candidates_archive_creates_score_and_selection(tmp_path):
     assert score_payload["items"][0]["score"] == 88
     assert selection_payload["items"][0]["slot"] == "detailed"
     assert "score=88" in selection_payload["items"][0]["selection_reason"]
+
+
+# ── P1-4: lead 头条层 ──
+
+
+def test_select_lead_event_picks_top_newsworthiness():
+    from report_engine import _select_lead_event
+
+    columns = {
+        "us_politics": {
+            "detailed_events": [
+                {"title_zh": "普通事件", "reader_body": "正文", "score": 80, "newsworthiness": 0.6},
+            ],
+        },
+        "economy": {
+            "detailed_events": [
+                {"title_zh": "重大事件", "reader_body": "正文", "score": 88, "newsworthiness": 0.92},
+            ],
+        },
+    }
+
+    lead = _select_lead_event(columns)
+
+    assert lead is not None
+    assert lead["title"] == "重大事件"
+    assert lead["column"] == "economy"
+
+
+def test_daily_markdown_renders_lead_block():
+    from report_renderer import render_structured_markdown
+
+    meta = {
+        "title": "测试日报",
+        "highlights": ["要点一"],
+        "date": "2026-09-17",
+        "lead_event": {"title": "今日头条事件", "body": "9 月 17 日，头条正文。", "column": "us_politics"},
+    }
+    columns = {
+        "us_politics": {
+            "detailed_events": [{"title_zh": "今日头条事件", "reader_body": "9 月 17 日，头条正文。"}],
+            "headline_only_events": [],
+        }
+    }
+
+    markdown = render_structured_markdown(meta, columns, report_type="daily")
+
+    assert "## 今日头条" in markdown
+    assert "**今日头条事件**" in markdown
