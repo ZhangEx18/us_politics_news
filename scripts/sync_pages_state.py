@@ -203,6 +203,15 @@ def restore_published_history(
             restored_counts[f"{product_key}/{report_type}"] = count
             print(f"  [{product_key}] {report_type} 恢复: {count} 份")
 
+        # 恢复 product metrics（避免跨产品部署时被整目录同步删除）
+        metrics_path = f"{product_key}/metrics/latest.json"
+        if _copy_git_file(
+            branch_ref, metrics_path,
+            docs_dir / metrics_path,
+            git_runner=git_runner, repo_root=repo_root,
+        ):
+            print(f"  [{product_key}] metrics 恢复: 是")
+
         # news 兼容别名：恢复旧路径
         if product_cfg.get("legacy_aliases"):
             # 恢复顶层 feed.xml

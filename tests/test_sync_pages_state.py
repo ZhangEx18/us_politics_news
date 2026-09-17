@@ -60,6 +60,11 @@ def test_restore_published_history_recovers_product_feeds_and_files(tmp_path):
             ),
             ("cat-file", "-e", "origin/gh-pages:algorithms/daily/2026-06-18.html"): SimpleNamespace(returncode=0, stdout="", stderr=""),
             ("show", "origin/gh-pages:algorithms/daily/2026-06-18.html"): SimpleNamespace(returncode=0, stdout="algo lesson", stderr=""),
+            # product metrics
+            ("cat-file", "-e", "origin/gh-pages:news/metrics/latest.json"): SimpleNamespace(returncode=0, stdout="", stderr=""),
+            ("show", "origin/gh-pages:news/metrics/latest.json"): SimpleNamespace(returncode=0, stdout='{"report_key": "2026-06-18"}', stderr=""),
+            ("cat-file", "-e", "origin/gh-pages:algorithms/metrics/latest.json"): SimpleNamespace(returncode=0, stdout="", stderr=""),
+            ("show", "origin/gh-pages:algorithms/metrics/latest.json"): SimpleNamespace(returncode=0, stdout='{"report_key": "2026-06-18"}', stderr=""),
             # legacy feed
             ("cat-file", "-e", "origin/gh-pages:feed.xml"): SimpleNamespace(returncode=0, stdout="", stderr=""),
             ("show", "origin/gh-pages:feed.xml"): SimpleNamespace(returncode=0, stdout="<rss legacy />", stderr=""),
@@ -89,6 +94,7 @@ def test_restore_published_history_recovers_product_feeds_and_files(tmp_path):
     assert (docs_dir / "feeds" / "news.xml").read_text(encoding="utf-8") == "<rss news />"
     assert (docs_dir / "feeds" / "algorithms.xml").read_text(encoding="utf-8") == "<rss algo />"
     # canonical paths
+    assert (docs_dir / "news" / "metrics" / "latest.json").read_text(encoding="utf-8") == '{"report_key": "2026-06-18"}'
     assert (docs_dir / "news" / "daily" / "2026-06-18.html").read_text(encoding="utf-8") == "canonical daily"
     assert (docs_dir / "algorithms" / "daily" / "2026-06-18.html").read_text(encoding="utf-8") == "algo lesson"
     # legacy
