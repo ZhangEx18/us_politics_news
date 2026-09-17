@@ -1904,3 +1904,20 @@ def test_headline_normalize_keeps_distinct_same_subject_news():
     normalized, _ = _normalize_headline_only_by_column(columns, detailed_events=detailed)
 
     assert [item["title_zh"] for item in normalized["economy"]] == ["美联储加息 25 个基点"]
+
+
+def test_audit_ignores_compacted_title_marker_when_body_displayed():
+    from report_engine import _audit_daily_content
+
+    columns = {
+        "us_politics": {
+            "detailed_events": [],
+            "headline_only_events": [
+                {"title_zh": "美联储发布声明并就利率路径作出说明…", "reader_body": "美联储发布声明，就利率路径作出说明。"},
+            ],
+        }
+    }
+
+    metrics = _audit_daily_content(columns, allowed_dates=None, body_date_year=None)
+
+    assert metrics["truncated_titles"] == 0
