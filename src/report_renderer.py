@@ -428,6 +428,15 @@ footer {
         "</header>",
     ]
 
+    lead_event = meta.get("lead_event") or {}
+    if report_type == "daily" and lead_event.get("title"):
+        html.append("<div class='lead-event'>")
+        html.append("<h2>今日头条</h2>")
+        html.append(f"<h3>{_html_text(lead_event.get('title', ''))}</h3>")
+        if lead_event.get("body"):
+            html.append(f"<p>{_html_text(lead_event.get('body', ''))}</p>")
+        html.append("</div>")
+
     if highlights:
         html.append("<div class='highlights'>")
         html.append("<h2>今日要点</h2>")
@@ -670,6 +679,16 @@ def render_structured_markdown(
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
 
     lines: list[str] = [_frontmatter(title, lead, highlights, date), ""]
+
+    lead_event = meta.get("lead_event") or {}
+    if report_type == "daily" and lead_event.get("title"):
+        lines.append("## 今日头条")
+        lines.append("")
+        lines.append(f"**{_markdown_text(lead_event.get('title', ''))}**")
+        lines.append("")
+        if lead_event.get("body"):
+            lines.append(_markdown_text(lead_event.get("body", "")))
+            lines.append("")
 
     if report_type == "daily" and highlights:
         lines.append("## 今日要点")

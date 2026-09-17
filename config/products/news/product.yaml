@@ -31,6 +31,8 @@ schedule:
     publish_at: "07:45"
 digest:
   language: zh
+  priority_limits:
+    lead: 1
   column:
     target_word_count_min: 2500
     target_word_count: 3500
