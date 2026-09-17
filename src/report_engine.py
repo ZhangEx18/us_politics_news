@@ -6,11 +6,13 @@ ReportSpec 定义报告类型差异，build_report() 执行共享阶段。
 """
 
 import asyncio
+import json
 import re
 from difflib import SequenceMatcher
 from dataclasses import dataclass, field
 from functools import lru_cache
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from ai_analyzer import (
@@ -578,6 +580,78 @@ def _dedupe_daily_column_events(
 
 def _normalize_event_title(title: str) -> str:
     return re.sub(r"[^0-9A-Za-z\u4e00-\u9fff]+", "", str(title or "")).lower()
+
+
+def _selection_reason(event: dict, slot: str) -> str:
+    """为归档记录生成可审计的选择理由。"""
+    parts: list[str] = []
+    score = event.get("score")
+    if score is not None:
+        parts.append(f"score={score}")
+    newsworthiness = event.get("newsworthiness")
+    if newsworthiness not in (None, ""):
+        parts.append(f"nw={newsworthiness}")
+    stage = str(event.get("event_stage") or "").strip()
+    if stage:
+        parts.append(f"stage={stage}")
+    parts.append(f"slot={slot}")
+    return ", ".join(parts)
+
+
+def _write_candidates_archive(spec, scored_events: list[dict], columns: dict) -> str:
+    """归档评分与选择结果到 {site_root}/candidates/{report_key}/，便于复盘与回归。"""
+    base_dir = Path(spec.output_dir).parent / "candidates" / spec.report_key
+    base_dir.mkdir(parents=True, exist_ok=True)
+    coverage = {"start": spec.since.isoformat(), "end": spec.until.isoformat()}
+
+    score_items = []
+    for entry in scored_events:
+        score_items.append({
+            "candidate_id": str(entry.get("event_key") or entry.get("link") or ""),
+            "link": entry.get("link", ""),
+            "title": entry.get("title", ""),
+            "source": entry.get("source", ""),
+            "column": entry.get("column", ""),
+            "score": entry.get("score"),
+            "is_hard_news": bool(entry.get("is_hard_news")),
+            "newsworthiness": entry.get("newsworthiness"),
+            "routine": entry.get("routine"),
+            "event_key": entry.get("event_key", ""),
+        })
+    score_payload = {
+        "schemaVersion": 1,
+        "date": spec.report_key,
+        "coverage": coverage,
+        "items": score_items,
+    }
+
+    selection_items = []
+    for col_key, payload in columns.items():
+        for slot, key in (("detailed", "detailed_events"), ("headline", "headline_only_events")):
+            for event in payload.get(key, []) or []:
+                selection_items.append({
+                    "candidate_id": str(event.get("event_key") or event.get("title_zh") or event.get("title") or ""),
+                    "column": col_key,
+                    "slot": slot,
+                    "title_zh": event.get("title_zh", ""),
+                    "score": event.get("score"),
+                    "selection_reason": _selection_reason(event, slot),
+                    "sources": event.get("source_links", []),
+                })
+    selection_payload = {
+        "schemaVersion": 1,
+        "date": spec.report_key,
+        "coverage": coverage,
+        "items": selection_items,
+    }
+
+    (base_dir / "score.json").write_text(
+        json.dumps(score_payload, ensure_ascii=False, indent=2), encoding="utf-8",
+    )
+    (base_dir / "selection.json").write_text(
+        json.dumps(selection_payload, ensure_ascii=False, indent=2), encoding="utf-8",
+    )
+    return str(base_dir)
 
 
 def _audit_daily_content(
@@ -1738,6 +1812,11 @@ def build_report(
             gate_config.get("body_date_year"),
         )
         metrics["content_audit"] = content_audit
+        try:
+            archive_dir = _write_candidates_archive(spec, scored_events, columns)
+            metrics["candidates_archive"] = archive_dir
+        except Exception as exc:  # noqa: BLE001 - 归档失败不影响发布
+            print(f"   候选归档失败: {exc}")
         print(
             "   内容审计: "
             f"重复标题 {content_audit['duplicate_titles']}，"

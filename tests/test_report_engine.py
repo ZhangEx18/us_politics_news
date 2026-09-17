@@ -1578,3 +1578,46 @@ def test_normalize_headline_drops_opinion_variants_added():
     # “有何利害关系”命中观点规则被丢弃；“俄非关系…”为综述类，暂未覆盖（记录为残留）
     assert kept_titles == ["俄非关系：莫斯科在非洲影响力日益增强"]
     assert metrics["global_affairs"]["headline_opinion_dropped"] == 1
+
+
+# ── P0-2: 候选归档 ──
+
+
+def test_write_candidates_archive_creates_score_and_selection(tmp_path):
+    from pathlib import Path
+
+    from report_engine import _write_candidates_archive
+
+    spec = ReportSpec(
+        report_type="daily",
+        report_key="2026-09-17",
+        title="测试日报",
+        since=datetime(2026, 9, 16, 7, tzinfo=timezone.utc),
+        until=datetime(2026, 9, 17, 7, tzinfo=timezone.utc),
+        output_dir=str(tmp_path / "daily"),
+        feed_path=str(tmp_path / "feed.xml"),
+        base_url="",
+        column_quotas={},
+    )
+    scored = [{
+        "link": "https://example.com/a", "title": "A", "source": "S",
+        "column": "us_politics", "score": 88, "is_hard_news": True,
+        "newsworthiness": 0.9, "routine": 0.1, "event_key": "a_20260917",
+    }]
+    columns = {
+        "us_politics": {
+            "detailed_events": [{**scored[0], "title_zh": "标题", "source_links": []}],
+            "headline_only_events": [],
+        }
+    }
+
+    archive_dir = _write_candidates_archive(spec, scored, columns)
+
+    score_payload = json.loads((Path(archive_dir) / "score.json").read_text(encoding="utf-8"))
+    selection_payload = json.loads((Path(archive_dir) / "selection.json").read_text(encoding="utf-8"))
+
+    assert score_payload["date"] == "2026-09-17"
+    assert score_payload["coverage"]["start"].startswith("2026-09-16")
+    assert score_payload["items"][0]["score"] == 88
+    assert selection_payload["items"][0]["slot"] == "detailed"
+    assert "score=88" in selection_payload["items"][0]["selection_reason"]
