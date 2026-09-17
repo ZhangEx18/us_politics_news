@@ -754,6 +754,7 @@ def _audit_daily_content(
         "pipeline_leak": 0,
         "untranslated_terms": 0,
         "long_titles": 0,
+        "long_headline_bodies": 0,
     }
     allowed = set(allowed_dates or [])
 
@@ -763,6 +764,9 @@ def _audit_daily_content(
             headline_title = str(event.get("title_zh") or event.get("title") or "").strip()
             if len(headline_title) > 22:
                 metrics["long_titles"] += 1
+            headline_body = str(event.get("reader_body") or "").strip()
+            if len(headline_body) > 37:
+                metrics["long_headline_bodies"] = metrics.get("long_headline_bodies", 0) + 1
         for event in column.get("detailed_events", []):
             title = str(event.get("title_zh") or event.get("title") or "").strip()
             norm_title = _normalize_event_title(title)
@@ -1466,12 +1470,20 @@ def _body_needs_translation(item: dict) -> bool:
     return False
 
 
-def _compact_headline_title(text: str, limit: int = 22) -> str:
-    """要点标题压缩到 limit 字（超出以省略号结尾），避免长句标题。"""
+def _compact_headline_title(text: str, limit: int = 21) -> str:
+    """要点标题压缩到 limit 字（含省略号不超过 limit+1），避免长句标题。"""
     title = str(text or "").strip()
-    if len(title) <= limit:
+    if len(title) <= limit + 1:
         return title
     return title[:limit].rstrip(" ，,。；;:：") + "…"
+
+
+def _compact_headline_body(text: str, limit: int = 36) -> str:
+    """要点描述压缩到 limit 字（含省略号不超过 limit+1），避免整句过长。"""
+    body = re.sub(r"\s+", " ", str(text or "")).strip()
+    if len(body) <= limit + 1:
+        return body
+    return body[:limit].rstrip(" ，,。；;:：") + "…"
 
 
 def _merge_headline_metrics(column_metrics_map: dict, col_key: str, new_metrics: dict) -> None:
@@ -1542,7 +1554,7 @@ def _normalize_headline_only_by_column(
             kept.append({
                 **item,
                 "title_zh": _compact_headline_title(title_zh),
-                "reader_body": reader_body,
+                "reader_body": _compact_headline_body(reader_body),
             })
 
         normalized_columns[col_key] = kept
