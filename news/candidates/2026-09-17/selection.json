@@ -7,30 +7,12 @@
   },
   "items": [
     {
-      "candidate_id": "美国众议院通过对俄制裁法案",
+      "candidate_id": "EPA 部分废止电厂碳排放标准",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "美国众议院通过对俄制裁法案",
-      "score": 85,
-      "selection_reason": "score=85, nw=0.762, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "NPR Politics",
-          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
-        },
-        {
-          "title": "SCMP",
-          "url": "https://www.scmp.com/news/us/economy-trade-business/article/3367782/us-congress-passes-bill-targeting-russias-leading-energy-buyers-china-and-india?utm_source=rss_feed"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美国环保署部分废除电厂碳排放标准",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "美国环保署部分废除电厂碳排放标准",
-      "score": 80,
-      "selection_reason": "score=80, nw=0.685, stage=首发, slot=detailed",
+      "title_zh": "EPA 部分废止电厂碳排放标准",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.645, stage=首发, slot=detailed",
       "sources": [
         {
           "title": "Federal Register",
@@ -43,10 +25,52 @@
       ]
     },
     {
-      "candidate_id": "北卡参议院选战成民主党翻盘共和党席位最佳机会",
+      "candidate_id": "白宫发布政府采购对等原则备忘录",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "白宫发布政府采购对等原则备忘录",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.555, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "White House News",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-reciprocity-in-government-procurement/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "众议院提前一天休会",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "众议院提前一天休会",
+      "score": 66,
+      "selection_reason": "score=66, nw=0.6, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/news-wrap-johnson-recesses-house-early"
+        }
+      ]
+    },
+    {
+      "candidate_id": "伊朗战争近七个月改变民众日常生活",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "北卡参议院选战成民主党翻盘共和党席位最佳机会",
+      "title_zh": "伊朗战争近七个月改变民众日常生活",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/how-nearly-7-months-of-war-have-changed-daily-life-in-iran"
+        }
+      ]
+    },
+    {
+      "candidate_id": "北卡州参院选举成民主党翻盘共和党席位良机",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "北卡州参院选举成民主党翻盘共和党席位良机",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -57,10 +81,10 @@
       ]
     },
     {
-      "candidate_id": "美国国会通过对俄制裁法案",
+      "candidate_id": "美国会通过对俄制裁法案 印度称恐损害印美关系",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "美国国会通过对俄制裁法案",
+      "title_zh": "美国会通过对俄制裁法案 印度称恐损害印美关系",
       "score": 85,
       "selection_reason": "score=85, nw=0.795, stage=首发, slot=detailed",
       "sources": [
@@ -69,82 +93,30 @@
           "url": "https://www.dw.com/en/us-congress-passes-russia-sanctions-bill/a-79299088?maca=en-rss-en-all-1573-rdf"
         },
         {
-          "title": "France24",
-          "url": "http://www.france24.com/en/europe/20260917-live-explosions-kyiv-us-congress-sanctions-moscow"
+          "title": "NPR",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
+        },
+        {
+          "title": "南华早报",
+          "url": "https://www.scmp.com/news/us/economy-trade-business/article/3367782/us-congress-passes-bill-targeting-russias-leading-energy-buyers-china-and-india?utm_source=rss_feed"
         },
         {
           "title": "联合早报",
           "url": "https://www.zaobao.com/news/world/story20260917-9690931"
-        }
-      ]
-    },
-    {
-      "candidate_id": "特朗普政府筹备28亿美元对以军售",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "特朗普政府筹备28亿美元对以军售",
-      "score": 78,
-      "selection_reason": "score=78, nw=0.7, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "France24",
-          "url": "http://www.france24.com/en/middle-east-trump-plans-2-8bn-arms-package-for-israel-amid-gaza-war"
         },
         {
-          "title": "The Guardian",
-          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNeEIwVHNucWh6QzFJeDVwel8ybm9MTW1Tby15aDMzWG5LU0FITTIxMWJ1dEFEcENTZTd4VndqUVpEdGU2aDBQYXQ3MG9QR1J4ZkE3M3hGazk4MlVFYlVhMVo1akliV1hQTUJtNHJYdElIS3lqWnBEUTgwTGtnWkdzbTdWYWxCU1JE?oc=5"
+          "title": "半岛电视台",
+          "url": "https://www.aljazeera.com/news/2026/9/17/india-warns-new-us-tariffs-over-russian-oil-could-impact-ties?traffic_source=rss"
         }
       ]
     },
     {
-      "candidate_id": "加拿大申请加入英国联合远征军",
+      "candidate_id": "俄罗斯以导弹和无人机袭击乌克兰多地",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "加拿大申请加入英国联合远征军",
-      "score": 71,
-      "selection_reason": "score=71, nw=0.53, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "CBC News",
-          "url": "https://www.cbc.ca/news/politics/canada-britain-military-expeditionary-force-nato-9.7347144?cmp=rss"
-        }
-      ]
-    },
-    {
-      "candidate_id": "报告称俄招募朝鲜工人生产无人机",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "报告称俄招募朝鲜工人生产无人机",
-      "score": 71,
-      "selection_reason": "score=71, nw=0.635, stage=跟进, slot=detailed",
-      "sources": [
-        {
-          "title": "South China Morning Post",
-          "url": "https://www.scmp.com/news/asia/east-asia/article/3367833/russia-employs-north-koreans-build-drones-ukraine-war-report?utm_source=rss_feed"
-        }
-      ]
-    },
-    {
-      "candidate_id": "巴黎会谈商讨加强黎巴嫩军队",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "巴黎会谈商讨加强黎巴嫩军队",
-      "score": 70,
-      "selection_reason": "score=70, nw=0.56, stage=跟进, slot=detailed",
-      "sources": [
-        {
-          "title": "France24",
-          "url": "http://www.france24.com/en/middle-east/20260917-middle-east-live-paris-talks-lebanese-army-unifil-israel-iran-yemen"
-        }
-      ]
-    },
-    {
-      "candidate_id": "俄军空袭基辅敖德萨致数人受伤",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "俄军空袭基辅敖德萨致数人受伤",
-      "score": 70,
-      "selection_reason": "score=70, nw=0.565, stage=首发, slot=detailed",
+      "title_zh": "俄罗斯以导弹和无人机袭击乌克兰多地",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.67, stage=跟进, slot=detailed",
       "sources": [
         {
           "title": "DW News",
@@ -157,124 +129,141 @@
       ]
     },
     {
-      "candidate_id": "韩国研讨向霍尔木兹海峡派兵",
+      "candidate_id": "加拿大申请加入英国主导联合远征军",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "韩国研讨向霍尔木兹海峡派兵",
-      "score": 68,
-      "selection_reason": "score=68, nw=0.5, stage=跟进, slot=detailed",
+      "title_zh": "加拿大申请加入英国主导联合远征军",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.5, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "联合早报",
-          "url": "https://www.zaobao.com/news/world/story20260917-9690687"
+          "title": "CBC News",
+          "url": "https://www.cbc.ca/news/politics/canada-britain-military-expeditionary-force-nato-9.7347144?cmp=rss"
         }
       ]
     },
     {
-      "candidate_id": "us_sanctions_pa_20260917",
+      "candidate_id": "特朗普警告欧盟加拿大联盟 威胁对欧加税",
       "column": "global_affairs",
-      "slot": "headline",
-      "title_zh": "制裁巴勒斯坦权力机构官员及巴解组织成员",
-      "score": 68,
-      "selection_reason": "score=68, nw=0.575, stage=首发, slot=headline",
-      "sources": [
-        {
-          "title": "Sanctioning Officials of the Palestinian Authority and Members of the Palestine Liberation Organization",
-          "url": "https://www.state.gov/releases/office-of-the-spokesman/2026/09/sanctioning-officials-of-the-palestinian-authority-and-members-of-the-palestine-liberation-organization-2/",
-          "primary": true
-        }
-      ]
-    },
-    {
-      "candidate_id": "trump_gulf_leaders_meeting_20260917",
-      "column": "global_affairs",
-      "slot": "headline",
-      "title_zh": "特朗普将在联合国与海湾领导人谈伊朗战事",
-      "score": 66,
-      "selection_reason": "score=66, nw=0.58, stage=首发, slot=headline",
-      "sources": [
-        {
-          "title": "Trump to meet Gulf leaders at UN over Iran war, postwar strategy: Report",
-          "url": "https://timesofindia.indiatimes.com/world/us/trump-to-meet-gulf-leaders-at-un-over-iran-war-postwar-strategy-report/articleshow/134299857.cms",
-          "primary": true
-        }
-      ]
-    },
-    {
-      "candidate_id": "以色列借人工智能拆除约旦河西岸建筑",
-      "column": "global_affairs",
-      "slot": "headline",
-      "title_zh": "以色列借人工智能拆除约旦河西岸建筑",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
-      "sources": [
-        {
-          "title": "Al Jazeera",
-          "url": "https://www.aljazeera.com/news/2026/9/17/israel-weaponises-ai-for-west-bank-demolitions?traffic_source=rss"
-        }
-      ]
-    },
-    {
-      "candidate_id": "华为发布昇腾960超节点，AI芯片提前9个月",
-      "column": "technology",
       "slot": "detailed",
-      "title_zh": "华为发布昇腾960超节点，AI芯片提前9个月",
+      "title_zh": "特朗普警告欧盟加拿大联盟 威胁对欧加税",
       "score": 80,
-      "selection_reason": "score=80, nw=0.67, stage=首发, slot=detailed",
+      "selection_reason": "score=80, nw=0.745, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "华尔街见闻",
-          "url": "https://wallstreetcn.com/articles/3781977"
+          "title": "财新国际",
+          "url": "https://international.caixin.com/2026-09-17/102485741.html"
         }
       ]
     },
     {
-      "candidate_id": "美联储加息 25 个基点，自 2023 年以来首次",
-      "column": "economy",
+      "candidate_id": "特朗普将在联合国会晤海湾国家领导人",
+      "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "美联储加息 25 个基点，自 2023 年以来首次",
-      "score": 85,
-      "selection_reason": "score=85, nw=0.767, stage=首发, slot=detailed",
+      "title_zh": "特朗普将在联合国会晤海湾国家领导人",
+      "score": 71,
+      "selection_reason": "score=71, nw=0.58, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "Live Updates: Fed Raises Interest Rates to Fight Inflation, at Odds With Trump - The New York Times",
-          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQM2stY3BUc2U1Z0tFTDJIOWNLMlBTaFh3TUN0bTZ0REtxZnJGVDlFSjdEUjZuYmE3UnBkb2NtTC1UeFlPa2o0Uk9NdXZCX01GN0ZNMnFNTEhQa0l6eFYxMU9fdlVxWmhCdDZwdl9lUXRBWWo1SU9tZ3d1S0NfNEhNdjBVOGZOSDdi?oc=5"
+          "title": "The Times of India",
+          "url": "https://timesofindia.indiatimes.com/world/us/trump-to-meet-gulf-leaders-at-un-over-iran-war-postwar-strategy-report/articleshow/134299857.cms"
+        }
+      ]
+    },
+    {
+      "candidate_id": "israel_ai_west_bank_demolitions_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "以色列将人工智能武器化用于约旦河西岸拆除",
+      "score": 65,
+      "selection_reason": "score=65, nw=0.56, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Israel weaponises AI for West Bank demolitions",
+          "url": "https://www.aljazeera.com/news/2026/9/17/israel-weaponises-ai-for-west-bank-demolitions?traffic_source=rss",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "australia_migration_crackdown_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "澳大利亚政府宣布收紧移民，目标2028年净…",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.63, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "International students, 'visa hoppers' and backpackers targeted in Australia migration crackdown",
+          "url": "https://www.bbc.co.uk/news/articles/cm986j81ky55o?at_medium=RSS&at_campaign=rss",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "lebanon_security_talks_paris_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "欧洲与阿拉伯军方首脑在巴黎会商，讨论在联黎…",
+      "score": 73,
+      "selection_reason": "score=73, nw=0.59, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Middle East live: Paris talks aim to bolster Lebanese army as end of UN mission looms",
+          "url": "http://www.france24.com/en/middle-east/20260917-middle-east-live-paris-talks-lebanese-army-unifil-israel-iran-yemen",
+          "primary": true
         },
         {
-          "title": "Fed raises interest rates by quarter point to tackle inflation - The Washington Post",
+          "title": "Lebanon: Macron, Aoun and King Abdullah II hold security talks in Paris",
+          "url": "http://www.france24.com/en/lebanon-macron-aoun-and-king-abdullah-ii-hold-security-talks-in-paris"
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI 发布模型错位披露框架",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "OpenAI 发布模型错位披露框架",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.63, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "AIHOT - AI 资讯精选",
+          "url": "https://aihot.news/items/cmu58anil0324ro8tawwelc4v"
+        },
+        {
+          "title": "卫报",
+          "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOU2xHb1VzUHk1ZUZJTWhQOXdsM0RKOXduMDI2a29fN3RmTFhTX3VIVGdyZmhaQWZsWTJzbG9hZUkwVGhrMGNiMTh6VjEwNWp4SlJSR1hsMTYxUXFOSDdDZDlJUWxza1NQZi1XbzRRd1RuYUloRHV4OHhYVDRnS1BkaGJWYTk5T0JjRzBDeGpqMFhRWjZLOEtPeUY0blRTSEtabTNoTDJJRUtqSzE5M3FCZHZaTElWVVhOaGZOT09GNHM?oc=5"
+        },
+        {
+          "title": "美国国家公共电台",
+          "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5wenVuMHkxd2dIMl9kOUdPblJhbUFSeWgxUWoxS21fOUdHNHZHbGVhMEVvUnJVMC1Wa1hFd0x5RlRSUFhpSXYtSzFCUE96bUNFUW9EMTN3OVQ3ZkRKX0gwSW8zOFBNR0FIMVFVT09ndktOWE8zTi1EcDdOOUM?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美联储加息25个基点，为2023年以来首次",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美联储加息25个基点，为2023年以来首次",
+      "score": 83,
+      "selection_reason": "score=83, nw=0.74, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "华盛顿邮报",
           "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxORFVoeUNBMTNYV2tDbGpKekd3Y3l6RGJLM0JrekZhRElkQjI0OFFsNmFCUzNUTk5ndUFWQkstdGZfeFVDdDZPUVQ0NEpkTjBQQk54VDh0dTNrQmE3MF9Rb2xBV2NLTUF5LUlsb19rMmU3MHNEOFdzbVhVQzFDQkJobmY0REljQ2R2cFR0LTFiZ2hYcDI4NkpKZkNuOGxlWEtZNVNB?oc=5"
         },
         {
-          "title": "US Fed raises interest rates for first time since 2023 as inflation stays high - Gulf Business",
+          "title": "纽约时报",
+          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQM2stY3BUc2U1Z0tFTDJIOWNLMlBTaFh3TUN0bTZ0REtxZnJGVDlFSjdEUjZuYmE3UnBkb2NtTC1UeFlPa2o0Uk9NdXZCX01GN0ZNMnFNTEhQa0l6eFYxMU9fdlVxWmhCdDZwdl9lUXRBWWo1SU9tZ3d1S0NfNEhNdjBVOGZOSDdi?oc=5"
+        },
+        {
+          "title": "Gulf Business",
           "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOZGx1LXRCTWs0Ym5rbERMTVVId3VtQUJHVXpZeFY1UE9TdEI1MTdORTIyc2E5RHBuQ0F4ODZ3dHIyTW5hbFNHeU5oN0ZTSG1oZV9yS2dpZWRiNFV5VGlBVm0zbzBHUmRIMXNHQjdTcjRoVlNScHBrc1Jaak9jbFk2cElyQ09MMTBjS1FsRjJsX0RLY0cxVC1GZ2hWREVmbzVCaGs1ekl6cGUtZlNFTFRyMGJjQzlhdjBIZW90NQ?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "特朗普签署联邦采购对等互惠备忘录",
-      "column": "economy",
-      "slot": "detailed",
-      "title_zh": "特朗普签署联邦采购对等互惠备忘录",
-      "score": 71,
-      "selection_reason": "score=71, nw=0.625, stage=首发, slot=detailed",
-      "sources": [
+        },
         {
-          "title": "Restoring Reciprocity in Government Procurement",
-          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-reciprocity-in-government-procurement/"
-        }
-      ]
-    },
-    {
-      "candidate_id": "塞汉特：美国城市未衰亡 财富倍增买家涌向多州",
-      "column": "economy",
-      "slot": "headline",
-      "title_zh": "塞汉特：美国城市未衰亡 财富倍增买家涌向多州",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
-      "sources": [
-        {
-          "title": "Fortune",
-          "url": "https://fortune.com/2026/09/17/ryan-serhant-american-city-isnt-dying-wealth-is-multiplying-buyers-flocking-to-ohio-alabama-carolinas/"
+          "title": "36氪",
+          "url": "https://www.36kr.com/p/3986735004892164"
         }
       ]
     }
