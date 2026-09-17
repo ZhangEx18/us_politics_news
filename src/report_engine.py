@@ -668,11 +668,16 @@ def _audit_daily_content(
         "meta_commentary": 0,
         "pipeline_leak": 0,
         "untranslated_terms": 0,
+        "long_titles": 0,
     }
     allowed = set(allowed_dates or [])
 
     for column in columns.values():
         seen_titles: list[str] = []
+        for event in column.get("headline_only_events", []) or []:
+            headline_title = str(event.get("title_zh") or event.get("title") or "").strip()
+            if len(headline_title) > 22:
+                metrics["long_titles"] += 1
         for event in column.get("detailed_events", []):
             title = str(event.get("title_zh") or event.get("title") or "").strip()
             norm_title = _normalize_event_title(title)
@@ -685,6 +690,8 @@ def _audit_daily_content(
                 seen_titles.append(norm_title)
             if title.endswith(("承", "垄")) or "…" in title or "..." in title:
                 metrics["truncated_titles"] += 1
+            if len(title) > 26:
+                metrics["long_titles"] += 1
 
             body = str(event.get("reader_body") or event.get("core_facts") or "").strip()
             first_date = _first_body_date(body, body_date_year)

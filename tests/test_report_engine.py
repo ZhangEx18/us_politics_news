@@ -220,6 +220,7 @@ def test_audit_daily_content_counts_common_content_problems():
         "meta_commentary": 0,
         "pipeline_leak": 0,
         "untranslated_terms": 0,
+        "long_titles": 2,
     }
 
 
