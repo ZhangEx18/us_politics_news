@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年9月18日 日报 — 2026-09-18</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年9月18日 日报</h1>
+<div class='date'>2026-09-18</div>
+</header>
+<div class='lead-event'>
+<h2>今日头条</h2>
+<h3>特朗普称将就伊朗战事作出重大决定</h3>
+<p>9 月 17 日，美国总统特朗普称伊朗战事已进入关键阶段。据联合早报报道，特朗普正权衡是否重新对伊朗发动大规模打击。</p>
+</div>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>FTC 对安利采取行动，和解金 2.25 亿美元</li>
+<li>美国批准向沙特出售 48 架 F-35 战机</li>
+<li>纽约时报诉 OpenAI 案未删节文件解封</li>
+<li>美国国会通过对俄能源买家加税法案</li>
+<li>白宫撤回施罗耶 ICE 局长提名</li>
+<li>特朗普称将就伊朗战事作出重大决定</li>
+<li>联合国联合谷歌改造全球发展数据</li>
+<li>ICE 官员因枪击委内瑞拉移民出庭</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. FTC 对安利采取行动，和解金 2.25 亿美元</h3>
+<p>9 月 17 日，美国联邦贸易委员会（FTC）对多层次营销企业安利及其两家关联公司采取执法行动。FTC 称，上述公司将支付 2.25 亿美元，了结有关不公平与欺骗性商业行为的指控。</p>
+</div>
+<div class='event'>
+<h3>2. 白宫撤回施罗耶 ICE 局长提名</h3>
+<p>9 月 17 日，白宫撤回兰斯·施罗耶出任美国移民和海关执法局（ICE）局长的提名。施罗耶曾任俄克拉荷马州州警。</p>
+</div>
+<div class='event'>
+<h3>3. ICE 官员因枪击委内瑞拉移民出庭</h3>
+<p>9 月 17 日，美国移民和海关执法局（ICE）一名官员在明尼苏达州法院出庭，面对枪击一名委内瑞拉移民的指控。NPR 报道称，该官员名为卡斯特罗，同时面临州与联邦指控。</p>
+</div>
+<div class='event'>
+<h3>4. 约 3500 万人被划入新众议院选区</h3>
+<p>9 月 17 日，PBS《新闻时刻》报道称，一份报告估算约 3500 万美国人已被划入新的众议院选区。报告所述选区变动发生在围绕国会选区地图的争斗过程中。</p>
+</div>
+<div class='event'>
+<h3>5. 众议院通过《水资源开发法》</h3>
+<p>9 月 17 日，美国众议院通过《水资源开发法》。科罗拉多政治网报道称，该法案包含一项涉及科罗拉多州东南部输水管道的条款。</p>
+</div>
+<ul class='headline-list'>
+<li>特朗普限制邮寄选票受挫，重塑中期选举仍推进</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 美国批准向沙特出售 48 架 F-35 战机</h3>
+<p>9 月 17 日，美国国务院批准向沙特阿拉伯出售 48 架 F-35 战斗机。这笔军售总价 243 亿美元。南华早报的报道提到，以色列方面对这笔交易存在关切。</p>
+</div>
+<div class='event'>
+<h3>2. 特朗普称将就伊朗战事作出重大决定 <span class="followup">持续跟踪</span></h3>
+<p>9 月 17 日，美国总统特朗普称伊朗战事已进入关键阶段。据联合早报报道，特朗普正权衡是否重新对伊朗发动大规模打击。</p>
+</div>
+<div class='event'>
+<h3>3. 俄中否决美延长对伊制裁监督授权提案</h3>
+<p>9 月 17 日，俄罗斯和中国在联合国安理会否决美国提出的一项涉伊朗提案。该提案要求延长负责监督对伊朗制裁的联合国专家授权。据《杰克逊维尔信使报》报道，联合国对伊朗制裁的独立监督授权随之结束。</p>
+</div>
+<div class='event'>
+<h3>4. 北约秘书长要求英国给出军费增长路径</h3>
+<p>据《卫报》报道，9 月 17 日，北约秘书长马克·吕特表示，英国必须展现年度国防预算持续增长的可信路径。吕特称，这一路径的目标是英国到 2035 年将国防开支提高至国内生产总值的 3.5%。</p>
+</div>
+<div class='event'>
+<h3>5. 波兰称俄计划或打击乌克兰盟国 <span class="followup">持续跟踪</span></h3>
+<p>据半岛电视台报道，9 月 17 日，波兰称俄罗斯的计划可能包括打击乌克兰的盟国。波兰紧急升空战机进行应对。</p>
+</div>
+<div class='event'>
+<h3>6. 特朗普与习近平下周举行晚宴</h3>
+<p>9 月 17 日，雅虎财经报道称，美国总统特朗普与中国国家主席习近平将于下周举行晚宴。OpenAI、英伟达和高通的首席执行官将出席这场晚宴。</p>
+</div>
+<ul class='headline-list'>
+<li>冯德莱恩总统与泽连斯基总统通话后发布通报</li>
+<li>北美防空司令部 F-16 赴高北执行北极先锋行动</li>
+<li>法国渔民将结束燃油价格抗议封锁</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 纽约时报诉 OpenAI 案未删节文件解封</h3>
+<p>9 月 17 日，TechCrunch 报道称，纽约时报诉 OpenAI 案的一批未删节文件解封。文件显示，一名微软高管将 AI 抓取内容称为“人类历史上最大的劳动盗窃”。文件还显示，两家公司内部曾讨论绕过付费墙的做法。</p>
+</div>
+<div class='event'>
+<h3>2. 联合国联合谷歌改造全球发展数据</h3>
+<p>9 月 18 日，TechCrunch 报道称，联合国正与谷歌合作改造其全球发展数据。改造目的是让 AI 代理能够准确检索并调用这些数据。</p>
+</div>
+<ul class='headline-list'>
+<li>让全球数据更易于探索</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 美国国会通过对俄能源买家加税法案</h3>
+<p>9 月 17 日，南华早报报道，美国国会通过一项法案，授权对俄罗斯能源主要买家加征关税。中国随后对该法案作出回应。法国 24 电视台报道，印度表示将保护本国能源安全。</p>
+</div>
+<ul class='headline-list'>
+<li>受 AI 影响专业毕业生 2022 年来多转零售餐饮</li>
+</ul>
+</body>
+</html>
