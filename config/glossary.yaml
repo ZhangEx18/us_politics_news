@@ -40,6 +40,9 @@ orgs:
   白宫: [White House]
   国会: [Congress]
 
+terms:
+  模型失准: [model misalignment, misalignment, AI misalignment]
+
 medias:
   半岛电视台: [Al Jazeera]
   南华早报: [South China Morning Post, SCMP]
