@@ -412,10 +412,30 @@ def test_save_daily_report_syncs_news_legacy_aliases(tmp_path, monkeypatch):
     assert (tmp_path / "docs" / "daily" / "2026-06-27.html").exists()
 
 
-def test_headline_only_text_compacts_long_body():
+def test_headline_only_text_keeps_short_body_and_cuts_long_at_clause():
     from report_renderer import _headline_only_text
 
-    long_body = "澳大利亚拟禁止留学生携伴侣及子女随行，目标 2028 年净移民降至 22.5 万…"
+    short = "澳大利亚拟禁止留学生携伴侣及子女随行，目标 2028 年净移民降至 22.5 万。"
+    assert _headline_only_text({"reader_body": short}) == short
+
+    long_body = "美联储宣布加息 25 个基点，为三年来首次上调利率，市场此前已有充分预期。后续政策路径仍待观察，多数官员预计年内还将再加息一次。"
     compacted = _headline_only_text({"reader_body": long_body})
 
-    assert len(compacted) <= 37
+    assert compacted == "美联储宣布加息 25 个基点，为三年来首次上调利率，市场此前已有充分预期。"
+    assert len(compacted) <= 46
+
+
+def test_frontmatter_lead_falls_back_to_lead_event_for_daily():
+    from report_renderer import render_structured_markdown
+
+    meta = {
+        "title": "2026年9月17日 日报",
+        "date": "2026-09-17",
+        "highlights": ["美联储加息"],
+        "lead_event": {"title": "美联储加息 25 个基点", "body": "美联储宣布加息。"},
+    }
+    columns = {"us_politics": {"detailed_events": [], "headline_only_events": []}}
+
+    md = render_structured_markdown(meta, columns, report_type="daily")
+
+    assert "lead: 美联储加息 25 个基点" in md

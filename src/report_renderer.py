@@ -69,9 +69,17 @@ def _markdown_title_text(text: object) -> str:
 def _headline_only_text(event: dict) -> str:
     """headline_only_events 优先使用可读短句，缺失时回退中文标题；渲染层兜底压缩。"""
     text = str(event.get("reader_body") or event.get("title_zh") or "").strip()
-    if len(text) > 37:
-        text = text[:36].rstrip(" ，,。；;:：") + "…"
-    return text
+    if len(text) <= 46:
+        return text
+    sentence_match = re.match(r"(.+?[。！？!?])", text)
+    if sentence_match and len(sentence_match.group(1)) <= 56:
+        return sentence_match.group(1)
+    cut = text[:46]
+    for punct in ("，", "、", "；", "：", "。"):
+        idx = cut.rfind(punct)
+        if idx >= 15:
+            return cut[: idx + 1]
+    return cut.rstrip(" ，,。；;:：") + "…"
 
 
 def _has_cjk(text: object) -> bool:
@@ -678,12 +686,14 @@ def render_structured_markdown(
         date_raw = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
         title = _markdown_title_text(build_report_title(report_type, date_raw))
     lead = _markdown_text(meta.get("lead", ""))
+    lead_event = meta.get("lead_event") or {}
+    if report_type == "daily" and not lead and lead_event.get("title"):
+        lead = _markdown_text(lead_event.get("title", ""))
     highlights = [_markdown_text(h) for h in meta.get("highlights", [])]
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
 
     lines: list[str] = [_frontmatter(title, lead, highlights, date), ""]
 
-    lead_event = meta.get("lead_event") or {}
     if report_type == "daily" and lead_event.get("title"):
         lines.append("## 今日头条")
         lines.append("")
