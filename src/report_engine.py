@@ -1466,6 +1466,14 @@ def _body_needs_translation(item: dict) -> bool:
     return False
 
 
+def _compact_headline_title(text: str, limit: int = 22) -> str:
+    """要点标题压缩到 limit 字（超出以省略号结尾），避免长句标题。"""
+    title = str(text or "").strip()
+    if len(title) <= limit:
+        return title
+    return title[:limit].rstrip(" ，,。；;:：") + "…"
+
+
 def _merge_headline_metrics(column_metrics_map: dict, col_key: str, new_metrics: dict) -> None:
     """累加合并要点过滤计数（第二次 normalize 不应覆盖第一次的丢弃数）。"""
     target = column_metrics_map.setdefault(col_key, {})
@@ -1497,7 +1505,7 @@ def _normalize_headline_only_by_column(
         ]
 
         for item in items:
-            title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
+            title_zh = _compact_headline_title(str(item.get("title_zh") or item.get("title") or "").strip())
             if _looks_like_english_fragment(title_zh):
                 unreadable_dropped += 1
                 continue

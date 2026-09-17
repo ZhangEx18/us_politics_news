@@ -1731,3 +1731,14 @@ def test_translate_headline_compacts_body_fallback_title():
     title = items[0]["title_zh"]
     assert len(title) <= 23
     assert title.endswith("…")
+
+
+def test_normalize_compacts_long_headline_titles():
+    long_title = "美联储时隔两年重启加息，但一次 25 个基点的举措本身已不是焦点——市场真正在押注的，是后续紧缩路径究竟延伸多远。"
+    normalized, _ = _normalize_headline_only_by_column({
+        "economy": [{"title_zh": long_title, "summary": "美联储重启加息。"}]
+    })
+
+    title = normalized["economy"][0]["title_zh"]
+    assert len(title) <= 23
+    assert title.endswith("…")
