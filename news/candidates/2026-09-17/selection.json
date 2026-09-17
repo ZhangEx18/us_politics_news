@@ -7,10 +7,24 @@
   },
   "items": [
     {
-      "candidate_id": "SEC提议废除股东提案规则",
+      "candidate_id": "众院委员会指亿万富翁布莱克藐视国会",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "SEC提议废除股东提案规则",
+      "title_zh": "众院委员会指亿万富翁布莱克藐视国会",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5954258/leon-black-jeffrey-epstein-contempt-congress"
+        }
+      ]
+    },
+    {
+      "candidate_id": "SEC 提议废除 14a-8 股东提案规则",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "SEC 提议废除 14a-8 股东提案规则",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
@@ -35,38 +49,28 @@
       ]
     },
     {
-      "candidate_id": "特朗普签署采购对等备忘录",
+      "candidate_id": "特朗普赴北卡为参议员候选人助选",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "特朗普签署采购对等备忘录",
+      "title_zh": "特朗普赴北卡为参议员候选人助选",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "White House News",
-          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-reciprocity-in-government-procurement/"
-        }
-      ]
-    },
-    {
-      "candidate_id": "北卡参院选战成民主党翻转共和党席位最佳机会",
-      "column": "us_politics",
-      "slot": "headline",
-      "title_zh": "北卡参院选战成民主党翻转共和党席位最佳机会",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
-      "sources": [
+          "title": "The Guardian US",
+          "url": "https://www.theguardian.com/us-news/2026/sep/16/trump-north-carolina-campaign-rally-republicans"
+        },
         {
-          "title": "PBS NewsHour",
-          "url": "https://www.pbs.org/newshour/show/north-carolina-senate-race-emerges-as-dems-best-chance-to-flip-gop-seat"
+          "title": "The Hill",
+          "url": "https://thehill.com/homenews/6094443-trump-whatley-rally-gop-battleground-credit/"
         }
       ]
     },
     {
-      "candidate_id": "特朗普幕僚长苏西·威尔斯称癌症已痊愈",
+      "candidate_id": "特朗普幕僚长苏西·威尔斯宣布已无癌症",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "特朗普幕僚长苏西·威尔斯称癌症已痊愈",
+      "title_zh": "特朗普幕僚长苏西·威尔斯宣布已无癌症",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -77,45 +81,16 @@
       ]
     },
     {
-      "candidate_id": "美国利率三年来首次上调",
+      "candidate_id": "leon_black_contempt_20260917",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "美国利率三年来首次上调",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "title_zh": "众议院委员会以藐视国会罪指控亿万富翁Leo…",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.66, stage=首发, slot=headline",
       "sources": [
         {
-          "title": "BBC US & Canada",
-          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
-        }
-      ]
-    },
-    {
-      "candidate_id": "众议院委员会认定布莱克藐视国会",
-      "column": "us_politics",
-      "slot": "headline",
-      "title_zh": "众议院委员会认定布莱克藐视国会",
-      "score": null,
-      "selection_reason": "slot=headline",
-      "sources": [
-        {
-          "title": "NPR Politics",
-          "url": "https://www.npr.org/2026/09/16/nx-s1-5954258/leon-black-jeffrey-epstein-contempt-congress"
-        }
-      ]
-    },
-    {
-      "candidate_id": "x_apple_antitrust_disclosure_20260917",
-      "column": "us_politics",
-      "slot": "headline",
-      "title_zh": "法官要求马斯克旗下 X 和 SpaceXA…",
-      "score": 70,
-      "selection_reason": "score=70, slot=headline",
-      "sources": [
-        {
-          "title": "法官要求马斯克旗下 X 和 SpaceXAI 披露与苹果撤诉相关的协议",
-          "url": "https://aihot.news/items/cmu4seygf06durokc85h5ce5u",
-          "via": "AIHOT",
+          "title": "Committee investigating Epstein holds billionaire Leon Black in contempt of Congress",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5954258/leon-black-jeffrey-epstein-contempt-congress",
           "primary": true
         }
       ]
@@ -129,62 +104,38 @@
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "Al Jazeera",
-          "url": "https://www.aljazeera.com/news/2026/9/17/congress-passes-sweeping-us-sanctions-bill-targeting-russia?traffic_source=rss"
+          "title": "德国之声",
+          "url": "https://www.dw.com/en/us-congress-passes-russia-sanctions-bill/a-79299088?maca=en-rss-en-all-1573-rdf"
+        },
+        {
+          "title": "美国国家公共电台",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
+        },
+        {
+          "title": "南华早报",
+          "url": "https://www.scmp.com/news/us/economy-trade-business/article/3367782/us-congress-passes-bill-targeting-russias-leading-energy-buyers-china-and-india?utm_source=rss_feed"
         }
       ]
     },
     {
-      "candidate_id": "加沙城战损建筑倒塌致 21 人死亡",
+      "candidate_id": "加沙城建筑倒塌致 21 人死亡",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "加沙城战损建筑倒塌致 21 人死亡",
+      "title_zh": "加沙城建筑倒塌致 21 人死亡",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "BBC World",
+          "title": "英国广播公司",
           "url": "https://www.bbc.co.uk/news/articles/cvp8d00j9gg5o?at_medium=RSS&at_campaign=rss"
         }
       ]
     },
     {
-      "candidate_id": "以色列与摩洛哥同意互设大使馆",
+      "candidate_id": "俄无人机袭击乌克兰致 5 人死亡",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "以色列与摩洛哥同意互设大使馆",
-      "score": null,
-      "selection_reason": "slot=detailed",
-      "sources": [
-        {
-          "title": "France24",
-          "url": "http://www.france24.com/en/middle-east/20260917-israel-morocco-embassies-new-york"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美众议院民主党高层反对对以军售",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "美众议院民主党高层反对对以军售",
-      "score": null,
-      "selection_reason": "slot=detailed",
-      "sources": [
-        {
-          "title": "BBC US & Canada",
-          "url": "https://www.bbc.co.uk/news/articles/crn8e20lep75o?at_medium=RSS&at_campaign=rss"
-        },
-        {
-          "title": "The Guardian",
-          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNeEIwVHNucWh6QzFJeDVwel8ybm9MTW1Tby15aDMzWG5LU0FITTIxMWJ1ZEFEcENTZTd4VndqUVpEdGU2aDBQYXQ3MG9QR1J4ZkE3M3hGazk4MlVFYlVhMVo1akliV1hQTUJtNHJYdElIS3lqWnBEUTgwTGtnWkdzbTdWYWxCU1JE?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "俄无人机袭击乌克兰客车列车致 5 死",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "俄无人机袭击乌克兰客车列车致 5 死",
+      "title_zh": "俄无人机袭击乌克兰致 5 人死亡",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
@@ -195,12 +146,58 @@
       ]
     },
     {
-      "candidate_id": "直播：爆炸震动基辅 美国国会推进对莫斯科新…",
+      "candidate_id": "美国制裁巴勒斯坦权力机构官员",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美国制裁巴勒斯坦权力机构官员",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "美国国务院",
+          "url": "https://www.state.gov/releases/office-of-the-spokesman/2026/09/sanctioning-officials-of-the-palestinian-authority-and-members-of-the-palestine-liberation-organization-2/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "众议院民主党人拦阻对以军售",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "众议院民主党人拦阻对以军售",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "卫报",
+          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNeEIwVHNucWh6QzFJeDVwel8ybm9MTW1Tby15aDMzWG5LU0FITTIxMWJ1ZEFEcENTZTd4VndqUVpEdGU2aDBQYXQ3MG9QR1J4ZkE3M3hGazk4MlVFYlVhMVo1akliV1hQTUJtNHJYdElIS3lqWnBEUTgwTGtnWkdzbTdWYWxCU1JE?oc=5"
+        },
+        {
+          "title": "英国广播公司",
+          "url": "https://www.bbc.co.uk/news/articles/crn8e20lep75o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "以色列与摩洛哥同意互开使馆提升外交关系",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "直播：爆炸震动基辅 美国国会推进对莫斯科新…",
+      "title_zh": "以色列与摩洛哥同意互开使馆提升外交关系",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/9/16/israel-and-morocco-agree-to-open-embassies-upgrading-diplomatic-ties?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "直播：美国国会推进对俄新制裁 基辅传出爆炸",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "直播：美国国会推进对俄新制裁 基辅传出爆炸",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.715, stage=跟进, slot=headline",
       "sources": [
         {
           "title": "France24",
@@ -209,17 +206,16 @@
       ]
     },
     {
-      "candidate_id": "australia_migration_curbs_20260917",
+      "candidate_id": "探秘新加坡20亿美元赃款拍卖的“金库”",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "澳洲拟收紧移民政策 禁留学生求学期间携伴侣…",
-      "score": 74,
-      "selection_reason": "score=74, slot=headline",
+      "title_zh": "探秘新加坡20亿美元赃款拍卖的“金库”",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
       "sources": [
         {
-          "title": "澳洲拟收紧移民政策 禁留学生求学期间携伴侣及子女",
-          "url": "https://www.zaobao.com/news/world/story20260917-9688945",
-          "primary": true
+          "title": "BBC World",
+          "url": "https://www.bbc.co.uk/news/videos/cmew984dq92lo?at_medium=RSS&at_campaign=rss"
         }
       ]
     },
@@ -227,9 +223,9 @@
       "candidate_id": "australia_veterans_health_cap_20260917",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "澳工党在兰比及退伍军人强烈反对后放弃对退伍…",
+      "title_zh": "澳工党在兰比与退伍军人强烈反对后，撤回退伍…",
       "score": 70,
-      "selection_reason": "score=70, slot=headline",
+      "selection_reason": "score=70, nw=0.505, stage=回应, slot=headline",
       "sources": [
         {
           "title": "Labor backs down on veterans’ health services cap after furious backlash from Jacqui Lambie and ex-ADF members",
@@ -239,32 +235,60 @@
       ]
     },
     {
-      "candidate_id": "OpenAI发布模型不当行为披露框架",
+      "candidate_id": "OpenAI 发布模型失范披露框架",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "OpenAI发布模型不当行为披露框架",
+      "title_zh": "OpenAI 发布模型失范披露框架",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "路透社",
-          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQZ09uWFd0WmUtWloyeENhUWp5NFJiNVF6REhDTUE2ZHZETW5DLUkyRG5QNDhfb0pvVWd5TkVLUEh0WnVja3dxMWJuU2ItSmRQLWM1bFJwN3RmdG03OWRhTXhzejQ2RHpBOTZ4d3hzQXdXOVNycjliMmlRSWhvOUF4NkpkVXVLcnZ2MThmTXpXMlJhQzVZQ0ZkWVAwX1Uwdw?oc=5"
+          "title": "Wired",
+          "url": "https://www.wired.com/story/openai-releases-new-policy-for-reporting-incidents-of-model-misalignment/"
         },
         {
-          "title": "纽约时报",
+          "title": "The New York Times",
           "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPanVqWlBmM21Obkh1TWdaekdGZS1CaEphcUllWFJnc1Rvdm9Ka3NHbWEtZFFWMU9vUW85ZnJpOW1fVG41djJPeEpjOFNoT0huMWtEVndLUVh2REN3VmNfRG5neXN0eW5YRktYX2w1MGR5QlFyQUlxWjFVREE4SWNkN05oMmIwbENJ?oc=5"
         },
         {
-          "title": "Wired",
-          "url": "https://www.wired.com/story/openai-releases-new-policy-for-reporting-incidents-of-model-misalignment/"
+          "title": "The Washington Post",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxONGVhZkdqTHVrUVNzR0xMQjBsM3FsYUlfcjZTQ1FBMm9yVkkyLTFpVHF2QVpuZTF0TktDTTlEb3VCa2Rac2xBVHdYLU1kUTFYckl6Y0RKRm1hbHlaREI5NjU2ck1xN0g4aHhLQWdtYzRtMXpueDgwTWt4R3Uyd0h6dWZULVNYY25rRWpJS293LVJ5QndpTEJ3YU41RFRmckI0VF9nLWlBRnIwRGlfZ2ZuRWhmRjE?oc=5"
         }
       ]
     },
     {
-      "candidate_id": "Meta Muse主打人人易用，被看好赢大…",
+      "candidate_id": "谷歌与英伟达等组建柔性数据中心联盟",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "谷歌与英伟达等组建柔性数据中心联盟",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "NVIDIA Blog",
+          "url": "https://blogs.nvidia.com/blog/ai-energy-management-alliance/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "华为将发布对标英伟达的 AI 芯片",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "华为将发布对标英伟达的 AI 芯片",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "The Japan Times",
+          "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOLVhrQzIzMHhYNWV5cWxvWGRoWW1acGJ3bnVLUWtzLVR5a3VleGo0bWZyc0xWZjMyb1d6cDBMYzdzRlN6OVV0S2RSLXJGWVF5OC1wei1jUUV2SFZKVml6aXNselNBZVVFZEZaYV9hSUY2bEluZXNiOGpYOFljWEN6LXpMWGZMTDFRZ1E?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Meta 的 Muse 主打易用，被看好赢…",
       "column": "technology",
       "slot": "headline",
-      "title_zh": "Meta Muse主打人人易用，被看好赢大…",
+      "title_zh": "Meta 的 Muse 主打易用，被看好赢…",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -275,10 +299,10 @@
       ]
     },
     {
-      "candidate_id": "帮助老年人在日常生活中使用AI",
+      "candidate_id": "帮助老年人在日常生活中使用 AI",
       "column": "technology",
       "slot": "headline",
-      "title_zh": "帮助老年人在日常生活中使用AI",
+      "title_zh": "帮助老年人在日常生活中使用 AI",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -289,63 +313,46 @@
       ]
     },
     {
-      "candidate_id": "openai_ai_safety_disclosure_20260917",
-      "column": "technology",
-      "slot": "headline",
-      "title_zh": "OpenAI表示将定期披露AI不当行为，并…",
-      "score": 74,
-      "selection_reason": "score=74, slot=headline",
-      "sources": [
-        {
-          "title": "OpenAI to regularly disclose AI misbehavior, warns safety challenges remain - Reuters",
-          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQZ09uWFd0WmUtWloyeENhUWp5NFJiNVF6REhDTUE2ZHZETW5DLUkyRG5QNDhfb0pvVWd5TkVLUEh0WnVja3dxMWJuU2ItSmRQLWM1bFJwN3RmdG03OWRhTXhzejQ2RHpBOTZ4d3hzQXdXOVNycjliMmlRSWhvOUF4NkpkVXVLcnZ2MThmTXpXMlJhQzVZQ0ZkWVAwX1Uwdw?oc=5",
-          "via": "Google News",
-          "primary": true
-        },
-        {
-          "title": "OpenAI Discloses Six New Incidents of ‘Concerning’ A.I. Behavior - The New York Times",
-          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPanVqWlBmM21Obkh1TWdaekdGZS1CaEphcUllWFJnc1Rvdm9Ka3NHbWEtZFFWMU9vUW85ZnJpOW1fVG41djJPeEpjOFNoT0huMWtEVndLUVh2REN3VmNfRG5neXN0eW5YRktYX2w1MGR5QlFyQUlxWjFVREE4SWNkN05oMmIwbENJ?oc=5",
-          "via": "Google News"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美联储加息25个基点，为2023年7月以来首次",
+      "candidate_id": "美联储时隔三年首次加息25个基点",
       "column": "economy",
       "slot": "detailed",
-      "title_zh": "美联储加息25个基点，为2023年7月以来首次",
+      "title_zh": "美联储时隔三年首次加息25个基点",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "美联储 FOMC 声明",
-          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm"
+          "title": "NBC News",
+          "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQaHFvTUxpaHU4XzFTTkx6bkQxb19mNkF3WjVwQ1FMZjVkaXRPMzZmdDFCZVNKU0RJSDNpUWR1TmxFWWkyUWxfUnl1aUs5SGRKYzU1eDgtUzR5cUZsX044M0E0T2VBenRKZUJOTk5Dc2FDbFhtRlpyenBmRk8wVjRERUFCbGpoM214OUE?oc=5"
         },
         {
-          "title": "美联储经济预测（9 月 15-16 日会议）",
-          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916b.htm"
+          "title": "BBC",
+          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "title": "The New York Times",
+          "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNRXNJaUw1MEZvcHA2N19Dd0hBbjlCYkFqOFNjclNYRTl4WkxkRENSbnZ2b1djdnZEN2FXZjJWVktja1BINHUxNkp6dFNPTHdkYy1nWXNVSUV4U1RzazVUajhndFlwUU5NVU10WkJ6MmU0YUhsa2tMTUVoVmV0c1BidFU1OHFiOXZ0bkpoaHdjWjh1a2piWWVqSw?oc=5"
+        },
+        {
+          "title": "财新",
+          "url": "https://international.caixin.com/2026-09-17/102485615.html"
         },
         {
           "title": "路透社",
           "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPd0VZMTZPMGRVWVVTY0lVRERxMHhQdlNnb2NBOHROMDJETXBLVmJFTW12SmFybUloWGRfYm1ueDhEZHJuOWNPQXh3RHpDVllhRVpSUVFVeDJmMGFNNTM2RTRqMkVFaXdwTmM1eG1UeVhqLXNuYW5LMjZGYUFCYUV0djFqUTUxRkF2Vk9NeTh5VU44bENZYi1kaTBnS1NuVngtX1dIeEVtaw?oc=5"
         },
         {
-          "title": "财富",
-          "url": "https://fortune.com/2026/09/16/warsh-fed-hike-ai-hyperscalers-treasury-yields/"
-        },
-        {
-          "title": "财新",
-          "url": "https://international.caixin.com/2026-09-17/102485615.html"
+          "title": "美联储",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916b.htm"
         }
       ]
     },
     {
-      "candidate_id": "美联储发布9月15-16日会议经济预测",
+      "candidate_id": "美联储发布9月议息会议经济预测",
       "column": "economy",
       "slot": "headline",
-      "title_zh": "美联储发布9月15-16日会议经济预测",
+      "title_zh": "美联储发布9月议息会议经济预测",
       "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "selection_reason": "score=0, nw=0.71, stage=首发, slot=headline",
       "sources": [
         {
           "title": "Federal Reserve",
@@ -354,16 +361,16 @@
       ]
     },
     {
-      "candidate_id": "美联储“如期加息”，市场关心接下来还有几次？",
+      "candidate_id": "美联储发布联邦公开市场委员会声明",
       "column": "economy",
       "slot": "headline",
-      "title_zh": "美联储“如期加息”，市场关心接下来还有几次？",
+      "title_zh": "美联储发布联邦公开市场委员会声明",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
         {
-          "title": "华尔街见闻 - 宏观/全球",
-          "url": "https://wallstreetcn.com/articles/3781935"
+          "title": "Federal Reserve",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm"
         }
       ]
     }

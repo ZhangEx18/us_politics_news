@@ -1839,44 +1839,44 @@
         "2026-09-16",
         "2026-09-17"
       ],
-      "kept": 2193,
-      "dropped": 1265,
+      "kept": 2211,
+      "dropped": 1253,
       "dropped_by_column": {
-        "us_politics": 256,
-        "global_affairs": 498,
-        "technology": 127,
+        "us_politics": 259,
+        "global_affairs": 493,
+        "technology": 117,
         "economy": 384
       }
     },
-    "raw_fetched": 3626,
-    "raw_merged": 2193
+    "raw_fetched": 3631,
+    "raw_merged": 2211
   },
-  "cn_source_fetched": 135,
+  "cn_source_fetched": 136,
   "cn_source_selected": 2,
   "cn_source_selected_by_column": {
     "global_affairs": 1,
-    "us_politics": 1,
+    "technology": 1,
     "economy": 0,
-    "technology": 0
+    "us_politics": 0
   },
   "columns": {
     "economy": {
       "prefiltered": 13,
       "hard_news_candidates": 13,
-      "hard_news_scored": 11,
-      "post_merge_scored": 3,
+      "hard_news_scored": 9,
+      "post_merge_scored": 2,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 3,
-      "source_quota_dropped": 2,
+      "source_quota_dropped": 0,
       "detailed_filled": 2,
       "headline_filled": 3,
-      "post_score_filtered": 3,
+      "post_score_filtered": 2,
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 1,
-      "headline_body_from_title": 2,
+      "headline_reader_body_missing": 0,
+      "headline_body_from_title": 4,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 0,
@@ -1886,51 +1886,52 @@
       "detailed_fallback_failed": 0,
       "fill_added": 0,
       "deduped_detailed": 0,
+      "headline_org_capped": 1,
       "rendered_detailed": 1,
       "rendered_headline_only": 2
     },
     "global_affairs": {
       "prefiltered": 25,
       "hard_news_candidates": 25,
-      "hard_news_scored": 11,
-      "post_merge_scored": 8,
+      "hard_news_scored": 13,
+      "post_merge_scored": 9,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 8,
       "source_quota_dropped": 0,
-      "detailed_filled": 8,
+      "detailed_filled": 9,
       "headline_filled": 8,
-      "post_score_filtered": 8,
+      "post_score_filtered": 9,
       "headline_translated": 8,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
       "headline_reader_body_missing": 3,
-      "headline_body_from_title": 2,
+      "headline_body_from_title": 6,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 4,
+      "headline_duplicate_dropped": 2,
       "headline_soft_dropped": 1,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 3,
+      "fill_added": 2,
       "deduped_detailed": 0,
-      "detailed_downgraded_to_headline_only": 3,
+      "detailed_downgraded_to_headline_only": 2,
       "rendered_detailed": 5,
-      "rendered_headline_only": 3
+      "rendered_headline_only": 4
     },
     "technology": {
       "prefiltered": 21,
       "hard_news_candidates": 21,
-      "hard_news_scored": 4,
-      "post_merge_scored": 3,
+      "hard_news_scored": 6,
+      "post_merge_scored": 5,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 3,
       "source_quota_dropped": 0,
-      "detailed_filled": 3,
+      "detailed_filled": 5,
       "headline_filled": 3,
-      "post_score_filtered": 3,
+      "post_score_filtered": 5,
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
@@ -1938,34 +1939,34 @@
       "headline_body_from_title": 2,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 0,
+      "headline_duplicate_dropped": 1,
       "headline_soft_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 1,
-      "deduped_detailed": 0,
+      "fill_added": 2,
+      "deduped_detailed": 1,
       "detailed_downgraded_to_headline_only": 1,
-      "rendered_detailed": 1,
-      "rendered_headline_only": 3
+      "rendered_detailed": 3,
+      "rendered_headline_only": 2
     },
     "us_politics": {
       "prefiltered": 23,
       "hard_news_candidates": 23,
-      "hard_news_scored": 10,
-      "post_merge_scored": 8,
+      "hard_news_scored": 7,
+      "post_merge_scored": 6,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 8,
       "source_quota_dropped": 0,
-      "detailed_filled": 8,
+      "detailed_filled": 6,
       "headline_filled": 8,
-      "post_score_filtered": 8,
+      "post_score_filtered": 6,
       "headline_translated": 8,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 2,
-      "headline_body_from_title": 6,
+      "headline_reader_body_missing": 4,
+      "headline_body_from_title": 2,
       "headline_opinion_dropped": 1,
       "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 2,
@@ -1973,17 +1974,17 @@
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 3,
-      "deduped_detailed": 2,
-      "detailed_downgraded_to_headline_only": 2,
-      "rendered_detailed": 3,
-      "rendered_headline_only": 5
+      "fill_added": 2,
+      "deduped_detailed": 1,
+      "detailed_downgraded_to_headline_only": 1,
+      "rendered_detailed": 4,
+      "rendered_headline_only": 2
     }
   },
   "ai": {
     "score_errors": 0,
     "digest_failures": {},
-    "score_duration_seconds": 295.3
+    "score_duration_seconds": 344.2
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -1997,35 +1998,35 @@
       "dropped_by_column": {}
     },
     "scored_events": {
-      "total": 36,
+      "total": 35,
       "freshness_ratio": 1.0,
-      "today_count": 36,
+      "today_count": 35,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 36
+        "today": 35
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 36,
+      "fresh_after_gate": 35,
       "gate_failed": false
     },
     "before_render": {
-      "total": 36,
+      "total": 35,
       "freshness_ratio": 1.0,
-      "today_count": 36,
+      "today_count": 35,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 36
+        "today": 35
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 36,
+      "fresh_after_gate": 35,
       "gate_failed": false
     }
   },
@@ -2034,16 +2035,16 @@
     "total": 82
   },
   "routine_notice_dropped": 0,
-  "low_newsworthiness_dropped": 5,
+  "low_newsworthiness_dropped": 4,
   "report_events": {
-    "upserted": 36,
-    "hard_news": 36
+    "upserted": 35,
+    "hard_news": 35
   },
   "freshness_ratio": 1.0,
-  "today_count": 36,
+  "today_count": 35,
   "old_count": 0,
   "unknown_date_count": 0,
-  "events_merged_duplicates": 14,
+  "events_merged_duplicates": 13,
   "content_audit": {
     "duplicate_titles": 0,
     "old_body_dates": 0,
@@ -2057,23 +2058,22 @@
   },
   "candidates_archive": "docs/news/candidates/2026-09-17",
   "rejections": {
-    "low_newsworthiness": 5,
-    "duplicate_event": 22,
-    "source_quota": 2,
-    "unreadable_body": 7,
+    "low_newsworthiness": 4,
+    "duplicate_event": 20,
     "soft_news": 1,
+    "unreadable_body": 8,
     "opinion_piece": 1
   },
   "lead": {
     "column": "us_politics",
-    "title": "SEC提议废除股东提案规则",
-    "body": "9 月 16 日，美国证券交易委员会提议废除股东提案规则 14a-8。SEC 同时提议改革代理征集程序。",
+    "title": "众院委员会指亿万富翁布莱克藐视国会",
+    "body": "9 月 17 日，据美国国家公共电台报道，美国众议院一个调查爱泼斯坦案的委员会以藐视国会罪指控亿万富翁利昂·布莱克。该委员会认定，布莱克拒绝就这项调查作证。",
     "score": null,
     "newsworthiness": null
   },
   "report": {
     "title": "2026年9月17日 日报",
     "published_at": "2026-09-17T07:45:00+08:00",
-    "duration_seconds": 115.9
+    "duration_seconds": 99.7
   }
 }
