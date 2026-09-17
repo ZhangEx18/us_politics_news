@@ -1921,3 +1921,31 @@ def test_audit_ignores_compacted_title_marker_when_body_displayed():
     metrics = _audit_daily_content(columns, allowed_dates=None, body_date_year=None)
 
     assert metrics["truncated_titles"] == 0
+
+
+def test_headline_normalize_drops_health_gossip_and_hedged_commentary_and_howto():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "us_politics": [
+            {"title_zh": "特朗普幕僚长苏西·威尔斯宣布已无癌", "summary": "健康消息。", "content": "健康消息。"},
+            {"title_zh": "参议院通过拨款法案", "summary": "参议院通过拨款法案。", "content": "参议院通过拨款法案。"},
+        ],
+        "global_affairs": [
+            {"title_zh": "罗森伯格：俄选举几无意外 但对克宫重要", "summary": "专家观点。", "content": "专家观点。"},
+            {"title_zh": "芬兰总统访问华盛顿讨论安全合作", "summary": "芬兰总统访问华盛顿。", "content": "芬兰总统访问华盛顿。"},
+        ],
+        "technology": [
+            {"title_zh": "帮助老年人日常生活中使用AI", "summary": "产品介绍。", "content": "产品介绍。"},
+            {"title_zh": "英伟达发布新一代芯片", "summary": "英伟达发布新一代芯片。", "content": "英伟达发布新一代芯片。"},
+        ],
+    }
+
+    normalized, metrics = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["us_politics"]] == ["参议院通过拨款法案"]
+    assert [i["title_zh"] for i in normalized["global_affairs"]] == ["芬兰总统访问华盛顿讨论安全合作"]
+    assert [i["title_zh"] for i in normalized["technology"]] == ["英伟达发布新一代芯片"]
+    assert metrics["us_politics"]["headline_soft_dropped"] == 1
+    assert metrics["global_affairs"]["headline_opinion_dropped"] == 1
+    assert metrics["technology"]["headline_opinion_dropped"] == 1
