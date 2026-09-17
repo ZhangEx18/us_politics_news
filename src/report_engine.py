@@ -1138,7 +1138,12 @@ def _glossary_name_bigrams() -> set[str]:
     return fragments
 
 
-def _same_event_titles(left: str, right: str, ratio_floor: float = 0.45) -> bool:
+def _same_event_titles(
+    left: str,
+    right: str,
+    ratio_floor: float = 0.45,
+    min_shared: int = 3,
+) -> bool:
     """判断两条标题是否同一事件：相似度 + 有效双字组重合（排除专名碎片）。"""
     norm_left = _normalize_event_title(left)
     norm_right = _normalize_event_title(right)
@@ -1150,7 +1155,7 @@ def _same_event_titles(left: str, right: str, ratio_floor: float = 0.45) -> bool
     bigrams_left = {norm_left[i:i + 2] for i in range(len(norm_left) - 1)}
     bigrams_right = {norm_right[i:i + 2] for i in range(len(norm_right) - 1)}
     shared = (bigrams_left & bigrams_right) - stop
-    return len(shared) >= 3
+    return len(shared) >= min_shared
 
 
 def _sanitize_event_text(text: str) -> tuple[str, list[str]]:
@@ -1638,7 +1643,10 @@ def _normalize_headline_only_by_column(
                 print(f"   [要点软新闻] {col_key}: {title_zh[:36]}")
                 soft_dropped += 1
                 continue
-            if any(_same_event_titles(title_zh, existing) for existing in existing_titles):
+            if any(
+                _same_event_titles(title_zh, existing, ratio_floor=0.30, min_shared=2)
+                for existing in existing_titles
+            ):
                 print(f"   [要点去重] {col_key}: {title_zh[:40]}")
                 duplicate_dropped += 1
                 continue

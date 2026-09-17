@@ -1885,3 +1885,22 @@ def test_compact_headline_body_prefers_complete_sentence():
 
     complete = "美联储宣布加息 25 个基点，为三年来首次。"
     assert _compact_headline_body(complete) == complete
+
+
+def test_headline_normalize_keeps_distinct_same_subject_news():
+    from report_engine import _normalize_headline_only_by_column
+
+    detailed = {
+        "economy": [
+            {"title_zh": "美联储维持利率不变", "source_links": [{"url": "https://www.federalreserve.gov/b"}]},
+        ]
+    }
+    columns = {
+        "economy": [
+            {"title_zh": "美联储加息 25 个基点", "summary": "加息。", "content": "加息。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns, detailed_events=detailed)
+
+    assert [item["title_zh"] for item in normalized["economy"]] == ["美联储加息 25 个基点"]
