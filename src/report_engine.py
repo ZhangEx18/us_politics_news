@@ -587,6 +587,8 @@ _REJECTION_METRIC_MAP: dict[str, str] = {
     "routine_notice_dropped": "routine_notice",
     "low_newsworthiness_dropped": "low_newsworthiness",
     "repeated_story_dropped": "repeated_story",
+    "headline_live_blog_dropped": "live_blog",
+    "headline_truncated_dropped": "cryptic_title",
     "source_quota_dropped": "source_quota",
     "headline_cryptic_dropped": "cryptic_title",
     "headline_opinion_dropped": "opinion_piece",
@@ -805,6 +807,8 @@ def _audit_daily_content(
             headline_title = str(event.get("title_zh") or event.get("title") or "").strip()
             if len(headline_title) > 22:
                 metrics["long_titles"] += 1
+            if "…" in headline_title or "..." in headline_title:
+                metrics["truncated_titles"] += 1
             headline_body = str(event.get("reader_body") or "").strip()
             if len(headline_body) > 37:
                 metrics["long_headline_bodies"] = metrics.get("long_headline_bodies", 0) + 1
@@ -1482,6 +1486,24 @@ def _is_cryptic_headline_only_title(title: str) -> bool:
     return False
 
 
+_LIVE_BLOG_TITLE_RE = re.compile(r"^(直播|live)\s*[：:]", re.IGNORECASE)
+_DANGLING_TITLE_TAIL = "称据的与对将把及或但而则又也"
+
+def _is_live_blog_title(title: str) -> bool:
+    """直播页标题（Live:/直播：）不适合作为单条要点。"""
+    return bool(_LIVE_BLOG_TITLE_RE.search(str(title or "").strip()))
+
+
+def _is_truncated_headline_title(title: str) -> bool:
+    """标题被截断或悬空（省略号、标点收尾、虚词/动词收尾）。"""
+    text = str(title or "").strip()
+    if not text:
+        return True
+    if text.endswith(("…", "...", "，", ",", "、", "：", ":", "；", ";", "（", "(", "—")):
+        return True
+    return text[-1] in _DANGLING_TITLE_TAIL
+
+
 def _build_headline_only_reader_body(item: dict) -> str:
     for field in ("summary", "content"):
         text = re.sub(r"\s+", " ", str(item.get(field, "") or "")).strip()
@@ -1550,6 +1572,8 @@ def _normalize_headline_only_by_column(
         promo_dropped = 0
         duplicate_dropped = 0
         soft_dropped = 0
+        live_blog_dropped = 0
+        truncated_dropped = 0
         # 跨栏目去重：与所有栏目的明细标题比较，避免同一事件在不同栏目重复出现
         existing_titles = [
             title
@@ -1561,6 +1585,14 @@ def _normalize_headline_only_by_column(
             title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
             if _looks_like_english_fragment(title_zh):
                 unreadable_dropped += 1
+                continue
+            if _is_live_blog_title(title_zh):
+                print(f"   [要点直播页] {col_key}: {title_zh[:36]}")
+                live_blog_dropped += 1
+                continue
+            if _is_truncated_headline_title(title_zh):
+                print(f"   [要点截断] {col_key}: {title_zh[:36]}")
+                truncated_dropped += 1
                 continue
             if _is_cryptic_headline_only_title(title_zh):
                 cryptic_dropped += 1
@@ -1607,6 +1639,8 @@ def _normalize_headline_only_by_column(
             "headline_promo_dropped": promo_dropped,
             "headline_duplicate_dropped": duplicate_dropped,
             "headline_soft_dropped": soft_dropped,
+            "headline_live_blog_dropped": live_blog_dropped,
+            "headline_truncated_dropped": truncated_dropped,
         }
 
     return normalized_columns, metrics

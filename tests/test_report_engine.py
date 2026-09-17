@@ -1793,3 +1793,22 @@ def test_apply_cross_day_dedup_drops_recent_event_key_and_link():
 
     assert [item["event_key"] for item in kept] == ["fresh_key"]
     assert metrics["repeated_story_dropped"] == 2
+
+
+def test_headline_normalize_drops_live_blog_and_truncated_titles():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "global_affairs": [
+            {"title_zh": "直播：爆炸震动基辅 美国国会推进对莫斯科新…", "summary": "直播内容。", "content": "直播内容。"},
+            {"title_zh": "加沙战损建筑倒塌 21死含8儿童 救援人员称", "summary": "加沙建筑倒塌。", "content": "加沙建筑倒塌。"},
+            {"title_zh": "俄军空袭基辅致数人受伤", "summary": "俄军空袭基辅，数人受伤。", "content": "俄军空袭基辅，数人受伤。"},
+        ]
+    }
+
+    normalized, metrics = _normalize_headline_only_by_column(columns)
+
+    kept_titles = [item["title_zh"] for item in normalized["global_affairs"]]
+    assert kept_titles == ["俄军空袭基辅致数人受伤"]
+    assert metrics["global_affairs"]["headline_live_blog_dropped"] == 1
+    assert metrics["global_affairs"]["headline_truncated_dropped"] == 1
