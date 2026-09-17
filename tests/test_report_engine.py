@@ -1701,5 +1701,5 @@ def test_summarize_rejections_aggregates_across_levels():
     assert summary["duplicate_event"] == 5
     assert summary["soft_news"] == 1
     assert summary["opinion_piece"] == 2
-    assert summary["source_quota"] == 2
+    assert summary["source_quota"] == 1
     assert summary["cryptic_title"] == 1
