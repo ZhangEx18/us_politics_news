@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-17",
+  "coverage": {
+    "start": "2026-09-16T07:00:00+08:00",
+    "end": "2026-09-17T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "SEC 提议废除 14a-8 股东提案规则",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "SEC 提议废除 14a-8 股东提案规则",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "美国证券交易委员会（SEC）新闻稿",
+          "url": "https://www.sec.gov/newsroom/press-releases/2026-89-sec-proposes-rescission-shareholder-proposal-rule-reforms-proxy-solicitation-process"
+        }
+      ]
+    },
+    {
+      "candidate_id": "众议院委员会认定布莱克蔑视国会",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "众议院委员会认定布莱克蔑视国会",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "WTOP News",
+          "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPaWhyclFEdFN4VWJURExOWkd0TnZja2Vmb2pORmNSSnN4bGp0VEZlQ05uZTRvS0tucHhJMjIzY0xJVWFWdUdiMmpwa3BFcXlsb2VRREpEbFdXX29PaV9TLVFEUHBidThQMHlodXQ1emdRckJzWUc3ZGc3YmFFV0ExWGRQbm5LWGxTVE0zMXBHWDNQZ2NreWJaNW0xZ1U3TnB2eXRrcWVTbUhacWNvOUhIbndOMmVpVHE4Z1BBRG9DMC0?oc=5"
+        },
+        {
+          "title": "美国国家公共电台（NPR）",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5954258/leon-black-jeffrey-epstein-contempt-congress"
+        }
+      ]
+    },
+    {
+      "candidate_id": "约翰逊让众议院提前一天休会",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "约翰逊让众议院提前一天休会",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "美国公共电视网《新闻时刻》",
+          "url": "https://www.pbs.org/newshour/show/news-wrap-johnson-recesses-house-early"
+        }
+      ]
+    },
+    {
+      "candidate_id": "北卡罗来纳州参议院选举成为民主党翻转共和党席位的最佳机会",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "北卡罗来纳州参议院选举成为民主党翻转共和党席位的最佳机会",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/north-carolina-senate-race-emerges-as-dems-best-chance-to-flip-gop-seat"
+        }
+      ]
+    },
+    {
+      "candidate_id": "众议院通过对俄制裁，将林赛·格雷厄姆命名法案送交特朗普",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "众议院通过对俄制裁，将林赛·格雷厄姆命名法案送交特朗普",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普幕僚长苏西·威尔斯宣布自己已无癌症",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "特朗普幕僚长苏西·威尔斯宣布自己已无癌症",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/c6j9xrx80ekro?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国国会通过制裁俄罗斯法案",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美国国会通过制裁俄罗斯法案",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "南华早报",
+          "url": "https://www.scmp.com/news/us/economy-trade-business/article/3367782/us-congress-passes-bill-targeting-russias-leading-energy-buyers-china-and-india?utm_source=rss_feed"
+        },
+        {
+          "title": "半岛电视台",
+          "url": "https://www.aljazeera.com/news/2026/9/17/congress-passes-sweeping-us-sanctions-bill-targeting-russia?traffic_source=rss"
+        },
+        {
+          "title": "德国之声",
+          "url": "https://www.dw.com/en/us-congress-passes-russia-sanctions-bill/a-79299088?maca=en-rss-en-all-1573-rdf"
+        },
+        {
+          "title": "美国国家公共电台",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
+        }
+      ]
+    },
+    {
+      "candidate_id": "以色列与摩洛哥同意互设使馆",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "以色列与摩洛哥同意互设使馆",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "法国24电视台",
+          "url": "http://www.france24.com/en/middle-east/20260917-israel-morocco-embassies-new-york"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普拟会晤波斯湾国家领导人",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普拟会晤波斯湾国家领导人",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20260917-9688688"
+        }
+      ]
+    },
+    {
+      "candidate_id": "印巴就军舰相撞互相召见外交官",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "印巴就军舰相撞互相召见外交官",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "南华早报",
+          "url": "https://www.scmp.com/news/asia/south-asia/article/3367789/india-pakistan-summon-each-others-diplomats-after-naval-ships-collide-arabian-sea?utm_source=rss_feed"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美议员拦下28亿美元对以军售",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美议员拦下28亿美元对以军售",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "卫报",
+          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNeEIwVHNucWh6QzFJeDVwel8ybm9MTW1Tby15aDMzWG5LU0FITTIxMWJ1ZEFEcENTZTd4VndqUVpEdGU2aDBQYXQ3MG9QR1J4ZkE3M3hGazk4MlVFYlVhMVo1akliV1hQTUJtNHJYdElIS3lqWnBEUTgwTGtnWkdzbTdWYWxCU1JE?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "加拿大申请加入联合远征军",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "加拿大申请加入联合远征军",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "加拿大广播公司",
+          "url": "https://www.cbc.ca/news/politics/canada-britain-military-expeditionary-force-nato-9.7347144?cmp=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美军参联会主席称须备战太空",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美军参联会主席称须备战太空",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20260917-9688752"
+        }
+      ]
+    },
+    {
+      "candidate_id": "加沙城建筑倒塌致21人死亡",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "加沙城建筑倒塌致21人死亡",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "英国广播公司",
+          "url": "https://www.bbc.co.uk/news/articles/cvp8d00j9gg5o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "普京呼吁选民参加议会选举",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "普京呼吁选民参加议会选举",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "法国24电视台",
+          "url": "http://www.france24.com/en/europe/20260916-putin-urges-russians-to-vote-in-parliamentary-election-as-show-of-support-for-ukraine-war"
+        }
+      ]
+    },
+    {
+      "candidate_id": "australia_veterans_health_cap_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "遭杰基·兰比和前澳大利亚国防军成员强烈反对后，工党在退伍军人医疗服务上限问题上让步",
+      "score": 70,
+      "selection_reason": "score=70, slot=headline",
+      "sources": [
+        {
+          "title": "Labor backs down on veterans’ health services cap after furious backlash from Jacqui Lambie and ex-ADF members",
+          "url": "https://www.theguardian.com/australia-news/2026/sep/17/veterans-allied-health-care-cap-jacqui-lambie-labor-backdown",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "eu_made_in_europe_law_20260916",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "“欧洲制造”法案威胁英国重启与欧盟关系计划",
+      "score": 70,
+      "selection_reason": "score=70, slot=headline",
+      "sources": [
+        {
+          "title": "‘Made in Europe’ law threatens UK plans for reset with EU",
+          "url": "https://www.theguardian.com/world/2026/sep/16/made-in-europe-laws-could-derail-uk-eu-reset-plans",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "russia_drone_strike_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "乌克兰战争直播：俄无人机袭击巴士和火车致5人死亡，被称为“残暴行径”",
+      "score": 70,
+      "selection_reason": "score=70, slot=headline",
+      "sources": [
+        {
+          "title": "Ukraine war live: Russian drones kill five on bus and train in ‘act of brutality’ - The Independent",
+          "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOV2pSWVBFUFNiR2ptV2V1QUYwR0V3VjdBMjhTUS1fTjYtbHQzdXRYXzc4aWtWWk9CZmQ4T3hWMENOVXctSnZzcW8wampFQllTLWZUd0R0NWUzNDJiUXZGWjlrVlp0T3YxYXNBbmNic29tSHpwcVR2NjJYLTdHNVRQVHgwRXRDbnFyRk5RcV82ajlmSFI5dmdTSVNDcmdiRmhfVzRPa1MzaTAxUGJlbjBMcmVB?oc=5",
+          "via": "Google News",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "pa_plo_sanctions_20260916",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "制裁巴勒斯坦权力机构官员和巴勒斯坦解放组织成员",
+      "score": 66,
+      "selection_reason": "score=66, slot=headline",
+      "sources": [
+        {
+          "title": "Sanctioning Officials of the Palestinian Authority and Members of the Palestine Liberation Organization",
+          "url": "https://www.state.gov/releases/office-of-the-spokesman/2026/09/sanctioning-officials-of-the-palestinian-authority-and-members-of-the-palestine-liberation-organization-2/",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "NHL超级球星奥韦奇金“被要求”拍摄普京广告，球队称",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "NHL超级球星奥韦奇金“被要求”拍摄普京广告，球队称",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/9/17/nhl-superstar-ovechkin-was-asked-to-film-putin-ad-team-says?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "亨特·利格特堡与合作伙伴联合扑救普拉斯基特大火",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "亨特·利格特堡与合作伙伴联合扑救普拉斯基特大火",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "U.S. Department of Defense",
+          "url": "https://www.war.gov/News/News-Stories/Article/Article/4603018/fort-hunter-liggett-partners-unify-to-battle-plaskett-fire/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI 发布模型异常行为披露框架",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "OpenAI 发布模型异常行为披露框架",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "Wired",
+          "url": "https://www.wired.com/story/openai-releases-new-policy-for-reporting-incidents-of-model-misalignment/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "谷歌英伟达等组建 AI 数据中心用电联盟",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "谷歌英伟达等组建 AI 数据中心用电联盟",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "NVIDIA Blog",
+          "url": "https://blogs.nvidia.com/blog/ai-energy-management-alliance/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Meta的Muse主打人人易用，被看好赢下大众AI赛道",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "Meta的Muse主打人人易用，被看好赢下大众AI赛道",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "AIHOT - AI 资讯精选",
+          "url": "https://aihot.news/items/cmu4osqjl08gcrodc2ivqjsmv"
+        }
+      ]
+    },
+    {
+      "candidate_id": "帮助老年人将AI用于日常生活",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "帮助老年人将AI用于日常生活",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "OpenAI Blog",
+          "url": "https://openai.com/index/helping-older-adults-use-ai-in-everyday-life"
+        }
+      ]
+    },
+    {
+      "candidate_id": "x_apple_antitrust_disclosure_20260917",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "法官要求马斯克旗下 X 和 SpaceXAI 披露与苹果撤诉相关的协议",
+      "score": 73,
+      "selection_reason": "score=73, slot=headline",
+      "sources": [
+        {
+          "title": "法官要求马斯克旗下 X 和 SpaceXAI 披露与苹果撤诉相关的协议",
+          "url": "https://aihot.news/items/cmu4seygf06durokc85h5ce5u",
+          "via": "AIHOT",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "美联储时隔三年首次加息25个基点",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美联储时隔三年首次加息25个基点",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "US interest rates raised for first time in three years",
+          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "title": "美联储时隔三年上调利率25基点 官员预计年内再加息一次",
+          "url": "https://international.caixin.com/2026-09-17/102485615.html"
+        },
+        {
+          "title": "美联储“如期加息”了，市场关心的是“接下来还有几次”？",
+          "url": "https://wallstreetcn.com/articles/3781935"
+        },
+        {
+          "title": "Federal Reserve Board and Federal Open Market Committee release economic projections from the September 15-16 FOMC meeting",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916b.htm"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国柴油价格升至每加仑6.31美元新高",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国柴油价格升至每加仑6.31美元新高",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "'Science fiction': Transport companies — the backbone of economy — are sounding alarm on fuel prices",
+          "url": "https://www.cnbc.com/2026/09/16/transport-economy-diesel-prices-iran.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普签备忘录要求政府采购对等互惠",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "特朗普签备忘录要求政府采购对等互惠",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "Restoring Reciprocity in Government Procurement",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-reciprocity-in-government-procurement/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美联储发布联邦公开市场委员会声明",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "美联储发布联邦公开市场委员会声明",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Federal Reserve",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美联储“如期加息”了，市场关心的是“接下来还有几次”？",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "美联储“如期加息”了，市场关心的是“接下来还有几次”？",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/articles/3781935"
+        }
+      ]
+    }
+  ]
+}
