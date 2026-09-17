@@ -2010,3 +2010,25 @@ def test_headline_normalize_drops_question_and_hedged_commentary_titles():
 
     assert [i["title_zh"] for i in normalized["economy"]] == ["英国通胀率升至 3.1% 超市场预期"]
     assert [i["title_zh"] for i in normalized["global_affairs"]] == ["加拿大申请加入联合远征军"]
+
+
+def test_headline_strips_report_said_and_filters_hedged_analyst_family():
+    from report_engine import (
+        _build_headline_only_reader_body,
+        _normalize_headline_only_by_column,
+    )
+
+    body = _build_headline_only_reader_body({"summary": "报告称俄罗斯招募朝鲜工人生产无人机。"})
+    assert body == "俄罗斯招募朝鲜工人生产无人机。"
+
+
+    columns = {
+        "global_affairs": [
+            {"title_zh": "罗森伯格：俄选举少有意外但对克宫重要", "summary": "分析。", "content": "分析。"},
+            {"title_zh": "加拿大申请加入联合远征军", "summary": "申请加入。", "content": "申请加入。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["global_affairs"]] == ["加拿大申请加入联合远征军"]

@@ -283,6 +283,7 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
             core = " ".join(str(part).strip() for part in core if str(part).strip())
         core = str(core).strip()
         text = title if title else core[:45]
+        text = re.sub(r"[！!]+", "，", text)
         text = re.sub(r"\s+", " ", text).strip("：:，,。. ")
         if not text:
             return ""
@@ -1099,7 +1100,8 @@ _OPINION_TITLE_RE = re.compile(
     r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评"
     r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难|难有|难现|难料|无意外"
     r"|^帮助|^助|^指南|新闻综述|新闻速览|一周要闻|每日简报"
-    r"|[？?]$|^helping\b|^how\s+to\b)",
+    r"|[？?]$|^[^\s：:]{2,6}[：:].*(意外|悬念)"
+    r"|^helping\b|^how\s+to\b)",
     re.IGNORECASE,
 )
 
@@ -1515,7 +1517,9 @@ def _event_url_set(event: dict) -> set[str]:
 _LIVE_BLOG_TITLE_RE = re.compile(r"^(直播|live)\s*[：:]", re.IGNORECASE)
 _DANGLING_TITLE_TAIL = "称据的与对将把及或但而则又也"
 
-_TITLE_ATTRIBUTION_PREFIX_RE = re.compile(r"^(?:有?报道称?|据报道|据悉|消息人士称|知情人士称)\s*[：:，,]?\s*")
+_TITLE_ATTRIBUTION_PREFIX_RE = re.compile(
+    r"^(?:有?报道称?|有?报告称|据报道|据悉|消息人士称|知情人士称|消息称)\s*[：:，,]?\s*"
+)
 
 
 @lru_cache(maxsize=1)
@@ -1556,7 +1560,7 @@ def _is_truncated_headline_title(title: str) -> bool:
 
 
 _ANONYMOUS_ATTRIBUTION_LEAD_RE = re.compile(
-    r"^(?:有?报道称|据报道称?|报道\s*[：:]|据悉|消息人士称|知情人士称)[，,：:]?\s*"
+    r"^(?:有?报道称|有?报告称|据报道称?|报道\s*[：:]|据悉|消息人士称|知情人士称|消息称)[，,：:]?\s*"
 )
 
 
