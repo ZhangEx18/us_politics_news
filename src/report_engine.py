@@ -810,7 +810,7 @@ def _audit_daily_content(
             if "…" in headline_title or "..." in headline_title:
                 metrics["truncated_titles"] += 1
             headline_body = str(event.get("reader_body") or "").strip()
-            if len(headline_body) > 37:
+            if len(headline_body) > 46:
                 metrics["long_headline_bodies"] = metrics.get("long_headline_bodies", 0) + 1
         for event in column.get("detailed_events", []):
             title = str(event.get("title_zh") or event.get("title") or "").strip()
@@ -1095,7 +1095,8 @@ _PIPELINE_LEAK_RE = re.compile(
 # 观点/分析稿标题（不进要点列表）
 _OPINION_TITLE_RE = re.compile(
     r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么"
-    r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评)"
+    r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评"
+    r"|或迎|看多|看空|转机|拐点|研判)"
 )
 
 # 公关语（标题命中时剔除）
@@ -1486,6 +1487,22 @@ def _is_cryptic_headline_only_title(title: str) -> bool:
     return False
 
 
+def _event_url_set(event: dict) -> set[str]:
+    """收集事件来源链接（归一化），用于同源去重。"""
+    urls: set[str] = set()
+    for field in ("source_links", "sources", "links"):
+        for item in event.get(field) or []:
+            url = (item.get("url") or item.get("link")) if isinstance(item, dict) else item
+            normalized = _normalize_link(url)
+            if normalized:
+                urls.add(normalized)
+    for field in ("link", "url"):
+        normalized = _normalize_link(event.get(field))
+        if normalized:
+            urls.add(normalized)
+    return urls
+
+
 _LIVE_BLOG_TITLE_RE = re.compile(r"^(直播|live)\s*[：:]", re.IGNORECASE)
 _DANGLING_TITLE_TAIL = "称据的与对将把及或但而则又也"
 
@@ -1542,11 +1559,19 @@ def _compact_headline_title(text: str, limit: int = 21) -> str:
 
 
 def _compact_headline_body(text: str, limit: int = 36) -> str:
-    """要点描述压缩到 limit 字（含省略号不超过 limit+1），避免整句过长。"""
-    body = re.sub(r"\s+", " ", str(text or "")).strip()
-    if len(body) <= limit + 1:
-        return body
-    return body[:limit].rstrip(" ，,。；;:：") + "…"
+    """压缩要点正文：完整首句优先，其次标点处收尾，无法可读截断返回空串。"""
+    text = re.sub(r"\s+", " ", str(text or "")).strip()
+    if len(text) <= limit:
+        return text
+    sentence_match = re.match(r"(.+?[。！？!?])", text)
+    if sentence_match and len(sentence_match.group(1)) <= limit + 10:
+        return sentence_match.group(1)
+    cut = text[:limit]
+    for punct in ("，", "、", "；", "：", "。"):
+        idx = cut.rfind(punct)
+        if idx >= limit // 3:
+            return cut[: idx + 1]
+    return ""
 
 
 def _merge_headline_metrics(column_metrics_map: dict, col_key: str, new_metrics: dict) -> None:
@@ -1559,9 +1584,11 @@ def _merge_headline_metrics(column_metrics_map: dict, col_key: str, new_metrics:
 def _normalize_headline_only_by_column(
     column_headline_only: dict[str, list[dict]],
     detailed_titles: dict[str, list[str]] | None = None,
+    detailed_events: dict[str, list[dict]] | None = None,
 ) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
     normalized_columns: dict[str, list[dict]] = {}
     metrics: dict[str, dict[str, int]] = {}
+    seen_headline_links: set[str] = set()
 
     for col_key, items in column_headline_only.items():
         kept: list[dict] = []
@@ -1580,6 +1607,10 @@ def _normalize_headline_only_by_column(
             for titles in (detailed_titles or {}).values()
             for title in titles
         ]
+        existing_links: set[str] = set()
+        for events in (detailed_events or {}).values():
+            for event in events:
+                existing_links |= _event_url_set(event)
 
         for item in items:
             title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
@@ -1611,6 +1642,11 @@ def _normalize_headline_only_by_column(
                 print(f"   [要点去重] {col_key}: {title_zh[:40]}")
                 duplicate_dropped += 1
                 continue
+            item_links = _event_url_set(item)
+            if item_links and (item_links & existing_links or item_links & seen_headline_links):
+                print(f"   [要点同源] {col_key}: {title_zh[:40]}")
+                duplicate_dropped += 1
+                continue
 
             reader_body = _build_headline_only_reader_body(item)
             if not reader_body or not re.search(r"[\u4e00-\u9fff]", reader_body):
@@ -1624,11 +1660,15 @@ def _normalize_headline_only_by_column(
                     unreadable_dropped += 1
                     continue
 
+            compacted_body = _compact_headline_body(reader_body)
+            if not compacted_body:
+                compacted_body = _compact_headline_title(title_zh)
             kept.append({
                 **item,
                 "title_zh": _compact_headline_title(title_zh),
-                "reader_body": _compact_headline_body(reader_body),
+                "reader_body": compacted_body,
             })
+            seen_headline_links |= item_links
 
         normalized_columns[col_key] = kept
         metrics[col_key] = {
@@ -1878,7 +1918,7 @@ def build_report(
             for key, events in column_results.items()
         }
         column_headline_only, normalized_metrics = _normalize_headline_only_by_column(
-            column_headline_only, detailed_titles=detailed_title_map,
+            column_headline_only, detailed_titles=detailed_title_map, detailed_events=column_results,
         )
         for col_key, column_metrics in normalized_metrics.items():
             _merge_headline_metrics(metrics["columns"], col_key, column_metrics)
@@ -1971,7 +2011,7 @@ def build_report(
             for key, events in column_results.items()
         }
         column_headline_only, post_downgrade_headline_metrics = _normalize_headline_only_by_column(
-            column_headline_only, detailed_titles=detailed_title_map,
+            column_headline_only, detailed_titles=detailed_title_map, detailed_events=column_results,
         )
         for col_key, column_metrics in post_downgrade_headline_metrics.items():
             _merge_headline_metrics(metrics["columns"], col_key, column_metrics)

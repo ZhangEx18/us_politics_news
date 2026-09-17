@@ -630,6 +630,12 @@ def _build_scoring_entries_by_column(
     return all_entries, by_column_entries
 
 
+def _is_fallback_eligible(item: ContentItem) -> bool:
+    """聚合器/社交类来源（如 AIHOT 推文流）不进入要点与兜底扩写。"""
+    tags = {str(tag).lower() for tag in (item.metadata.get("tags") or [])}
+    return "aggregator" not in tags
+
+
 def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> dict:
     freshness_date = _freshness_date_for_item(item)
     return {
@@ -1499,7 +1505,11 @@ def _run_digest_phase(
                 phase_metrics["ai"]["score_errors"] = 0
                 phase_metrics["ai"]["score_duration_seconds"] = 0
                 fallback_candidates_by_column = {
-                    col_key: [_content_item_to_report_candidate(item) for item in items]
+                    col_key: [
+                        _content_item_to_report_candidate(item)
+                        for item in items
+                        if _is_fallback_eligible(item)
+                    ]
                     for col_key, items in prefiltered_by_column.items()
                 }
                 return _build_and_log_digest_report(
@@ -1538,7 +1548,11 @@ def _run_digest_phase(
             phase_metrics["ai"]["score_errors"] = 0
             phase_metrics["ai"]["score_duration_seconds"] = 0
             fallback_candidates_by_column = {
-                col_key: [_content_item_to_report_candidate(item) for item in items]
+                col_key: [
+                    _content_item_to_report_candidate(item)
+                    for item in items
+                    if _is_fallback_eligible(item)
+                ]
                 for col_key, items in prefiltered_by_column.items()
             }
             return _build_and_log_digest_report(
@@ -1686,6 +1700,8 @@ def _run_digest_phase(
         non_hard: list[dict] = []
         for item in items:
             if is_routine_notice(item.title, item.content):
+                continue
+            if not _is_fallback_eligible(item):
                 continue
             non_hard.append(_content_item_to_report_candidate(item))
         fallback_candidates_by_column[col_key] = non_hard

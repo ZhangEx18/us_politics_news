@@ -1812,3 +1812,76 @@ def test_headline_normalize_drops_live_blog_and_truncated_titles():
     assert kept_titles == ["俄军空袭基辅致数人受伤"]
     assert metrics["global_affairs"]["headline_live_blog_dropped"] == 1
     assert metrics["global_affairs"]["headline_truncated_dropped"] == 1
+
+
+def test_headline_normalize_drops_same_source_duplicates():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "us_politics": [
+            {
+                "title_zh": "加密监管法案未过关",
+                "summary": "参议院投票未过关。",
+                "content": "参议院投票未过关。",
+                "source_links": [{"title": "华尔街见闻", "url": "https://wallstreetcn.com/member/articles/3781896"}],
+            }
+        ],
+        "economy": [
+            {
+                "title_zh": "加密立法表决未达门槛",
+                "summary": "加密立法表决未达门槛。",
+                "content": "加密立法表决未达门槛。",
+                "source_links": [{"title": "华尔街见闻", "url": "https://wallstreetcn.com/member/articles/3781896"}],
+            }
+        ],
+    }
+    detailed = {
+        "us_politics": [
+            {
+                "title_zh": "环保署废除电厂碳排放标准",
+                "source_links": [
+                    {"title": "Federal Register", "url": "https://www.federalregister.gov/documents/2026/09/17/2026-19072/x"}
+                ],
+            }
+        ]
+    }
+    columns["us_politics"].append({
+        "title_zh": "美撤销电厂温室气体认定",
+        "summary": "撤销温室气体认定。",
+        "content": "撤销温室气体认定。",
+        "source_links": [{"title": "Federal Register", "url": "https://www.federalregister.gov/documents/2026/09/17/2026-19072/x"}],
+    })
+
+    normalized, metrics = _normalize_headline_only_by_column(columns, detailed_events=detailed)
+
+    assert [item["title_zh"] for item in normalized["us_politics"]] == ["加密监管法案未过关"]
+    assert normalized["economy"] == []
+    assert metrics["economy"]["headline_duplicate_dropped"] == 1
+
+
+def test_headline_normalize_drops_prediction_titles():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "economy": [
+            {"title_zh": "张忆东：中国股市或迎向上转机", "summary": "专家观点。", "content": "专家观点。"},
+            {"title_zh": "央行下调再贷款利率", "summary": "央行下调再贷款利率。", "content": "央行下调再贷款利率。"},
+        ]
+    }
+
+    normalized, metrics = _normalize_headline_only_by_column(columns)
+
+    assert [item["title_zh"] for item in normalized["economy"]] == ["央行下调再贷款利率"]
+    assert metrics["economy"]["headline_opinion_dropped"] == 1
+
+
+def test_compact_headline_body_prefers_complete_sentence():
+    from report_engine import _compact_headline_body
+
+    long_first = "9 月 15 日，旨在为美国数字资产建立全面监管框架的法案未获通过。后续安排另行公布。"
+    assert _compact_headline_body(long_first) == "9 月 15 日，旨在为美国数字资产建立全面监管框架的法案未获通过。"
+
+    assert _compact_headline_body("这是一段没有任何标点的超长文本" * 5) == ""
+
+    complete = "美联储宣布加息 25 个基点，为三年来首次。"
+    assert _compact_headline_body(complete) == complete
