@@ -2040,3 +2040,39 @@ def test_live_blog_title_caught_mid_title():
     assert _is_live_blog_title("乌克兰直播：基辅爆炸 美国国会推进对俄新制裁")
     assert _is_live_blog_title("Live: Explosions shake Kyiv")
     assert not _is_live_blog_title("美国国会推进对俄新制裁")
+
+
+def test_headline_drops_unknown_person_hedged_commentary_only():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "economy": [
+            {"title_zh": "塞汉特：美国城市未衰亡 财富倍增买家涌向多州", "summary": "观点。", "content": "观点。"},
+            {"title_zh": "俄非关系：莫斯科在非洲影响力日益增强", "summary": "综述。", "content": "综述。"},
+            {"title_zh": "央行开展 5000 亿元逆回购操作", "summary": "央行操作。", "content": "央行操作。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["economy"]] == [
+        "俄非关系：莫斯科在非洲影响力日益增强",
+        "央行开展 5000 亿元逆回购操作",
+    ]
+
+
+def test_dedupe_daily_column_events_drops_cross_column_same_story():
+    from report_engine import _dedupe_daily_column_events
+
+    columns = {
+        "us_politics": [{"title_zh": "美国众议院通过对俄制裁法案", "event_key": "a"}],
+        "global_affairs": [{"title_zh": "美国国会通过对俄制裁法案", "event_key": "b"}],
+        "technology": [{"title_zh": "华为发布昇腾 960 超节点", "event_key": "c"}],
+    }
+
+    deduped, metrics = _dedupe_daily_column_events(columns)
+
+    assert [e["title_zh"] for e in deduped["us_politics"]] == ["美国众议院通过对俄制裁法案"]
+    assert deduped["global_affairs"] == []
+    assert metrics["global_affairs"]["deduped_detailed"] == 1
+    assert len(deduped["technology"]) == 1

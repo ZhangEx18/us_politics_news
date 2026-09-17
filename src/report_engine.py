@@ -411,7 +411,8 @@ def _normalize_detailed_events_to_chinese(
         kept: list[dict] = []
         dropped_english = 0
         for item in items:
-            title_zh = str(item.get("title_zh") or "").strip()
+            title_zh = _strip_title_source_prefix(str(item.get("title_zh") or "").strip())
+            item = {**item, "title_zh": title_zh}
             reader_body = str(item.get("reader_body") or item.get("core_facts") or "").strip()
 
             title_ok = _contains_meaningful_cjk(title_zh) and not _looks_like_english_fragment(title_zh)
@@ -547,14 +548,17 @@ def _ensure_daily_detailed_events(
 def _dedupe_daily_column_events(
     column_results: dict[str, list[dict]],
 ) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
-    """按 event_key 和标题近似度去掉同栏重复重点解析。"""
+    """按 event_key 与标题近似度去掉重复重点解析（含跨栏：同事件只保留优先栏目）。"""
     deduped: dict[str, list[dict]] = {}
     metrics: dict[str, dict[str, int]] = {}
+    seen_keys: set[str] = set()
+    seen_titles: list[str] = []
 
-    for col_key, events in column_results.items():
+    ordered = [key for key in COLUMN_ORDER if key in column_results]
+    ordered += [key for key in column_results if key not in ordered]
+    for col_key in ordered:
+        events = column_results[col_key]
         kept: list[dict] = []
-        seen_keys: set[str] = set()
-        seen_titles: list[str] = []
         dropped = 0
         for event in events:
             event_key = str(event.get("event_key") or "").strip()
@@ -563,9 +567,9 @@ def _dedupe_daily_column_events(
             if event_key and event_key in seen_keys:
                 dropped += 1
                 continue
-            if norm_title and any(
-                norm_title == old or SequenceMatcher(None, norm_title, old).ratio() >= 0.58
-                for old in seen_titles
+            if norm_title and (
+                any(SequenceMatcher(None, norm_title, old).ratio() >= 0.58 for old in seen_titles)
+                or _is_duplicate_headline_title(title, seen_titles)
             ):
                 dropped += 1
                 continue
@@ -1544,6 +1548,40 @@ def _strip_title_source_prefix(title: str) -> str:
     return text
 
 
+_NON_PERSON_PREFIX_SUFFIXES = (
+    "部", "局", "委", "院", "署", "会", "行", "司", "社", "台", "网", "报",
+    "公司", "集团", "组织", "理事会", "政府", "国", "省", "州", "市", "县", "区", "邦",
+)
+
+
+@lru_cache(maxsize=1)
+def _glossary_known_names() -> frozenset[str]:
+    glossary = _load_glossary()
+    names: set[str] = set()
+    for group in ("people", "orgs", "medias", "laws", "terms"):
+        names.update(str(key) for key in (glossary.get(group) or {}))
+    return frozenset(names)
+
+
+_HEDGE_MARKER_RE = re.compile(
+    r"(意外|悬念|难有|难现|难料|料将|料无|未衰|衰亡|或迎|或将|有望|看多|看空|转机|拐点|研判)"
+)
+
+
+def _is_unknown_person_commentary_title(title: str) -> bool:
+    """「陌生名字：带对冲观点」式标题（分析师/评论员），术语表人物除外。"""
+    text = str(title or "").strip()
+    match = re.match(r"^([^\s：:，,]{2,6})[：:]", text)
+    if not match:
+        return False
+    name = match.group(1)
+    if name.endswith(_NON_PERSON_PREFIX_SUFFIXES):
+        return False
+    if name in _glossary_known_names():
+        return False
+    return bool(_HEDGE_MARKER_RE.search(text[match.end():]))
+
+
 def _is_live_blog_title(title: str) -> bool:
     """直播页标题（Live:/直播：）不适合作为单条要点。"""
     return bool(_LIVE_BLOG_TITLE_RE.search(str(title or "").strip()))
@@ -1680,6 +1718,10 @@ def _normalize_headline_only_by_column(
             )
             if _looks_like_english_fragment(title_zh):
                 unreadable_dropped += 1
+                continue
+            if _is_unknown_person_commentary_title(title_zh):
+                print(f"   [要点评论] {col_key}: {title_zh[:36]}")
+                opinion_dropped += 1
                 continue
             if _is_live_blog_title(title_zh):
                 print(f"   [要点直播页] {col_key}: {title_zh[:36]}")
@@ -2011,11 +2053,6 @@ def build_report(
         for col_key, column_metrics in dedupe_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
 
-    # ── 提炼要点 ──
-    print(f"\n[要点] 提炼要点...")
-    highlights = build_reader_highlights(column_results, limit=spec.highlights_limit)
-    print(f"   要点: {len(highlights)} 条")
-
     # ── 质量门禁 ──
     print(f"\n[门禁] 质量检查...")
     gate_config = dict(config.get("rules", {}).get("quality_gate") or {})
@@ -2091,6 +2128,11 @@ def build_report(
             if capped > 0:
                 metrics["columns"].setdefault(col_key, {})["headline_org_capped"] = capped
     print(f"   {'全部通过' if not total_issues else f'{total_issues} 个质量问题（已清理）'}")
+
+    # ── 提炼要点（在门禁/降级之后，确保与最终入选一致） ──
+    print(f"\n[要点] 提炼要点...")
+    highlights = build_reader_highlights(column_results, limit=spec.highlights_limit)
+    print(f"   要点: {len(highlights)} 条")
 
     # ── 组装 columns ──
     columns: dict[str, dict[str, list[dict] | str]] = {}
