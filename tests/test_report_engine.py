@@ -2032,3 +2032,11 @@ def test_headline_strips_report_said_and_filters_hedged_analyst_family():
     normalized, _ = _normalize_headline_only_by_column(columns)
 
     assert [i["title_zh"] for i in normalized["global_affairs"]] == ["加拿大申请加入联合远征军"]
+
+
+def test_live_blog_title_caught_mid_title():
+    from report_engine import _is_live_blog_title
+
+    assert _is_live_blog_title("乌克兰直播：基辅爆炸 美国国会推进对俄新制裁")
+    assert _is_live_blog_title("Live: Explosions shake Kyiv")
+    assert not _is_live_blog_title("美国国会推进对俄新制裁")

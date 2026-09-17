@@ -1514,7 +1514,7 @@ def _event_url_set(event: dict) -> set[str]:
     return urls
 
 
-_LIVE_BLOG_TITLE_RE = re.compile(r"^(直播|live)\s*[：:]", re.IGNORECASE)
+_LIVE_BLOG_TITLE_RE = re.compile(r"^.{0,12}?(?:直播|\blive\b)\s*[：:]", re.IGNORECASE)
 _DANGLING_TITLE_TAIL = "称据的与对将把及或但而则又也"
 
 _TITLE_ATTRIBUTION_PREFIX_RE = re.compile(
