@@ -238,3 +238,20 @@ def test_prompt_forbids_boilerplate():
     assert "凸显了" in COLUMN_DIGEST_PROMPT_TEMPLATE
     assert "反映了" in COLUMN_DIGEST_PROMPT_TEMPLATE
     assert "对于读者来说" in COLUMN_DIGEST_PROMPT_TEMPLATE
+
+
+def test_prompt_files_externalized_with_version_header():
+    """6 个 prompt 模板必须外置在 prompts/ 且带版本头。"""
+    from pathlib import Path
+
+    prompts_dir = Path(__file__).resolve().parents[1] / "prompts"
+    for name in ("score", "digest", "translate", "overview", "periodical", "fallback_body"):
+        text = (prompts_dir / f"{name}.md").read_text(encoding="utf-8")
+        assert text.startswith("<!-- version:"), name
+        assert "updated:" in text.splitlines()[0], name
+
+    from ai_analyzer import _load_prompt_template
+
+    loaded = _load_prompt_template("translate")
+    assert not loaded.startswith("<!--")
+    assert "翻译" in loaded
