@@ -1949,3 +1949,28 @@ def test_headline_normalize_drops_health_gossip_and_hedged_commentary_and_howto(
     assert metrics["us_politics"]["headline_soft_dropped"] == 1
     assert metrics["global_affairs"]["headline_opinion_dropped"] == 1
     assert metrics["technology"]["headline_opinion_dropped"] == 1
+
+
+def test_headline_normalize_drops_adjacent_epa_companion_rules_and_roundups():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "us_politics": [
+            {"title_zh": "撤销化石燃料电厂温室气体认定并废除排放法规", "summary": "撤销认定。", "content": "撤销认定。"},
+            {"title_zh": "部分废除化石燃料发电机组碳污染标准", "summary": "废除标准。", "content": "废除标准。"},
+            {"title_zh": "新闻综述：约翰逊提前让众议院休会", "summary": "综述。", "content": "综述。"},
+            {"title_zh": "众议院通过拨款法案", "summary": "通过拨款法案。", "content": "通过拨款法案。"},
+        ],
+        "technology": [
+            {"title_zh": "助老年人将AI融入日常生活", "summary": "产品介绍。", "content": "产品介绍。"},
+            {"title_zh": "英伟达发布新一代芯片", "summary": "发布芯片。", "content": "发布芯片。"},
+        ],
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["us_politics"]] == [
+        "撤销化石燃料电厂温室气体认定并废除排放法规",
+        "众议院通过拨款法案",
+    ]
+    assert [i["title_zh"] for i in normalized["technology"]] == ["英伟达发布新一代芯片"]
