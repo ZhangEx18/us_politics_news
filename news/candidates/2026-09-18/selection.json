@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-18",
+  "coverage": {
+    "start": "2026-09-17T07:00:00+08:00",
+    "end": "2026-09-18T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "FTC 对安利采取行动，和解金 2.25 亿美元",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "FTC 对安利采取行动，和解金 2.25 亿美元",
+      "score": 79,
+      "selection_reason": "score=79, nw=0.695, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "FTC Takes Historic Action Against Multilevel Marketing Operator Amway for Unfair and Deceptive Business Practices",
+          "url": "https://www.ftc.gov/news-events/news/press-releases/2026/09/ftc-takes-historic-action-against-multilevel-marketing-operator-amway-unfair-deceptive-business"
+        }
+      ]
+    },
+    {
+      "candidate_id": "白宫撤回施罗耶 ICE 局长提名",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "白宫撤回施罗耶 ICE 局长提名",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.59, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "White House withdraws nomination of ex-state trooper Lance Schroyer to head ICE",
+          "url": "https://www.theguardian.com/us-news/2026/sep/17/lance-schroyer-ice-director-nomination-withdrawn"
+        },
+        {
+          "title": "Trump withdraws Lance Schroyer, a former Oklahoma state trooper, as his nominee to lead ICE",
+          "url": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice"
+        }
+      ]
+    },
+    {
+      "candidate_id": "ICE 官员因枪击委内瑞拉移民出庭",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "ICE 官员因枪击委内瑞拉移民出庭",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.57, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "ICE agent appears in Minnesota court to face charges in the shooting of a Venezuelan immigrant",
+          "url": "https://www.npr.org/2026/09/17/nx-s1-5973127/ice-agent-court-extradition-minnesota-immigrant-shooting"
+        }
+      ]
+    },
+    {
+      "candidate_id": "约 3500 万人被划入新众议院选区",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "约 3500 万人被划入新众议院选区",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.575, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "About 35 million people have been put into new House districts in the fight over congressional maps, report says",
+          "url": "https://www.pbs.org/newshour/politics/about-35-million-people-have-been-put-into-new-house-districts-in-the-fight-over-congressional-maps-report-says"
+        }
+      ]
+    },
+    {
+      "candidate_id": "众议院通过《水资源开发法》",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "众议院通过《水资源开发法》",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.51, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "U.S. House passes Water Resources Development Act with provision on Southeast Colorado conduit - Colorado Politics",
+          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNazdRcnNxcU5CMnZabnpMMU4wc1NOdWlLel9DenlMdW9UZTVDMEZvNi16cElTa3lOUWJUMGd3YXNwZ3RLd2FaQ2VkZm1JYjk2WEFoM2pKZGtpMjJWT3FvN24zOUlwcERBQkx6c1R5MjJKYzdfX0ludlUtdFZJVkdKQ1NxZGVNZEdHUXBHVVFsYjkxXzItYVQ0djhEcy13YnNLNDAyd3dWUDhWdERDUmNUM2Y0bXBGRlFQVzhNQlg1cHlWQ1VIWnFNaUVrRjRjTi1FLXdZcA?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普限制邮寄选票受挫，重塑中期选举仍推进",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "特朗普限制邮寄选票受挫，重塑中期选举仍推进",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/politics/trumps-push-to-restrict-mail-ballots-failed-other-efforts-to-reshape-the-midterms-continue"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国批准向沙特出售48架F-35战机",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美国批准向沙特出售48架F-35战机",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.7, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/news/world/middle-east/article/3367912/us-approves-sale-48-f-35-jets-saudi-arabia-despite-israeli-concerns?utm_source=rss_feed"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普称将就伊朗战事作出重大决定",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普称将就伊朗战事作出重大决定",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.765, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报 - 国际",
+          "url": "https://www.zaobao.com/news/world/story20260918-9694776"
+        }
+      ]
+    },
+    {
+      "candidate_id": "俄中否决美延长对伊制裁监督授权提案",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "俄中否决美延长对伊制裁监督授权提案",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.72, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Jacksonville Journal-Courier",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxObmFabWt6aFgzSXdMemJlZEhoQnFpeU93LVBvT3o5b3Y4X1lIWDliakFwY205SnhUUzFQX0NBUHNPLUI3cGxOcEhJMFh2TV9ueFA4eXFiLU9KLVh2d1pTU3lGa2Z0MWIxRXRIaDRpS0VPWG9sX29BX3NpY1FtNTg2LXBvUGJsOE5KelpnaDZvbDZsX1hfTVNJOVZWMXhneTBXNDNLRURHeVJGcHk1VEpwMWpOX0IyN2s?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "北约秘书长要求英国给出军费增长路径",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "北约秘书长要求英国给出军费增长路径",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.555, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "The Guardian World",
+          "url": "https://www.theguardian.com/world/2026/sep/17/nato-head-britain-must-show-credible-path-of-annual-defence-budget-increases"
+        }
+      ]
+    },
+    {
+      "candidate_id": "波兰称俄计划或打击乌克兰盟国",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "波兰称俄计划或打击乌克兰盟国",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.61, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/9/17/russian-plans-include-strikes-against-ukraines-allies-poland-says?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普与习近平下周举行晚宴",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普与习近平下周举行晚宴",
+      "score": 65,
+      "selection_reason": "score=65, nw=0.645, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Yahoo Finance",
+          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNcUJITjJuZExocUt0NlBHMUN3STRFRndRY1ZiTHJGR2ZOY3NFams3UUd2NnluLXBjRWhkTWZISWFBbkFIZU1EY29nYXdhbThPRkhVazJOZFFUYktXYjRmWDBDMUhGUHYzQ3pWdWJ3ekRzb1pPSUNwcDBpLXJoSi1ibXc4R1ZCeGFOZ1MwcS10TjNsdGc?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "冯德莱恩总统与泽连斯基总统通话后发布通报",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "冯德莱恩总统与泽连斯基总统通话后发布通报",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "European Commission Press Corner",
+          "url": "https://ec.europa.eu/commission/presscorner/detail/en/read_26_1899"
+        }
+      ]
+    },
+    {
+      "candidate_id": "北美防空司令部F-16赴高北执行北极先锋行动",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "北美防空司令部F-16赴高北执行北极先锋行动",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "U.S. Department of Defense",
+          "url": "https://www.war.gov/News/News-Stories/Article/Article/4604174/norad-f-16s-deploy-to-high-north-under-operation-arctic-vanguard/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "法国渔民将结束燃油价格抗议封锁",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "法国渔民将结束燃油价格抗议封锁",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "France24",
+          "url": "https://www.france24.com/en/french-fishermen-to-end-blockades-over-fuel-prices"
+        }
+      ]
+    },
+    {
+      "candidate_id": "纽约时报诉OpenAI案未删节文件解封",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "纽约时报诉OpenAI案未删节文件解封",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.715, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/17/microsoft-exec-called-ai-scraping-the-largest-theft-of-labor-in-human-history-new-unredacted-filings-reveal/"
+        },
+        {
+          "title": "AIHOT",
+          "url": "https://aihot.news/items/cmu62wp5j08tkrofj60s4kfwv"
+        }
+      ]
+    },
+    {
+      "candidate_id": "联合国联合谷歌改造全球发展数据",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "联合国联合谷歌改造全球发展数据",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.52, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/17/un-turns-to-google-to-make-its-global-data-ready-for-ai-agents/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "让全球数据更易于探索",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "让全球数据更易于探索",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Google AI Blog",
+          "url": "https://blog.google/innovation-and-ai/technology/ai/google-un-data-commons-platform/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国国会通过对俄能源买家加税法案",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国国会通过对俄能源买家加税法案",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.715, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/news/china/diplomacy/article/3367884/china-hits-back-us-congress-approves-tariffs-top-buyers-russian-energy?utm_source=rss_feed"
+        },
+        {
+          "title": "France24",
+          "url": "https://www.france24.com/en/india-vows-to-protect-energy-security-after-new-us-tariffs-over-russian-oil"
+        }
+      ]
+    },
+    {
+      "candidate_id": "受AI影响专业毕业生2022年来多转零售餐饮",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "受AI影响专业毕业生2022年来多转零售餐饮",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Fortune",
+          "url": "https://fortune.com/2026/09/17/ai-chatgpt-college-majors-retail-jobs/"
+        }
+      ]
+    }
+  ]
+}
