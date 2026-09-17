@@ -620,14 +620,38 @@ def _summarize_rejections(metrics: dict) -> dict[str, int]:
     return summary
 
 
+def _normalize_link(url: object) -> str:
+    """URL 归一化：去 query/fragment、去尾斜杠、小写。"""
+    return re.sub(r"[#?].*$", "", str(url or "").strip()).rstrip("/").lower()
+
+
+def _event_links(event: dict) -> list[str]:
+    """从写作产物中提取可关联的链接（明细用 source_links，要点用 sources）。"""
+    links: list[str] = []
+    for field in ("source_links", "sources", "links"):
+        for item in event.get(field) or []:
+            url = (item.get("url") or item.get("link")) if isinstance(item, dict) else item
+            normalized = _normalize_link(url)
+            if normalized:
+                links.append(normalized)
+    for field in ("link", "url", "source_url"):
+        normalized = _normalize_link(event.get(field))
+        if normalized:
+            links.append(normalized)
+    return links
+
+
 def _score_lookup(scored_events: list[dict] | None) -> dict[str, dict]:
-    """按 event_key/标题建立评分查找表（写作产物不带评分）。"""
+    """按 event_key/标题/链接建立评分查找表（写作产物不带评分）。"""
     score_map: dict[str, dict] = {}
     for entry in scored_events or []:
         for key in (entry.get("event_key"), entry.get("title_zh"), entry.get("title")):
             normalized = _normalize_event_title(key)
             if normalized and normalized not in score_map:
                 score_map[normalized] = entry
+        link = _normalize_link(entry.get("link") or entry.get("url"))
+        if link:
+            score_map.setdefault(f"link::{link}", entry)
     return score_map
 
 
@@ -636,6 +660,10 @@ def _lookup_scored(score_map: dict[str, dict], event: dict) -> dict:
         normalized = _normalize_event_title(key)
         if normalized and normalized in score_map:
             return score_map[normalized]
+    for link in _event_links(event):
+        entry = score_map.get(f"link::{link}")
+        if entry:
+            return entry
     return {}
 
 
@@ -653,12 +681,7 @@ def _select_lead_event(columns: dict, scored_events: list[dict] | None = None) -
             title = str(event.get("title_zh") or event.get("title") or "").strip()
             if not title:
                 continue
-            scored_entry: dict = {}
-            for key in (event.get("event_key"), title):
-                normalized = _normalize_event_title(key)
-                if normalized and normalized in score_map:
-                    scored_entry = score_map[normalized]
-                    break
+            scored_entry = _lookup_scored(score_map, event)
             newsworthiness = _to_float(scored_entry.get("newsworthiness"))
             score = _to_float(scored_entry.get("score"))
             key = (newsworthiness, score)

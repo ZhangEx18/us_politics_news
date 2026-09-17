@@ -1743,3 +1743,24 @@ def test_normalize_compacts_long_headline_titles():
     title = normalized["economy"][0]["title_zh"]
     assert len(title) <= 23
     assert title.endswith("…")
+
+
+def test_lookup_scored_matches_by_source_link():
+    from report_engine import _lookup_scored, _score_lookup
+
+    scored = [
+        {
+            "event_key": "hegseth_impeachment_20260916",
+            "title": "Hegseth impeachment",
+            "link": "https://example.com/a?utm=1",
+            "score": 72,
+            "newsworthiness": 80,
+        }
+    ]
+    score_map = _score_lookup(scored)
+    event = {
+        "title_zh": "众院委员会指布莱克藐视国会",
+        "source_links": [{"title": "NPR", "url": "https://example.com/a/"}],
+    }
+
+    assert _lookup_scored(score_map, event)["score"] == 72
