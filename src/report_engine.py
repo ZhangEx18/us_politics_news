@@ -1098,7 +1098,8 @@ _OPINION_TITLE_RE = re.compile(
     r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么"
     r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评"
     r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难"
-    r"|^帮助|^指南|^helping\b|^how\s+to\b)",
+    r"|^帮助|^助|^指南|新闻综述|新闻速览|一周要闻|每日简报"
+    r"|^helping\b|^how\s+to\b)",
     re.IGNORECASE,
 )
 
@@ -1589,6 +1590,15 @@ def _merge_headline_metrics(column_metrics_map: dict, col_key: str, new_metrics:
         target[key] = int(target.get(key, 0)) + int(value)
 
 
+def _is_duplicate_headline_title(title: str, existing_titles: list[str]) -> bool:
+    """要点标题与既有标题是否同一事件：常规阈值或「主题双字组≥4」强信号。"""
+    return any(
+        _same_event_titles(title, existing)
+        or _same_event_titles(title, existing, ratio_floor=0.25, min_shared=4)
+        for existing in existing_titles
+    )
+
+
 def _normalize_headline_only_by_column(
     column_headline_only: dict[str, list[dict]],
     detailed_titles: dict[str, list[str]] | None = None,
@@ -1597,6 +1607,7 @@ def _normalize_headline_only_by_column(
     normalized_columns: dict[str, list[dict]] = {}
     metrics: dict[str, dict[str, int]] = {}
     seen_headline_links: set[str] = set()
+    seen_headline_titles: list[str] = []
 
     for col_key, items in column_headline_only.items():
         kept: list[dict] = []
@@ -1646,9 +1657,8 @@ def _normalize_headline_only_by_column(
                 print(f"   [要点软新闻] {col_key}: {title_zh[:36]}")
                 soft_dropped += 1
                 continue
-            if any(
-                _same_event_titles(title_zh, existing, ratio_floor=0.30, min_shared=2)
-                for existing in existing_titles
+            if _is_duplicate_headline_title(title_zh, existing_titles) or _is_duplicate_headline_title(
+                title_zh, seen_headline_titles
             ):
                 print(f"   [要点去重] {col_key}: {title_zh[:40]}")
                 duplicate_dropped += 1
@@ -1680,6 +1690,7 @@ def _normalize_headline_only_by_column(
                 "reader_body": compacted_body,
             })
             seen_headline_links |= item_links
+            seen_headline_titles.append(title_zh)
 
         normalized_columns[col_key] = kept
         metrics[col_key] = {
