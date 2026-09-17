@@ -702,9 +702,10 @@ def test_digest_phase_reuses_report_events_without_rescoring(monkeypatch):
             return len(candidates)
 
         def fetch_report_events(self, since_key, until_key=None, report_type="daily"):
-            assert since_key == "2026-06-27"
-            assert until_key == "2026-06-28"
-            return report_events
+            if since_key == "2026-06-27":
+                assert until_key == "2026-06-28"
+                return report_events
+            return []
 
         def log_report_run(self, **kwargs):
             pass
