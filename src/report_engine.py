@@ -807,9 +807,10 @@ def _audit_daily_content(
             headline_title = str(event.get("title_zh") or event.get("title") or "").strip()
             if len(headline_title) > 22:
                 metrics["long_titles"] += 1
-            if "…" in headline_title or "..." in headline_title:
-                metrics["truncated_titles"] += 1
             headline_body = str(event.get("reader_body") or "").strip()
+            display_text = headline_body or headline_title
+            if "…" in display_text or "..." in display_text:
+                metrics["truncated_titles"] += 1
             if len(headline_body) > 46:
                 metrics["long_headline_bodies"] = metrics.get("long_headline_bodies", 0) + 1
         for event in column.get("detailed_events", []):
