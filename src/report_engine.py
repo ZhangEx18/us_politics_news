@@ -620,17 +620,31 @@ def _summarize_rejections(metrics: dict) -> dict[str, int]:
     return summary
 
 
-def _select_lead_event(columns: dict, scored_events: list[dict] | None = None) -> dict | None:
-    """跨栏目选择当日头条：newsworthiness 优先，其次 score。
-
-    写作产物（明细事件）本身不带评分，按 event_key/标题关联评分记录后再比较。
-    """
+def _score_lookup(scored_events: list[dict] | None) -> dict[str, dict]:
+    """按 event_key/标题建立评分查找表（写作产物不带评分）。"""
     score_map: dict[str, dict] = {}
     for entry in scored_events or []:
         for key in (entry.get("event_key"), entry.get("title_zh"), entry.get("title")):
             normalized = _normalize_event_title(key)
             if normalized and normalized not in score_map:
                 score_map[normalized] = entry
+    return score_map
+
+
+def _lookup_scored(score_map: dict[str, dict], event: dict) -> dict:
+    for key in (event.get("event_key"), event.get("title_zh"), event.get("title")):
+        normalized = _normalize_event_title(key)
+        if normalized and normalized in score_map:
+            return score_map[normalized]
+    return {}
+
+
+def _select_lead_event(columns: dict, scored_events: list[dict] | None = None) -> dict | None:
+    """跨栏目选择当日头条：newsworthiness 优先，其次 score。
+
+    写作产物（明细事件）本身不带评分，按 event_key/标题关联评分记录后再比较。
+    """
+    score_map = _score_lookup(scored_events)
 
     best: dict | None = None
     best_key = (0.0, 0.0)
@@ -689,6 +703,7 @@ def _write_candidates_archive(spec, scored_events: list[dict], columns: dict) ->
     base_dir.mkdir(parents=True, exist_ok=True)
     coverage = {"start": spec.since.isoformat(), "end": spec.until.isoformat()}
 
+    score_map = _score_lookup(scored_events)
     score_items = []
     for entry in scored_events:
         score_items.append({
@@ -714,13 +729,15 @@ def _write_candidates_archive(spec, scored_events: list[dict], columns: dict) ->
     for col_key, payload in columns.items():
         for slot, key in (("detailed", "detailed_events"), ("headline", "headline_only_events")):
             for event in payload.get(key, []) or []:
+                scored_entry = _lookup_scored(score_map, event)
+                merged = {**scored_entry, **event} if scored_entry else event
                 selection_items.append({
                     "candidate_id": str(event.get("event_key") or event.get("title_zh") or event.get("title") or ""),
                     "column": col_key,
                     "slot": slot,
                     "title_zh": event.get("title_zh", ""),
-                    "score": event.get("score"),
-                    "selection_reason": _selection_reason(event, slot),
+                    "score": merged.get("score"),
+                    "selection_reason": _selection_reason(merged, slot),
                     "sources": event.get("source_links", []),
                 })
     selection_payload = {
