@@ -1839,93 +1839,30 @@
         "2026-09-16",
         "2026-09-17"
       ],
-      "kept": 2387,
-      "dropped": 1183,
+      "kept": 2379,
+      "dropped": 1184,
       "dropped_by_column": {
-        "us_politics": 238,
-        "global_affairs": 482,
-        "technology": 105,
-        "economy": 358
+        "us_politics": 237,
+        "global_affairs": 485,
+        "technology": 111,
+        "economy": 351
       }
     },
     "raw_fetched": 3740,
-    "raw_merged": 2387
+    "raw_merged": 2379
   },
   "cn_source_fetched": 136,
-  "cn_source_selected": 3,
+  "cn_source_selected": 6,
   "cn_source_selected_by_column": {
-    "global_affairs": 2,
-    "economy": 0,
+    "global_affairs": 3,
     "us_politics": 0,
-    "technology": 1
+    "technology": 2,
+    "economy": 1
   },
   "columns": {
     "economy": {
-      "prefiltered": 14,
-      "hard_news_candidates": 14,
-      "hard_news_scored": 5,
-      "post_merge_scored": 2,
-      "detailed_filled_from_low_score": 0,
-      "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 3,
-      "source_quota_dropped": 0,
-      "detailed_filled": 2,
-      "headline_filled": 3,
-      "post_score_filtered": 2,
-      "headline_translated": 3,
-      "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 2,
-      "headline_body_from_title": 2,
-      "headline_opinion_dropped": 0,
-      "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 0,
-      "headline_soft_dropped": 0,
-      "headline_live_blog_dropped": 0,
-      "headline_truncated_dropped": 0,
-      "detailed_translation_failed": 0,
-      "detailed_fallback_added": 0,
-      "detailed_fallback_failed": 0,
-      "fill_added": 0,
-      "deduped_detailed": 0,
-      "rendered_detailed": 2,
-      "rendered_headline_only": 1
-    },
-    "global_affairs": {
-      "prefiltered": 24,
-      "hard_news_candidates": 24,
-      "hard_news_scored": 16,
-      "post_merge_scored": 12,
-      "detailed_filled_from_low_score": 0,
-      "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 6,
-      "source_quota_dropped": 0,
-      "detailed_filled": 10,
-      "headline_filled": 8,
-      "post_score_filtered": 12,
-      "headline_translated": 8,
-      "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 3,
-      "headline_body_from_title": 2,
-      "headline_opinion_dropped": 1,
-      "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 2,
-      "headline_soft_dropped": 0,
-      "headline_live_blog_dropped": 0,
-      "headline_truncated_dropped": 0,
-      "detailed_translation_failed": 0,
-      "detailed_fallback_added": 0,
-      "detailed_fallback_failed": 0,
-      "fill_added": 2,
-      "deduped_detailed": 1,
-      "detailed_downgraded_to_headline_only": 1,
-      "rendered_detailed": 7,
-      "rendered_headline_only": 3
-    },
-    "technology": {
-      "prefiltered": 18,
-      "hard_news_candidates": 18,
+      "prefiltered": 13,
+      "hard_news_candidates": 13,
       "hard_news_scored": 4,
       "post_merge_scored": 2,
       "detailed_filled_from_low_score": 0,
@@ -1939,41 +1876,73 @@
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
       "headline_reader_body_missing": 2,
-      "headline_body_from_title": 0,
-      "headline_opinion_dropped": 1,
+      "headline_body_from_title": 1,
+      "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 0,
+      "headline_soft_dropped": 0,
+      "headline_live_blog_dropped": 0,
+      "headline_truncated_dropped": 1,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
+      "detailed_fallback_failed": 0,
+      "fill_added": 0,
+      "deduped_detailed": 0,
+      "rendered_detailed": 1,
+      "rendered_headline_only": 0
+    },
+    "global_affairs": {
+      "prefiltered": 25,
+      "hard_news_candidates": 25,
+      "hard_news_scored": 17,
+      "post_merge_scored": 12,
+      "detailed_filled_from_low_score": 0,
+      "headline_filled_from_low_score": 1,
+      "headline_filled_from_non_hard_news": 6,
+      "source_quota_dropped": 0,
+      "detailed_filled": 10,
+      "headline_filled": 8,
+      "post_score_filtered": 11,
+      "headline_translated": 8,
+      "headline_translation_failed": 0,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 2,
+      "headline_body_from_title": 0,
+      "headline_opinion_dropped": 2,
+      "headline_promo_dropped": 0,
+      "headline_duplicate_dropped": 3,
       "headline_soft_dropped": 0,
       "headline_live_blog_dropped": 0,
       "headline_truncated_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 1,
+      "fill_added": 3,
       "deduped_detailed": 1,
-      "rendered_detailed": 1,
-      "rendered_headline_only": 0
+      "detailed_downgraded_to_headline_only": 2,
+      "rendered_detailed": 5,
+      "rendered_headline_only": 3
     },
-    "us_politics": {
-      "prefiltered": 19,
-      "hard_news_candidates": 19,
+    "technology": {
+      "prefiltered": 18,
+      "hard_news_candidates": 18,
       "hard_news_scored": 5,
       "post_merge_scored": 3,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 8,
+      "headline_filled_from_non_hard_news": 3,
       "source_quota_dropped": 0,
       "detailed_filled": 3,
-      "headline_filled": 8,
+      "headline_filled": 3,
       "post_score_filtered": 3,
-      "headline_translated": 8,
+      "headline_translated": 3,
       "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 3,
-      "headline_reader_body_missing": 1,
-      "headline_body_from_title": 2,
-      "headline_opinion_dropped": 2,
-      "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 2,
+      "headline_cryptic_dropped": 0,
+      "headline_reader_body_missing": 2,
+      "headline_body_from_title": 0,
+      "headline_opinion_dropped": 1,
+      "headline_promo_dropped": 1,
+      "headline_duplicate_dropped": 0,
       "headline_soft_dropped": 0,
       "headline_live_blog_dropped": 0,
       "headline_truncated_dropped": 0,
@@ -1983,14 +1952,45 @@
       "fill_added": 1,
       "deduped_detailed": 0,
       "detailed_downgraded_to_headline_only": 1,
-      "rendered_detailed": 2,
-      "rendered_headline_only": 1
+      "rendered_detailed": 1,
+      "rendered_headline_only": 0
+    },
+    "us_politics": {
+      "prefiltered": 18,
+      "hard_news_candidates": 18,
+      "hard_news_scored": 6,
+      "post_merge_scored": 4,
+      "detailed_filled_from_low_score": 0,
+      "headline_filled_from_low_score": 0,
+      "headline_filled_from_non_hard_news": 8,
+      "source_quota_dropped": 0,
+      "detailed_filled": 4,
+      "headline_filled": 8,
+      "post_score_filtered": 4,
+      "headline_translated": 8,
+      "headline_translation_failed": 0,
+      "headline_cryptic_dropped": 3,
+      "headline_reader_body_missing": 1,
+      "headline_body_from_title": 4,
+      "headline_opinion_dropped": 0,
+      "headline_promo_dropped": 0,
+      "headline_duplicate_dropped": 2,
+      "headline_soft_dropped": 0,
+      "headline_live_blog_dropped": 0,
+      "headline_truncated_dropped": 0,
+      "detailed_translation_failed": 0,
+      "detailed_fallback_added": 0,
+      "detailed_fallback_failed": 0,
+      "fill_added": 1,
+      "deduped_detailed": 1,
+      "rendered_detailed": 3,
+      "rendered_headline_only": 2
     }
   },
   "ai": {
     "score_errors": 0,
     "digest_failures": {},
-    "score_duration_seconds": 278.0
+    "score_duration_seconds": 312.2
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -1999,61 +1999,61 @@
         "2026-09-16",
         "2026-09-17"
       ],
-      "kept": 75,
+      "kept": 74,
       "dropped": 0,
       "dropped_by_column": {}
     },
     "scored_events": {
-      "total": 30,
+      "total": 32,
       "freshness_ratio": 1.0,
-      "today_count": 30,
+      "today_count": 32,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 30
+        "today": 32
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 30,
+      "fresh_after_gate": 32,
       "gate_failed": false
     },
     "before_render": {
-      "total": 30,
+      "total": 32,
       "freshness_ratio": 1.0,
-      "today_count": 30,
+      "today_count": 32,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 30
+        "today": 32
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 30,
+      "fresh_after_gate": 32,
       "gate_failed": false
     }
   },
   "candidate_pool": {
-    "upserted": 75,
-    "total": 75
+    "upserted": 74,
+    "total": 74
   },
   "routine_notice_dropped": 0,
   "low_newsworthiness_dropped": 5,
   "cross_day_dedup": {
     "recent_events": 194,
-    "dropped": 7,
-    "kept": 30
+    "dropped": 2,
+    "kept": 32
   },
-  "repeated_story_dropped": 7,
+  "repeated_story_dropped": 2,
   "report_events": {
-    "upserted": 30,
-    "hard_news": 30
+    "upserted": 32,
+    "hard_news": 32
   },
   "freshness_ratio": 1.0,
-  "today_count": 30,
+  "today_count": 32,
   "old_count": 0,
   "unknown_date_count": 0,
   "events_merged_duplicates": 11,
@@ -2071,22 +2071,23 @@
   "candidates_archive": "docs/news/candidates/2026-09-17",
   "rejections": {
     "low_newsworthiness": 5,
-    "repeated_story": 7,
-    "duplicate_event": 17,
-    "unreadable_body": 8,
-    "opinion_piece": 4,
-    "cryptic_title": 3
+    "repeated_story": 2,
+    "duplicate_event": 18,
+    "cryptic_title": 4,
+    "unreadable_body": 7,
+    "opinion_piece": 3,
+    "promo_piece": 1
   },
   "lead": {
     "column": "global_affairs",
-    "title": "美国国会通过对俄制裁法案",
-    "body": "9 月 17 日，美国国会通过对俄制裁法案。德国之声称，这是特朗普重返白宫后规模最大的对俄立法行动。联合早报报道称，印度认为这项针对俄罗斯石油买家的制裁法案可能损害印美关系。",
+    "title": "美国会通过对俄制裁法案 印度称恐损害印美关系",
+    "body": "9 月 16 日，美国国会通过一项对俄制裁法案，该案已送交美国总统特朗普。法案可能对购买俄罗斯能源的印度、中国和伊朗实施次级制裁。9 月 17 日，印度外交部警告，该法案可能损害印美关系与全球能源市场。",
     "score": 85,
     "newsworthiness": 0.795
   },
   "report": {
     "title": "2026年9月17日 日报",
     "published_at": "2026-09-17T07:45:00+08:00",
-    "duration_seconds": 235.8
+    "duration_seconds": 130.1
   }
 }
