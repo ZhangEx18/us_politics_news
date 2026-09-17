@@ -37,3 +37,19 @@ def is_routine_notice(*texts: object) -> bool:
     if not haystack:
         return False
     return bool(_ROUTINE_NOTICE_RE.search(haystack))
+
+
+# 拒绝原因枚举（统一观测口径）
+REJECT_REASONS: dict[str, str] = {
+    "routine_notice": "例行公告",
+    "low_newsworthiness": "低新闻价值",
+    "soft_news": "软新闻",
+    "opinion_piece": "观点/分析稿",
+    "promo_piece": "公关稿",
+    "cryptic_title": "标题不可读",
+    "unreadable_body": "正文不可用",
+    "duplicate_event": "同事件重复",
+    "source_quota": "来源配额",
+    "date_out_of_window": "日期越窗",
+    "body_too_short": "正文过短",
+}

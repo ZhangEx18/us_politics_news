@@ -1670,3 +1670,36 @@ def test_daily_markdown_renders_lead_block():
 
     assert "## 今日头条" in markdown
     assert "**今日头条事件**" in markdown
+
+
+# ── P1-5: 拒绝原因汇总 ──
+
+
+def test_summarize_rejections_aggregates_across_levels():
+    from report_engine import _summarize_rejections
+
+    metrics = {
+        "routine_notice_dropped": 2,
+        "low_newsworthiness_dropped": 3,
+        "events_merged_duplicates": 5,
+        "columns": {
+            "us_politics": {
+                "headline_soft_dropped": 1,
+                "headline_opinion_dropped": 2,
+                "source_quota_dropped": 1,
+            },
+            "economy": {
+                "headline_cryptic_dropped": 1,
+            },
+        },
+    }
+
+    summary = _summarize_rejections(metrics)
+
+    assert summary["routine_notice"] == 2
+    assert summary["low_newsworthiness"] == 3
+    assert summary["duplicate_event"] == 5
+    assert summary["soft_news"] == 1
+    assert summary["opinion_piece"] == 2
+    assert summary["source_quota"] == 2
+    assert summary["cryptic_title"] == 1
