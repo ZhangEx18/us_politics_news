@@ -24,3 +24,15 @@ def test_routine_notice_ignores_real_news():
 
 def test_routine_notice_matches_chinese_titles():
     assert is_routine_notice("FTC 就拟议规则公开征求意见")
+
+
+def test_fomc_statement_and_projections_are_routine_notices():
+    assert is_routine_notice("Federal Reserve issues FOMC statement")
+    assert is_routine_notice(
+        "Federal Reserve Board and Federal Open Market Committee release economic projections from the September 15-16 FOMC meeting"
+    )
+    assert is_routine_notice("美联储发布FOMC声明")
+
+
+def test_market_reaction_headline_is_not_routine_notice():
+    assert not is_routine_notice("Fed signals possible rate cut as inflation cools")
