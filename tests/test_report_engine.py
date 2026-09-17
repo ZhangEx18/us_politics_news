@@ -1764,3 +1764,32 @@ def test_lookup_scored_matches_by_source_link():
     }
 
     assert _lookup_scored(score_map, event)["score"] == 72
+
+
+def test_apply_cross_day_dedup_drops_recent_event_key_and_link():
+    from database import ReportEvent
+    from run_pipeline import _apply_cross_day_dedup
+
+    recent = [
+        ReportEvent(
+            report_key="2026-09-16",
+            report_type="daily",
+            event_key="sec_rule_14a8",
+            column="us_politics",
+            title_zh="SEC 提议废除 14a-8 规则",
+            summary_zh="",
+            score=78.0,
+            source_links=[{"title": "SEC", "url": "https://www.sec.gov/news/a?utm=1"}],
+        )
+    ]
+    entries = [
+        {"event_key": "sec_rule_14a8", "title": "SEC proposes rule", "link": "https://x.com/1"},
+        {"event_key": "other_key", "title": "Other", "link": "https://www.sec.gov/news/a"},
+        {"event_key": "fresh_key", "title": "Fresh", "link": "https://y.com/2"},
+    ]
+    metrics: dict = {}
+
+    kept = _apply_cross_day_dedup(entries, recent, metrics)
+
+    assert [item["event_key"] for item in kept] == ["fresh_key"]
+    assert metrics["repeated_story_dropped"] == 2

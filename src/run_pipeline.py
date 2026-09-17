@@ -20,6 +20,7 @@
 import asyncio
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -649,6 +650,53 @@ def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> di
         "event_date": freshness_date,
         "freshness_status": "",
     }
+
+
+def _normalize_event_link(url: object) -> str:
+    """URL 归一化，用于跨天同一事件的来源链接匹配。"""
+    return re.sub(r"[#?].*$", "", str(url or "").strip()).rstrip("/").lower()
+
+
+def _apply_cross_day_dedup(
+    hard_news_scored: list[dict],
+    recent_events: list["ReportEvent"],
+    phase_metrics: dict,
+) -> list[dict]:
+    """过滤近两日已上稿的同一事件（event_key 或来源链接级匹配）。"""
+    if not recent_events:
+        return hard_news_scored
+    seen_keys: set[str] = set()
+    seen_links: set[str] = set()
+    for event in recent_events:
+        key = str(event.event_key or "").strip()
+        if key:
+            seen_keys.add(key)
+            normalized_key = _normalize_event_link(key)
+            if normalized_key:
+                seen_links.add(normalized_key)
+        for link in event.source_links or []:
+            url = (link or {}).get("url") if isinstance(link, dict) else link
+            normalized = _normalize_event_link(url)
+            if normalized:
+                seen_links.add(normalized)
+    kept: list[dict] = []
+    dropped = 0
+    for entry in hard_news_scored:
+        key = str(entry.get("event_key") or "").strip()
+        link = _normalize_event_link(entry.get("link"))
+        if (key and key in seen_keys) or (link and link in seen_links):
+            dropped += 1
+            continue
+        kept.append(entry)
+    phase_metrics["cross_day_dedup"] = {
+        "recent_events": len(recent_events),
+        "dropped": dropped,
+        "kept": len(kept),
+    }
+    phase_metrics["repeated_story_dropped"] = dropped
+    if dropped:
+        print(f"   跨天去重: 近两日已上稿 {dropped} 条")
+    return kept
 
 
 def _scored_entries_to_report_events(
@@ -1400,6 +1448,10 @@ def _run_digest_phase(
 
     reuse_events_cfg = _reuse_events_enabled(runtime_cfg)
     next_report_date = (datetime.strptime(report_date, "%Y-%m-%d") + timedelta(days=1)).date().isoformat()
+    recent_published_events: list[ReportEvent] = []
+    if report_type == "daily":
+        lookback_key = (datetime.strptime(report_date, "%Y-%m-%d") - timedelta(days=2)).date().isoformat()
+        recent_published_events = db.fetch_report_events(lookback_key, report_date, report_type=report_type)
     stored_events = (
         db.fetch_report_events(report_date, next_report_date, report_type=report_type)
         if reuse_events_cfg and report_type == "daily"
@@ -1436,6 +1488,9 @@ def _run_digest_phase(
                     f"ratio={reuse_freshness['freshness_ratio']:.0%}"
                 )
             else:
+                hard_news_scored = _apply_cross_day_dedup(
+                    hard_news_scored, recent_published_events, phase_metrics
+                )
                 print(f"   复用事件库: {len(hard_news_scored)} 条，跳过 AI 评分")
                 phase_metrics["report_events"] = {
                     "reused": len(hard_news_scored),
@@ -1588,6 +1643,9 @@ def _run_digest_phase(
         print(f"   例行公告剔除: {routine_notice_dropped} 条")
     if low_value_dropped:
         print(f"   低新闻价值剔除: {low_value_dropped} 条")
+    hard_news_scored = _apply_cross_day_dedup(
+        hard_news_scored, recent_published_events, phase_metrics
+    )
     if report_type == "daily":
         hard_news_scored, scored_freshness = _filter_scored_entries_by_freshness(
             hard_news_scored,

@@ -586,6 +586,7 @@ def _normalize_event_title(title: str) -> str:
 _REJECTION_METRIC_MAP: dict[str, str] = {
     "routine_notice_dropped": "routine_notice",
     "low_newsworthiness_dropped": "low_newsworthiness",
+    "repeated_story_dropped": "repeated_story",
     "source_quota_dropped": "source_quota",
     "headline_cryptic_dropped": "cryptic_title",
     "headline_opinion_dropped": "opinion_piece",
