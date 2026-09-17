@@ -410,3 +410,12 @@ def test_save_daily_report_syncs_news_legacy_aliases(tmp_path, monkeypatch):
     assert (tmp_path / html_path).exists()
     assert (tmp_path / "docs" / "daily" / "2026-06-27.md").exists()
     assert (tmp_path / "docs" / "daily" / "2026-06-27.html").exists()
+
+
+def test_headline_only_text_compacts_long_body():
+    from report_renderer import _headline_only_text
+
+    long_body = "澳大利亚拟禁止留学生携伴侣及子女随行，目标 2028 年净移民降至 22.5 万…"
+    compacted = _headline_only_text({"reader_body": long_body})
+
+    assert len(compacted) <= 37
