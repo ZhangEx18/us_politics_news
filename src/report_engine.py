@@ -1097,9 +1097,9 @@ _PIPELINE_LEAK_RE = re.compile(
 _OPINION_TITLE_RE = re.compile(
     r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么"
     r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评"
-    r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难"
+    r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难|难有|难现|难料|无意外"
     r"|^帮助|^助|^指南|新闻综述|新闻速览|一周要闻|每日简报"
-    r"|^helping\b|^how\s+to\b)",
+    r"|[？?]$|^helping\b|^how\s+to\b)",
     re.IGNORECASE,
 )
 
@@ -1515,6 +1515,31 @@ def _event_url_set(event: dict) -> set[str]:
 _LIVE_BLOG_TITLE_RE = re.compile(r"^(直播|live)\s*[：:]", re.IGNORECASE)
 _DANGLING_TITLE_TAIL = "称据的与对将把及或但而则又也"
 
+_TITLE_ATTRIBUTION_PREFIX_RE = re.compile(r"^(?:有?报道称?|据报道|据悉|消息人士称|知情人士称)\s*[：:，,]?\s*")
+
+
+@lru_cache(maxsize=1)
+def _glossary_media_names() -> tuple[str, ...]:
+    try:
+        medias = _load_glossary().get("medias", {})
+    except Exception:
+        medias = {}
+    return tuple(sorted((str(name) for name in medias), key=len, reverse=True))
+
+
+def _strip_title_source_prefix(title: str) -> str:
+    """去掉标题起首的来源前缀（报道：/英国广播公司：），保留可读主谓。"""
+    text = _TITLE_ATTRIBUTION_PREFIX_RE.sub("", str(title or "").strip())
+    for name in _glossary_media_names():
+        for sep in ("：", ":"):
+            prefix = f"{name}{sep}"
+            if text.startswith(prefix):
+                stripped = text[len(prefix):].strip()
+                if len(stripped) >= 6:
+                    return stripped
+    return text
+
+
 def _is_live_blog_title(title: str) -> bool:
     """直播页标题（Live:/直播：）不适合作为单条要点。"""
     return bool(_LIVE_BLOG_TITLE_RE.search(str(title or "").strip()))
@@ -1530,6 +1555,17 @@ def _is_truncated_headline_title(title: str) -> bool:
     return text[-1] in _DANGLING_TITLE_TAIL
 
 
+_ANONYMOUS_ATTRIBUTION_LEAD_RE = re.compile(
+    r"^(?:有?报道称|据报道称?|报道\s*[：:]|据悉|消息人士称|知情人士称)[，,：:]?\s*"
+)
+
+
+def _strip_anonymous_attribution(text: str) -> str:
+    """去掉起句的匿名归因（报道称/据悉…），让要点以事实开头。"""
+    cleaned = _ANONYMOUS_ATTRIBUTION_LEAD_RE.sub("", str(text or "").strip())
+    return cleaned.strip()
+
+
 def _build_headline_only_reader_body(item: dict) -> str:
     for field in ("summary", "content"):
         text = re.sub(r"\s+", " ", str(item.get(field, "") or "")).strip()
@@ -1539,6 +1575,9 @@ def _build_headline_only_reader_body(item: dict) -> str:
             continue
         sentence_match = re.match(r"(.+?[。！？!?])", text)
         sentence = sentence_match.group(1).strip() if sentence_match else text[:80].rstrip(" ，,。；;:：")
+        cleaned_sentence = _strip_anonymous_attribution(sentence)
+        if cleaned_sentence:
+            sentence = cleaned_sentence
         if sentence and sentence[-1] not in "。！？!?":
             sentence += "。"
         if _looks_like_english_fragment(sentence):
@@ -1632,7 +1671,9 @@ def _normalize_headline_only_by_column(
                 existing_links |= _event_url_set(event)
 
         for item in items:
-            title_zh = str(item.get("title_zh") or item.get("title") or "").strip()
+            title_zh = _strip_title_source_prefix(
+                str(item.get("title_zh") or item.get("title") or "").strip()
+            )
             if _looks_like_english_fragment(title_zh):
                 unreadable_dropped += 1
                 continue
