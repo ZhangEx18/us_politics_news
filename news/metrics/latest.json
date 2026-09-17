@@ -1839,73 +1839,74 @@
         "2026-09-16",
         "2026-09-17"
       ],
-      "kept": 2167,
-      "dropped": 1281,
+      "kept": 2177,
+      "dropped": 1278,
       "dropped_by_column": {
-        "us_politics": 261,
-        "global_affairs": 501,
-        "technology": 130,
-        "economy": 389
+        "us_politics": 260,
+        "global_affairs": 502,
+        "technology": 129,
+        "economy": 387
       }
     },
-    "raw_fetched": 3615,
-    "raw_merged": 2167
+    "raw_fetched": 3622,
+    "raw_merged": 2177
   },
-  "cn_source_fetched": 133,
-  "cn_source_selected": 4,
+  "cn_source_fetched": 135,
+  "cn_source_selected": 3,
   "cn_source_selected_by_column": {
     "technology": 1,
     "global_affairs": 2,
-    "us_politics": 0,
-    "economy": 1
+    "economy": 0,
+    "us_politics": 0
   },
   "columns": {
     "economy": {
       "prefiltered": 14,
       "hard_news_candidates": 14,
-      "hard_news_scored": 10,
-      "post_merge_scored": 3,
+      "hard_news_scored": 7,
+      "post_merge_scored": 2,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 3,
       "source_quota_dropped": 0,
-      "detailed_filled": 3,
+      "detailed_filled": 2,
       "headline_filled": 3,
-      "post_score_filtered": 3,
+      "post_score_filtered": 2,
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 1,
-      "headline_body_from_title": 2,
+      "headline_reader_body_missing": 0,
+      "headline_body_from_title": 4,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 1,
+      "headline_duplicate_dropped": 0,
       "headline_soft_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
       "fill_added": 0,
       "deduped_detailed": 0,
+      "headline_org_capped": 1,
       "rendered_detailed": 2,
-      "rendered_headline_only": 1
+      "rendered_headline_only": 2
     },
     "global_affairs": {
       "prefiltered": 26,
       "hard_news_candidates": 26,
-      "hard_news_scored": 15,
-      "post_merge_scored": 13,
+      "hard_news_scored": 16,
+      "post_merge_scored": 11,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 5,
+      "headline_filled_from_non_hard_news": 7,
       "source_quota_dropped": 0,
       "detailed_filled": 10,
       "headline_filled": 8,
-      "post_score_filtered": 13,
+      "post_score_filtered": 11,
       "headline_translated": 8,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 1,
-      "headline_body_from_title": 2,
+      "headline_reader_body_missing": 2,
+      "headline_body_from_title": 4,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 3,
@@ -1913,16 +1914,16 @@
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 1,
+      "fill_added": 2,
       "deduped_detailed": 0,
-      "detailed_downgraded_to_headline_only": 1,
-      "rendered_detailed": 8,
+      "detailed_downgraded_to_headline_only": 2,
+      "rendered_detailed": 7,
       "rendered_headline_only": 4
     },
     "technology": {
-      "prefiltered": 22,
-      "hard_news_candidates": 22,
-      "hard_news_scored": 6,
+      "prefiltered": 23,
+      "hard_news_candidates": 23,
+      "hard_news_scored": 5,
       "post_merge_scored": 5,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
@@ -1943,46 +1944,45 @@
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 1,
-      "deduped_detailed": 0,
-      "detailed_downgraded_to_headline_only": 1,
+      "fill_added": 2,
+      "deduped_detailed": 2,
       "rendered_detailed": 3,
-      "rendered_headline_only": 3
+      "rendered_headline_only": 2
     },
     "us_politics": {
       "prefiltered": 21,
       "hard_news_candidates": 21,
-      "hard_news_scored": 5,
-      "post_merge_scored": 4,
+      "hard_news_scored": 6,
+      "post_merge_scored": 6,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 8,
       "source_quota_dropped": 0,
-      "detailed_filled": 4,
+      "detailed_filled": 6,
       "headline_filled": 8,
-      "post_score_filtered": 4,
+      "post_score_filtered": 6,
       "headline_translated": 8,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 2,
+      "headline_reader_body_missing": 1,
       "headline_body_from_title": 6,
       "headline_opinion_dropped": 1,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 2,
+      "headline_duplicate_dropped": 3,
       "headline_soft_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
       "fill_added": 0,
       "deduped_detailed": 0,
-      "rendered_detailed": 3,
+      "rendered_detailed": 4,
       "rendered_headline_only": 3
     }
   },
   "ai": {
     "score_errors": 0,
     "digest_failures": {},
-    "score_duration_seconds": 329.4
+    "score_duration_seconds": 313.6
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -1991,58 +1991,58 @@
         "2026-09-16",
         "2026-09-17"
       ],
-      "kept": 83,
+      "kept": 84,
       "dropped": 0,
       "dropped_by_column": {}
     },
     "scored_events": {
-      "total": 36,
+      "total": 34,
       "freshness_ratio": 1.0,
-      "today_count": 36,
+      "today_count": 34,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 36
+        "today": 34
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 36,
+      "fresh_after_gate": 34,
       "gate_failed": false
     },
     "before_render": {
-      "total": 36,
+      "total": 34,
       "freshness_ratio": 1.0,
-      "today_count": 36,
+      "today_count": 34,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 36
+        "today": 34
       },
       "allowed_dates": [
         "2026-09-16",
         "2026-09-17"
       ],
-      "fresh_after_gate": 36,
+      "fresh_after_gate": 34,
       "gate_failed": false
     }
   },
   "candidate_pool": {
-    "upserted": 83,
-    "total": 83
+    "upserted": 84,
+    "total": 84
   },
   "routine_notice_dropped": 0,
-  "low_newsworthiness_dropped": 1,
+  "low_newsworthiness_dropped": 3,
   "report_events": {
-    "upserted": 36,
-    "hard_news": 36
+    "upserted": 34,
+    "hard_news": 34
   },
   "freshness_ratio": 1.0,
-  "today_count": 36,
+  "today_count": 34,
   "old_count": 0,
   "unknown_date_count": 0,
-  "events_merged_duplicates": 11,
+  "events_merged_duplicates": 10,
   "content_audit": {
     "duplicate_titles": 0,
     "old_body_dates": 0,
@@ -2051,26 +2051,27 @@
     "meta_commentary": 0,
     "pipeline_leak": 0,
     "untranslated_terms": 0,
-    "long_titles": 3
+    "long_titles": 0,
+    "long_headline_bodies": 0
   },
   "candidates_archive": "docs/news/candidates/2026-09-17",
   "rejections": {
-    "low_newsworthiness": 1,
-    "duplicate_event": 17,
-    "unreadable_body": 5,
+    "low_newsworthiness": 3,
+    "duplicate_event": 18,
     "soft_news": 1,
+    "unreadable_body": 4,
     "opinion_piece": 1
   },
   "lead": {
-    "column": "us_politics",
-    "title": "美国国会通过涉俄制裁法案 送交特朗普",
-    "body": "9 月 16 日，美国国会通过一项涉俄制裁法案。南华早报报道称，该法案以二级制裁打击俄罗斯能源的主要买家中国和印度。该法案以林赛·格雷厄姆命名，并已送交特朗普。",
-    "score": null,
-    "newsworthiness": null
+    "column": "global_affairs",
+    "title": "美军高官称须做好太空作战准备",
+    "body": "9 月 16 日，美军参谋长联席会议主席凯恩表示，美军须准备从海底到地月空间都能作战。联合早报报道称，美国太空军计划在五年内扩编至 2.5 万人。",
+    "score": 68,
+    "newsworthiness": 0.515
   },
   "report": {
     "title": "2026年9月17日 日报",
     "published_at": "2026-09-17T07:45:00+08:00",
-    "duration_seconds": 131.7
+    "duration_seconds": 129.8
   }
 }

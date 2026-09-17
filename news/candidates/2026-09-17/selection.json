@@ -7,32 +7,10 @@
   },
   "items": [
     {
-      "candidate_id": "美国国会通过涉俄制裁法案 送交特朗普",
+      "candidate_id": "美国证券交易委员会拟废除股东提案规则",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "美国国会通过涉俄制裁法案 送交特朗普",
-      "score": null,
-      "selection_reason": "slot=detailed",
-      "sources": [
-        {
-          "title": "South China Morning Post",
-          "url": "https://www.scmp.com/news/us/economy-trade-business/article/3367782/us-congress-passes-bill-targeting-russias-leading-energy-buyers-china-and-india?utm_source=rss_feed"
-        },
-        {
-          "title": "NPR",
-          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
-        },
-        {
-          "title": "DW",
-          "url": "https://www.dw.com/en/us-congress-passes-russia-sanctions-bill/a-79299088?maca=en-rss-en-all-1573-rdf"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美国证交会提议废除股东提案规则 14a-8",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "美国证交会提议废除股东提案规则 14a-8",
+      "title_zh": "美国证券交易委员会拟废除股东提案规则",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
@@ -43,10 +21,10 @@
       ]
     },
     {
-      "candidate_id": "众议院委员会裁定布莱克藐视国会",
+      "candidate_id": "众院委员会认定布莱克藐视国会",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "众议院委员会裁定布莱克藐视国会",
+      "title_zh": "众院委员会认定布莱克藐视国会",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
@@ -57,10 +35,38 @@
       ]
     },
     {
-      "candidate_id": "北卡参院选举成民主党翻转共和党席位最佳机会",
+      "candidate_id": "约翰逊宣布众议院提前休会",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "约翰逊宣布众议院提前休会",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/news-wrap-johnson-recesses-house-early"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普签署联邦水质行政令",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普签署联邦水质行政令",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "White House News",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/providing-meaningful-water-quality-improvements-through-collaboration-and-oversight-of-federal-support/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "北卡参议院选战成民主党翻转共和党席位最佳机会",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "北卡参院选举成民主党翻转共和党席位最佳机会",
+      "title_zh": "北卡参议院选战成民主党翻转共和党席位最佳机会",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -85,58 +91,38 @@
       ]
     },
     {
-      "candidate_id": "美国三年来首次加息",
+      "candidate_id": "民主党高层反对美国向以色列出售重型炸弹",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "美国三年来首次加息",
+      "title_zh": "民主党高层反对美国向以色列出售重型炸弹",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
         {
           "title": "BBC US & Canada",
-          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
+          "url": "https://www.bbc.co.uk/news/articles/crn8e20lep75o?at_medium=RSS&at_campaign=rss"
         }
       ]
     },
     {
-      "candidate_id": "美国国会通过大规模对俄制裁法案",
+      "candidate_id": "美国国会通过对俄制裁法案",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "美国国会通过大规模对俄制裁法案",
+      "title_zh": "美国国会通过对俄制裁法案",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "Al Jazeera",
-          "url": "https://www.aljazeera.com/news/2026/9/17/congress-passes-sweeping-us-sanctions-bill-targeting-russia?traffic_source=rss"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美众院民主党人拒放行以色列军售",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "美众院民主党人拒放行以色列军售",
-      "score": null,
-      "selection_reason": "slot=detailed",
-      "sources": [
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/news/us/economy-trade-business/article/3367782/us-congress-passes-bill-targeting-russias-leading-energy-buyers-china-and-india?utm_source=rss_feed"
+        },
         {
-          "title": "The Guardian",
-          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNeEIwVHNucWh6QzFJeDVwel8ybm9MTW1Tby15aDMzWG5LU0FITTIxMWJ1ZEFEcENTZTd4VndqUVpEdGU2aDBQYXQ3MG9QR1J4ZkE3M3hGazk4MlVFYlVhMVo1akliV1hQTUJtNHJYdElIS3lqWnBEUTgwTGtnWkdzbTdWYWxCU1JE?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "加沙城战损建筑倒塌致 21 人死亡",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "加沙城战损建筑倒塌致 21 人死亡",
-      "score": null,
-      "selection_reason": "slot=detailed",
-      "sources": [
+          "title": "NPR",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
+        },
         {
-          "title": "BBC News",
-          "url": "https://www.bbc.co.uk/news/articles/cvp8d00j9gg5o?at_medium=RSS&at_campaign=rss"
+          "title": "Deutsche Welle",
+          "url": "https://www.dw.com/en/us-congress-passes-russia-sanctions-bill/a-79299088?maca=en-rss-en-all-1573-rdf"
         }
       ]
     },
@@ -149,48 +135,52 @@
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "France 24",
+          "title": "France24",
           "url": "http://www.france24.com/en/middle-east/20260917-israel-morocco-embassies-new-york"
+        },
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/9/16/israel-and-morocco-agree-to-open-embassies-upgrading-diplomatic-ties?traffic_source=rss"
         }
       ]
     },
     {
-      "candidate_id": "俄无人机袭乌巴士与列车致 5 人死亡",
+      "candidate_id": "俄无人机袭乌克兰客车致 5 人死亡",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "俄无人机袭乌巴士与列车致 5 人死亡",
+      "title_zh": "俄无人机袭乌克兰客车致 5 人死亡",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
+        {
+          "title": "Pittsburgh Post-Gazette",
+          "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPcW1ubG9qWHFFSXZ0Rmc1SnF0NkhLUVdNLVc2U3NNUzYtcnB1b0JPVkc5dlBHbEtEbXRCM2ZqTGZOM1lFU28xZk1QdjBFQ21wcEh1Uk9UbzMySjk4QnZPYkhNeVpubmdYaUpaS1NGSWoyZ1VTVGRySVNZS3Y1SkZnSnh2QUZGQ3hIMUNRSmZjdl94a1hIVWJwSjNWZmhsTEhwQWdiT2p3cTdlYnp0R3NXR2VDbmo2a0c2d2FscA?oc=5"
+        },
         {
           "title": "The Independent",
           "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOV2pSWVBFUFNiR2ptV2V1QUYwR0V3VjdBMjhTUS1fTjYtbHQzdXRYXzc4aWtWWk9CZmQ4T3hWMENOVXctSnZzcW8wampFQllTLWZUd0R0NWUzNDJiUXZGWjlrVlp0T3YxYXNBbmNic29tSHpwcVR2NjJYLTdHNVRQVHgwRXRDbnFyRk5RcV82ajlmSFI5dmdTSVNDcmdiRmhfVzRPa1MzaTAxUGJlbjBMcmVB?oc=5"
-        },
-        {
-          "title": "The Guardian",
-          "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQeVdMaHBoT0Nnb2cxUk9FZGpiNk12QWN0Q1ZLSUFvQzZxbFdZUV96c0JaLTZjOFVFb0lBNVEyS1p6bXllYVVaVHdsZGV3MHJreFNXNTAyS0pOS0lKTGFncDVvbVdKQ1ZfYXBmcXhudVlQNFRJS0QwU1duTXdQTzBBbUZLeVAwb2NMNG03d3ZTbTFuQkt0UlRfTXdQS0tmakNLRUJMSWFXaTdiX21Bb2FCbllxaFZ6MFNVMXc1QjhnV1kzUUtiajFkTFRBWTdhTnBKeFE?oc=5"
         }
       ]
     },
     {
-      "candidate_id": "美军参联会主席称须准备太空作战",
+      "candidate_id": "加沙城战损建筑倒塌致 21 人死亡",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "美军参联会主席称须准备太空作战",
+      "title_zh": "加沙城战损建筑倒塌致 21 人死亡",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "联合早报",
-          "url": "https://www.zaobao.com/news/world/story20260917-9688752"
+          "title": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cvp8d00j9gg5o?at_medium=RSS&at_campaign=rss"
         }
       ]
     },
     {
-      "candidate_id": "加拿大申请加入英国联合远征军",
+      "candidate_id": "加拿大申请加入联合远征军",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "加拿大申请加入英国联合远征军",
+      "title_zh": "加拿大申请加入联合远征军",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
@@ -201,93 +191,107 @@
       ]
     },
     {
-      "candidate_id": "国际海事组织就中东商船遇袭发警报",
+      "candidate_id": "美国制裁巴勒斯坦权力机构官员",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "国际海事组织就中东商船遇袭发警报",
+      "title_zh": "美国制裁巴勒斯坦权力机构官员",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "UN News",
-          "url": "https://news.un.org/feed/view/en/story/2026/09/1168352"
+          "title": "U.S. State Department",
+          "url": "https://www.state.gov/releases/office-of-the-spokesman/2026/09/sanctioning-officials-of-the-palestinian-authority-and-members-of-the-palestine-liberation-organization-2/"
         }
       ]
     },
     {
-      "candidate_id": "israel_bomb_sale_20260916",
+      "candidate_id": "美军高官称须做好太空作战准备",
       "column": "global_affairs",
-      "slot": "headline",
-      "title_zh": "民主党高层反对美国向以色列出售重型炸弹",
-      "score": 70,
-      "selection_reason": "score=70, slot=headline",
+      "slot": "detailed",
+      "title_zh": "美军高官称须做好太空作战准备",
+      "score": null,
+      "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "Top Democrat opposes US sale of heavy bombs to Israel",
-          "url": "https://www.bbc.co.uk/news/articles/crn8e20lep75o?at_medium=RSS&at_campaign=rss",
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20260917-9688752"
+        }
+      ]
+    },
+    {
+      "candidate_id": "ukraine_commander_killed_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "卫报：俄指挥官因虚假捷报受勋后遭无人机击杀",
+      "score": 65,
+      "selection_reason": "score=65, slot=headline",
+      "sources": [
+        {
+          "title": "Ukraine war briefing: Drone kills Russian commander just decorated after fake victory claim - The Guardian",
+          "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQeVdMaHBoT0Nnb2cxUk9FZGpiNk12QWN0Q1ZLSUFvQzZxbFdZUV96c0JaLTZjOFVFb0lBNVEyS1p6bXllYVVaVHdsZGV3MHJreFNXNTAyS0pOS0lKTGFncDVvbVdKQ1ZfYXBmcXhudVlQNFRJS0QwU1duTXdQTzBBbUZLeVAwb2NMNG03d3ZTbTFuQkt0UlRfTXdQS0tmakNLRUJMSWFXaTdiX21Bb2FCbllxaFZ6MFNVMXc1QjhnV1kzUUtiajFkTFRBWTdhTnBKeFE?oc=5",
+          "via": "Google News",
           "primary": true
         }
       ]
     },
     {
-      "candidate_id": "veterans_health_cap_20260917",
+      "candidate_id": "新加坡“诺克斯堡”：20亿美元黑钱拍卖内幕",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "兰比等强烈反对后 工党撤回退伍军人医疗服务上…",
-      "score": 70,
-      "selection_reason": "score=70, slot=headline",
-      "sources": [
-        {
-          "title": "Labor backs down on veterans’ health services cap after furious backlash from Jacqui Lambie and ex-ADF members",
-          "url": "https://www.theguardian.com/australia-news/2026/sep/17/veterans-allied-health-care-cap-jacqui-lambie-labor-backdown",
-          "primary": true
-        }
-      ]
-    },
-    {
-      "candidate_id": "pa_plo_sanctions_20260916",
-      "column": "global_affairs",
-      "slot": "headline",
-      "title_zh": "制裁巴勒斯坦民族权力机构官员和巴解组织成员",
-      "score": 66,
-      "selection_reason": "score=66, slot=headline",
-      "sources": [
-        {
-          "title": "Sanctioning Officials of the Palestinian Authority and Members of the Palestine Liberation Organization",
-          "url": "https://www.state.gov/releases/office-of-the-spokesman/2026/09/sanctioning-officials-of-the-palestinian-authority-and-members-of-the-palestine-liberation-organization-2/",
-          "primary": true
-        }
-      ]
-    },
-    {
-      "candidate_id": "亨特·利格特堡与伙伴联手扑救普拉斯基特山火",
-      "column": "global_affairs",
-      "slot": "headline",
-      "title_zh": "亨特·利格特堡与伙伴联手扑救普拉斯基特山火",
+      "title_zh": "新加坡“诺克斯堡”：20亿美元黑钱拍卖内幕",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
         {
-          "title": "U.S. Department of Defense",
-          "url": "https://www.war.gov/News/News-Stories/Article/Article/4603018/fort-hunter-liggett-partners-unify-to-battle-plaskett-fire/"
+          "title": "BBC World",
+          "url": "https://www.bbc.co.uk/news/videos/cmew984dq92lo?at_medium=RSS&at_campaign=rss"
         }
       ]
     },
     {
-      "candidate_id": "OpenAI发布模型失准披露框架",
+      "candidate_id": "俄非关系：莫斯科在非洲影响力上升",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "俄非关系：莫斯科在非洲影响力上升",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "France24",
+          "url": "http://www.france24.com/en/video/20260916-russia-africa-ties-moscow-s-growing-influence-in-africa"
+        }
+      ]
+    },
+    {
+      "candidate_id": "australia_migration_policy_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "澳洲拟收紧移民政策 禁留学生求学期间携伴侣…",
+      "score": 78,
+      "selection_reason": "score=78, slot=headline",
+      "sources": [
+        {
+          "title": "澳洲拟收紧移民政策 禁留学生求学期间携伴侣及子女",
+          "url": "https://www.zaobao.com/news/world/story20260917-9688945",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI 发布模型失准披露框架",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "OpenAI发布模型失准披露框架",
+      "title_zh": "OpenAI 发布模型失准披露框架",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "Wired",
-          "url": "https://www.wired.com/story/openai-releases-new-policy-for-reporting-incidents-of-model-misalignment/"
+          "title": "OpenAI Blog",
+          "url": "https://openai.com/index/model-misalignment-reporting-framework"
         },
         {
-          "title": "Reuters",
-          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQZ09uWFd0WmUtWloyeENhUWp5NFJiNVF6REhDTUE2ZHZETW5DLUkyRG5QNDhfb0pvVWd5TkVLUEh0WnVja3dxMWJuU2ItSmRQLWM1bFJwN3RmdG03OWRhTXhzejQ2RHpBOTZ4d3hzQXdXOVNycjliMmlRSWhvOUF4NkpkVXVLcnZ2MThmTXpXMlJhQzVZQ0ZkWVAwX1Uwdw?oc=5"
+          "title": "Wired",
+          "url": "https://www.wired.com/story/openai-releases-new-policy-for-reporting-incidents-of-model-misalignment/"
         },
         {
           "title": "The New York Times",
@@ -296,10 +300,24 @@
       ]
     },
     {
-      "candidate_id": "谷歌英伟达等组建数据中心用电联盟",
+      "candidate_id": "法官令 X 与 SpaceXAI 披露苹果撤诉协议",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "谷歌英伟达等组建数据中心用电联盟",
+      "title_zh": "法官令 X 与 SpaceXAI 披露苹果撤诉协议",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "AIHOT",
+          "url": "https://aihot.news/items/cmu4seygf06durokc85h5ce5u"
+        }
+      ]
+    },
+    {
+      "candidate_id": "谷歌英伟达等组建柔性数据中心联盟",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "谷歌英伟达等组建柔性数据中心联盟",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
@@ -310,24 +328,10 @@
       ]
     },
     {
-      "candidate_id": "苹果被曝研发 M 系列 Ultra AI 服务器",
-      "column": "technology",
-      "slot": "detailed",
-      "title_zh": "苹果被曝研发 M 系列 Ultra AI 服务器",
-      "score": null,
-      "selection_reason": "slot=detailed",
-      "sources": [
-        {
-          "title": "Ars Technica",
-          "url": "https://arstechnica.com/ai/2026/09/apple-reportedly-building-server-packed-with-m-series-ultra-chips-for-ai/"
-        }
-      ]
-    },
-    {
-      "candidate_id": "Meta的Muse主打人人易用，被看好赢下大…",
+      "candidate_id": "Meta的Muse主打人人易用，被看好赢下…",
       "column": "technology",
       "slot": "headline",
-      "title_zh": "Meta的Muse主打人人易用，被看好赢下大…",
+      "title_zh": "Meta的Muse主打人人易用，被看好赢下…",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -338,10 +342,10 @@
       ]
     },
     {
-      "candidate_id": "帮助老年人使用AI融入日常生活",
+      "candidate_id": "帮助老年人将AI用于日常生活",
       "column": "technology",
       "slot": "headline",
-      "title_zh": "帮助老年人使用AI融入日常生活",
+      "title_zh": "帮助老年人将AI用于日常生活",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -352,61 +356,56 @@
       ]
     },
     {
-      "candidate_id": "ai_datacenter_energy_alliance_20260916",
-      "column": "technology",
-      "slot": "headline",
-      "title_zh": "Emerald AI、Google与NVID…",
-      "score": 70,
-      "selection_reason": "score=70, slot=headline",
-      "sources": [
-        {
-          "title": "Emerald AI, Google and NVIDIA Launch Alliance to Advance Flexible AI Data Centers",
-          "url": "https://blogs.nvidia.com/blog/ai-energy-management-alliance/",
-          "primary": true
-        }
-      ]
-    },
-    {
-      "candidate_id": "美联储加息 25 个基点至 3.75%-4%",
+      "candidate_id": "美联储三年来首次加息25个基点",
       "column": "economy",
       "slot": "detailed",
-      "title_zh": "美联储加息 25 个基点至 3.75%-4%",
+      "title_zh": "美联储三年来首次加息25个基点",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
-          "title": "华尔街见闻",
-          "url": "https://wallstreetcn.com/articles/3781935"
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
         },
         {
           "title": "财新",
           "url": "https://international.caixin.com/2026-09-17/102485615.html"
         },
         {
-          "title": "BBC",
-          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
+          "title": "美联储",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916b.htm"
         },
         {
           "title": "Fortune",
           "url": "https://fortune.com/2026/09/16/warsh-fed-hike-ai-hyperscalers-treasury-yields/"
-        },
-        {
-          "title": "36氪",
-          "url": "https://www.36kr.com/p/3986735004892164"
         }
       ]
     },
     {
-      "candidate_id": "特朗普签署联邦采购对等互惠备忘录",
+      "candidate_id": "白宫要求联邦采购实行对等原则",
       "column": "economy",
       "slot": "detailed",
-      "title_zh": "特朗普签署联邦采购对等互惠备忘录",
+      "title_zh": "白宫要求联邦采购实行对等原则",
       "score": null,
       "selection_reason": "slot=detailed",
       "sources": [
         {
           "title": "White House News",
           "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-reciprocity-in-government-procurement/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美联储理事会与FOMC发布9月会议经济预测",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "美联储理事会与FOMC发布9月会议经济预测",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Federal Reserve",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916b.htm"
         }
       ]
     },
