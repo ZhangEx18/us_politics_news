@@ -27,6 +27,7 @@ from ai_analyzer import (
 )
 from database import build_source_health_summary
 from feed_builder import save_feed
+from content_policy import REJECT_REASONS
 from publish_manifest import build_manifest
 from report_renderer import COLUMN_ORDER, save_daily_report
 
@@ -580,6 +581,43 @@ def _dedupe_daily_column_events(
 
 def _normalize_event_title(title: str) -> str:
     return re.sub(r"[^0-9A-Za-z\u4e00-\u9fff]+", "", str(title or "")).lower()
+
+
+_REJECTION_METRIC_MAP: dict[str, str] = {
+    "routine_notice_dropped": "routine_notice",
+    "low_newsworthiness_dropped": "low_newsworthiness",
+    "source_quota_dropped": "source_quota",
+    "headline_cryptic_dropped": "cryptic_title",
+    "headline_opinion_dropped": "opinion_piece",
+    "headline_promo_dropped": "promo_piece",
+    "headline_soft_dropped": "soft_news",
+    "headline_duplicate_dropped": "duplicate_event",
+    "headline_reader_body_missing": "unreadable_body",
+    "deduped_detailed": "duplicate_event",
+    "events_merged_duplicates": "duplicate_event",
+}
+
+
+def _summarize_rejections(metrics: dict) -> dict[str, int]:
+    """把散落的拒绝计数按统一原因汇总，便于观测每日被拒构成。"""
+    summary: dict[str, int] = {}
+
+    def _add(reason: str, count: object) -> None:
+        try:
+            value = int(count)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            return
+        if value > 0:
+            summary[reason] = summary.get(reason, 0) + value
+
+    for key, reason in _REJECTION_METRIC_MAP.items():
+        _add(reason, metrics.get(key))
+    for column_metrics in (metrics.get("columns") or {}).values():
+        if not isinstance(column_metrics, dict):
+            continue
+        for key, reason in _REJECTION_METRIC_MAP.items():
+            _add(reason, column_metrics.get(key))
+    return summary
 
 
 def _select_lead_event(columns: dict) -> dict | None:
@@ -1852,6 +1890,14 @@ def build_report(
             metrics["candidates_archive"] = archive_dir
         except Exception as exc:  # noqa: BLE001 - 归档失败不影响发布
             print(f"   候选归档失败: {exc}")
+        rejections = _summarize_rejections(metrics)
+        if rejections:
+            metrics["rejections"] = rejections
+            parts = [
+                f"{REJECT_REASONS.get(reason, reason)} {count}"
+                for reason, count in sorted(rejections.items(), key=lambda item: -item[1])
+            ]
+            print(f"   拒绝汇总: {'，'.join(parts)}")
         print(
             "   内容审计: "
             f"重复标题 {content_audit['duplicate_titles']}，"
