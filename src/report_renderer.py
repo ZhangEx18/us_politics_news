@@ -67,8 +67,11 @@ def _markdown_title_text(text: object) -> str:
 
 
 def _headline_only_text(event: dict) -> str:
-    """headline_only_events 优先使用可读短句，缺失时回退中文标题。"""
-    return str(event.get("reader_body") or event.get("title_zh") or "").strip()
+    """headline_only_events 优先使用可读短句，缺失时回退中文标题；渲染层兜底压缩。"""
+    text = str(event.get("reader_body") or event.get("title_zh") or "").strip()
+    if len(text) > 37:
+        text = text[:36].rstrip(" ，,。；;:：") + "…"
+    return text
 
 
 def _has_cjk(text: object) -> bool:
