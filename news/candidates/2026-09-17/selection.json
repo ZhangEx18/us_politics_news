@@ -7,58 +7,26 @@
   },
   "items": [
     {
-      "candidate_id": "美国环保署部分废除电厂碳排放标准",
+      "candidate_id": "EPA 部分废除电厂碳污染标准",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "美国环保署部分废除电厂碳排放标准",
+      "title_zh": "EPA 部分废除电厂碳污染标准",
       "score": 78,
-      "selection_reason": "score=78, nw=0.647, stage=首发, slot=detailed",
+      "selection_reason": "score=78, nw=0.645, stage=首发, slot=detailed",
       "sources": [
         {
           "title": "Federal Register",
           "url": "https://www.federalregister.gov/documents/2026/09/17/2026-19071/partial-repeal-of-the-carbon-pollution-standards-for-fossil-fuel-fired-electric-generating-units"
-        },
-        {
-          "title": "Federal Register",
-          "url": "https://www.federalregister.gov/documents/2026/09/17/2026-19072/rescission-of-the-greenhouse-gas-findings-for-fossil-fuel-fired-power-plants-and-repeal-of"
         }
       ]
     },
     {
-      "candidate_id": "肯尼迪中心主楼关闭并架起围栏",
+      "candidate_id": "众议院议长约翰逊宣布提前休会",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "肯尼迪中心主楼关闭并架起围栏",
-      "score": 66,
-      "selection_reason": "score=66, nw=0.555, stage=跟进, slot=detailed",
-      "sources": [
-        {
-          "title": "AP News",
-          "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxObC10Q2xCdEtYZzZHVElOamk3X19QVGtfYi1LS3BlanhOT1hMWmJ2REZBZWtQYWlmaXFfRUF4ZzdzU3dDalFFbHpxZ3E4M1BLakRsT0dZWS1zRTFDRWdGbFlNZ0hlc0o4RTBEbHU1clpSYy1TLV82YmgxSTZ5eGRuaGJZVmRmQkh1eS1IMkNYaEotNDU4ZTZCR0ttQnVfQ1V1RkZ0YQ?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美撤销电厂温室气体认定与排放法规",
-      "column": "us_politics",
-      "slot": "headline",
-      "title_zh": "美撤销电厂温室气体认定与排放法规",
-      "score": 0,
-      "selection_reason": "score=0, nw=0.645, stage=跟进, slot=headline",
-      "sources": [
-        {
-          "title": "Federal Register",
-          "url": "https://www.federalregister.gov/documents/2026/09/17/2026-19072/rescission-of-the-greenhouse-gas-findings-for-fossil-fuel-fired-power-plants-and-repeal-of"
-        }
-      ]
-    },
-    {
-      "candidate_id": "新闻综述：约翰逊提前让众议院休会",
-      "column": "us_politics",
-      "slot": "headline",
-      "title_zh": "新闻综述：约翰逊提前让众议院休会",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "title_zh": "众议院议长约翰逊宣布提前休会",
+      "score": 64,
+      "selection_reason": "score=64, nw=0.595, stage=跟进, slot=detailed",
       "sources": [
         {
           "title": "PBS NewsHour",
@@ -67,10 +35,38 @@
       ]
     },
     {
-      "candidate_id": "民主党视北卡参院选战为翻盘最佳机会",
+      "candidate_id": "肯尼迪中心董事会投票关闭主楼",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "肯尼迪中心董事会投票关闭主楼",
+      "score": 63,
+      "selection_reason": "score=63, nw=0.51, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "AP News",
+          "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxObC10Q2xCdEtYZzZHVElOamk3X19QVGtfYi1LS3BlanhOT1hMWmJ2REZBZWtQYWlmaXFfRUF4ZzdzU3dDalFFbHpxZ3E4M1BLakRsT0dZWS1zRTFDRWdGbFlNZ0hlc0o4RTBEbHU1clpSYy1TLV82YmgxSTZ5eGRuaGJZVmRmQkh1eS1IMkNYaEotNDU4ZTZCR0ttQnVfQ1V1RkZ0YQ?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "撤销电厂温室气体危害认定并废除其排放监管",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "民主党视北卡参院选战为翻盘最佳机会",
+      "title_zh": "撤销电厂温室气体危害认定并废除其排放监管",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Federal Register",
+          "url": "https://www.federalregister.gov/documents/2026/09/17/2026-19072/rescission-of-the-greenhouse-gas-findings-for-fossil-fuel-fired-power-plants-and-repeal-of"
+        }
+      ]
+    },
+    {
+      "candidate_id": "北卡州参议院选战成民主党翻盘最佳机会",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "北卡州参议院选战成民主党翻盘最佳机会",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -81,12 +77,12 @@
       ]
     },
     {
-      "candidate_id": "美参议院49比50否决加密监管法案",
+      "candidate_id": "美参议院否决《CLARITY 法案》程序性…",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "美参议院49比50否决加密监管法案",
-      "score": 73,
-      "selection_reason": "score=73, nw=0.615, stage=跟进, slot=headline",
+      "title_zh": "美参议院否决《CLARITY 法案》程序性…",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.63, stage=跟进, slot=headline",
       "sources": [
         {
           "title": "华尔街见闻",
@@ -95,140 +91,174 @@
       ]
     },
     {
-      "candidate_id": "特朗普威胁就欧盟加拿大结盟加征关税",
+      "candidate_id": "美众议院通过对俄制裁法案并递交特朗普",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "特朗普威胁就欧盟加拿大结盟加征关税",
-      "score": 82,
-      "selection_reason": "score=82, nw=0.765, stage=首发, slot=detailed",
+      "title_zh": "美众议院通过对俄制裁法案并递交特朗普",
+      "score": 86,
+      "selection_reason": "score=86, nw=0.795, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "财新国际 - 欧盟加拿大拟建独特联盟 特朗普称若属“敌对行为”将加征重税",
-          "url": "https://international.caixin.com/2026-09-17/102485741.html"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美国国会通过对俄全面制裁法案",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "美国国会通过对俄全面制裁法案",
-      "score": 82,
-      "selection_reason": "score=82, nw=0.735, stage=首发, slot=detailed",
-      "sources": [
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/09/16/nx-s1-5971289/russia-sanctions-house-vote-lindsey-graham"
+        },
         {
-          "title": "Al Jazeera - Congress passes sweeping US sanctions bill targeting Russia",
+          "title": "France24",
+          "url": "http://www.france24.com/en/europe/20260917-live-explosions-kyiv-us-congress-sanctions-moscow"
+        },
+        {
+          "title": "DW",
+          "url": "https://www.dw.com/en/us-congress-passes-russia-sanctions-bill/a-79299088?maca=en-rss-en-all-1573-rdf"
+        },
+        {
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/news/us/economy-trade-business/article/3367782/us-congress-passes-bill-targeting-russias-leading-energy-buyers-china-and-india?utm_source=rss_feed"
+        },
+        {
+          "title": "Al Jazeera",
           "url": "https://www.aljazeera.com/news/2026/9/17/congress-passes-sweeping-us-sanctions-bill-targeting-russia?traffic_source=rss"
         }
       ]
     },
     {
-      "candidate_id": "俄军空袭基辅和敖德萨致数人受伤",
+      "candidate_id": "特朗普警告欧盟与加拿大结盟或属敌对行为",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "俄军空袭基辅和敖德萨致数人受伤",
-      "score": 72,
-      "selection_reason": "score=72, nw=0.555, stage=跟进, slot=detailed",
+      "title_zh": "特朗普警告欧盟与加拿大结盟或属敌对行为",
+      "score": 83,
+      "selection_reason": "score=83, nw=0.753, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "DW News - Ukraine: Russian strikes injure several in Kyiv, Odesa",
-          "url": "https://www.dw.com/en/ukraine-russian-strikes-injure-several-in-kyiv-odesa/a-79299579?maca=en-rss-en-all-1573-rdf"
+          "title": "财新国际",
+          "url": "https://international.caixin.com/2026-09-17/102485741.html"
         }
       ]
     },
     {
-      "candidate_id": "以色列与摩洛哥同意互设大使馆",
+      "candidate_id": "以色列与摩洛哥同意互设使馆",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "以色列与摩洛哥同意互设大使馆",
-      "score": 72,
-      "selection_reason": "score=72, nw=0.547, stage=首发, slot=detailed",
+      "title_zh": "以色列与摩洛哥同意互设使馆",
+      "score": 79,
+      "selection_reason": "score=79, nw=0.605, stage=跟进, slot=detailed",
       "sources": [
         {
-          "title": "France24 - Israel and Morocco agree to open embassies after New York talks",
+          "title": "France24",
           "url": "http://www.france24.com/en/middle-east/20260917-israel-morocco-embassies-new-york"
         }
       ]
     },
     {
-      "candidate_id": "加拿大申请加入联合远征军",
+      "candidate_id": "加拿大申请加入英国主导的联合远征军",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "加拿大申请加入联合远征军",
+      "title_zh": "加拿大申请加入英国主导的联合远征军",
       "score": 74,
-      "selection_reason": "score=74, nw=0.51, stage=首发, slot=detailed",
+      "selection_reason": "score=74, nw=0.57, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "CBC News - Canada wants into Britain's rapid-response defence club",
+          "title": "CBC News - World",
           "url": "https://www.cbc.ca/news/politics/canada-britain-military-expeditionary-force-nato-9.7347144?cmp=rss"
         }
       ]
     },
     {
-      "candidate_id": "乌军无人机击杀俄军指挥官",
+      "candidate_id": "美国制裁巴勒斯坦官员并再拒代表团签证",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "乌军无人机击杀俄军指挥官",
-      "score": 70,
-      "selection_reason": "score=70, nw=0.555, stage=首发, slot=detailed",
+      "title_zh": "美国制裁巴勒斯坦官员并再拒代表团签证",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.562, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "The Guardian - Ukraine war briefing: Drone kills Russian commander just decorated after fake victory claim",
-          "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQeVdMaHBoT0Nnb2cxUk9FZGpiNk12QWN0Q1ZLSUFvQzZxbFdZUV96c0JaLTZjOFVFb0lBNVEyS1p6bXllYVVaVHdsZGV3MHJreFNXNTAyS0pOS0lKTGFncDVvbVdKQ1ZfYXBmcXhudVlQNFRJS0QwU1duTXdQTzBBbUZLeVAwb2NMNG03d3ZTbTFuQkt0UlRfTXdQS0tmakNLRUJMSWFXaTdiX21Bb2FCbllxaFZ6MFNVMXc1QjhnV1kzUUtiajFkTFRBWTdhTnBKeFE?oc=5"
+          "title": "U.S. State Department",
+          "url": "https://www.state.gov/releases/office-of-the-spokesman/2026/09/sanctioning-officials-of-the-palestinian-authority-and-members-of-the-palestine-liberation-organization-2/"
         },
         {
-          "title": "The Independent - Ukraine-Russia war latest: General decorated by Putin for false victory claim killed in Ukrainian drone strike",
-          "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOQkQtQWpJX1VTMWxZdnJUVC0ybkFBeWgyRDZlZnlfTmlvTTQ0SEoxOXhTa25tWGk2TThXOXU1aGVJNlNOTVVOUWdKMmZKTjhQbVdjN2EyeTl4Yy02SjJLdmJYSW1wRE9vVGlqVS1hWkhJMWJ6LUxscHZFb3poSHFWbHhWZWpZN3JYZXFEVDkxQm5nQXhDX21udWRhQThBZUttcjVUemp5SVVSN1FmdURFdHBUNTM1U25zWGNrS1FqNlBKdw?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "普京敦促选民参加俄议会选举",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "普京敦促选民参加俄议会选举",
-      "score": 71,
-      "selection_reason": "score=71, nw=0.61, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "France24 - Putin urges Russians to vote in parliamentary election as show of support for Ukraine war",
-          "url": "http://www.france24.com/en/europe/20260916-putin-urges-russians-to-vote-in-parliamentary-election-as-show-of-support-for-ukraine-war"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美方再拒巴勒斯坦代表团联大签证",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "美方再拒巴勒斯坦代表团联大签证",
-      "score": 72,
-      "selection_reason": "score=72, nw=0.585, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "WTOP News - Trump administration again denies visas for Palestinian delegation to attend the UN General Assembly",
+          "title": "WTOP News",
           "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNZkNjd2xySV9qeGhvbHZTc2I4aHo3SWlPb0h6WjFJRlFmamFlNURjcjZsM1I3cTFDQ1BXVWNuR1VWNlBYSllSZzlUTzhZemlVWkp6YmtxZ1BCLXVVMGJzOVdXaFBUdzZGeldqdXUwZnpvZU1ocXc4WkxOZV9jNlllby1mNm9yWXU1WGdsYzBELXZLOWpvRzlvNVJvZ3VoOUUzbThQUkdJWnFtSHBCcWZpS2QyWTBEMV9QT1piZXpBUHdVZ19qRUl6N0NxT0YxcmRvRVJjSg?oc=5"
         }
       ]
     },
     {
-      "candidate_id": "特朗普将在联大期间会晤海湾领导人",
+      "candidate_id": "俄军空袭基辅与敖德萨致多人受伤",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "特朗普将在联大期间会晤海湾领导人",
-      "score": 74,
-      "selection_reason": "score=74, nw=0.675, stage=首发, slot=detailed",
+      "title_zh": "俄军空袭基辅与敖德萨致多人受伤",
+      "score": 71,
+      "selection_reason": "score=71, nw=0.605, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "The Times of India - Trump to meet Gulf leaders at UN over Iran war, postwar strategy: Report",
-          "url": "https://timesofindia.indiatimes.com/world/us/trump-to-meet-gulf-leaders-at-un-over-iran-war-postwar-strategy-report/articleshow/134299857.cms"
+          "title": "DW News",
+          "url": "https://www.dw.com/en/ukraine-russian-strikes-injure-several-in-kyiv-odesa/a-79299579?maca=en-rss-en-all-1573-rdf"
         }
       ]
     },
     {
-      "candidate_id": "罗森伯格：俄选举几无悬念 对克宫却重要",
+      "candidate_id": "比亚迪小米等企业高管或随习近平访美",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "比亚迪小米等企业高管或随习近平访美",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.643, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/economy/global-economy/article/3367813/byd-xiaomi-and-innolight-executives-likely-join-xi-jinping-us-visit-sources?utm_source=rss_feed"
+        }
+      ]
+    },
+    {
+      "candidate_id": "trump_gulf_iran_meeting_20260917",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "罗森伯格：俄选举几无悬念 对克宫却重要",
+      "title_zh": "特朗普将在联大会晤海湾领导人商讨伊朗战事",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.655, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Trump to meet Gulf leaders at UN over Iran war, postwar strategy: Report",
+          "url": "https://timesofindia.indiatimes.com/world/us/trump-to-meet-gulf-leaders-at-un-over-iran-war-postwar-strategy-report/articleshow/134299857.cms",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "ukraine_russia_war_general_killed_20260917",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "获普京授勋的俄将军在乌无人机袭击中身亡",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.54, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Ukraine-Russia war latest: General decorated by Putin for false victory claim killed in Ukrainian drone strike - The Independent",
+          "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOQkQtQWpJX1VTMWxZdnJUVC0ybkFBeWgyRDZlZnlfTmlvTTQ0SEoxOXhTa25tWGk2TThXOXU1aGVJNlNOTVVOUWdKMmZKTjhQbVdjN2EyeTl4Yy02SjJLdmJYSW1wRE9vVGlqVS1hWkhJMWJ6LUxscHZFb3poSHFWbHhWZWpZN3JYZXFEVDkxQm5nQXhDX21udWRhQThBZUttcjVUemp5SVVSN1FmdURFdHBUNTM1U25zWGNrS1FqNlBKdw?oc=5",
+          "via": "Google News",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "imo_shipping_alert_20260916",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "国际海事组织发航运警报 尼加拉瓜民主消亡",
+      "score": 66,
+      "selection_reason": "score=66, nw=0.535, stage=回应, slot=headline",
+      "sources": [
+        {
+          "title": "World News in Brief: Shipping alert from IMO, democracy vanishing in Nicaragua, alert over political ‘denialism’",
+          "url": "https://news.un.org/feed/view/en/story/2026/09/1168352",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "罗森伯格：俄选举料无悬念 对克宫却举足轻重",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "罗森伯格：俄选举料无悬念 对克宫却举足轻重",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -239,16 +269,17 @@
       ]
     },
     {
-      "candidate_id": "国际学生、频繁换签者和背包客成澳移民打击目标",
+      "candidate_id": "australia_migration_crackdown_20260917",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "国际学生、频繁换签者和背包客成澳移民打击目标",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "title_zh": "澳大利亚收紧移民政策，目标2028年将净移…",
+      "score": 73,
+      "selection_reason": "score=73, nw=0.595, stage=首发, slot=headline",
       "sources": [
         {
-          "title": "BBC World",
-          "url": "https://www.bbc.co.uk/news/articles/cm986j81ky55o?at_medium=RSS&at_campaign=rss"
+          "title": "International students, 'visa hoppers' and backpackers targeted in Australia migration crackdown",
+          "url": "https://www.bbc.co.uk/news/articles/cm986j81ky55o?at_medium=RSS&at_campaign=rss",
+          "primary": true
         }
       ]
     },
@@ -257,31 +288,31 @@
       "column": "technology",
       "slot": "detailed",
       "title_zh": "OpenAI 发布模型失准报告框架",
-      "score": 73,
-      "selection_reason": "score=73, nw=0.61, stage=首发, slot=detailed",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.575, stage=首发, slot=detailed",
       "sources": [
         {
           "title": "OpenAI Blog",
           "url": "https://openai.com/index/model-misalignment-reporting-framework"
         },
         {
-          "title": "The Guardian",
+          "title": "卫报",
           "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOU2xHb1VzUHk1ZUZJTWhQOXdsM0RKOXduMDI2a29fN3RmTFhTX3VIVGdyZmhaQWZsWTJzbG9hZUkwVGhrMGNiMTh6VjEwNWp4SlJSR1hsMTYxUXFOSDdDZDlJUWxza1NQZi1XbzRRd1RuYUloRHV4OHhYVDRnS1BkaGJWYTk5T0JjRzBDeGpqMFhRWjZLOEtPeUY0blRTSEtabTNoTDJJRUtqSzE5M3FCZHZaTElWVVhOaGZOT09GNHM?oc=5"
-        },
-        {
-          "title": "The New York Times",
-          "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPanVqWlBmM21Obkh1TWdaekdGZS1CaEphcUllWFJnc1Rvdm9Ka3NHbWEtZFFWMU9vUW85ZnJpOW1fVG41djJPeEpjOFNoT0huMWtEVndLUVh2REN3VmNfRG5neXN0eW5YRktYX2w1MGR5QlFyQUlxWjFVREE4SWNkN05oMmIwbENJ?oc=5"
         }
       ]
     },
     {
-      "candidate_id": "华为汪涛：AI 战略核心是算力",
+      "candidate_id": "华为设定 2027 年推出新一代 AI 芯片",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "华为汪涛：AI 战略核心是算力",
+      "title_zh": "华为设定 2027 年推出新一代 AI 芯片",
       "score": 72,
-      "selection_reason": "score=72, nw=0.515, stage=首发, slot=detailed",
+      "selection_reason": "score=72, nw=0.605, stage=首发, slot=detailed",
       "sources": [
+        {
+          "title": "路透社",
+          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQUUF2NV9DeFExYkFNQS1hQnZfTjFBY05sRjRmN3hMQkxoTmo0aEYtMnNyU3BnRUZPUzVtZGt6ZjE1ZWVsRldkWG1RMVUyaWpFWTg1Q3paeENVblNJUi1ITktZemVWRy1tbGc3OHd5QkFLT0Zya1UyOE13LW1XbTN4d002Zi1ReXJHRlZDNTZlUmh5cmFEcmhlNk9ET2JWZw?oc=5"
+        },
         {
           "title": "华尔街见闻",
           "url": "https://wallstreetcn.com/articles/3781968"
@@ -289,64 +320,27 @@
       ]
     },
     {
-      "candidate_id": "Ilya 2015年追问马斯克FSD时间表",
+      "candidate_id": "帮助老年人将AI用于日常生活",
       "column": "technology",
       "slot": "headline",
-      "title_zh": "Ilya 2015年追问马斯克FSD时间表",
+      "title_zh": "帮助老年人将AI用于日常生活",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
         {
-          "title": "AIHOT - AI 资讯精选",
-          "url": "https://aihot.news/items/cmu50k1jk06c5roqbt3a288p4"
+          "title": "OpenAI Blog",
+          "url": "https://openai.com/index/helping-older-adults-use-ai-in-everyday-life"
         }
       ]
     },
     {
-      "candidate_id": "谷歌论文展示AI发现RSI循环",
-      "column": "technology",
-      "slot": "headline",
-      "title_zh": "谷歌论文展示AI发现RSI循环",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
-      "sources": [
-        {
-          "title": "AIHOT - AI 资讯精选",
-          "url": "https://aihot.news/items/cmu5062kp05u3roqbwmbrrbun"
-        }
-      ]
-    },
-    {
-      "candidate_id": "huawei_ai_strategy_20260917",
-      "column": "technology",
-      "slot": "headline",
-      "title_zh": "核心是算力！华为轮值董事长谈AI战略",
-      "score": 72,
-      "selection_reason": "score=72, nw=0.515, stage=首发, slot=headline",
-      "sources": [
-        {
-          "title": "核心是算力！华为轮值董事长谈AI战略",
-          "url": "https://wallstreetcn.com/articles/3781968",
-          "primary": true
-        }
-      ]
-    },
-    {
-      "candidate_id": "美联储三年来首次加息25个基点",
+      "candidate_id": "美联储加息25个基点，为三年多来首次",
       "column": "economy",
       "slot": "detailed",
-      "title_zh": "美联储三年来首次加息25个基点",
+      "title_zh": "美联储加息25个基点，为三年多来首次",
       "score": 88,
-      "selection_reason": "score=88, nw=0.848, stage=首发, slot=detailed",
+      "selection_reason": "score=88, nw=0.765, stage=首发, slot=detailed",
       "sources": [
-        {
-          "title": "BBC US & Canada",
-          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
-        },
-        {
-          "title": "财新",
-          "url": "https://international.caixin.com/2026-09-17/102485615.html"
-        },
         {
           "title": "The Washington Post",
           "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxORFVoeUNBMTNYV2tDbGpKekd3Y3l6RGJLM0JrekZhRElkQjI0OFFsNmFCUzNUTk5ndUFWQkstdGZfeFVDdDZPUVQ0NEpkTjBQQk54VDh0dTNrQmE3MF9Rb2xBV2NLTUF5LUlsb19rMmU3MHNEOFdzbVhVQzFDQkJobmY0REljQ2R2cFR0LTFiZ2hYcDI4NkpKZkNuOGxlWEtZNVNB?oc=5"
@@ -354,34 +348,42 @@
         {
           "title": "The New York Times",
           "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQM2stY3BUc2U1Z0tFTDJIOWNLMlBTaFh3TUN0bTZ0REtxZnJGVDlFSjdEUjZuYmE3UnBkb2NtTC1UeFlPa2o0Uk9NdXZCX01GN0ZNMnFNTEhQa0l6eFYxMU9fdlVxWmhCdDZwdl9lUXRBWWo1SU9tZ3d1S0NfNEhNdjBVOGZOSDdi?oc=5"
+        },
+        {
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cw4gmlyvj422o?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "title": "China Daily Global Edition",
+          "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPdy1qWG9XbGhjVERtMmJSSEVSX3dXTjBfRDd1R0lPX3VVS1dPQUtVS19WZ2RYaS03TS1hQTBFcDZpcDZNLWlncEVDOGZEWEZJS0Fpc2tvUi1FOHdWVmk0RTBZMUdnWndyQWI1dGI5MmF0VmNfZ2M5T3VIckNrS0JlLTZR?oc=5"
         }
       ]
     },
     {
-      "candidate_id": "美国加密立法表决49:50未达60票门槛",
+      "candidate_id": "白宫备忘录要求联邦采购实行对等",
       "column": "economy",
-      "slot": "headline",
-      "title_zh": "美国加密立法表决49:50未达60票门槛",
-      "score": 0,
-      "selection_reason": "score=0, nw=0.615, stage=跟进, slot=headline",
+      "slot": "detailed",
+      "title_zh": "白宫备忘录要求联邦采购实行对等",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.653, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "华尔街见闻 - 宏观/全球",
-          "url": "https://wallstreetcn.com/member/articles/3781896"
+          "title": "White House News",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-reciprocity-in-government-procurement/"
         }
       ]
     },
     {
-      "candidate_id": "张忆东：中国股市本周至九月底或迎向上转机",
+      "candidate_id": "英国通胀升至3.1%，央行预计维持利率",
       "column": "economy",
-      "slot": "headline",
-      "title_zh": "张忆东：中国股市本周至九月底或迎向上转机",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "slot": "detailed",
+      "title_zh": "英国通胀升至3.1%，央行预计维持利率",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.59, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "华尔街见闻 - 宏观/全球",
-          "url": "https://wallstreetcn.com/articles/3781965"
+          "title": "CNBC Economy",
+          "url": "https://www.cnbc.com/2026/09/17/bank-of-england-interest-rate-decision-fed-rate-hike-uk-inflation.html"
         }
       ]
     }
