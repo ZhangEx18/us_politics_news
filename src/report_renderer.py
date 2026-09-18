@@ -77,22 +77,22 @@ def _display_width(text: str) -> float:
 def _compact_brief_text(text: str, limit: int = _BRIEF_WIDTH_LIMIT) -> str:
     """把简讯压缩成完整中文短句（1-2 句，≤ limit 显示宽），无法可读时返回空串。"""
     text = re.sub(r"\s+", " ", str(text or "")).strip()
-    if not text:
+    if not text or not re.search(r"[\u4e00-\u9fff]", text):
         return ""
-    if _display_width(text) <= limit + 4:
+    if _display_width(text) <= limit + 6:
         return text
     sentences = [s.strip() for s in re.findall(r"[^。！？!?]+[。！？!?]?", text) if s.strip()]
     picked = ""
     for sentence in sentences[:2]:
         candidate = f"{picked}{sentence}"
-        if _display_width(candidate) <= limit:
+        if _display_width(candidate) <= limit + 6:
             picked = candidate
         else:
             break
     if picked:
         return picked
     cut = text[:limit]
-    for punct in ("，", "、", "；", "：", "。"):
+    for punct in ("。", "！", "？"):
         idx = cut.rfind(punct)
         if idx >= limit // 2:
             return cut[: idx + 1]
@@ -107,7 +107,8 @@ def _headline_only_text(event: dict) -> str:
         return compacted
     fallback_title = str(event.get("title_zh") or "").strip()
     if fallback_title:
-        return _compact_brief_text(fallback_title) or fallback_title
+        compacted_title = _compact_brief_text(fallback_title) or fallback_title
+        return compacted_title.rstrip("，、；：,;:")
     return ""
 
 
