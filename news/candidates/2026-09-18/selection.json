@@ -7,256 +7,201 @@
   },
   "items": [
     {
-      "candidate_id": "美国联邦贸易委员会与安利达成和解",
+      "candidate_id": "联邦法官推翻特朗普削减教师培训资金政策",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "美国联邦贸易委员会与安利达成和解",
-      "score": 79.0,
-      "selection_reason": "score=79.0, slot=detailed",
+      "title_zh": "联邦法官推翻特朗普削减教师培训资金政策",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.695, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "FTC Takes Historic Action Against Multilevel Marketing Operator Amway for Unfair and Deceptive Business Practices",
-          "url": "https://www.ftc.gov/news-events/news/press-releases/2026/09/ftc-takes-historic-action-against-multilevel-marketing-operator-amway-unfair-deceptive-business"
+          "title": "The Seattle Times",
+          "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQODFJcWFhTldwZFg1TVgzWHJaVTBHcWxFXzRtM1BoOEVkTGVNWUFvdjdUeHd6Yl8xZHNweG81TzBnWjhMb3ZCVmJQczdlRTl1emVUWmtJOUZyUVV6Vk96TXVEU3ZBYnM3ZzIwbkhodEtGVDNjTFhDdTNKWHdhV1VNRGIyWjZLNWVaV0ZsVHowenE0eXdURnVPTGJPUzBvQ0UxbnM0OGZYRUxPdkc1VWxkYktRaFRlOUtyVmVGckRjX0xneDA?oc=5"
         }
       ]
     },
     {
-      "candidate_id": "FleetCor 以 1 亿美元了结行政诉讼",
+      "candidate_id": "白宫撤回ICE局长提名人选",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "FleetCor 以 1 亿美元了结行政诉讼",
-      "score": 78.0,
-      "selection_reason": "score=78.0, slot=detailed",
+      "title_zh": "白宫撤回ICE局长提名人选",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.625, stage=跟进, slot=detailed",
       "sources": [
         {
-          "title": "FleetCor Agrees to Pay $100 Million to Resolve Administrative Action After Federal Court Finds that It Violated the FTC Act by Charging Unauthorized Fees",
-          "url": "https://www.ftc.gov/news-events/news/press-releases/2026/09/fleetcor-agrees-pay-100-million-resolve-administrative-action-after-federal-court-finds-it-violated"
-        }
-      ]
-    },
-    {
-      "candidate_id": "特朗普签署狩猎与垂钓两项行政令",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "特朗普签署狩猎与垂钓两项行政令",
-      "score": 76.0,
-      "selection_reason": "score=76.0, slot=detailed",
-      "sources": [
-        {
-          "title": "America’s hunters get an exclusive seat at Trump’s White House table as he takes aim at Biden-era rules",
-          "url": "https://www.foxnews.com/politics/americas-hunters-get-exclusive-seat-trumps-white-house-table-he-takes-aim-biden-era-rules"
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cq23xzp55x08o?at_medium=RSS&at_campaign=rss"
         },
         {
-          "title": "RESTORING AMERICAN SALTWATER ANGLING AND RECREATION",
-          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-american-saltwater-angling-and-recreation/"
-        }
-      ]
-    },
-    {
-      "candidate_id": "白宫撤回 ICE 局长人选提名",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "白宫撤回 ICE 局长人选提名",
-      "score": 76.0,
-      "selection_reason": "score=76.0, slot=detailed",
-      "sources": [
-        {
-          "title": "White House withdraws nomination of ex-state trooper Lance Schroyer to head ICE",
-          "url": "https://www.theguardian.com/us-news/2026/sep/17/lance-schroyer-ice-director-nomination-withdrawn"
-        },
-        {
-          "title": "Trump withdraws Lance Schroyer, a former Oklahoma state trooper, as his nominee to lead ICE",
+          "title": "NPR National",
           "url": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice"
         }
       ]
     },
     {
-      "candidate_id": "ICE 官员就枪击案在明尼苏达出庭",
+      "candidate_id": "法官要求肯尼迪中心拆除前须提前30天通知",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "ICE 官员就枪击案在明尼苏达出庭",
-      "score": 74.0,
-      "selection_reason": "score=74.0, slot=detailed",
+      "title_zh": "法官要求肯尼迪中心拆除前须提前30天通知",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.69, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "ICE agent appears in Minnesota court to face charges in the shooting of a Venezuelan immigrant",
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cklyexdlepv1o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国邮政局长称已停止开发限制邮寄投票系统",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "美国邮政局长称已停止开发限制邮寄投票系统",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.655, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/politics/work-has-stopped-on-system-that-was-key-to-trump-effort-to-limit-mail-voting-usps-chief-says"
+        }
+      ]
+    },
+    {
+      "candidate_id": "ICE官员因枪击委内瑞拉移民在明尼苏达出庭",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "ICE官员因枪击委内瑞拉移民在明尼苏达出庭",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.57, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "NPR National",
           "url": "https://www.npr.org/2026/09/17/nx-s1-5973127/ice-agent-court-extradition-minnesota-immigrant-shooting"
         }
       ]
     },
     {
-      "candidate_id": "报告：约 3500 万人被划入新选区",
+      "candidate_id": "特朗普签署行政令重振狩猎传统",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "报告：约 3500 万人被划入新选区",
-      "score": 72.0,
-      "selection_reason": "score=72.0, slot=detailed",
+      "title_zh": "特朗普签署行政令重振狩猎传统",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.565, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "About 35 million people have been put into new House districts in the fight over congressional maps, report says",
+          "title": "White House News",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/reinvigorating-americas-hunting-heritage/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "约3500万人被划入新众议院选区",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "约3500万人被划入新众议院选区",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.61, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
           "url": "https://www.pbs.org/newshour/politics/about-35-million-people-have-been-put-into-new-house-districts-in-the-fight-over-congressional-maps-report-says"
         }
       ]
     },
     {
-      "candidate_id": "众议院通过《水资源开发法》",
+      "candidate_id": "共和党众议员在广告中批评特朗普移民政策",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "众议院通过《水资源开发法》",
-      "score": 70.0,
-      "selection_reason": "score=70.0, slot=detailed",
+      "title_zh": "共和党众议员在广告中批评特朗普移民政策",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.57, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "U.S. House passes Water Resources Development Act with provision on Southeast Colorado conduit - Colorado Politics",
-          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNazdRcnNxcU5CMnZabnpMMU4wc1NOdWlLel9DenlMdW9UZTVDMEZvNi16cElTa3lOUWJUMGd3YXNwZ3RLd2FaQ2VkZm1JYjk2WEFoM2pKZGtpMjJWT3FvN24zOUlwcERBQkx6c1R5MjJKYzdfX0ludlUtdFZJVkdKQ1NxZGVNZEdHUXBHVVFsYjkxXzItYVQ0djhEcy13YnNLNDAyd3dWUDhWdERDUmNUM2Y0bXBGRlFQVzhNQlg1cHlWQ1VIWnFNaUVrRjRjTi1FLXdZcA?oc=5"
+          "title": "The New York Times",
+          "url": "https://www.nytimes.com/2026/09/17/us/politics/salazar-florida-republican-immigration-trump.html"
         }
       ]
     },
     {
-      "candidate_id": "小肯尼迪在其创办反疫苗组织会议演讲",
+      "candidate_id": "rfk_vaccine_white_house_20260917",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "小肯尼迪在其创办反疫苗组织会议演讲",
+      "title_zh": "小罗伯特·肯尼迪称反疫苗组织在白宫有朋友",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.61, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "RFK Jr. says anti-vaccine group has a ‘friend at the White House’",
+          "url": "https://thehill.com/policy/healthcare/6096884-kennedy-trump-administration-anti-vaccination/",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "国会通过对俄及使用俄能源国家新制裁",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "国会通过对俄及使用俄能源国家新制裁",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
         {
           "title": "PBS NewsHour",
-          "url": "https://www.pbs.org/newshour/politics/watch-rfk-jr-speaks-at-conference-for-anti-vaccine-group-he-founded"
+          "url": "https://www.pbs.org/newshour/show/congress-passes-new-sanctions-on-russia-and-countries-using-russian-energy"
         }
       ]
     },
     {
-      "candidate_id": "美国批准向沙特出售48架F-35",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "美国批准向沙特出售48架F-35",
-      "score": 82.0,
-      "selection_reason": "score=82.0, slot=detailed",
-      "sources": [
-        {
-          "title": "South China Morning Post",
-          "url": "https://www.scmp.com/news/world/middle-east/article/3367912/us-approves-sale-48-f-35-jets-saudi-arabia-despite-israeli-concerns?utm_source=rss_feed"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美国允许伊朗代表团入境出席联大",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "美国允许伊朗代表团入境出席联大",
-      "score": 76.0,
-      "selection_reason": "score=76.0, slot=detailed",
-      "sources": [
-        {
-          "title": "联合早报",
-          "url": "https://www.zaobao.com/news/world/story20260918-9694831"
-        }
-      ]
-    },
-    {
-      "candidate_id": "俄中否决安理会伊朗制裁监督提案",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "俄中否决安理会伊朗制裁监督提案",
-      "score": 74.0,
-      "selection_reason": "score=74.0, slot=detailed",
-      "sources": [
-        {
-          "title": "Jacksonville Journal-Courier",
-          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxObmFabWt6aFgzSXdMemJlZEhoQnFpeU93LVBvT3o5b3Y4X1lIWDliakFwY205SnhUUzFQX0NBUHNPLUI3cGxOcEhJMFh2TV9ueFA4eXFiLU9KLVh2d1pTU3lGa2Z0MWIxRXRIaDRpS0VPWG9sX29BX3NpY1FtNTg2LXBvUGJsOE5KelpnaDZvbDZsX1hfTVNJOVZWMXhneTBXNDNLRURHeVJGcHk1VEpwMWpOX0IyN2s?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "王毅同鲁比奥通话筹备中美高层交往",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "王毅同鲁比奥通话筹备中美高层交往",
-      "score": 75.0,
-      "selection_reason": "score=75.0, slot=detailed",
-      "sources": [
-        {
-          "title": "财新国际",
-          "url": "https://international.caixin.com/2026-09-17/102486015.html"
-        }
-      ]
-    },
-    {
-      "candidate_id": "特朗普与习近平下周晚宴 科企CEO据报出席",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "特朗普与习近平下周晚宴 科企CEO据报出席",
-      "score": 65.0,
-      "selection_reason": "score=65.0, slot=detailed",
-      "sources": [
-        {
-          "title": "Yahoo Finance",
-          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNcUJITjJuZExocUt0NlBHMUN3STRFRndRY1ZiTHJGR2ZOY3NFams3UUd2NnluLXBjRWhkTWZISWFBbkFIZU1EY29nYXdhbThPRkhVazJOZFFUYktXYjRmWDBDMUhGUHYzQ3pWdWJ3ekRzb1pPSUNwcDBpLXJoSi1ibXc4R1ZCeGFOZ1MwcS10TjNsdGc?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "北约要求英国给出军费增长可信路径",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "北约要求英国给出军费增长可信路径",
-      "score": 74.0,
-      "selection_reason": "score=74.0, slot=detailed",
-      "sources": [
-        {
-          "title": "The Guardian",
-          "url": "https://www.theguardian.com/world/2026/sep/17/nato-head-britain-must-show-credible-path-of-annual-defence-budget-increases"
-        }
-      ]
-    },
-    {
-      "candidate_id": "波兰称俄计划或打击乌克兰盟国",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "波兰称俄计划或打击乌克兰盟国",
-      "score": 72.0,
-      "selection_reason": "score=72.0, slot=detailed",
-      "sources": [
-        {
-          "title": "Al Jazeera",
-          "url": "https://www.aljazeera.com/news/2026/9/17/russian-plans-include-strikes-against-ukraines-allies-poland-says?traffic_source=rss"
-        }
-      ]
-    },
-    {
-      "candidate_id": "伊朗驱逐瑞典外交官进行报复",
+      "candidate_id": "ukraine_war_tusk_kyiv_20260918",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "伊朗驱逐瑞典外交官进行报复",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "title_zh": "波兰总理图斯克警告俄打击乌盟友后前往基辅",
+      "score": 75,
+      "selection_reason": "score=75, nw=0.61, stage=跟进, slot=headline",
       "sources": [
         {
-          "title": "Al Jazeera",
-          "url": "https://www.aljazeera.com/news/2026/9/18/iran-expels-swedish-diplomat-in-retaliatory-move?traffic_source=rss"
+          "title": "Ukraine war briefing: Poland’s Tusk heads to Kyiv after warning of Russian strikes on Ukrainian allies - The Guardian",
+          "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQVjQ0SERCdkZYYmRfN3lidWdiWkxoQ1ljQkp4R2l1ZTdDNzhCYmFHZjJjaWpNcVRMMjVyOTgtcXFGMmtCRjRHeFd3eEJoUXlXNnhXS0EtZUxxZ2FMeFFwZWdETlAtSmRydHByNGV6dlQ4SjhjcllDaHNZWU9BMG5uSUJYZ3duMlRKM3dDQlJLQjgtYkotUXd0cS1zMThWdHlfMFF4T3BRUnh4bkk?oc=5",
+          "via": "Google News",
+          "primary": true
         }
       ]
     },
     {
-      "candidate_id": "法国渔民将结束燃油价格封锁行动",
+      "candidate_id": "red_sea_houthi_blockade_20260918",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "法国渔民将结束燃油价格封锁行动",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "title_zh": "美国拒绝红海干预后沙特急寻解困之策",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.68, stage=跟进, slot=headline",
       "sources": [
         {
-          "title": "France24",
-          "url": "https://www.france24.com/en/french-fishermen-to-end-blockades-over-fuel-prices"
+          "title": "Saudi scrambles to solve ‘humiliating dilemma’ after US rejects Red Sea intervention",
+          "url": "https://www.scmp.com/week-asia/politics/article/3367944/saudi-scrambles-solve-humiliating-dilemma-after-us-rejects-red-sea-intervention?utm_source=rss_feed",
+          "primary": true
         }
       ]
     },
     {
-      "candidate_id": "奥运河流有500条鳄鱼但并非主要担忧",
+      "candidate_id": "gaza_double_tap_strike_20260918",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "奥运河流有500条鳄鱼但并非主要担忧",
+      "title_zh": "加沙目击者讲述以军二次打击致儿童和医护死亡",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.525, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "‘Run! Get away!’: witnesses recount Israeli ‘double tap’ strike that killed child and medic in Gaza",
+          "url": "https://www.theguardian.com/world/2026/sep/18/run-get-away-witnesses-recount-israeli-double-tap-strike-that-killed-child-and-medic-in-gaza",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "奥运河流中有500条鳄鱼但并非主要担忧",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "奥运河流中有500条鳄鱼但并非主要担忧",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -267,10 +212,10 @@
       ]
     },
     {
-      "candidate_id": "部门发布男性军人睾酮缺乏筛查实施指南",
+      "candidate_id": "美国国防部发布男性军人睾酮缺乏筛查指南",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "部门发布男性军人睾酮缺乏筛查实施指南",
+      "title_zh": "美国国防部发布男性军人睾酮缺乏筛查指南",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -281,62 +226,152 @@
       ]
     },
     {
-      "candidate_id": "冯德莱恩与泽连斯基通话后发布纪要",
+      "candidate_id": "iran_un_visa_20260918",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "冯德莱恩与泽连斯基通话后发布纪要",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
+      "title_zh": "特朗普政府批准伊朗总统和外长等高级官员签证…",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.705, stage=首发, slot=headline",
       "sources": [
         {
-          "title": "European Commission Press Corner",
-          "url": "https://ec.europa.eu/commission/presscorner/detail/en/read_26_1899"
+          "title": "US to allow Iranian leaders to attend UN meeting in New York amid wartime stand-off",
+          "url": "https://www.scmp.com/news/world/united-states-canada/article/3367948/us-allow-iranian-leaders-attend-un-meeting-new-york-amid-wartime-stand?utm_source=rss_feed",
+          "primary": true
         }
       ]
     },
     {
-      "candidate_id": "纽约时报诉 OpenAI 案解封文件披露内部表述",
+      "candidate_id": "us_poland_military_base_20260918",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "特朗普称美波在波兰设立美军基地一事取得重大…",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.685, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Trump says 'major progress' made toward US military base in Poland",
+          "url": "https://www.france24.com/en/europe/20260918-trump-says-major-progress-made-toward-us-military-base-in-poland",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "SEC发布创新豁免令 允许代币化NMS股票交易",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "纽约时报诉 OpenAI 案解封文件披露内部表述",
-      "score": 75.0,
-      "selection_reason": "score=75.0, slot=detailed",
+      "title_zh": "SEC发布创新豁免令 允许代币化NMS股票交易",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.63, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "SEC Press Releases",
+          "url": "https://www.sec.gov/newsroom/press-releases/2026-90-sec-issues-innovation-exemption-facilitate-trading-tokenized-nms-stock-request-comment"
+        }
+      ]
+    },
+    {
+      "candidate_id": "解封文件：微软高管称AI抓取是“史上最大劳动盗窃”",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "解封文件：微软高管称AI抓取是“史上最大劳动盗窃”",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.725, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "NYT Technology",
+          "url": "https://www.nytimes.com/2026/09/17/technology/microsoft-openai-publishing-industry.html"
+        },
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/17/microsoft-exec-called-ai-scraping-the-largest-theft-of-labor-in-human-history-new-unredacted-filings-reveal/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Waymo将于2028年前在新加坡推出无人驾驶出租车",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Waymo将于2028年前在新加坡推出无人驾驶出租车",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.525, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Fortune",
+          "url": "https://fortune.com/2026/09/17/waymo-launch-robotaxis-singapore-first-southeast-asia-market/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Google DeepMind成立新研究所 扩大AGI讨论范围",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Google DeepMind成立新研究所 扩大AGI讨论范围",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.56, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/17/google-deepmind-launches-institute-to-widen-the-agi-debate/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国《联邦公报》网站被曝部署阿里千问搜索工具后同日下线",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "美国《联邦公报》网站被曝部署阿里千问搜索工具后同日下线",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.515, stage=首发, slot=detailed",
       "sources": [
         {
           "title": "AIHOT - AI 资讯精选",
-          "url": "https://aihot.news/items/cmu62wp5j08tkrofj60s4kfwv"
+          "url": "https://aihot.news/items/cmu6c5cta0izmrofj3ykdq9gz"
         }
       ]
     },
     {
-      "candidate_id": "让全球数据更易于探索",
-      "column": "technology",
-      "slot": "headline",
-      "title_zh": "让全球数据更易于探索",
-      "score": 0,
-      "selection_reason": "score=0, slot=headline",
-      "sources": [
-        {
-          "title": "Google AI Blog",
-          "url": "https://blog.google/innovation-and-ai/technology/ai/google-un-data-commons-platform/"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美国国会通过法案 授权对俄能源买家加税",
+      "candidate_id": "日本央行加息至31年新高",
       "column": "economy",
       "slot": "detailed",
-      "title_zh": "美国国会通过法案 授权对俄能源买家加税",
-      "score": 80.0,
-      "selection_reason": "score=80.0, slot=detailed",
+      "title_zh": "日本央行加息至31年新高",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.705, stage=跟进, slot=detailed",
       "sources": [
         {
-          "title": "South China Morning Post",
-          "url": "https://www.scmp.com/news/china/diplomacy/article/3367884/china-hits-back-us-congress-approves-tariffs-top-buyers-russian-energy?utm_source=rss_feed"
+          "title": "CNBC",
+          "url": "https://www.cnbc.com/2026/09/18/japan-raises-rates-30-year-high-yen-jgb.html"
         },
+        {
+          "title": "BBC",
+          "url": "https://www.bbc.co.uk/news/articles/cqn74jeek06no?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "印度回应美国因俄油加征新关税",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "印度回应美国因俄油加征新关税",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.615, stage=回应, slot=detailed",
+      "sources": [
         {
           "title": "France24",
           "url": "https://www.france24.com/en/india-vows-to-protect-energy-security-after-new-us-tariffs-over-russian-oil"
+        }
+      ]
+    },
+    {
+      "candidate_id": "英国央行维持利率不变并警告通胀走高",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "英国央行维持利率不变并警告通胀走高",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.64, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "NYT Business",
+          "url": "https://www.nytimes.com/2026/09/17/business/bank-of-england-interest-rates.html"
         }
       ]
     }
