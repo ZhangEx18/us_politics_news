@@ -788,6 +788,14 @@ def _write_candidates_archive(spec, scored_events: list[dict], columns: dict) ->
     return str(base_dir)
 
 
+def _title_display_width(text: str) -> float:
+    """标题显示宽度：CJK 按 1，其他（拉丁/数字/空格）按 0.5。"""
+    width = 0.0
+    for char in str(text or ""):
+        width += 1.0 if ord(char) > 0x2E80 else 0.5
+    return width
+
+
 def _audit_daily_content(
     columns: dict[str, dict],
     allowed_dates: list[str] | None,
@@ -811,7 +819,7 @@ def _audit_daily_content(
         seen_titles: list[str] = []
         for event in column.get("headline_only_events", []) or []:
             headline_title = str(event.get("title_zh") or event.get("title") or "").strip()
-            if len(headline_title) > 22:
+            if _title_display_width(headline_title) > 22:
                 metrics["long_titles"] += 1
             headline_body = str(event.get("reader_body") or "").strip()
             display_text = headline_body or headline_title
@@ -831,7 +839,7 @@ def _audit_daily_content(
                 seen_titles.append(norm_title)
             if title.endswith(("承", "垄")) or "…" in title or "..." in title:
                 metrics["truncated_titles"] += 1
-            if len(title) > 26:
+            if _title_display_width(title) > 26:
                 metrics["long_titles"] += 1
 
             body = str(event.get("reader_body") or event.get("core_facts") or "").strip()
@@ -1098,7 +1106,7 @@ _META_COMMENTARY_RE = re.compile(
 
 # 管道/采集信息泄漏（系统元数据写进正文）
 _PIPELINE_LEAK_RE = re.compile(
-    r"(聚合条目|收录了这条|转载自|抓取|来源层级|多来源收录|Google News 聚合)"
+    r"(聚合条目|收录了这条|转载自|抓取失败|抓取自|内容抓取|来源层级|多来源收录|Google News 聚合)"
 )
 
 # 观点/分析稿标题（不进要点列表）
@@ -1540,13 +1548,26 @@ def _glossary_media_names() -> tuple[str, ...]:
     return tuple(sorted((str(name) for name in medias), key=len, reverse=True))
 
 
+@lru_cache(maxsize=1)
+def _glossary_media_aliases() -> tuple[str, ...]:
+    """媒体名 + 英文变体（WSJ/BBC/FT…），长名优先。"""
+    aliases: set[str] = set(_glossary_media_names())
+    try:
+        medias = _load_glossary().get("medias", {})
+    except Exception:
+        medias = {}
+    for variants in medias.values():
+        aliases.update(str(v) for v in (variants or ()))
+    return tuple(sorted(aliases, key=len, reverse=True))
+
+
 def _strip_title_source_prefix(title: str) -> str:
-    """去掉标题起首的来源前缀（报道：/英国广播公司：），保留可读主谓。"""
+    """去掉标题起首的来源前缀（报道：/英国广播公司：/WSJ：），保留可读主谓。"""
     text = _TITLE_ATTRIBUTION_PREFIX_RE.sub("", str(title or "").strip())
-    for name in _glossary_media_names():
+    for name in _glossary_media_aliases():
         for sep in ("：", ":"):
             prefix = f"{name}{sep}"
-            if text.startswith(prefix):
+            if text.casefold().startswith(prefix.casefold()):
                 stripped = text[len(prefix):].strip()
                 if len(stripped) >= 6:
                     return stripped

@@ -33,8 +33,8 @@ ROUTINE_NOTICE_PATTERNS: tuple[str, ...] = (
     r"撤回.{0,6}(过时|失效)",
     r"发布.{0,10}(FOMC|联邦公开市场委员会).{0,6}(声明|预测|纪要)",
     r"美联储.{0,12}发布.{0,8}(声明|预测|纪要)",
-    r"(通话|会见|会谈).{0,8}(纪要|readout)",
-    r"发布.{0,6}(通话|会谈)纪要",
+    r"(通话|会见|会谈).{0,10}(纪要|通报|readout)",
+    r"发布.{0,10}(通话|会谈|会见).{0,6}(纪要|通报)",
 )
 
 _ROUTINE_NOTICE_RE = re.compile("|".join(ROUTINE_NOTICE_PATTERNS), re.IGNORECASE)
