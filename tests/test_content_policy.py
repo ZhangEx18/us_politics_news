@@ -42,3 +42,8 @@ def test_readout_release_is_routine_notice():
     assert is_routine_notice("冯德莱恩与泽连斯基通话后发布通报")
     assert is_routine_notice("Commission readout of the call with Zelenskyy")
     assert not is_routine_notice("警方发布通报称已抓获嫌疑人")
+
+
+def test_bureaucratic_notice_keywords_are_routine():
+    assert is_routine_notice("国家农村卫生信息交换所项目补充资金通知")
+    assert not is_routine_notice("美国众议院通过对俄新制裁法案")
