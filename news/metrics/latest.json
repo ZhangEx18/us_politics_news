@@ -1839,31 +1839,30 @@
         "2026-09-17",
         "2026-09-18"
       ],
-      "kept": 1975,
-      "dropped": 1358,
+      "kept": 2031,
+      "dropped": 1336,
       "dropped_by_column": {
-        "us_politics": 329,
-        "global_affairs": 508,
-        "technology": 108,
-        "economy": 413
+        "us_politics": 325,
+        "global_affairs": 514,
+        "technology": 111,
+        "economy": 386
       }
     },
-    "raw_fetched": 3492,
-    "raw_merged": 1975
+    "raw_fetched": 3505,
+    "raw_merged": 2031
   },
-  "cn_source_fetched": 129,
-  "cn_source_selected": 4,
+  "cn_source_fetched": 132,
+  "cn_source_selected": 0,
   "cn_source_selected_by_column": {
     "us_politics": 0,
-    "global_affairs": 3,
-    "technology": 1,
+    "global_affairs": 0,
+    "technology": 0,
     "economy": 0
   },
   "columns": {
     "economy": {
-      "prefiltered": 17,
-      "hard_news_candidates": 17,
-      "hard_news_scored": 3,
+      "prefiltered": 13,
+      "hard_news_candidates": 13,
       "post_merge_scored": 2,
       "detailed_filled_from_low_score": 1,
       "headline_filled_from_low_score": 0,
@@ -1875,9 +1874,9 @@
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 2,
-      "headline_body_from_title": 2,
-      "headline_opinion_dropped": 0,
+      "headline_reader_body_missing": 1,
+      "headline_body_from_title": 0,
+      "headline_opinion_dropped": 2,
       "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 0,
       "headline_soft_dropped": 0,
@@ -1889,12 +1888,11 @@
       "fill_added": 1,
       "deduped_detailed": 1,
       "rendered_detailed": 1,
-      "rendered_headline_only": 1
+      "rendered_headline_only": 0
     },
     "global_affairs": {
-      "prefiltered": 24,
-      "hard_news_candidates": 24,
-      "hard_news_scored": 11,
+      "prefiltered": 27,
+      "hard_news_candidates": 27,
       "post_merge_scored": 9,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
@@ -1907,10 +1905,10 @@
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
       "headline_reader_body_missing": 2,
-      "headline_body_from_title": 6,
-      "headline_opinion_dropped": 1,
+      "headline_body_from_title": 10,
+      "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 2,
+      "headline_duplicate_dropped": 1,
       "headline_soft_dropped": 0,
       "headline_live_blog_dropped": 0,
       "headline_truncated_dropped": 0,
@@ -1919,18 +1917,17 @@
       "detailed_fallback_failed": 0,
       "fill_added": 0,
       "deduped_detailed": 0,
-      "rendered_detailed": 6,
-      "rendered_headline_only": 3
+      "rendered_detailed": 7,
+      "rendered_headline_only": 5
     },
     "technology": {
-      "prefiltered": 22,
-      "hard_news_candidates": 22,
-      "hard_news_scored": 4,
+      "prefiltered": 19,
+      "hard_news_candidates": 19,
       "post_merge_scored": 3,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 3,
-      "source_quota_dropped": 1,
+      "source_quota_dropped": 2,
       "detailed_filled": 3,
       "headline_filled": 3,
       "post_score_filtered": 3,
@@ -1950,45 +1947,45 @@
       "detailed_fallback_failed": 0,
       "fill_added": 1,
       "deduped_detailed": 2,
-      "rendered_detailed": 2,
+      "rendered_detailed": 1,
       "rendered_headline_only": 1
     },
     "us_politics": {
-      "prefiltered": 23,
-      "hard_news_candidates": 23,
-      "hard_news_scored": 12,
+      "prefiltered": 21,
+      "hard_news_candidates": 21,
       "post_merge_scored": 10,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 8,
-      "source_quota_dropped": 0,
+      "source_quota_dropped": 1,
       "detailed_filled": 10,
       "headline_filled": 8,
       "post_score_filtered": 10,
       "headline_translated": 8,
       "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 2,
-      "headline_reader_body_missing": 2,
+      "headline_cryptic_dropped": 4,
+      "headline_reader_body_missing": 1,
       "headline_body_from_title": 2,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 2,
+      "headline_duplicate_dropped": 3,
       "headline_soft_dropped": 0,
-      "headline_live_blog_dropped": 1,
+      "headline_live_blog_dropped": 0,
       "headline_truncated_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
       "fill_added": 1,
-      "deduped_detailed": 2,
-      "rendered_detailed": 5,
+      "deduped_detailed": 0,
+      "detailed_downgraded_to_headline_only": 1,
+      "rendered_detailed": 7,
       "rendered_headline_only": 1
     }
   },
   "ai": {
     "score_errors": 0,
     "digest_failures": {},
-    "score_duration_seconds": 281.5
+    "score_duration_seconds": 0
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -1997,97 +1994,91 @@
         "2026-09-17",
         "2026-09-18"
       ],
-      "kept": 86,
+      "kept": 80,
       "dropped": 0,
       "dropped_by_column": {}
     },
-    "scored_events": {
-      "total": 30,
+    "report_events_reuse": {
+      "total": 28,
       "freshness_ratio": 1.0,
-      "today_count": 30,
+      "today_count": 28,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 30
+        "today": 28
       },
       "allowed_dates": [
         "2026-09-17",
         "2026-09-18"
       ],
-      "fresh_after_gate": 30,
+      "fresh_after_gate": 28,
       "gate_failed": false
     },
     "before_render": {
-      "total": 30,
+      "total": 28,
       "freshness_ratio": 1.0,
-      "today_count": 30,
+      "today_count": 28,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 30
+        "today": 28
       },
       "allowed_dates": [
         "2026-09-17",
         "2026-09-18"
       ],
-      "fresh_after_gate": 30,
+      "fresh_after_gate": 28,
       "gate_failed": false
     }
   },
   "candidate_pool": {
-    "upserted": 86,
-    "total": 86
+    "upserted": 80,
+    "total": 80
   },
-  "routine_notice_dropped": 1,
-  "low_newsworthiness_dropped": 10,
   "cross_day_dedup": {
     "recent_events": 402,
-    "dropped": 5,
-    "kept": 30
+    "dropped": 0,
+    "kept": 28
   },
-  "repeated_story_dropped": 5,
+  "repeated_story_dropped": 0,
   "report_events": {
-    "upserted": 30,
-    "hard_news": 30
+    "reused": 28,
+    "source": "report_events"
   },
   "freshness_ratio": 1.0,
-  "today_count": 30,
+  "today_count": 28,
   "old_count": 0,
   "unknown_date_count": 0,
-  "events_merged_duplicates": 6,
+  "events_merged_duplicates": 4,
   "content_audit": {
     "duplicate_titles": 0,
     "old_body_dates": 0,
     "fallback_boilerplate": 0,
     "truncated_titles": 0,
     "meta_commentary": 0,
-    "pipeline_leak": 1,
+    "pipeline_leak": 0,
     "untranslated_terms": 0,
     "long_titles": 0,
     "long_headline_bodies": 0
   },
   "candidates_archive": "docs/news/candidates/2026-09-18",
   "rejections": {
-    "routine_notice": 1,
-    "low_newsworthiness": 10,
-    "repeated_story": 5,
-    "duplicate_event": 16,
-    "unreadable_body": 7,
-    "opinion_piece": 1,
-    "source_quota": 1,
-    "live_blog": 1,
-    "cryptic_title": 2
+    "duplicate_event": 12,
+    "opinion_piece": 2,
+    "unreadable_body": 5,
+    "source_quota": 3,
+    "cryptic_title": 4
   },
   "lead": {
     "column": "global_affairs",
-    "title": "特朗普称将就伊朗战事作出重大决定",
-    "body": "9 月 17 日，美国总统特朗普称伊朗战事已进入关键阶段。据联合早报报道，特朗普正权衡是否重新对伊朗发动大规模打击。",
-    "score": 78,
-    "newsworthiness": 0.765
+    "title": "美国批准向沙特出售48架F-35",
+    "body": "9 月 17 日，南华早报报道，美国国务院批准向沙特阿拉伯出售 48 架 F-35 战斗机。该笔军售总价 243 亿美元。此项批准在以色列表达关切的情况下作出。",
+    "score": 82.0,
+    "newsworthiness": null
   },
   "report": {
     "title": "2026年9月18日 日报",
     "published_at": "2026-09-18T07:45:00+08:00",
-    "duration_seconds": 130.7
+    "duration_seconds": 122.3
   }
 }
