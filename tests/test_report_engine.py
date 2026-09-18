@@ -2127,3 +2127,32 @@ def test_renderer_headline_falls_back_to_title_when_body_uncuttable():
 
     event = {"title_zh": "微软高管称为最大劳动盗窃", "reader_body": "This is an unpunctuated english fragment that is far too long to display"}
     assert _headline_only_text(event) == "微软高管称为最大劳动盗窃"
+
+
+def test_clean_event_title_and_body_remove_media_tags_and_duplicate_dates():
+    from report_engine import _clean_event_body, _clean_event_title
+
+    assert _clean_event_title("美联储上调利率 25 基点(含视频)") == "美联储上调利率 25 基点"
+    assert _clean_event_title("美联储上调利率 25 基点（含视频）") == "美联储上调利率 25 基点"
+    assert _clean_event_title("日本央行加息至 31 年高位") == "日本央行加息至 31 年高位"
+
+    cleaned = _clean_event_body("9 月 17 日，【财新网】 9 月 16 日，美联储宣布加息 25 个基点至 3.75%。")
+    assert cleaned == "9 月 16 日，美联储宣布加息 25 个基点至 3.75%。"
+
+    normal = _clean_event_body("9 月 17 日，美联储宣布加息。")
+    assert normal == "9 月 17 日，美联储宣布加息。"
+
+
+def test_headline_normalize_drops_unknown_person_with_definitive_claim():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "global_affairs": [
+            {"title_zh": "保罗·基廷：奥库斯将把澳拖入对华战争且必败", "summary": "评论。", "content": "评论。"},
+            {"title_zh": "澳大利亚与英国举行联合演习", "summary": "演习。", "content": "演习。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["global_affairs"]] == ["澳大利亚与英国举行联合演习"]

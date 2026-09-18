@@ -439,3 +439,12 @@ def test_frontmatter_lead_falls_back_to_lead_event_for_daily():
     md = render_structured_markdown(meta, columns, report_type="daily")
 
     assert "lead: 美联储加息 25 个基点" in md
+
+
+def test_markdown_text_keeps_ascii_parentheses_unescaped():
+    from report_renderer import _markdown_text
+
+    assert _markdown_text("美联储上调利率 25 基点(含视频)") == "美联储上调利率 25 基点(含视频)"
+    escaped = _markdown_text("[危险链接](javascript:alert(1))")
+    assert "[危险链接](javascript" not in escaped
+    assert "\\[危险链接\\](javascript" in escaped
