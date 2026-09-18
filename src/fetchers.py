@@ -72,6 +72,14 @@ def _resolve_fetch_mode(source: dict) -> str:
     return "rss"
 
 
+_ZERO_WIDTH_RE = re.compile(r"[\u200b-\u200d\u2060\ufeff]")
+
+
+def _strip_zero_width(text: str) -> str:
+    """去掉正文/标题中的零宽字符（源站常见，会破坏日期与去重匹配）。"""
+    return _ZERO_WIDTH_RE.sub("", str(text or ""))
+
+
 _VIDEO_LIVE_TITLE_RE = re.compile(
     r"^(?:watch|live|video|full video|live updates?|photo|photos)\s*[：:]",
     re.IGNORECASE,
@@ -318,11 +326,11 @@ class RSSFetcher(BaseFetcher):
                     if published and published < since_utc:
                         continue
 
-                    title = unescape(entry.get("title", "")).strip()
+                    title = _strip_zero_width(unescape(entry.get("title", "")).strip())
                     if _is_video_or_live_entry(title):
                         continue
                     link = entry.get("link", "").strip()
-                    content = unescape(self._extract_content(entry))
+                    content = _strip_zero_width(unescape(self._extract_content(entry)))
                     content = re.sub(r"<[^>]+>", "", content)
 
                     entry_id = entry.get("id", entry.get("link", ""))
@@ -484,11 +492,11 @@ class GoogleNewsFetcher(BaseFetcher):
                 text = await self._get(feed_cfg["url"], timeout=aiohttp.ClientTimeout(total=60))
                 data = feedparser.parse(text)
                 for entry in data.entries:
-                    title = unescape(entry.get("title", "")).strip()
+                    title = _strip_zero_width(unescape(entry.get("title", "")).strip())
                     if _is_video_or_live_entry(title):
                         continue
                     link = entry.get("link", "").strip()
-                    content = unescape(re.sub(r"<[^>]+>", "", entry.get("summary", "")))
+                    content = _strip_zero_width(unescape(re.sub(r"<[^>]+>", "", entry.get("summary", ""))))
                     entry_hash = self._hash_id(entry.get("id", link))
                     # 解析 Google News 的发布时间
                     published = None

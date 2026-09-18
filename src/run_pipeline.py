@@ -630,6 +630,35 @@ def _build_scoring_entries_by_column(
     return all_entries, by_column_entries
 
 
+PRIORITY_ENTITY_SCORE_BOOST = 12
+PRIORITY_ENTITY_NW_BOOST = 0.12
+
+
+def _apply_priority_entities(
+    entries: list[dict],
+    columns_cfg: dict[str, dict],
+) -> tuple[list[dict], int]:
+    """高优先级主体（如科技栏的 OpenAI/Anthropic）加分，确保进入重点解析。"""
+    boosted = 0
+    for entry in entries:
+        entities = (columns_cfg.get(str(entry.get("column") or "")) or {}).get("priority_entities") or []
+        if not entities:
+            continue
+        haystack = " ".join(
+            str(entry.get(field) or "")
+            for field in ("title", "title_zh", "summary", "content")
+        ).lower()
+        if not any(str(entity).lower() in haystack for entity in entities):
+            continue
+        entry["score"] = float(entry.get("score") or 0) + PRIORITY_ENTITY_SCORE_BOOST
+        nw = entry.get("newsworthiness")
+        if isinstance(nw, (int, float)):
+            entry["newsworthiness"] = min(1.0, float(nw) + PRIORITY_ENTITY_NW_BOOST)
+        entry["priority_entity"] = True
+        boosted += 1
+    return entries, boosted
+
+
 def _is_fallback_eligible(item: ContentItem) -> bool:
     """聚合器/社交类来源（如 AIHOT 推文流）不进入要点与兜底扩写。"""
     tags = {str(tag).lower() for tag in (item.metadata.get("tags") or [])}
@@ -1650,6 +1679,9 @@ def _run_digest_phase(
     # === 6. 硬新闻过滤 ===
     print("\n[6/13] 硬新闻过滤...")
     hard_news_scored = [entry for entry in scored_dicts if _is_hard_news_entry(entry)]
+    hard_news_scored, priority_boosted = _apply_priority_entities(hard_news_scored, columns_cfg)
+    if priority_boosted:
+        print(f"   重点主体加分: {priority_boosted} 条")
     filtered_hard: list[dict] = []
     routine_notice_dropped = 0
     low_value_dropped = 0
@@ -1663,6 +1695,7 @@ def _run_digest_phase(
         filtered_hard.append(entry)
     hard_news_scored = filtered_hard
     phase_metrics["routine_notice_dropped"] = routine_notice_dropped
+    phase_metrics["priority_boosted"] = priority_boosted
     phase_metrics["low_newsworthiness_dropped"] = low_value_dropped
     if routine_notice_dropped:
         print(f"   例行公告剔除: {routine_notice_dropped} 条")
