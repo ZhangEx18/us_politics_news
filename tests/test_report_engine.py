@@ -2156,3 +2156,21 @@ def test_headline_normalize_drops_unknown_person_with_definitive_claim():
     normalized, _ = _normalize_headline_only_by_column(columns)
 
     assert [i["title_zh"] for i in normalized["global_affairs"]] == ["澳大利亚与英国举行联合演习"]
+
+
+def test_brief_compaction_keeps_complete_sentence_within_36_and_drops_fragments():
+    from report_engine import _compact_headline_body
+
+    # 完整单句 ≤36：保留
+    single = "美国和平研究所向法院提交紧急动议，要求阻止在总部外立面刻名并拆除围栏。"
+    assert _compact_headline_body(single) == single
+
+    # 两句合计超过 36：只保留第一句
+    two = "美联储宣布加息 25 个基点，为三年来首次。市场此前已有充分预期，后续路径仍待观察。"
+    assert _compact_headline_body(two) == "美联储宣布加息 25 个基点，为三年来首次。"
+
+    # 无句号边界且超长：返回空串（交由上层回退/丢弃）
+    assert _compact_headline_body("绿光资本创始人 David Einhorn 预计，未来三到五年，黄金将大幅跑赢标普500指数。") == ""
+
+    # 纯英文不产出简讯
+    assert _compact_headline_body("This is an english only fragment") == ""

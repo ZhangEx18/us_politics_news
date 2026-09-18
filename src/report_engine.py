@@ -845,7 +845,7 @@ def _audit_daily_content(
             display_text = headline_body or headline_title
             if "…" in display_text or "..." in display_text:
                 metrics["truncated_titles"] += 1
-            if _title_display_width(headline_body) > 34:
+            if _title_display_width(headline_body) > 38:
                 metrics["long_headline_bodies"] = metrics.get("long_headline_bodies", 0) + 1
         for event in column.get("detailed_events", []):
             title = str(event.get("title_zh") or event.get("title") or "").strip()
@@ -1133,7 +1133,7 @@ _PIPELINE_LEAK_RE = re.compile(
 _OPINION_TITLE_RE = re.compile(
     r"(为何|为什么|如何|解读|观察|盘点|展望|一文看懂|背后|意味着什么|说明了什么"
     r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评"
-    r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难|难有|难现|难料|无意外"
+    r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难|难有|难现|难料|无意外|必败|必胜|注定"
     r"|^帮助|^助|^指南|新闻综述|新闻速览|一周要闻|每日简报"
     r"|^让[^，。]{0,14}更(?:易|轻松|方便)"
     r"|[？?]$|^[^\s：:]{2,6}[：:].*(意外|悬念)"
@@ -1697,22 +1697,22 @@ def _compact_headline_title(text: str, limit: int = 21) -> str:
 def _compact_headline_body(text: str, limit: int = 30) -> str:
     """把要点正文压成完整中文概括（1-2 句，≤ limit 显示宽），无法可读时返回空串。"""
     text = re.sub(r"\s+", " ", str(text or "")).strip()
-    if not text:
+    if not text or not re.search(r"[\u4e00-\u9fff]", text):
         return ""
-    if _title_display_width(text) <= limit + 4:
+    if _title_display_width(text) <= limit + 6:
         return text
     sentences = [s.strip() for s in re.findall(r"[^。！？!?]+[。！？!?]?", text) if s.strip()]
     picked = ""
     for sentence in sentences[:2]:
         candidate = f"{picked}{sentence}"
-        if _title_display_width(candidate) <= limit:
+        if _title_display_width(candidate) <= limit + 6:
             picked = candidate
         else:
             break
     if picked:
         return picked
     cut = text[:limit]
-    for punct in ("，", "、", "；", "：", "。"):
+    for punct in ("。", "！", "？"):
         idx = cut.rfind(punct)
         if idx >= limit // 2:
             return cut[: idx + 1]
@@ -1847,6 +1847,10 @@ def _normalize_headline_only_by_column(
             compacted_body = _compact_headline_body(reader_body)
             if not compacted_body:
                 compacted_body = _compact_headline_title(title_zh)
+                if compacted_body.endswith("…"):
+                    print(f"   [要点截断] {col_key}: {title_zh[:36]}")
+                    truncated_dropped += 1
+                    continue
             kept.append({
                 **item,
                 "title_zh": _compact_headline_title(title_zh),
