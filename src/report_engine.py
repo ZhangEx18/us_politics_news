@@ -273,8 +273,12 @@ def _load_history_context(db, days: int = 3) -> str:
     return "\n\n".join(lines)
 
 
-def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> list[str]:
-    """从最终入选的重点解析事件提炼要点（跳过过短的条目）。"""
+def build_reader_highlights(
+    columns: dict[str, list[dict]],
+    limit: int = 8,
+    scored_events: list[dict] | None = None,
+) -> list[str]:
+    """从最终入选的重点事件中按重要性提炼今日要点（最多 limit 条，不凑数）。"""
     MIN_BODY_LENGTH = 80  # reader_body 低于此长度的条目不进入今日要点
 
     def _highlight_text(event: dict) -> str:
@@ -302,25 +306,36 @@ def build_reader_highlights(columns: dict[str, list[dict]], limit: int = 8) -> l
             return bool(title and len(title) >= 2)
         return bool(title and len(title) >= 8)
 
-    highlights: list[str] = []
     column_keys = [key for key in columns if columns.get(key)]
     if not column_keys:
-        return highlights
+        return []
 
-    max_len = max(len(columns.get(key, [])) for key in column_keys)
-    for idx in range(max_len):
-        for col_key in column_keys:
-            events = columns.get(col_key, [])
-            if idx >= len(events):
+    score_map = _score_lookup(scored_events) if scored_events else {}
+    ranked: list[tuple[float, float, str]] = []
+    for col_key in column_keys:
+        for event in columns.get(col_key, []):
+            if not _is_detailed_event(event):
                 continue
-            if not _is_detailed_event(events[idx]):
+            text = _highlight_text(event)
+            if not text:
                 continue
-            text = _highlight_text(events[idx])
-            if not text or text in highlights:
-                continue
-            highlights.append(text)
-            if len(highlights) >= limit:
-                return highlights
+            scored_entry = _lookup_scored(score_map, event) if score_map else {}
+            ranked.append((
+                _to_float(scored_entry.get("newsworthiness")),
+                _to_float(scored_entry.get("score")),
+                text,
+            ))
+
+    # 按 (新闻价值, 评分) 降序；同分保持栏目原有顺序（稳定排序）
+    ranked.sort(key=lambda item: (item[0], item[1]), reverse=True)
+
+    highlights: list[str] = []
+    for _, _, text in ranked:
+        if text in highlights:
+            continue
+        highlights.append(text)
+        if len(highlights) >= limit:
+            break
     return highlights
 
 
@@ -825,7 +840,7 @@ def _audit_daily_content(
             display_text = headline_body or headline_title
             if "…" in display_text or "..." in display_text:
                 metrics["truncated_titles"] += 1
-            if len(headline_body) > 46:
+            if _title_display_width(headline_body) > 34:
                 metrics["long_headline_bodies"] = metrics.get("long_headline_bodies", 0) + 1
         for event in column.get("detailed_events", []):
             title = str(event.get("title_zh") or event.get("title") or "").strip()
@@ -1674,18 +1689,27 @@ def _compact_headline_title(text: str, limit: int = 21) -> str:
     return title[:limit].rstrip(" ，,。；;:：") + "…"
 
 
-def _compact_headline_body(text: str, limit: int = 36) -> str:
-    """压缩要点正文：完整首句优先，其次标点处收尾，无法可读截断返回空串。"""
+def _compact_headline_body(text: str, limit: int = 30) -> str:
+    """把要点正文压成完整中文概括（1-2 句，≤ limit 显示宽），无法可读时返回空串。"""
     text = re.sub(r"\s+", " ", str(text or "")).strip()
-    if len(text) <= limit:
+    if not text:
+        return ""
+    if _title_display_width(text) <= limit + 4:
         return text
-    sentence_match = re.match(r"(.+?[。！？!?])", text)
-    if sentence_match and len(sentence_match.group(1)) <= limit + 10:
-        return sentence_match.group(1)
+    sentences = [s.strip() for s in re.findall(r"[^。！？!?]+[。！？!?]?", text) if s.strip()]
+    picked = ""
+    for sentence in sentences[:2]:
+        candidate = f"{picked}{sentence}"
+        if _title_display_width(candidate) <= limit:
+            picked = candidate
+        else:
+            break
+    if picked:
+        return picked
     cut = text[:limit]
     for punct in ("，", "、", "；", "：", "。"):
         idx = cut.rfind(punct)
-        if idx >= limit // 3:
+        if idx >= limit // 2:
             return cut[: idx + 1]
     return ""
 
@@ -2168,7 +2192,9 @@ def build_report(
 
     # ── 提炼要点（在门禁/降级之后，确保与最终入选一致） ──
     print(f"\n[要点] 提炼要点...")
-    highlights = build_reader_highlights(column_results, limit=spec.highlights_limit)
+    highlights = build_reader_highlights(
+        column_results, limit=spec.highlights_limit, scored_events=scored_events,
+    )
     print(f"   要点: {len(highlights)} 条")
 
     # ── 组装 columns ──
