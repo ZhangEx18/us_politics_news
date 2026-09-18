@@ -2199,3 +2199,18 @@ def test_headline_normalize_drops_reaction_verdict_titles():
     normalized, _ = _normalize_headline_only_by_column(columns)
 
     assert [i["title_zh"] for i in normalized["global_affairs"]] == ["以色列与摩洛哥同意互设使馆"]
+
+
+def test_headline_normalize_drops_quoted_soundbite_titles():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "global_affairs": [
+            {"title_zh": "「无耻谎言」：以色列选民无视西方制裁", "summary": "表态。", "content": "表态。"},
+            {"title_zh": "以色列与摩洛哥同意互设使馆", "summary": "互设使馆。", "content": "互设使馆。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["global_affairs"]] == ["以色列与摩洛哥同意互设使馆"]
