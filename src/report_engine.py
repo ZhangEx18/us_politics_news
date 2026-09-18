@@ -1104,6 +1104,7 @@ _OPINION_TITLE_RE = re.compile(
     r"|关键所在|关键在哪|何利害关系|有何|前景|影响几何|^分析|^前瞻|^复盘|^影评|^书评"
     r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难|难有|难现|难料|无意外"
     r"|^帮助|^助|^指南|新闻综述|新闻速览|一周要闻|每日简报"
+    r"|^让[^，。]{0,14}更(?:易|轻松|方便)"
     r"|[？?]$|^[^\s：:]{2,6}[：:].*(意外|悬念)"
     r"|^helping\b|^how\s+to\b)",
     re.IGNORECASE,
@@ -1522,7 +1523,8 @@ _LIVE_BLOG_TITLE_RE = re.compile(r"^.{0,12}?(?:直播|\blive\b)\s*[：:]", re.IG
 _DANGLING_TITLE_TAIL = "称据的与对将把及或但而则又也"
 
 _TITLE_ATTRIBUTION_PREFIX_RE = re.compile(
-    r"^(?:有?报道称?|有?报告称|据报道|据悉|消息人士称|知情人士称|消息称)\s*[：:，,]?\s*"
+    r"^(?:有?报道称?|有?报告称|据报道|据悉|消息人士称|知情人士称|消息称"
+    r"|(?:美国|美|外|当地)?媒体(?:报道)?称|(?:一份|最新|一份最新)?报告(?:称|显示|披露))\s*[：:，,]?\s*"
 )
 
 
@@ -2034,18 +2036,28 @@ def build_report(
         column_results, detailed_metrics = _normalize_detailed_events_to_chinese(column_results)
         for col_key, column_metrics in detailed_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        # 合并候选池：已评分候选优先，其后为未评分兜底候选（已剔除 aggregator）
+        fill_pool = {key: list(value) for key, value in column_candidates.items()}
+        for col_key, items in (spec.fallback_candidates_by_column or {}).items():
+            pool = fill_pool.setdefault(col_key, [])
+            seen_titles = {str(i.get("title_zh") or i.get("title") or "").strip() for i in pool}
+            for item in items:
+                title = str(item.get("title_zh") or item.get("title") or "").strip()
+                if title and title not in seen_titles:
+                    pool.append(item)
+                    seen_titles.add(title)
         # AI 兜底扩写优先：摘要过短/英文候选时用 AI 生成简讯正文（质量高于规则兜底）
         column_results, ai_fallback_metrics = _ai_expand_fallback_events(
-            column_results, column_candidates, columns_cfg, ai_config,
+            column_results, fill_pool, columns_cfg, ai_config, max_per_column=5,
         )
         for col_key, column_metrics in ai_fallback_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
-        column_results, fallback_metrics = _ensure_daily_detailed_events(column_results, column_candidates)
+        column_results, fallback_metrics = _ensure_daily_detailed_events(column_results, fill_pool)
         for col_key, column_metrics in fallback_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
-        # 保底填充：AI 写作丢弃过多时，从候选中补充
+        # 保底填充：AI 写作丢弃过多时，从合并候选池补足 min_items
         column_results, fill_metrics = _fill_underrepresented_columns(
-            column_results, column_candidates, columns_cfg,
+            column_results, fill_pool, columns_cfg,
         )
         for col_key, column_metrics in fill_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)

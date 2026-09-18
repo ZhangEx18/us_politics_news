@@ -1674,8 +1674,8 @@ def test_daily_markdown_renders_lead_block():
 
     markdown = render_structured_markdown(meta, columns, report_type="daily")
 
-    assert "## 今日头条" in markdown
-    assert "**今日头条事件**" in markdown
+    assert "## 今日头条" not in markdown
+    assert "今日要点" in markdown
 
 
 # ── P1-5: 拒绝原因汇总 ──

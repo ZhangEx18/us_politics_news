@@ -22,6 +22,8 @@ ROUTINE_NOTICE_PATTERNS: tuple[str, ...] = (
     r"(issues?|releases?|publishes?)[^.\n]{0,40}\bfomc\s+statement\b",
     r"(release[sd]?|summary\s+of)\s+(the\s+)?(economic\s+projections|beige\s+book)\b",
     r"(releases?|publishes?)\s+(the\s+)?(minutes|meeting\s+minutes)\b",
+    r"\breadout\s+of\b",
+    r"\b(spoke|speaks|call|call\s+with|phone\s+call)\s+(with|to)\b[^.\n]{0,60}\babout\b",
     r"\bschedules?\s+(a\s+)?(public\s+)?(meeting|hearing|vote)\b",
     # 中文例行公告
     r"公开征求意见",
@@ -31,6 +33,8 @@ ROUTINE_NOTICE_PATTERNS: tuple[str, ...] = (
     r"撤回.{0,6}(过时|失效)",
     r"发布.{0,10}(FOMC|联邦公开市场委员会).{0,6}(声明|预测|纪要)",
     r"美联储.{0,12}发布.{0,8}(声明|预测|纪要)",
+    r"(通话|会见|会谈).{0,8}(纪要|readout)",
+    r"发布.{0,6}(通话|会谈)纪要",
 )
 
 _ROUTINE_NOTICE_RE = re.compile("|".join(ROUTINE_NOTICE_PATTERNS), re.IGNORECASE)
