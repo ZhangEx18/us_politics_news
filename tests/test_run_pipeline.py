@@ -871,3 +871,24 @@ def test_reuse_events_enabled_respects_env_override(monkeypatch):
 
     monkeypatch.setenv("REUSE_REPORT_EVENTS", "true")
     assert _reuse_events_enabled({"reuse_report_events": False}) is True
+
+
+def test_apply_priority_entities_boosts_openai_and_anthropic():
+    from run_pipeline import _apply_priority_entities
+
+    entries = [
+        {"column": "technology", "title": "OpenAI ships new model", "score": 60, "newsworthiness": 0.5},
+        {"column": "technology", "title": "Anthropic raises the bar", "score": 58, "newsworthiness": 0.55},
+        {"column": "technology", "title": "Apple event recap", "score": 70, "newsworthiness": 0.6},
+        {"column": "economy", "title": "OpenAI partner deal", "score": 66, "newsworthiness": 0.5},
+    ]
+    columns_cfg = {"technology": {"priority_entities": ["OpenAI", "Anthropic"]}}
+
+    boosted_entries, boosted = _apply_priority_entities(entries, columns_cfg)
+
+    assert boosted == 2
+    assert boosted_entries[0]["score"] == 72
+    assert abs(boosted_entries[0]["newsworthiness"] - 0.62) < 1e-9
+    assert boosted_entries[0]["priority_entity"] is True
+    assert boosted_entries[2]["score"] == 70
+    assert boosted_entries[3]["score"] == 66

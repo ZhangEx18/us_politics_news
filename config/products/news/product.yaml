@@ -63,6 +63,7 @@ digest:
       max_items: 7
       headline_items: 3
       prefilter_items: 35
+      priority_entities: ["OpenAI", "Anthropic"]
     economy:
       label: "经济走势"
       min_items: 4

@@ -1136,6 +1136,8 @@ _OPINION_TITLE_RE = re.compile(
     r"|或迎|看多|看空|转机|拐点|研判|料将|料无|几无|恐将|恐难|难有|难现|难料|无意外|必败|必胜|注定"
     r"|^帮助|^助|^指南|新闻综述|新闻速览|一周要闻|每日简报"
     r"|^让[^，。]{0,14}更(?:易|轻松|方便)"
+    r"|(斥|怒斥|痛斥|抨击|炮轰).{0,10}(谎言|无耻|虚伪|荒谬)"
+    r"|(选民|民众|网友|示威者|抗议者).{0,6}(斥|怒斥|抨击|痛批)"
     r"|[？?]$|^[^\s：:]{2,6}[：:].*(意外|悬念)"
     r"|^helping\b|^how\s+to\b)",
     re.IGNORECASE,
@@ -1202,7 +1204,7 @@ def _same_event_titles(
 
 def _sanitize_event_text(text: str) -> tuple[str, list[str]]:
     issues: list[str] = []
-    cleaned = text
+    cleaned = _ZERO_WIDTH_RE.sub("", text)
     for label in _FORBIDDEN_LABELS:
         if label in cleaned:
             issues.append(f"标签残留: {label}")
@@ -1721,6 +1723,8 @@ def _compact_headline_body(text: str, limit: int = 30) -> str:
 
 _MEDIA_TAIL_TAG_RE = re.compile(r"[（(【\[][^）)】\]]{0,10}(含视频|视频|图集|多图|独家|有图)[）)】\]]\s*$")
 _SOURCE_BRAND_TAG_RE = re.compile(r"^【[^】]{1,12}】\s*")
+_ZERO_WIDTH_RE = re.compile(r"[\u200b-\u200d\u2060\ufeff]")
+_LEADING_DATE_ONLY_RE = re.compile(r"^(\d{1,2}) 月 (\d{1,2}) 日，")
 _LEADING_DOUBLE_DATE_RE = re.compile(
     r"^(\d{1,2} 月 \d{1,2} 日，)\s*(?:【[^】]{1,12}】\s*)?(\d{1,2} 月 \d{1,2} 日，)"
 )
@@ -1728,15 +1732,34 @@ _LEADING_DATE_BRAND_TAG_RE = re.compile(r"^(\d{1,2} 月 \d{1,2} 日，)\s*【[^�
 
 
 def _clean_event_title(text: str) -> str:
-    """去掉标题尾部的媒体标记（如「(含视频)」）。"""
-    return _MEDIA_TAIL_TAG_RE.sub("", str(text or "").strip()).strip()
+    """去掉标题里的零宽字符与尾部媒体标记（如「(含视频)」）。"""
+    value = _ZERO_WIDTH_RE.sub("", str(text or "")).strip()
+    return _MEDIA_TAIL_TAG_RE.sub("", value).strip()
+
+
+def _dedupe_repeated_body_date(value: str) -> str:
+    """正文开头已有日期时，去掉首句内重复的同一日期（源稿常见「9月17日，… 9月17日同…」）。"""
+    match = _LEADING_DATE_ONLY_RE.match(value)
+    if not match:
+        return value
+    date_text = f"{int(match.group(1))} 月 {int(match.group(2))} 日"
+    head = value[: match.end()]
+    tail = value[match.end():]
+    window = tail[:60]
+    idx = window.find(date_text)
+    if idx == -1:
+        return value
+    merged = f"{tail[:idx].rstrip()}{tail[idx + len(date_text):].lstrip()}"
+    return head + merged
 
 
 def _clean_event_body(text: str) -> str:
-    """去掉正文起首的品牌标签与重复日期（如「9 月 17 日，【财新网】 9 月 16 日，…」）。"""
-    value = _SOURCE_BRAND_TAG_RE.sub("", str(text or "").strip())
+    """去掉正文里的零宽字符、起首品牌标签与重复日期。"""
+    value = _ZERO_WIDTH_RE.sub("", str(text or "")).strip()
+    value = _SOURCE_BRAND_TAG_RE.sub("", value)
     value = _LEADING_DOUBLE_DATE_RE.sub(r"\2", value)
     value = _LEADING_DATE_BRAND_TAG_RE.sub(r"\1", value)
+    value = _dedupe_repeated_body_date(value)
     return value.strip()
 
 

@@ -2174,3 +2174,28 @@ def test_brief_compaction_keeps_complete_sentence_within_36_and_drops_fragments(
 
     # 纯英文不产出简讯
     assert _compact_headline_body("This is an english only fragment") == ""
+
+
+def test_clean_event_body_strips_zero_width_and_repeated_date():
+    from report_engine import _clean_event_body
+
+    body = "9 月 17 日，\u200c9 月 16 日，美联储宣布加息。"
+    assert _clean_event_body(body) == "9 月 16 日，美联储宣布加息。"
+
+    repeated = "9 月 17 日，中共中央政治局委员、外交部长王毅 9 月 17 日同美国国务卿鲁比奥通电话。"
+    assert _clean_event_body(repeated) == "9 月 17 日，中共中央政治局委员、外交部长王毅同美国国务卿鲁比奥通电话。"
+
+
+def test_headline_normalize_drops_reaction_verdict_titles():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "global_affairs": [
+            {"title_zh": "以色列选民斥西方制裁为无耻谎言", "summary": "反应。", "content": "反应。"},
+            {"title_zh": "以色列与摩洛哥同意互设使馆", "summary": "互设使馆。", "content": "互设使馆。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["global_affairs"]] == ["以色列与摩洛哥同意互设使馆"]
