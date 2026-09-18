@@ -427,9 +427,14 @@ def _normalize_detailed_events_to_chinese(
         kept: list[dict] = []
         dropped_english = 0
         for item in items:
-            title_zh = _strip_title_source_prefix(str(item.get("title_zh") or "").strip())
-            item = {**item, "title_zh": title_zh}
-            reader_body = str(item.get("reader_body") or item.get("core_facts") or "").strip()
+            title_zh = _clean_event_title(
+                _strip_title_source_prefix(str(item.get("title_zh") or "").strip())
+            )
+            cleaned_body = _clean_event_body(
+                str(item.get("reader_body") or item.get("core_facts") or "").strip()
+            )
+            item = {**item, "title_zh": title_zh, "reader_body": cleaned_body}
+            reader_body = cleaned_body
 
             title_ok = _contains_meaningful_cjk(title_zh) and not _looks_like_english_fragment(title_zh)
             body_ok = _contains_meaningful_cjk(reader_body) and not _looks_like_english_fragment(reader_body)
@@ -1605,7 +1610,7 @@ def _glossary_known_names() -> frozenset[str]:
 
 
 _HEDGE_MARKER_RE = re.compile(
-    r"(意外|悬念|难有|难现|难料|料将|料无|未衰|衰亡|或迎|或将|有望|看多|看空|转机|拐点|研判)"
+    r"(意外|悬念|难有|难现|难料|料将|料无|未衰|衰亡|或迎|或将|有望|看多|看空|转机|拐点|研判|必败|必胜|注定)"
 )
 
 
@@ -1714,6 +1719,27 @@ def _compact_headline_body(text: str, limit: int = 30) -> str:
     return ""
 
 
+_MEDIA_TAIL_TAG_RE = re.compile(r"[（(【\[][^）)】\]]{0,10}(含视频|视频|图集|多图|独家|有图)[）)】\]]\s*$")
+_SOURCE_BRAND_TAG_RE = re.compile(r"^【[^】]{1,12}】\s*")
+_LEADING_DOUBLE_DATE_RE = re.compile(
+    r"^(\d{1,2} 月 \d{1,2} 日，)\s*(?:【[^】]{1,12}】\s*)?(\d{1,2} 月 \d{1,2} 日，)"
+)
+_LEADING_DATE_BRAND_TAG_RE = re.compile(r"^(\d{1,2} 月 \d{1,2} 日，)\s*【[^】]{1,12}】\s*")
+
+
+def _clean_event_title(text: str) -> str:
+    """去掉标题尾部的媒体标记（如「(含视频)」）。"""
+    return _MEDIA_TAIL_TAG_RE.sub("", str(text or "").strip()).strip()
+
+
+def _clean_event_body(text: str) -> str:
+    """去掉正文起首的品牌标签与重复日期（如「9 月 17 日，【财新网】 9 月 16 日，…」）。"""
+    value = _SOURCE_BRAND_TAG_RE.sub("", str(text or "").strip())
+    value = _LEADING_DOUBLE_DATE_RE.sub(r"\2", value)
+    value = _LEADING_DATE_BRAND_TAG_RE.sub(r"\1", value)
+    return value.strip()
+
+
 def _merge_headline_metrics(column_metrics_map: dict, col_key: str, new_metrics: dict) -> None:
     """累加合并要点过滤计数（第二次 normalize 不应覆盖第一次的丢弃数）。"""
     target = column_metrics_map.setdefault(col_key, {})
@@ -1763,9 +1789,9 @@ def _normalize_headline_only_by_column(
                 existing_links |= _event_url_set(event)
 
         for item in items:
-            title_zh = _strip_title_source_prefix(
+            title_zh = _clean_event_title(_strip_title_source_prefix(
                 str(item.get("title_zh") or item.get("title") or "").strip()
-            )
+            ))
             if _looks_like_english_fragment(title_zh):
                 unreadable_dropped += 1
                 continue

@@ -55,7 +55,7 @@ def _markdown_text(text: object) -> str:
     value = _pangu(str(text)).replace("\r\n", "\n").replace("\r", "\n")
     value = re.sub(r"\n+", " ", value).strip()
     value = html.escape(value, quote=False)
-    for token in ("[", "]", "(", ")", "`"):
+    for token in ("[", "]", "`"):
         value = value.replace(token, f"\\{token}")
     return value
 
