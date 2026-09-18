@@ -4,7 +4,7 @@
 
 特性：
 - 从结构化 dict 直接生成 HTML / Markdown，不经过 Markdown → HTML 转换
-- YAML frontmatter（title / lead / highlights / date）
+- YAML frontmatter（title / lead / highlights）
 - 四大栏目分组：美国政局 / 国际局势 / 科技前沿 / 经济走势
 - 每条事件：核心事实 + 背景与影响 + 为什么值得关注 + 来源链接
 - 中英文混排自动空格（Pangu spacing）
@@ -66,22 +66,48 @@ def _markdown_title_text(text: object) -> str:
     return html.escape(str(text), quote=False)
 
 
-def _headline_only_text(event: dict) -> str:
-    """headline_only_events 优先使用可读短句，缺失时回退中文标题；渲染层兜底压缩。"""
-    text = str(event.get("reader_body") or event.get("title_zh") or "").strip()
-    if len(text) <= 46:
+_BRIEF_WIDTH_LIMIT = 30
+
+
+def _display_width(text: str) -> float:
+    """显示宽度：CJK 按 1，拉丁/数字/空格按 0.5。"""
+    return sum(1.0 if ord(char) > 0x2E80 else 0.5 for char in str(text or ""))
+
+
+def _compact_brief_text(text: str, limit: int = _BRIEF_WIDTH_LIMIT) -> str:
+    """把简讯压缩成完整中文短句（1-2 句，≤ limit 显示宽），无法可读时返回空串。"""
+    text = re.sub(r"\s+", " ", str(text or "")).strip()
+    if not text:
+        return ""
+    if _display_width(text) <= limit + 4:
         return text
-    sentence_match = re.match(r"(.+?[。！？!?])", text)
-    if sentence_match and len(sentence_match.group(1)) <= 56:
-        return sentence_match.group(1)
-    cut = text[:46]
+    sentences = [s.strip() for s in re.findall(r"[^。！？!?]+[。！？!?]?", text) if s.strip()]
+    picked = ""
+    for sentence in sentences[:2]:
+        candidate = f"{picked}{sentence}"
+        if _display_width(candidate) <= limit:
+            picked = candidate
+        else:
+            break
+    if picked:
+        return picked
+    cut = text[:limit]
     for punct in ("，", "、", "；", "：", "。"):
         idx = cut.rfind(punct)
-        if idx >= 15:
+        if idx >= limit // 2:
             return cut[: idx + 1]
+    return ""
+
+
+def _headline_only_text(event: dict) -> str:
+    """要点简讯：完整中文短句（≤30 显示宽）；无法可读截断时回退标题。"""
+    text = str(event.get("reader_body") or event.get("title_zh") or "").strip()
+    compacted = _compact_brief_text(text)
+    if compacted:
+        return compacted
     fallback_title = str(event.get("title_zh") or "").strip()
-    if fallback_title and len(fallback_title) <= 46:
-        return fallback_title
+    if fallback_title:
+        return _compact_brief_text(fallback_title) or fallback_title
     return ""
 
 
@@ -148,12 +174,12 @@ def _daily_highlights(meta: dict) -> list[str]:
     return [str(item).strip() for item in meta.get("highlights", []) if str(item).strip()]
 
 
-def _frontmatter(title: str, lead: str, highlights: list, date: str) -> str:
+def _frontmatter(title: str, lead: str, highlights: list) -> str:
+    """YAML frontmatter：title/lead/highlights（date 与 title 重复，不再输出）。"""
     payload = {
         "title": title,
         "lead": lead,
         "highlights": highlights,
-        "date": date,
     }
     dumped = yaml.safe_dump(payload, allow_unicode=True, sort_keys=False).strip()
     return f"---\n{dumped}\n---\n"
@@ -686,7 +712,7 @@ def render_structured_markdown(
     highlights = [_markdown_text(h) for h in meta.get("highlights", [])]
     date = meta.get("date", datetime.now().strftime("%Y-%m-%d"))
 
-    lines: list[str] = [_frontmatter(title, lead, highlights, date), ""]
+    lines: list[str] = [_frontmatter(title, lead, highlights), ""]
 
     lines.append("## 今日要点")
     lines.append("")

@@ -242,16 +242,34 @@ def test_build_reader_highlights_empty():
     assert highlights == []
 
 
-def test_build_reader_highlights_round_robin_across_columns():
+def test_build_reader_highlights_orders_by_importance():
+    body = "正文内容。" * 20
     columns = {
-        "us_politics": [{"title_zh": "美国一"}, {"title_zh": "美国二"}],
-        "global_affairs": [{"title_zh": "国际一"}, {"title_zh": "国际二"}],
-        "technology": [{"title_zh": "科技一"}],
+        "us_politics": [{"title_zh": "美国一", "reader_body": body, "event_key": "a"}],
+        "global_affairs": [{"title_zh": "国际一", "reader_body": body, "event_key": "b"}],
+        "technology": [{"title_zh": "科技一", "reader_body": body, "event_key": "c"}],
+    }
+    scored = [
+        {"event_key": "a", "newsworthiness": 0.5, "score": 90},
+        {"event_key": "b", "newsworthiness": 0.9, "score": 80},
+        {"event_key": "c", "newsworthiness": 0.7, "score": 70},
+    ]
+
+    highlights = build_reader_highlights(columns, limit=5, scored_events=scored)
+
+    assert highlights == ["国际一", "科技一", "美国一"]
+
+
+def test_build_reader_highlights_without_scores_keeps_column_order():
+    body = "正文内容。" * 20
+    columns = {
+        "us_politics": [{"title_zh": "美国一", "reader_body": body}],
+        "global_affairs": [{"title_zh": "国际一", "reader_body": body}],
     }
 
-    highlights = build_reader_highlights(columns, limit=4)
+    highlights = build_reader_highlights(columns, limit=5)
 
-    assert highlights == ["美国一", "国际一", "科技一", "美国二"]
+    assert highlights == ["美国一", "国际一"]
 
 
 def test_build_periodical_overview_payload_from_dataclass():
@@ -1878,13 +1896,18 @@ def test_headline_normalize_drops_prediction_titles():
 def test_compact_headline_body_prefers_complete_sentence():
     from report_engine import _compact_headline_body
 
-    long_first = "9 月 15 日，旨在为美国数字资产建立全面监管框架的法案未获通过。后续安排另行公布。"
-    assert _compact_headline_body(long_first) == "9 月 15 日，旨在为美国数字资产建立全面监管框架的法案未获通过。"
+    long_text = "美联储宣布加息 25 个基点，为三年来首次。市场此前已有充分预期，后续路径仍待观察。"
+    assert _compact_headline_body(long_text) == "美联储宣布加息 25 个基点，为三年来首次。"
 
     assert _compact_headline_body("这是一段没有任何标点的超长文本" * 5) == ""
 
-    complete = "美联储宣布加息 25 个基点，为三年来首次。"
+    complete = "美联储宣布加息 25 个基点。"
     assert _compact_headline_body(complete) == complete
+
+    # 首句超长：在标点处收尾，保证可读
+    clause = "在围绕国会选区地图的长期争斗之后各方终于达成的协议仍然面临挑战" * 2
+    compacted = _compact_headline_body(clause)
+    assert compacted == "" or compacted.endswith(("，", "。"))
 
 
 def test_headline_normalize_keeps_distinct_same_subject_news():
