@@ -82,7 +82,18 @@
 | C | 四栏目 `rendered_detailed ≥ min_items` 且 `rendered_headline_only ≥ headline_items`（供给不足时允许回落至 min_items） | `metrics.columns` 对比 product.yaml |
 | 常量 | `content_audit` 8 项全 0 | metrics 每日核查 |
 
-## 四、残留与后续（P1/P2）
+## 四、实施后验证（2026-09-18 05:54 发布版，commit 5d4893d）
+
+| 项 | 结果 |
+|---|---|
+| A 今日头条 | ✅ 已移除，首屏为"今日要点" |
+| B 用词 | ✅ 视频/匿名归因/弱动词/软文/部门开头/通话通报/WSJ 前缀/要点截断 全部为 0；奇闻条目（鳄鱼）已被过滤 |
+| C 数量 | 美国政局 8+2 ✅ / 国际局势 7+6 ✅ / 经济走势 4+1 ✅（min 4 达标）/ 科技前沿 2+0 ⚠️（目标 7+3，仍供应不足） |
+| 审计 | ✅ `content_audit` 8 项全 0；`digest_failures` 空 |
+| 拒绝分类 | ✅ 仅 low_newsworthiness/repeated_story/duplicate_event/unreadable_body/cryptic_title/source_quota，无 soft/opinion/routine/live_blog |
+| 补充修复 | pipeline_leak 误报（数据抓取）、标题按显示宽度计长、渲染层截断回退标题、digest 缺 events 重试、兜底候选 freshness_status |
+
+## 五、残留与后续（P1/P2）
 - P1（已有监控，待规则）：BBC 特稿/奇闻类条目（B2）——建议后续给 BBC World 增加"硬新闻优先"选择权重，或引入轻量 AI 判类。
 - P1：经济栏与科技栏的 headline 数量在周六日/低供给日可能仍低于 headline_items，监控两周后决定是否再补源或放宽评分线。
 - P2：翻译 prompt 的机构名还原可扩展为"机构术语表自动注入"，减少逐条补规则。
