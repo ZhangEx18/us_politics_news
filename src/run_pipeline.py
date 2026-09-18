@@ -636,7 +636,11 @@ def _is_fallback_eligible(item: ContentItem) -> bool:
     return "aggregator" not in tags
 
 
-def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> dict:
+def _content_item_to_report_candidate(
+    item: ContentItem,
+    score: float = 0,
+    allowed_dates: set[str] | None = None,
+) -> dict:
     freshness_date = _freshness_date_for_item(item)
     return {
         "title": item.title,
@@ -654,7 +658,11 @@ def _content_item_to_report_candidate(item: ContentItem, score: float = 0) -> di
         "fetched": item.fetched_at.isoformat() if item.fetched_at else "",
         "freshness_date": freshness_date,
         "event_date": freshness_date,
-        "freshness_status": "",
+        "freshness_status": (
+            _freshness_status_for_date(freshness_date, allowed_dates)
+            if allowed_dates
+            else ""
+        ),
     }
 
 
@@ -1288,6 +1296,7 @@ def _build_and_log_digest_report(
         history_days=history_days,
         min_llm_score=analysis_cfg.get("min_llm_score", 65),
         fallback_candidates_by_column=fallback_candidates_by_column,
+        digest_failed_columns=set((phase_metrics.get("ai") or {}).get("digest_failures") or {}),
     )
 
     try:
@@ -1504,9 +1513,10 @@ def _run_digest_phase(
                 }
                 phase_metrics["ai"]["score_errors"] = 0
                 phase_metrics["ai"]["score_duration_seconds"] = 0
+                fallback_allowed_dates = _allowed_freshness_dates(report_date)
                 fallback_candidates_by_column = {
                     col_key: [
-                        _content_item_to_report_candidate(item)
+                        _content_item_to_report_candidate(item, allowed_dates=fallback_allowed_dates)
                         for item in items
                         if _is_fallback_eligible(item)
                     ]
@@ -1547,9 +1557,10 @@ def _run_digest_phase(
             }
             phase_metrics["ai"]["score_errors"] = 0
             phase_metrics["ai"]["score_duration_seconds"] = 0
+            fallback_allowed_dates = _allowed_freshness_dates(report_date)
             fallback_candidates_by_column = {
                 col_key: [
-                    _content_item_to_report_candidate(item)
+                    _content_item_to_report_candidate(item, allowed_dates=fallback_allowed_dates)
                     for item in items
                     if _is_fallback_eligible(item)
                 ]
@@ -1696,6 +1707,7 @@ def _run_digest_phase(
         "hard_news": len(hard_news_scored),
     }
     fallback_candidates_by_column: dict[str, list[dict]] = {}
+    fallback_allowed_dates = _allowed_freshness_dates(report_date)
     for col_key, items in prefiltered_by_column.items():
         non_hard: list[dict] = []
         for item in items:
@@ -1703,7 +1715,9 @@ def _run_digest_phase(
                 continue
             if not _is_fallback_eligible(item):
                 continue
-            non_hard.append(_content_item_to_report_candidate(item))
+            non_hard.append(
+                _content_item_to_report_candidate(item, allowed_dates=fallback_allowed_dates)
+            )
         fallback_candidates_by_column[col_key] = non_hard
     # 按栏目统计
     _hard_by_col: dict[str, int] = {}

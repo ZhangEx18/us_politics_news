@@ -68,6 +68,7 @@ class ReportSpec:
     history_days: int = 3
     min_llm_score: float = 65
     fallback_candidates_by_column: dict[str, list[dict]] = field(default_factory=dict)
+    digest_failed_columns: set[str] = field(default_factory=set)
 
 
 @dataclass(frozen=True)
@@ -957,6 +958,7 @@ def _ai_expand_fallback_events(
     columns_cfg: dict[str, dict],
     ai_config: dict,
     max_per_column: int = 2,
+    boost_columns: set[str] | None = None,
 ) -> tuple[dict[str, list[dict]], dict[str, dict[str, int]]]:
     """栏目重点解析不足时，用 AI 把候选扩写成中文简讯正文。"""
     expanded: dict[str, list[dict]] = {key: list(value) for key, value in column_results.items()}
@@ -984,7 +986,8 @@ def _ai_expand_fallback_events(
             if str(candidate.get("freshness_status") or "") not in {"today", "recent_followup"}:
                 continue
             picks.append(candidate)
-            if len(picks) >= min(deficit, max_per_column):
+            cap = min_items if col_key in (boost_columns or set()) else max_per_column
+            if len(picks) >= min(deficit, cap):
                 break
 
         if not picks:
@@ -2048,7 +2051,8 @@ def build_report(
                     seen_titles.add(title)
         # AI 兜底扩写优先：摘要过短/英文候选时用 AI 生成简讯正文（质量高于规则兜底）
         column_results, ai_fallback_metrics = _ai_expand_fallback_events(
-            column_results, fill_pool, columns_cfg, ai_config, max_per_column=5,
+            column_results, fill_pool, columns_cfg, ai_config,
+            max_per_column=5, boost_columns=spec.digest_failed_columns,
         )
         for col_key, column_metrics in ai_fallback_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
