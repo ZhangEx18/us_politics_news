@@ -1957,71 +1957,71 @@
         "2026-09-17",
         "2026-09-18"
       ],
-      "kept": 2192,
-      "dropped": 1269,
+      "kept": 2234,
+      "dropped": 1273,
       "dropped_by_column": {
-        "us_politics": 296,
-        "global_affairs": 499,
-        "technology": 116,
-        "economy": 358
+        "us_politics": 298,
+        "global_affairs": 493,
+        "technology": 117,
+        "economy": 365
       }
     },
-    "raw_fetched": 3654,
-    "raw_merged": 2192
+    "raw_fetched": 3700,
+    "raw_merged": 2234
   },
-  "cn_source_fetched": 134,
+  "cn_source_fetched": 138,
   "cn_source_selected": 4,
   "cn_source_selected_by_column": {
     "economy": 0,
-    "technology": 3,
-    "global_affairs": 1,
+    "global_affairs": 2,
+    "technology": 2,
     "us_politics": 0
   },
   "columns": {
     "economy": {
       "prefiltered": 14,
       "hard_news_candidates": 14,
-      "hard_news_scored": 4,
-      "post_merge_scored": 3,
+      "hard_news_scored": 3,
+      "post_merge_scored": 2,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 3,
       "source_quota_dropped": 0,
-      "detailed_filled": 3,
+      "detailed_filled": 2,
       "headline_filled": 3,
-      "post_score_filtered": 3,
+      "post_score_filtered": 2,
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
-      "headline_reader_body_missing": 0,
+      "headline_reader_body_missing": 1,
       "headline_body_from_title": 0,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 1,
+      "headline_duplicate_dropped": 0,
       "headline_soft_dropped": 0,
       "headline_live_blog_dropped": 0,
       "headline_truncated_dropped": 2,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 0,
-      "deduped_detailed": 0,
+      "fill_added": 1,
+      "deduped_detailed": 1,
       "detailed_downgraded_to_headline_only": 1,
-      "rendered_detailed": 2,
+      "rendered_detailed": 1,
       "rendered_headline_only": 1
     },
     "global_affairs": {
-      "prefiltered": 27,
-      "hard_news_candidates": 27,
-      "hard_news_scored": 19,
-      "post_merge_scored": 14,
+      "prefiltered": 26,
+      "hard_news_candidates": 26,
+      "hard_news_scored": 15,
+      "post_merge_scored": 13,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 4,
+      "headline_filled_from_non_hard_news": 5,
       "source_quota_dropped": 0,
       "detailed_filled": 10,
       "headline_filled": 8,
-      "post_score_filtered": 14,
+      "post_score_filtered": 13,
       "headline_translated": 8,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
@@ -2029,36 +2029,36 @@
       "headline_body_from_title": 4,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
-      "headline_duplicate_dropped": 0,
+      "headline_duplicate_dropped": 1,
       "headline_soft_dropped": 0,
       "headline_live_blog_dropped": 0,
-      "headline_truncated_dropped": 1,
+      "headline_truncated_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 1,
-      "deduped_detailed": 0,
-      "detailed_downgraded_to_headline_only": 2,
-      "rendered_detailed": 0,
-      "rendered_headline_only": 7
+      "fill_added": 2,
+      "deduped_detailed": 1,
+      "detailed_downgraded_to_headline_only": 1,
+      "rendered_detailed": 6,
+      "rendered_headline_only": 6
     },
     "technology": {
-      "prefiltered": 15,
-      "hard_news_candidates": 15,
-      "hard_news_scored": 10,
-      "post_merge_scored": 7,
+      "prefiltered": 17,
+      "hard_news_candidates": 17,
+      "hard_news_scored": 7,
+      "post_merge_scored": 5,
       "detailed_filled_from_low_score": 0,
       "headline_filled_from_low_score": 0,
       "headline_filled_from_non_hard_news": 3,
       "source_quota_dropped": 0,
-      "detailed_filled": 7,
+      "detailed_filled": 5,
       "headline_filled": 3,
-      "post_score_filtered": 7,
+      "post_score_filtered": 5,
       "headline_translated": 3,
       "headline_translation_failed": 0,
       "headline_cryptic_dropped": 0,
       "headline_reader_body_missing": 1,
-      "headline_body_from_title": 0,
+      "headline_body_from_title": 1,
       "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 1,
@@ -2068,49 +2068,48 @@
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 1,
+      "fill_added": 2,
       "deduped_detailed": 1,
-      "rendered_detailed": 5,
-      "rendered_headline_only": 0
+      "detailed_downgraded_to_headline_only": 1,
+      "rendered_detailed": 3,
+      "rendered_headline_only": 1
     },
     "us_politics": {
-      "prefiltered": 23,
-      "hard_news_candidates": 23,
-      "hard_news_scored": 14,
-      "post_merge_scored": 12,
-      "detailed_filled_from_low_score": 0,
+      "prefiltered": 24,
+      "hard_news_candidates": 24,
+      "hard_news_scored": 10,
+      "post_merge_scored": 8,
+      "detailed_filled_from_low_score": 1,
       "headline_filled_from_low_score": 0,
-      "headline_filled_from_non_hard_news": 6,
+      "headline_filled_from_non_hard_news": 8,
       "source_quota_dropped": 0,
-      "detailed_filled": 10,
+      "detailed_filled": 8,
       "headline_filled": 8,
-      "post_score_filtered": 12,
+      "post_score_filtered": 7,
       "headline_translated": 8,
       "headline_translation_failed": 0,
-      "headline_cryptic_dropped": 0,
+      "headline_cryptic_dropped": 3,
       "headline_reader_body_missing": 1,
-      "headline_body_from_title": 3,
-      "headline_opinion_dropped": 1,
+      "headline_body_from_title": 6,
+      "headline_opinion_dropped": 0,
       "headline_promo_dropped": 0,
       "headline_duplicate_dropped": 1,
       "headline_soft_dropped": 0,
-      "headline_live_blog_dropped": 1,
-      "headline_truncated_dropped": 2,
+      "headline_live_blog_dropped": 0,
+      "headline_truncated_dropped": 0,
       "detailed_translation_failed": 0,
       "detailed_fallback_added": 0,
       "detailed_fallback_failed": 0,
-      "fill_added": 0,
-      "deduped_detailed": 0,
-      "rendered_detailed": 8,
-      "rendered_headline_only": 2
+      "fill_added": 2,
+      "deduped_detailed": 2,
+      "rendered_detailed": 6,
+      "rendered_headline_only": 3
     }
   },
   "ai": {
     "score_errors": 0,
-    "digest_failures": {
-      "global_affairs": "generate_column_digest 响应中未找到 events 数组: {\"\": \"\"}"
-    },
-    "score_duration_seconds": 366.8
+    "digest_failures": {},
+    "score_duration_seconds": 253.9
   },
   "freshness_gate": {
     "min_ratio": 0.95,
@@ -2119,71 +2118,69 @@
         "2026-09-17",
         "2026-09-18"
       ],
-      "kept": 79,
+      "kept": 81,
       "dropped": 0,
       "dropped_by_column": {}
     },
     "scored_events": {
-      "total": 47,
+      "total": 35,
       "freshness_ratio": 1.0,
-      "today_count": 47,
+      "today_count": 35,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 41,
-        "recent_followup": 6
+        "today": 35
       },
       "allowed_dates": [
         "2026-09-17",
         "2026-09-18"
       ],
-      "fresh_after_gate": 47,
+      "fresh_after_gate": 35,
       "gate_failed": false
     },
     "before_render": {
-      "total": 47,
+      "total": 35,
       "freshness_ratio": 1.0,
-      "today_count": 47,
+      "today_count": 35,
       "old_count": 0,
       "unknown_date_count": 0,
       "status_counts": {
-        "today": 41,
-        "recent_followup": 6
+        "today": 35
       },
       "allowed_dates": [
         "2026-09-17",
         "2026-09-18"
       ],
-      "fresh_after_gate": 47,
+      "fresh_after_gate": 35,
       "gate_failed": false
     }
   },
   "candidate_pool": {
-    "upserted": 79,
-    "total": 79
+    "upserted": 81,
+    "total": 81
   },
-  "routine_notice_dropped": 0,
-  "low_newsworthiness_dropped": 2,
+  "routine_notice_dropped": 1,
+  "low_newsworthiness_dropped": 5,
   "cross_day_dedup": {
     "recent_events": 402,
-    "dropped": 1,
-    "kept": 47
+    "dropped": 4,
+    "kept": 35
   },
-  "repeated_story_dropped": 1,
+  "repeated_story_dropped": 4,
   "report_events": {
-    "upserted": 47,
-    "hard_news": 47
+    "upserted": 35,
+    "hard_news": 35
   },
   "freshness_ratio": 1.0,
-  "today_count": 47,
+  "today_count": 35,
   "old_count": 0,
   "unknown_date_count": 0,
-  "events_merged_duplicates": 11,
+  "events_merged_duplicates": 7,
   "content_audit": {
     "duplicate_titles": 0,
     "old_body_dates": 0,
     "fallback_boilerplate": 0,
-    "truncated_titles": 0,
+    "truncated_titles": 1,
     "meta_commentary": 0,
     "pipeline_leak": 1,
     "untranslated_terms": 0,
@@ -2192,24 +2189,23 @@
   },
   "candidates_archive": "docs/news/candidates/2026-09-18",
   "rejections": {
-    "low_newsworthiness": 2,
-    "repeated_story": 1,
+    "routine_notice": 1,
+    "low_newsworthiness": 5,
+    "repeated_story": 4,
     "duplicate_event": 15,
     "cryptic_title": 6,
-    "unreadable_body": 4,
-    "live_blog": 1,
-    "opinion_piece": 1
+    "unreadable_body": 5
   },
   "lead": {
-    "column": "technology",
-    "title": "解封文件：微软高管称AI抓取是“史上最大劳动盗窃”",
-    "body": "9 月 17 日，新解封的法庭文件显示，微软一名高管将 AI 抓取新闻文章的行为称为“人类历史上最大的劳动盗窃”。文件同时显示微软和 OpenAI 员工对使用数百万篇新闻文章训练 AI 系统表示担忧。",
-    "score": 78,
-    "newsworthiness": 0.725
+    "column": "global_affairs",
+    "title": "俄中否决安理会涉伊朗制裁监督决议",
+    "body": "9 月 18 日，据雅虎新闻报道，俄罗斯与中国在联合国安理会否决了美国提出的一项决议。该决议要求联合国专家继续监督对伊朗的制裁。",
+    "score": 84,
+    "newsworthiness": 0.785
   },
   "report": {
     "title": "2026年9月18日 日报",
     "published_at": "2026-09-18T07:45:00+08:00",
-    "duration_seconds": 35.7
+    "duration_seconds": 145.2
   }
 }
