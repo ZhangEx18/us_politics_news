@@ -2214,3 +2214,39 @@ def test_headline_normalize_drops_quoted_soundbite_titles():
     normalized, _ = _normalize_headline_only_by_column(columns)
 
     assert [i["title_zh"] for i in normalized["global_affairs"]] == ["以色列与摩洛哥同意互设使馆"]
+
+
+def test_headline_filters_opinion_urls_and_curly_quote_soundbites():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "global_affairs": [
+            {
+                "title_zh": "以色列宁愿不看NAZA",
+                "summary": "评论。",
+                "content": "评论。",
+                "source_links": [{"url": "https://www.aljazeera.com/opinions/2026/9/18/israel-would-rather-not-watch-naza"}],
+            },
+            {"title_zh": "“无耻谎言”：以色列选民对西方制裁不以为意", "summary": "表态。", "content": "表态。"},
+            {"title_zh": "以色列与摩洛哥同意互设使馆", "summary": "互设使馆。", "content": "互设使馆。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["global_affairs"]] == ["以色列与摩洛哥同意互设使馆"]
+
+
+def test_headline_filters_chinese_routine_notice_titles():
+    from report_engine import _normalize_headline_only_by_column
+
+    columns = {
+        "us_politics": [
+            {"title_zh": "国家农村卫生信息交流中心项目补充资金通知", "summary": "通知。", "content": "通知。"},
+            {"title_zh": "联邦法官推翻教师培训经费削减", "summary": "裁决。", "content": "裁决。"},
+        ]
+    }
+
+    normalized, _ = _normalize_headline_only_by_column(columns)
+
+    assert [i["title_zh"] for i in normalized["us_politics"]] == ["联邦法官推翻教师培训经费削减"]
