@@ -79,7 +79,10 @@ def _headline_only_text(event: dict) -> str:
         idx = cut.rfind(punct)
         if idx >= 15:
             return cut[: idx + 1]
-    return cut.rstrip(" ，,。；;:：") + "…"
+    fallback_title = str(event.get("title_zh") or "").strip()
+    if fallback_title and len(fallback_title) <= 46:
+        return fallback_title
+    return ""
 
 
 def _has_cjk(text: object) -> bool:

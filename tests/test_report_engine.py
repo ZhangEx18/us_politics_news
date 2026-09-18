@@ -220,7 +220,7 @@ def test_audit_daily_content_counts_common_content_problems():
         "meta_commentary": 0,
         "pipeline_leak": 0,
         "untranslated_terms": 0,
-        "long_titles": 2,
+        "long_titles": 1,
         "long_headline_bodies": 0,
     }
 
@@ -2076,3 +2076,31 @@ def test_dedupe_daily_column_events_drops_cross_column_same_story():
     assert deduped["global_affairs"] == []
     assert metrics["global_affairs"]["deduped_detailed"] == 1
     assert len(deduped["technology"]) == 1
+
+
+def test_pipeline_leak_ignores_data_scraping_news():
+    from report_engine import _PIPELINE_LEAK_RE
+
+    assert not _PIPELINE_LEAK_RE.search("微软高管将针对 OpenAI 的数据抓取称为窃取")
+    assert _PIPELINE_LEAK_RE.search("该条目为聚合条目")
+
+
+def test_title_display_width_counts_latin_half():
+    from report_engine import _title_display_width
+
+    assert _title_display_width("美联储加息 25 个基点") <= 14
+    assert _title_display_width("Google DeepMind 成立新研究所讨论 AGI 影响") < 26
+    assert _title_display_width("这是一个非常非常非常非常非常非常非常非常非常长的中文标题") > 26
+
+
+def test_strip_title_source_prefix_handles_latin_alias():
+    from report_engine import _strip_title_source_prefix
+
+    assert _strip_title_source_prefix("WSJ：三名研究人员用 Claude 训练模型") == "三名研究人员用 Claude 训练模型"
+
+
+def test_renderer_headline_falls_back_to_title_when_body_uncuttable():
+    from report_renderer import _headline_only_text
+
+    event = {"title_zh": "微软高管称为最大劳动盗窃", "reader_body": "This is an unpunctuated english fragment that is far too long to display"}
+    assert _headline_only_text(event) == "微软高管称为最大劳动盗窃"

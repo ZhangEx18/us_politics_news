@@ -36,3 +36,9 @@ def test_fomc_statement_and_projections_are_routine_notices():
 
 def test_market_reaction_headline_is_not_routine_notice():
     assert not is_routine_notice("Fed signals possible rate cut as inflation cools")
+
+
+def test_readout_release_is_routine_notice():
+    assert is_routine_notice("冯德莱恩与泽连斯基通话后发布通报")
+    assert is_routine_notice("Commission readout of the call with Zelenskyy")
+    assert not is_routine_notice("警方发布通报称已抓获嫌疑人")
