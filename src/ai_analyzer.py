@@ -1222,9 +1222,11 @@ async def generate_column_digest(
             ) from retry_exc
 
     # 提取 events 数组
-    if isinstance(parsed, dict) and isinstance(parsed.get("events"), list):
+    def _extract_events(payload: object) -> list[dict] | None:
+        if not isinstance(payload, dict) or not isinstance(payload.get("events"), list):
+            return None
         normalized_events = []
-        for event in parsed["events"]:
+        for event in payload["events"]:
             if not isinstance(event, dict):
                 continue
             reader_body = str(event.get("reader_body", "") or event.get("core_facts", "")).strip()
@@ -1239,9 +1241,32 @@ async def generate_column_digest(
             normalized_events.append(normalized)
         return normalized_events
 
-    raise RuntimeError(
-        f"generate_column_digest 响应中未找到 events 数组: {response[:300]}"
-    )
+    normalized_events = _extract_events(parsed)
+    if normalized_events is None:
+        # 偶发返回空对象/近似结构：追加约束重试一次
+        _ai_log("栏目写作 JSON 缺少 events 数组，追加约束后重试一次")
+        retry_prompt = (
+            prompt
+            + "\n\n注意：只输出 JSON 对象，且必须包含 events 数组（形如 {\"events\": [...]}）。"
+        )
+        response = await _call_llm(
+            retry_prompt,
+            {**ai_config, "temperature": 0.2, "max_tokens": 16000, "json_object": True},
+            timeout=_timeout_for(ai_config, "digest", 180),
+        )
+        try:
+            parsed = _parse_jsonish_object(response)
+        except ValueError as retry_exc:
+            raise RuntimeError(
+                f"generate_column_digest JSON 解析失败: {response[:300]}"
+            ) from retry_exc
+        normalized_events = _extract_events(parsed)
+
+    if normalized_events is None:
+        raise RuntimeError(
+            f"generate_column_digest 响应中未找到 events 数组: {response[:300]}"
+        )
+    return normalized_events
 
 
 async def generate_periodical_overview(
