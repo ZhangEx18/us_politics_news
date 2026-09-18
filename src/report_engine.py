@@ -1663,7 +1663,7 @@ def _build_headline_only_reader_body(item: dict) -> str:
             continue
         sentence_match = re.match(r"(.+?[。！？!?])", text)
         sentence = sentence_match.group(1).strip() if sentence_match else text[:80].rstrip(" ，,。；;:：")
-        cleaned_sentence = _strip_anonymous_attribution(sentence)
+        cleaned_sentence = _clean_event_body(_strip_anonymous_attribution(sentence))
         if cleaned_sentence:
             sentence = cleaned_sentence
         if sentence and sentence[-1] not in "。！？!?":
@@ -2140,6 +2140,16 @@ def build_report(
         )
         for col_key, column_metrics in fill_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
+        # 统一清洗：兜底/扩写/填充新增的事件同样要去掉源站标记与重复日期
+        for col_key, events in column_results.items():
+            cleaned_events: list[dict] = []
+            for event in events:
+                title = _clean_event_title(str(event.get("title_zh") or event.get("title") or ""))
+                body = _clean_event_body(
+                    str(event.get("reader_body") or event.get("core_facts") or "")
+                )
+                cleaned_events.append({**event, "title_zh": title, "reader_body": body})
+            column_results[col_key] = cleaned_events
         column_results, dedupe_metrics = _dedupe_daily_column_events(column_results)
         for col_key, column_metrics in dedupe_metrics.items():
             metrics["columns"].setdefault(col_key, {}).update(column_metrics)
