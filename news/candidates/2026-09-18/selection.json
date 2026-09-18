@@ -7,90 +7,58 @@
   },
   "items": [
     {
-      "candidate_id": "FleetCor 付 1 亿美元了结 FTC 指控",
+      "candidate_id": "白宫撤回ICE局长提名",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "FleetCor 付 1 亿美元了结 FTC 指控",
-      "score": 78,
-      "selection_reason": "score=78, nw=0.65, stage=首发, slot=detailed",
+      "title_zh": "白宫撤回ICE局长提名",
+      "score": 75,
+      "selection_reason": "score=75, nw=0.645, stage=跟进, slot=detailed",
       "sources": [
-        {
-          "title": "FTC Press Releases",
-          "url": "https://www.ftc.gov/news-events/news/press-releases/2026/09/fleetcor-agrees-pay-100-million-resolve-administrative-action-after-federal-court-finds-it-violated"
-        }
-      ]
-    },
-    {
-      "candidate_id": "法官令特朗普拆除肯尼迪中心前提前通知",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "法官令特朗普拆除肯尼迪中心前提前通知",
-      "score": 78,
-      "selection_reason": "score=78, nw=0.645, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "BBC US & Canada",
-          "url": "https://www.bbc.co.uk/news/articles/cklyexdlepv1o?at_medium=RSS&at_campaign=rss"
-        }
-      ]
-    },
-    {
-      "candidate_id": "美国邮政局长称限制邮寄投票系统已停工",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "美国邮政局长称限制邮寄投票系统已停工",
-      "score": 78,
-      "selection_reason": "score=78, nw=0.645, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "PBS NewsHour",
-          "url": "https://www.pbs.org/newshour/politics/work-has-stopped-on-system-that-was-key-to-trump-effort-to-limit-mail-voting-usps-chief-says"
-        }
-      ]
-    },
-    {
-      "candidate_id": "白宫撤回施罗耶 ICE 局长提名",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "白宫撤回施罗耶 ICE 局长提名",
-      "score": 76,
-      "selection_reason": "score=76, nw=0.64, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "NPR Politics",
-          "url": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice"
-        },
         {
           "title": "BBC US & Canada",
           "url": "https://www.bbc.co.uk/news/articles/cq23xzp55x08o?at_medium=RSS&at_campaign=rss"
-        }
-      ]
-    },
-    {
-      "candidate_id": "特朗普签署狩猎与咸水垂钓行政令",
-      "column": "us_politics",
-      "slot": "detailed",
-      "title_zh": "特朗普签署狩猎与咸水垂钓行政令",
-      "score": 70,
-      "selection_reason": "score=70, nw=0.585, stage=首发, slot=detailed",
-      "sources": [
-        {
-          "title": "White House News：Reinvigorating America’s Hunting Heritage",
-          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/reinvigorating-americas-hunting-heritage/"
         },
         {
-          "title": "White House News：Restoring American Saltwater Angling and Recreation",
-          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-american-saltwater-angling-and-recreation/"
+          "title": "NPR National",
+          "url": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice"
         }
       ]
     },
     {
-      "candidate_id": "小肯尼迪称反疫苗团体在白宫有朋友",
+      "candidate_id": "蒂利斯支持弹劾防长赫格塞思",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "小肯尼迪称反疫苗团体在白宫有朋友",
-      "score": 68,
-      "selection_reason": "score=68, nw=0.51, stage=首发, slot=detailed",
+      "title_zh": "蒂利斯支持弹劾防长赫格塞思",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.645, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "The Hill",
+          "url": "https://thehill.com/homenews/senate/6097194-tillis-calls-for-hegseth-impeachment/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国中期选举提前投票启动",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "美国中期选举提前投票启动",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.63, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "France24",
+          "url": "https://www.france24.com/en/americas/20260918-early-voting-begins-in-us-midterms-that-could-see-republicans-lose-control-of-congress"
+        }
+      ]
+    },
+    {
+      "candidate_id": "肯尼迪称反疫苗团体有白宫盟友",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "肯尼迪称反疫苗团体有白宫盟友",
+      "score": 71,
+      "selection_reason": "score=71, nw=0.565, stage=首发, slot=detailed",
       "sources": [
         {
           "title": "The Hill",
@@ -99,24 +67,86 @@
       ]
     },
     {
-      "candidate_id": "美联储时隔三年上调利率25基点 官员预计年内再加息一次(含视频)",
+      "candidate_id": "美国邮政局长称停建限制邮寄投票系统",
       "column": "us_politics",
       "slot": "detailed",
-      "title_zh": "美联储时隔三年上调利率25基点 官员预计年内再加息一次(含视频)",
-      "score": 0,
-      "selection_reason": "score=0, slot=detailed",
+      "title_zh": "美国邮政局长称停建限制邮寄投票系统",
+      "score": 71,
+      "selection_reason": "score=71, nw=0.605, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "财新国际 - 美国政治",
-          "url": "https://international.caixin.com/2026-09-17/102485615.html"
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/politics/work-has-stopped-on-system-that-was-key-to-trump-effort-to-limit-mail-voting-usps-chief-says"
         }
       ]
     },
     {
-      "candidate_id": "国会通过对俄及使用俄能源国家新制裁",
+      "candidate_id": "特朗普签署重振狩猎传统行政令",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普签署重振狩猎传统行政令",
+      "score": 69,
+      "selection_reason": "score=69, nw=0.52, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "White House News",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/reinvigorating-americas-hunting-heritage/"
+        },
+        {
+          "title": "Fox News",
+          "url": "https://www.foxnews.com/politics/americas-hunters-get-exclusive-seat-trumps-white-house-table-he-takes-aim-biden-era-rules"
+        }
+      ]
+    },
+    {
+      "candidate_id": "ICE官员因枪击移民出庭受审",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "ICE官员因枪击移民出庭受审",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.54, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "NPR National",
+          "url": "https://www.npr.org/2026/09/17/nx-s1-5973127/ice-agent-court-extradition-minnesota-immigrant-shooting"
+        }
+      ]
+    },
+    {
+      "candidate_id": "usip_trump_name_motion_20260917",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "国会通过对俄及使用俄能源国家新制裁",
+      "title_zh": "美国和平研究所申请阻止总部外墙刻特朗普名",
+      "score": 66,
+      "selection_reason": "score=66, nw=0.51, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "US Institute of Peace files emergency motion to block carving of Trump’s name into facade of its headquarters – as it happened",
+          "url": "https://www.theguardian.com/us-news/live/2026/sep/17/donald-trump-democrats-republicans-russia-sanctions-us-politics-latest-news",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "salazar_immigration_ad_20260917",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "共和党议员发广告批移民打击并与特朗普决裂",
+      "score": 62,
+      "selection_reason": "score=62, nw=0.5, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "G.O.P. Representative Breaks With Trump in Ad Criticizing the Immigration Crackdown",
+          "url": "https://www.nytimes.com/2026/09/17/us/politics/salazar-florida-republican-immigration-trump.html",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "国会通过针对俄罗斯及使用俄能源国家的新制裁",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "国会通过针对俄罗斯及使用俄能源国家的新制裁",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -127,40 +157,73 @@
       ]
     },
     {
-      "candidate_id": "选区之争致约3500万人被划入新众院选区",
+      "candidate_id": "洛杉矶撞公交司机在直升机坠毁后被控谋杀",
       "column": "us_politics",
       "slot": "headline",
-      "title_zh": "选区之争致约3500万人被划入新众院选区",
+      "title_zh": "洛杉矶撞公交司机在直升机坠毁后被控谋杀",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
         {
-          "title": "PBS NewsHour",
-          "url": "https://www.pbs.org/newshour/politics/about-35-million-people-have-been-put-into-new-house-districts-in-the-fight-over-congressional-maps-report-says"
+          "title": "NPR National",
+          "url": "https://www.npr.org/2026/09/18/g-s1-143900/helicopter-crash-los-angeles"
         }
       ]
     },
     {
-      "candidate_id": "王毅与鲁比奥通话筹备中美高层交往",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "王毅与鲁比奥通话筹备中美高层交往",
-      "score": 79,
-      "selection_reason": "score=79, nw=0.645, stage=首发, slot=detailed",
+      "candidate_id": "卡尼提出加拿大人赴欧盟居留工作计划",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "卡尼提出加拿大人赴欧盟居留工作计划",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
       "sources": [
         {
-          "title": "财新国际",
-          "url": "https://international.caixin.com/2026-09-17/102486015.html"
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cx980qj57r89o?at_medium=RSS&at_campaign=rss"
         }
       ]
     },
     {
-      "candidate_id": "俄中在安理会否决美国涉伊制裁监督决议",
+      "candidate_id": "congressional_redistricting_20260917",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "因党派重划选区之争，约3500万美国人被划…",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.51, stage=跟进, slot=headline",
+      "sources": [
+        {
+          "title": "About 35 million people have been put into new House districts in the fight over congressional maps, report says",
+          "url": "https://www.pbs.org/newshour/politics/about-35-million-people-have-been-put-into-new-house-districts-in-the-fight-over-congressional-maps-report-says",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普称权衡扩大对伊打击，韩国拒派兵",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "俄中在安理会否决美国涉伊制裁监督决议",
-      "score": 78,
-      "selection_reason": "score=78, nw=0.765, stage=首发, slot=detailed",
+      "title_zh": "特朗普称权衡扩大对伊打击，韩国拒派兵",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.825, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "The Times of India - World",
+          "url": "https://timesofindia.indiatimes.com/world/us/do-i-want-to-annihilate-them-trump-weighs-next-phase-of-iran-war/articleshow/134323883.cms"
+        },
+        {
+          "title": "The Guardian World",
+          "url": "https://www.theguardian.com/world/2026/sep/18/south-korea-will-not-send-military-to-support-us-war-on-iran-defying-trump-pressure"
+        }
+      ]
+    },
+    {
+      "candidate_id": "俄中否决涉伊核制裁决议，美称捣毁规避网络",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "俄中否决涉伊核制裁决议，美称捣毁规避网络",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.74, stage=首发, slot=detailed",
       "sources": [
         {
           "title": "Yahoo News Singapore",
@@ -169,105 +232,130 @@
         {
           "title": "Manila Bulletin",
           "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPdE53alYzVmttejFCZUZvRFJuTzAxQ1d6R1BFeHVZS2IzWFpWc3ZBb29HaVhPOFBqOFJKSUp6anYyMEgybW5Na0ZfdDJpSGprM29qaUptelZOSTVqTEFtM0VJZy0zV3ZPMTdncXJ5Qm9BYVZ4czRIX054WWxGbF83QWxPdnJqMUxKcHJ2c1BZRGw1UXEwZVY4VVhKQ1BQMnFOSGkzQ2ZXcnh3djNzRkJhenF5Y2Q?oc=5"
-        }
-      ]
-    },
-    {
-      "candidate_id": "特朗普将签对俄制裁法案 拟对印中加税",
-      "column": "global_affairs",
-      "slot": "detailed",
-      "title_zh": "特朗普将签对俄制裁法案 拟对印中加税",
-      "score": 78,
-      "selection_reason": "score=78, nw=0.745, stage=跟进, slot=detailed",
-      "sources": [
-        {
-          "title": "Firstpost",
-          "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPS2tJcEQ3S09LV1VGR010UE1SZTZTTUVBdjJmOFd2R21udnVERko5bU5VVTFJUks0eXI4LXprcVFOYUttSWVOMXBSM1IyYW5RS0N4NmVxeTZFNVh3NEloSGhvSzNGRXQteFpHajZIRTlScXVSVFN6Zzl5aHhDb1JURWJVNFpLdVRBNC1KU0JhRnV6Y1VtQXZfNdIBngFBVV95cUxQNWJpeVl5RWpRNzZnVUpaRzlUY05EN0oyQ1laLTV6VU1vZHc5NVFiOVJXeTFQRU5FclZaNEdXUnJVR2VydEpfMmxWT3d6YjdodzZMVGdBeG10NFN1em9ucXFXWV8tV3YxaXl6d3NDM0J4U3RVNkt6TTVYN2FFdS1EYzRkRWlPQXJXU1FuQzd3bzROakVOVkMwMHAwaUhPQQ?oc=5"
         },
         {
-          "title": "Hindustan Times",
-          "url": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxPRmMzRXFhc2FRNFJXNXNoMzE2MWZGT3AtNlI4RGgxTC12RG5Xa19NS21MRGZuSnZVeDFVT3Z6ZDJiamdYOG1kZklIbDdfZy10d21XQ2NPWGRqWFAyLXozbHBMeU5qN3lDYWxDMWtJX3MtcGZUazlRanB1MkZDNDljNlZVM2pxMlpla2VuMVlVa2VPY3Y2V2Q1TFpCV0o1UVN3a1VoR04tdlV0aGhtRjNtQnhOT2o0c0dLYjVNYTBxYU0xUlJoWW5QQWZURS1KQkw2a2ZjaFRiVDJaZmRIUEZybmt0THVELWROSXhuYWs5aWvSAfYBQVVfeXFMUERTWmxBN1UyYWc3cTFwWUp3aXJtUG5YY3R1QXduSmlZSlFKRVd5Q0l5YnRPMjV3NGxQTU1wOE0yZ0xPc25ONHNYU3RSdkRKTmdHMHRIblRjazBhM3l6dXdtaTFVT2tqSFBJTHh6cGNaakRnUW9NTExxcGRrOFFwS1ZqVllEVDdwaHpYUGs5WmpWV3NiUjZUSmJZMjRKN3N6TFJRdFZZMVU2SldwTV9ySkF6ZHF1dENfUnVmMVZRRllEMHVweExDZDNzeW1jZHd0VGVmVFo1TF9kWk5mV2Qya2lLLVNmNDZMX2N2MmVHSG9CQVE1VV9B?oc=5"
+          "title": "U.S. State Department",
+          "url": "https://www.state.gov/releases/office-of-the-spokesman/2026/09/operation-economic-outcast-dismantles-irans-sanctions-evasion-network/"
         }
       ]
     },
     {
-      "candidate_id": "特朗普称正权衡对伊朗发动大规模打击",
+      "candidate_id": "俄罗斯开启为期三天的议会选举投票",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "特朗普称正权衡对伊朗发动大规模打击",
-      "score": 76,
-      "selection_reason": "score=76, nw=0.785, stage=首发, slot=detailed",
+      "title_zh": "俄罗斯开启为期三天的议会选举投票",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.65, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "The Times of India",
-          "url": "https://timesofindia.indiatimes.com/world/us/do-i-want-to-annihilate-them-trump-weighs-next-phase-of-iran-war/articleshow/134323883.cms"
+          "title": "France24",
+          "url": "https://www.france24.com/en/europe/20260918-russia-votes-in-wartime-parliamentary-election-set-to-secure-the-kremlin-power"
+        },
+        {
+          "title": "The Guardian",
+          "url": "https://www.theguardian.com/world/2026/sep/18/russia-parliament-election-duma-putin"
+        },
+        {
+          "title": "SCMP",
+          "url": "https://www.scmp.com/news/world/russia-central-asia/article/3367960/russians-begin-voting-parliamentary-election-shadow-war?utm_source=rss_feed"
         }
       ]
     },
     {
-      "candidate_id": "美政府推进向沙特出售 F-35 战机",
+      "candidate_id": "特朗普称美波就驻军基地取得进展",
       "column": "global_affairs",
       "slot": "detailed",
-      "title_zh": "美政府推进向沙特出售 F-35 战机",
+      "title_zh": "特朗普称美波就驻军基地取得进展",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.69, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "France24",
+          "url": "https://www.france24.com/en/europe/20260918-trump-says-major-progress-made-toward-us-military-base-in-poland"
+        }
+      ]
+    },
+    {
+      "candidate_id": "以军对加沙“双重打击”致少年与医护死亡",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "以军对加沙“双重打击”致少年与医护死亡",
       "score": 73,
-      "selection_reason": "score=73, nw=0.67, stage=跟进, slot=detailed",
+      "selection_reason": "score=73, nw=0.595, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "The New York Times",
-          "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNSGtpbGNKbDdhNmlyS0xqY0JjbHhiNFZnaGV1THAwYVRycUZZYUE3SS1WZkVnWm0yMjhhanlPby1zbU05OEt6RTN0WjhFbHNQai0zZlEzby1DOXBHYmVYZlJDYWVPaW9xUlB4VDlvZGJOcEp6SXRqSXdRTkRtNnR4RzJTS1o?oc=5"
+          "title": "The Guardian - Middle East",
+          "url": "https://www.theguardian.com/world/2026/sep/18/run-get-away-witnesses-recount-israeli-double-tap-strike-that-killed-child-and-medic-in-gaza"
         }
       ]
     },
     {
-      "candidate_id": "iran_protest_un_report_20260918",
+      "candidate_id": "un_abbas_video_address_20260917",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "联合国特派团指控伊朗镇压抗议涉危害人类罪",
+      "title_zh": "联大允许巴勒斯坦总统阿巴斯以预制录像方式参会",
       "score": 72,
-      "selection_reason": "score=72, nw=0.62, stage=首发, slot=headline",
+      "selection_reason": "score=72, nw=0.57, stage=首发, slot=headline",
       "sources": [
         {
-          "title": "UN mission alleges crimes against humanity in Iranian protest crackdown",
-          "url": "https://www.aljazeera.com/video/newsfeed/2026/9/18/un-mission-alleges-crimes-against-humanity-in-iranian-protest-crackdown?traffic_source=rss",
+          "title": "联大允许巴勒斯坦总统阿巴斯以预制录像方式参会",
+          "url": "https://www.zaobao.com/news/world/story20260918-9696318",
           "primary": true
         }
       ]
     },
     {
-      "candidate_id": "zaporizhzhia_strike_20260918",
+      "candidate_id": "un_iran_factfinding_20260917",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "俄军袭击后扎波罗热购物中心起火",
-      "score": 72,
-      "selection_reason": "score=72, nw=0.555, stage=首发, slot=headline",
+      "title_zh": "联合国伊朗实况调查团聚焦平民困境",
+      "score": 71,
+      "selection_reason": "score=71, nw=0.54, stage=首发, slot=headline",
       "sources": [
         {
-          "title": "Fire engulfs Zaporizhzhia shopping centre after Russian strike",
-          "url": "https://www.aljazeera.com/video/newsfeed/2026/9/18/fire-engulfs-zaporizhzhia-shopping-centre-after-russian-strike?traffic_source=rss",
+          "title": "UN fact-finding mission on Iran focuses on plight of civilians",
+          "url": "https://news.un.org/feed/view/en/story/2026/09/1168358",
           "primary": true
         }
       ]
     },
     {
-      "candidate_id": "houthi_red_sea_blockade_20260918",
+      "candidate_id": "russia_ballistic_missile_ukraine_20260918",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "美拒介入红海 沙特急寻摆脱羞辱困境",
+      "title_zh": "据路透社报道，俄改装训练导弹主导对乌弹道攻势",
       "score": 70,
-      "selection_reason": "score=70, nw=0.58, stage=跟进, slot=headline",
+      "selection_reason": "score=70, nw=0.625, stage=首发, slot=headline",
       "sources": [
         {
-          "title": "Saudi scrambles to solve ‘humiliating dilemma’ after US rejects Red Sea intervention",
-          "url": "https://www.scmp.com/week-asia/politics/article/3367944/saudi-scrambles-solve-humiliating-dilemma-after-us-rejects-red-sea-intervention?utm_source=rss_feed",
+          "title": "Russia adapts a training missile to lead its ballistic onslaught of Ukraine - Reuters",
+          "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOeUNWVzAzWVRGVXc5RkhoNEFoVkNIbGZob2gyU2k0NmhuRXVqckx6NTh5R1BQTHlnMENfN1dXa2RYVGVnenRjQVJhdFQ0c2hHTjQzTjB1bW4xVVB0R1pHUDZYYk1oN2FDNUN2dEk5UXA5N3RaeXVVWnRBZWRDY043aEE3SmprQl9RMFdpWFJ3a2dkZDF0Mk5UemV1b0c2UldEaENtQWxIZjhHclBROXBOVHlZcmRWczk3SDJaaWJR?oc=5",
+          "via": "Google News",
           "primary": true
         }
       ]
     },
     {
-      "candidate_id": "保罗·基廷：奥库斯将把澳拖入对华战争且必败",
+      "candidate_id": "us_india_tariff_threat_20260918",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "保罗·基廷：奥库斯将把澳拖入对华战争且必败",
+      "title_zh": "印度称俄制裁法案或影响美印关系与全球能源市场",
+      "score": 66,
+      "selection_reason": "score=66, nw=0.535, stage=回应, slot=headline",
+      "sources": [
+        {
+          "title": "India says Russia sanctions bill threatening 100% tariffs can impact US ties, global energy market | India News - Hindustan Times",
+          "url": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxPRmMzRXFhc2FRNFJXNXNoMzE2MWZGT3AtNlI4RGgxTC12RG5Xa19NS21MRGZuSnZVeDFVT3Z6ZDJiamdYOG1kZklIbDdfZy10d21XQ2NPWGRqWFAyLXozbHBMeU5qN3lDYWxDMWtJX3MtcGZUazlRanB1MkZDNDljNlZVM2pxMlpla2VuMVlVa2VPY3Y2V2Q1TFpCV0o1UVN3a1VoR04tdlV0aGhtRjNtQnhOT2o0c0dLYjVNYTBxYU0xUlJoWW5QQWZURS1KQkw2a2ZjaFRiVDJaZmRIUEZybmt0THVELWROSXhuYWs5aWvSAfYBQVVfeXFMUERTWmxBN1UyYWc3cTFwWUp3aXJtUG5YY3R1QXduSmlZSlFKRVd5Q0l5YnRPMjV3NGxQTU1wOE0yZ0xPc25ONHNYU3RSdkRKTmdHMHRIblRjazBhM3l6dXdtaTFVT2tqSFBJTHh6cGNaakRnUW9NTExxcGRrOFFwS1ZqVllEVDdwaHpYUGs5WmpWV3NiUjZUSmJZMjRKN3N6TFJRdFZZMVU2SldwTV9ySkF6ZHF1dENfUnVmMVZRRllEMHVweExDZDNzeW1jZHd0VGVmVFo1TF9kWk5mV2Qya2lLLVNmNDZMX2N2MmVHSG9CQVE1VV9B?oc=5",
+          "via": "Google News",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "保罗·基廷称奥库斯将澳拖入美对华战争，澳必败",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "保罗·基廷称奥库斯将澳拖入美对华战争，澳必败",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
@@ -278,27 +366,26 @@
       ]
     },
     {
-      "candidate_id": "south_korea_iran_deployment_20260918",
+      "candidate_id": "俄军袭击扎波罗热，购物中心起火",
       "column": "global_affairs",
       "slot": "headline",
-      "title_zh": "韩国总统李在明宣布不会向霍尔木兹海峡部署军…",
-      "score": 80,
-      "selection_reason": "score=80, nw=0.675, stage=首发, slot=headline",
+      "title_zh": "俄军袭击扎波罗热，购物中心起火",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.575, stage=首发, slot=headline",
       "sources": [
         {
-          "title": "South Korea will not send military to support US war on Iran, defying Trump pressure",
-          "url": "https://www.theguardian.com/world/2026/sep/18/south-korea-will-not-send-military-to-support-us-war-on-iran-defying-trump-pressure",
-          "primary": true
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/video/newsfeed/2026/9/18/fire-engulfs-zaporizhzhia-shopping-centre-after-russian-strike?traffic_source=rss"
         }
       ]
     },
     {
-      "candidate_id": "微软高管称AI抓取为史上最大劳动力盗窃",
+      "candidate_id": "微软内部文件称AI抓取为“史上最大劳动盗窃”",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "微软高管称AI抓取为史上最大劳动力盗窃",
-      "score": 81,
-      "selection_reason": "score=81, nw=0.725, stage=首发, slot=detailed",
+      "title_zh": "微软内部文件称AI抓取为“史上最大劳动盗窃”",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.688, stage=首发, slot=detailed",
       "sources": [
         {
           "title": "TechCrunch",
@@ -311,84 +398,125 @@
       ]
     },
     {
-      "candidate_id": "研究人员借Claude Opus 5访问OpenAI私有代码",
+      "candidate_id": "谷歌DeepMind成立新研究所扩大AGI讨论",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "研究人员借Claude Opus 5访问OpenAI私有代码",
-      "score": 74,
-      "selection_reason": "score=74, nw=0.635, stage=首发, slot=detailed",
+      "title_zh": "谷歌DeepMind成立新研究所扩大AGI讨论",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.522, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "AIHOT（转述《华尔街日报》报道）",
-          "url": "https://aihot.news/items/cmu6i7irl000qro0fik1cusru"
-        },
-        {
-          "title": "AIHOT（Hacktron 复盘材料）",
-          "url": "https://aihot.news/items/cmu6idvti04i9ro0fktczvi9g"
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/17/google-deepmind-launches-institute-to-widen-the-agi-debate/"
         }
       ]
     },
     {
-      "candidate_id": "奥特曼称后Astra模型可解全球最难数学题",
+      "candidate_id": "刚刚，Gemini 4 Pro偷跑上线，碾压Astra和Fable",
       "column": "technology",
       "slot": "detailed",
-      "title_zh": "奥特曼称后Astra模型可解全球最难数学题",
-      "score": 71,
-      "selection_reason": "score=71, nw=0.635, stage=首发, slot=detailed",
+      "title_zh": "刚刚，Gemini 4 Pro偷跑上线，碾压Astra和Fable",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
       "sources": [
         {
-          "title": "36氪",
+          "title": "36氪 - 科技",
+          "url": "https://www.36kr.com/p/3988310431431682"
+        }
+      ]
+    },
+    {
+      "candidate_id": "奥特曼自曝「后Astra」模型，已超越全球最强数学家",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "奥特曼自曝「后Astra」模型，已超越全球最强数学家",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "36氪 - 科技",
           "url": "https://www.36kr.com/p/3988171209243401"
-        },
-        {
-          "title": "AIHOT（OpenAI 披露内容）",
-          "url": "https://aihot.news/items/cmu6e3iuu0l7urofjfmjy1v3z"
         }
       ]
     },
     {
-      "candidate_id": "日本央行加息至31年高位",
+      "candidate_id": "openai_discourse_breach_20260918",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "三名研究人员用 Claude Opus 5…",
+      "score": 73,
+      "selection_reason": "score=73, nw=0.55, stage=跟进, slot=headline",
+      "sources": [
+        {
+          "title": "WSJ：三名研究人员用 Claude Opus 5 借 Discourse 漏洞访问 OpenAI 私有代码",
+          "url": "https://aihot.news/items/cmu6i7irl000qro0fik1cusru",
+          "via": "AIHOT",
+          "primary": true
+        },
+        {
+          "title": "白帽黑客用 Anthropic Claude 入侵 OpenAI 员工 ChatGPT 账户，获 6500 美元赏金",
+          "url": "https://aihot.news/items/cmu6kq1ft09hkro0fzohew27y",
+          "via": "AIHOT"
+        }
+      ]
+    },
+    {
+      "candidate_id": "日本央行加息，利率创 31 年新高",
       "column": "economy",
       "slot": "detailed",
-      "title_zh": "日本央行加息至31年高位",
-      "score": 83,
-      "selection_reason": "score=83, nw=0.72, stage=首发, slot=detailed",
+      "title_zh": "日本央行加息，利率创 31 年新高",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.705, stage=跟进, slot=detailed",
       "sources": [
         {
-          "title": "CNBC Top News",
+          "title": "CNBC",
           "url": "https://www.cnbc.com/2026/09/18/japan-raises-rates-30-year-high-yen-jgb.html"
         },
         {
-          "title": "BBC News",
+          "title": "BBC",
           "url": "https://www.bbc.co.uk/news/articles/cqn74jeek06no?at_medium=RSS&at_campaign=rss"
         }
       ]
     },
     {
-      "candidate_id": "法国渔民解除燃油价格封锁",
+      "candidate_id": "英国央行维持利率不变并警告通胀走高",
       "column": "economy",
       "slot": "detailed",
-      "title_zh": "法国渔民解除燃油价格封锁",
-      "score": 70,
-      "selection_reason": "score=70, nw=0.515, stage=首发, slot=detailed",
+      "title_zh": "英国央行维持利率不变并警告通胀走高",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.58, stage=首发, slot=detailed",
       "sources": [
         {
-          "title": "France24",
-          "url": "https://www.france24.com/en/french-fishermen-to-end-blockades-over-fuel-prices"
+          "title": "纽约时报",
+          "url": "https://www.nytimes.com/2026/09/17/business/bank-of-england-interest-rates.html"
         }
       ]
     },
     {
-      "candidate_id": "中国工业5.0：12万亿美元资本开支超级周期",
+      "candidate_id": "中国工业5.0：十年12万亿美元资本开支周期",
       "column": "economy",
       "slot": "headline",
-      "title_zh": "中国工业5.0：12万亿美元资本开支超级周期",
+      "title_zh": "中国工业5.0：十年12万亿美元资本开支周期",
       "score": 0,
       "selection_reason": "score=0, slot=headline",
       "sources": [
         {
           "title": "华尔街见闻 - 宏观/全球",
           "url": "https://wallstreetcn.com/articles/3782054"
+        }
+      ]
+    },
+    {
+      "candidate_id": "艾因霍恩：未来3-5年黄金将大幅跑赢纳指",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "艾因霍恩：未来3-5年黄金将大幅跑赢纳指",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/articles/3782039"
         }
       ]
     }
