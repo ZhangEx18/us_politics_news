@@ -72,6 +72,18 @@ def _resolve_fetch_mode(source: dict) -> str:
     return "rss"
 
 
+_VIDEO_LIVE_TITLE_RE = re.compile(
+    r"^(?:watch|live|video|full video|live updates?|photo|photos)\s*[：:]",
+    re.IGNORECASE,
+)
+_VIDEO_LIVE_TITLE_CN_RE = re.compile(r"^(?:视频|直播|回放|图集)\s*[：:]")
+
+def _is_video_or_live_entry(title: str) -> bool:
+    """视频/直播/图集类条目不适合作为日报事件。"""
+    text = str(title or "").strip()
+    return bool(_VIDEO_LIVE_TITLE_RE.match(text) or _VIDEO_LIVE_TITLE_CN_RE.match(text))
+
+
 def _build_item_metadata(source_cfg: dict, entry_tags: list[str] | None = None) -> dict:
     metadata = {
         "language": source_cfg.get("language", "en"),
@@ -307,6 +319,8 @@ class RSSFetcher(BaseFetcher):
                         continue
 
                     title = unescape(entry.get("title", "")).strip()
+                    if _is_video_or_live_entry(title):
+                        continue
                     link = entry.get("link", "").strip()
                     content = unescape(self._extract_content(entry))
                     content = re.sub(r"<[^>]+>", "", content)
@@ -471,6 +485,8 @@ class GoogleNewsFetcher(BaseFetcher):
                 data = feedparser.parse(text)
                 for entry in data.entries:
                     title = unescape(entry.get("title", "")).strip()
+                    if _is_video_or_live_entry(title):
+                        continue
                     link = entry.get("link", "").strip()
                     content = unescape(re.sub(r"<[^>]+>", "", entry.get("summary", "")))
                     entry_hash = self._hash_id(entry.get("id", link))
