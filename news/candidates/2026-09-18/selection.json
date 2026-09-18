@@ -1,0 +1,344 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-18",
+  "coverage": {
+    "start": "2026-09-17T07:00:00+08:00",
+    "end": "2026-09-18T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "美国联邦贸易委员会与安利达成和解",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "美国联邦贸易委员会与安利达成和解",
+      "score": 79.0,
+      "selection_reason": "score=79.0, slot=detailed",
+      "sources": [
+        {
+          "title": "FTC Takes Historic Action Against Multilevel Marketing Operator Amway for Unfair and Deceptive Business Practices",
+          "url": "https://www.ftc.gov/news-events/news/press-releases/2026/09/ftc-takes-historic-action-against-multilevel-marketing-operator-amway-unfair-deceptive-business"
+        }
+      ]
+    },
+    {
+      "candidate_id": "FleetCor 以 1 亿美元了结行政诉讼",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "FleetCor 以 1 亿美元了结行政诉讼",
+      "score": 78.0,
+      "selection_reason": "score=78.0, slot=detailed",
+      "sources": [
+        {
+          "title": "FleetCor Agrees to Pay $100 Million to Resolve Administrative Action After Federal Court Finds that It Violated the FTC Act by Charging Unauthorized Fees",
+          "url": "https://www.ftc.gov/news-events/news/press-releases/2026/09/fleetcor-agrees-pay-100-million-resolve-administrative-action-after-federal-court-finds-it-violated"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普签署狩猎与垂钓两项行政令",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普签署狩猎与垂钓两项行政令",
+      "score": 76.0,
+      "selection_reason": "score=76.0, slot=detailed",
+      "sources": [
+        {
+          "title": "America’s hunters get an exclusive seat at Trump’s White House table as he takes aim at Biden-era rules",
+          "url": "https://www.foxnews.com/politics/americas-hunters-get-exclusive-seat-trumps-white-house-table-he-takes-aim-biden-era-rules"
+        },
+        {
+          "title": "RESTORING AMERICAN SALTWATER ANGLING AND RECREATION",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/09/restoring-american-saltwater-angling-and-recreation/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "白宫撤回 ICE 局长人选提名",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "白宫撤回 ICE 局长人选提名",
+      "score": 76.0,
+      "selection_reason": "score=76.0, slot=detailed",
+      "sources": [
+        {
+          "title": "White House withdraws nomination of ex-state trooper Lance Schroyer to head ICE",
+          "url": "https://www.theguardian.com/us-news/2026/sep/17/lance-schroyer-ice-director-nomination-withdrawn"
+        },
+        {
+          "title": "Trump withdraws Lance Schroyer, a former Oklahoma state trooper, as his nominee to lead ICE",
+          "url": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice"
+        }
+      ]
+    },
+    {
+      "candidate_id": "ICE 官员就枪击案在明尼苏达出庭",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "ICE 官员就枪击案在明尼苏达出庭",
+      "score": 74.0,
+      "selection_reason": "score=74.0, slot=detailed",
+      "sources": [
+        {
+          "title": "ICE agent appears in Minnesota court to face charges in the shooting of a Venezuelan immigrant",
+          "url": "https://www.npr.org/2026/09/17/nx-s1-5973127/ice-agent-court-extradition-minnesota-immigrant-shooting"
+        }
+      ]
+    },
+    {
+      "candidate_id": "报告：约 3500 万人被划入新选区",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "报告：约 3500 万人被划入新选区",
+      "score": 72.0,
+      "selection_reason": "score=72.0, slot=detailed",
+      "sources": [
+        {
+          "title": "About 35 million people have been put into new House districts in the fight over congressional maps, report says",
+          "url": "https://www.pbs.org/newshour/politics/about-35-million-people-have-been-put-into-new-house-districts-in-the-fight-over-congressional-maps-report-says"
+        }
+      ]
+    },
+    {
+      "candidate_id": "众议院通过《水资源开发法》",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "众议院通过《水资源开发法》",
+      "score": 70.0,
+      "selection_reason": "score=70.0, slot=detailed",
+      "sources": [
+        {
+          "title": "U.S. House passes Water Resources Development Act with provision on Southeast Colorado conduit - Colorado Politics",
+          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNazdRcnNxcU5CMnZabnpMMU4wc1NOdWlLel9DenlMdW9UZTVDMEZvNi16cElTa3lOUWJUMGd3YXNwZ3RLd2FaQ2VkZm1JYjk2WEFoM2pKZGtpMjJWT3FvN24zOUlwcERBQkx6c1R5MjJKYzdfX0ludlUtdFZJVkdKQ1NxZGVNZEdHUXBHVVFsYjkxXzItYVQ0djhEcy13YnNLNDAyd3dWUDhWdERDUmNUM2Y0bXBGRlFQVzhNQlg1cHlWQ1VIWnFNaUVrRjRjTi1FLXdZcA?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "小肯尼迪在其创办反疫苗组织会议演讲",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "小肯尼迪在其创办反疫苗组织会议演讲",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/politics/watch-rfk-jr-speaks-at-conference-for-anti-vaccine-group-he-founded"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国批准向沙特出售48架F-35",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美国批准向沙特出售48架F-35",
+      "score": 82.0,
+      "selection_reason": "score=82.0, slot=detailed",
+      "sources": [
+        {
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/news/world/middle-east/article/3367912/us-approves-sale-48-f-35-jets-saudi-arabia-despite-israeli-concerns?utm_source=rss_feed"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国允许伊朗代表团入境出席联大",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美国允许伊朗代表团入境出席联大",
+      "score": 76.0,
+      "selection_reason": "score=76.0, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20260918-9694831"
+        }
+      ]
+    },
+    {
+      "candidate_id": "俄中否决安理会伊朗制裁监督提案",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "俄中否决安理会伊朗制裁监督提案",
+      "score": 74.0,
+      "selection_reason": "score=74.0, slot=detailed",
+      "sources": [
+        {
+          "title": "Jacksonville Journal-Courier",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxObmFabWt6aFgzSXdMemJlZEhoQnFpeU93LVBvT3o5b3Y4X1lIWDliakFwY205SnhUUzFQX0NBUHNPLUI3cGxOcEhJMFh2TV9ueFA4eXFiLU9KLVh2d1pTU3lGa2Z0MWIxRXRIaDRpS0VPWG9sX29BX3NpY1FtNTg2LXBvUGJsOE5KelpnaDZvbDZsX1hfTVNJOVZWMXhneTBXNDNLRURHeVJGcHk1VEpwMWpOX0IyN2s?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "王毅同鲁比奥通话筹备中美高层交往",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "王毅同鲁比奥通话筹备中美高层交往",
+      "score": 75.0,
+      "selection_reason": "score=75.0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际",
+          "url": "https://international.caixin.com/2026-09-17/102486015.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普与习近平下周晚宴 科企CEO据报出席",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普与习近平下周晚宴 科企CEO据报出席",
+      "score": 65.0,
+      "selection_reason": "score=65.0, slot=detailed",
+      "sources": [
+        {
+          "title": "Yahoo Finance",
+          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNcUJITjJuZExocUt0NlBHMUN3STRFRndRY1ZiTHJGR2ZOY3NFams3UUd2NnluLXBjRWhkTWZISWFBbkFIZU1EY29nYXdhbThPRkhVazJOZFFUYktXYjRmWDBDMUhGUHYzQ3pWdWJ3ekRzb1pPSUNwcDBpLXJoSi1ibXc4R1ZCeGFOZ1MwcS10TjNsdGc?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "北约要求英国给出军费增长可信路径",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "北约要求英国给出军费增长可信路径",
+      "score": 74.0,
+      "selection_reason": "score=74.0, slot=detailed",
+      "sources": [
+        {
+          "title": "The Guardian",
+          "url": "https://www.theguardian.com/world/2026/sep/17/nato-head-britain-must-show-credible-path-of-annual-defence-budget-increases"
+        }
+      ]
+    },
+    {
+      "candidate_id": "波兰称俄计划或打击乌克兰盟国",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "波兰称俄计划或打击乌克兰盟国",
+      "score": 72.0,
+      "selection_reason": "score=72.0, slot=detailed",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/9/17/russian-plans-include-strikes-against-ukraines-allies-poland-says?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "伊朗驱逐瑞典外交官进行报复",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "伊朗驱逐瑞典外交官进行报复",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/9/18/iran-expels-swedish-diplomat-in-retaliatory-move?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "法国渔民将结束燃油价格封锁行动",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "法国渔民将结束燃油价格封锁行动",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "France24",
+          "url": "https://www.france24.com/en/french-fishermen-to-end-blockades-over-fuel-prices"
+        }
+      ]
+    },
+    {
+      "candidate_id": "奥运河流有500条鳄鱼但并非主要担忧",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "奥运河流有500条鳄鱼但并非主要担忧",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/c68xkypqyxw7o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "部门发布男性军人睾酮缺乏筛查实施指南",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "部门发布男性军人睾酮缺乏筛查实施指南",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "U.S. Department of Defense",
+          "url": "https://www.war.gov/News/News-Stories/Article/Article/4604632/department-releases-guidance-on-implementing-testosterone-deficiency-screenings/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "冯德莱恩与泽连斯基通话后发布纪要",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "冯德莱恩与泽连斯基通话后发布纪要",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "European Commission Press Corner",
+          "url": "https://ec.europa.eu/commission/presscorner/detail/en/read_26_1899"
+        }
+      ]
+    },
+    {
+      "candidate_id": "纽约时报诉 OpenAI 案解封文件披露内部表述",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "纽约时报诉 OpenAI 案解封文件披露内部表述",
+      "score": 75.0,
+      "selection_reason": "score=75.0, slot=detailed",
+      "sources": [
+        {
+          "title": "AIHOT - AI 资讯精选",
+          "url": "https://aihot.news/items/cmu62wp5j08tkrofj60s4kfwv"
+        }
+      ]
+    },
+    {
+      "candidate_id": "让全球数据更易于探索",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "让全球数据更易于探索",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Google AI Blog",
+          "url": "https://blog.google/innovation-and-ai/technology/ai/google-un-data-commons-platform/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国国会通过法案 授权对俄能源买家加税",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国国会通过法案 授权对俄能源买家加税",
+      "score": 80.0,
+      "selection_reason": "score=80.0, slot=detailed",
+      "sources": [
+        {
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/news/china/diplomacy/article/3367884/china-hits-back-us-congress-approves-tariffs-top-buyers-russian-energy?utm_source=rss_feed"
+        },
+        {
+          "title": "France24",
+          "url": "https://www.france24.com/en/india-vows-to-protect-energy-security-after-new-us-tariffs-over-russian-oil"
+        }
+      ]
+    }
+  ]
+}
