@@ -47,3 +47,10 @@ def test_readout_release_is_routine_notice():
 def test_bureaucratic_notice_keywords_are_routine():
     assert is_routine_notice("国家农村卫生信息交换所项目补充资金通知")
     assert not is_routine_notice("美国众议院通过对俄新制裁法案")
+
+
+def test_funding_notice_is_routine_but_funding_news_is_not():
+    assert is_routine_notice(
+        "Notice of Supplemental Funding for the National Rural Health Information Clearinghouse Program"
+    )
+    assert not is_routine_notice("Congress approves supplemental funding for Ukraine")

@@ -27,7 +27,7 @@ from ai_analyzer import (
 )
 from database import build_source_health_summary
 from feed_builder import save_feed
-from content_policy import REJECT_REASONS
+from content_policy import REJECT_REASONS, is_routine_notice
 from publish_manifest import build_manifest
 from report_renderer import COLUMN_ORDER, save_daily_report
 
@@ -1138,7 +1138,7 @@ _OPINION_TITLE_RE = re.compile(
     r"|^让[^，。]{0,14}更(?:易|轻松|方便)"
     r"|(斥|怒斥|痛斥|抨击|炮轰).{0,10}(谎言|无耻|虚伪|荒谬)"
     r"|(选民|民众|网友|示威者|抗议者).{0,6}(斥|怒斥|抨击|痛批)"
-    r"|^[「『\"][^」』\"]{1,10}[」』\"]\s*[：:]"
+    r"|^[「『\"\u201c\u2018][^」』\"\u201d\u2019]{1,10}[」』\"\u201d\u2019]\s*[：:]"
     r"|[？?]$|^[^\s：:]{2,6}[：:].*(意外|悬念)"
     r"|^helping\b|^how\s+to\b)",
     re.IGNORECASE,
@@ -1631,6 +1631,14 @@ def _is_unknown_person_commentary_title(title: str) -> bool:
     return bool(_HEDGE_MARKER_RE.search(text[match.end():]))
 
 
+_OPINION_URL_RE = re.compile(r"/(opinions?|commentisfree|editorials?|voices?)(/|$)", re.IGNORECASE)
+
+
+def _is_opinion_url(url: object) -> bool:
+    """评论/社论栏目 URL（如 /opinions/）不作为新闻条目。"""
+    return bool(_OPINION_URL_RE.search(str(url or "")))
+
+
 def _is_live_blog_title(title: str) -> bool:
     """直播页标题（Live:/直播：）不适合作为单条要点。"""
     return bool(_LIVE_BLOG_TITLE_RE.search(str(title or "").strip()))
@@ -1818,6 +1826,15 @@ def _normalize_headline_only_by_column(
             ))
             if _looks_like_english_fragment(title_zh):
                 unreadable_dropped += 1
+                continue
+            if is_routine_notice(title_zh):
+                print(f"   [要点例行] {col_key}: {title_zh[:36]}")
+                cryptic_dropped += 1
+                continue
+            item_urls = _event_url_set(item)
+            if any(_is_opinion_url(url) for url in item_urls):
+                print(f"   [要点评论源] {col_key}: {title_zh[:36]}")
+                opinion_dropped += 1
                 continue
             if _is_unknown_person_commentary_title(title_zh):
                 print(f"   [要点评论] {col_key}: {title_zh[:36]}")
