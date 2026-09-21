@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年9月21日 日报 — 2026-09-21</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年9月21日 日报</h1>
+<div class='date'>2026-09-21</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>乌称对莫斯科发动最大规模无人机袭击</li>
+<li>泽连斯基称将与特朗普在纽约会面</li>
+<li>美“格雷厄姆制裁法案”成法 升级美对涉俄能源出口打击</li>
+<li>伊朗对美提交 7 项谈判条件 称已为决定性战争做好准备</li>
+<li>加总理卡尼与马克龙会晤 深化合作</li>
+<li>欧洲情报负责人警告俄对北约行动</li>
+<li>投行预测美财政部未来一年发 1 万亿美元短债</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 伊朗对美提交 7 项谈判条件 称已为决定性战争做好准备</h3>
+<p>9 月 20 日，当地时间 9 月 19 日，伊朗最高国家安全委员会秘书穆赫辛·雷扎伊公开证实，伊朗已经向美国方面提交了启动任何谈判的七项条件。他在社交媒体 X 上写道：“德黑兰的信号是清晰和明确的：如果华盛顿想要摆脱其自己造成的困境，避免进一步深陷其中，那么就没有其他选择，只能接受伊朗的权利和条件。”不过，雷扎伊并未在社交媒体上详细说明这七项条件具体为何。</p>
+</div>
+<div class='event'>
+<h3>2. 美“格雷厄姆制裁法案”成法 升级美对涉俄能源出口打击</h3>
+<p>9 月 20 日，9 月 18 日，美国总统特朗普签署了以已故共和党籍鹰派参议员林赛·格雷厄姆命名的对俄制裁法案，使得俄罗斯的能源出口收入可能遭到进一步打击。该法案此前在美国国会以压倒性优势通过，但直到加入了延长对伊朗制裁的条款后，特朗普才同意签署。该法案正式名称为《2026 年格雷厄姆制裁俄罗斯和伊朗法案》，在美国国会经历了长达一年多的辩论和修改。</p>
+</div>
+<ul class='headline-list'>
+<li>特朗普面临联大、习到访与 AI 政治考验</li>
+<li>美国行政管理和预算局审查孤儿药信息收集活动</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 乌称对莫斯科发动最大规模无人机袭击 <span class="followup">持续跟踪</span></h3>
+<p>9 月 20 日，乌克兰向俄罗斯发射逾 1000 架无人机袭击莫斯科。据法国 24 电视台报道，乌方称这是对莫斯科规模最大的一次袭击。袭击造成 3 人死亡。出口民调显示，俄罗斯执政党统一俄罗斯党将赢得议会选举。</p>
+</div>
+<div class='event'>
+<h3>2. 泽连斯基称将与特朗普在纽约会面 <span class="followup">持续跟踪</span></h3>
+<p>9 月 20 日，乌克兰总统泽连斯基称已与美国总统特朗普通电话。据南华早报报道，双方同意在纽约会面，商讨结束俄乌战争。</p>
+</div>
+<div class='event'>
+<h3>3. 加总理卡尼与马克龙会晤 深化合作</h3>
+<p>9 月 20 日，加拿大总理卡尼与法国总统马克龙举行会晤。据《财富》报道，双方同意深化太空、防务、能源与商业合作。马克龙同时寻求石油和天然气供应，伊朗战争正扰乱相关供应。</p>
+</div>
+<div class='event'>
+<h3>4. 欧洲情报负责人警告俄对北约行动 <span class="followup">持续跟踪</span></h3>
+<p>9 月 20 日，欧洲多国情报负责人就俄罗斯动向发出警告。据《卫报》报道，情报负责人称俄罗斯正计划在未来数月对北约采取更果断的行动。</p>
+</div>
+<ul class='headline-list'>
+<li>伊朗当局以违反外交公约为由关闭德黑兰与法国使馆关联的法语中心。</li>
+<li>卡塔尔首相在联大警告中东勿陷入升级循环，并宣布调整卡塔尔投资战略。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<ul class='headline-list'>
+<li>Google 确认 Gemini 测试访问 3 家真实公司系统。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 投行预测美财政部未来一年发 1 万亿美元短债</h3>
+<p>9 月 21 日，据华尔街见闻报道，美银、摩根大通和高盛预测美国财政部未来一年发行约 1 万亿美元短期国债。两年期美债收益率升至 4.75%。</p>
+</div>
+<ul class='headline-list'>
+<li>本周股市值得关注的三大看点</li>
+<li>日本央行加息后日元跌破 157。</li>
+</ul>
+</body>
+</html>
