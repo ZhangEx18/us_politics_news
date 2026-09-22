@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-22",
+  "coverage": {
+    "start": "2026-09-21T07:00:00+08:00",
+    "end": "2026-09-22T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "三家媒体起诉特朗普政府白宫采访禁令",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "三家媒体起诉特朗普政府白宫采访禁令",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.785, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/09/21/nx-s1-5975451/reporters-say-they-were-blocked-from-entering-white-house-after-trump-banned-outlets"
+        },
+        {
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cm0e32rwvrryo?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "title": "The Hill",
+          "url": "https://thehill.com/homenews/administration/6102606-trump-bans-white-house-press/"
+        },
+        {
+          "title": "The New York Times",
+          "url": "https://www.nytimes.com/2026/09/21/business/media/cnn-trump-press-pool-ban.html"
+        },
+        {
+          "title": "The Guardian US",
+          "url": "https://www.theguardian.com/us-news/live/2026/sep/21/donald-trump-arch-media-white-house-press-ban-mamdani-ai-unga-latest-news-updates"
+        }
+      ]
+    },
+    {
+      "candidate_id": "上诉法院支持密苏里州国会选区地图",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "上诉法院支持密苏里州国会选区地图",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.67, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "The Guardian US",
+          "url": "https://www.theguardian.com/us-news/2026/sep/21/missouri-congressional-map-trump-appeals-court"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普到访纽约市长官邸会见曼达尼",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普到访纽约市长官邸会见曼达尼",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.575, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Fortune",
+          "url": "https://fortune.com/2026/09/21/trump-mamdani-press-conference-new-york-city-sunnyside-queens-housing-federal-funds/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "分析｜德国两州选举极左极右分别得势 基民盟重挫默茨去留引争论",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "分析｜德国两州选举极左极右分别得势 基民盟重挫默茨去留引争论",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-09-22/102487288.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "贝森特称美方提议建立中美AI安全通报机制 将提请峰会考虑",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "贝森特称美方提议建立中美AI安全通报机制 将提请峰会考虑",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.69, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-09-21/102487081.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "塔玛拉·基思与艾米·沃尔特谈特朗普攻击媒体",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "塔玛拉·基思与艾米·沃尔特谈特朗普攻击媒体",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/tamara-keith-and-amy-walter-on-trumps-media-attacks"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普忙碌周末：拱门、格陵兰与媒体被禁入白宫",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "特朗普忙碌周末：拱门、格陵兰与媒体被禁入白宫",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/09/21/nx-s1-5976738/trumps-big-weekend-the-arch-greenland-and-media-outlets-banned-from-white-house"
+        }
+      ]
+    },
+    {
+      "candidate_id": "us_fiber_cut_flight_disruption_20260922",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "新泽西施工挖断 Verizon 光纤，致全…",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.555, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "A cut cable disrupted hundreds of flights across the US",
+          "url": "https://www.theverge.com/transportation/998550/a-cut-cable-disrupted-hundreds-of-flights-across-the-us",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普与习近平会晤 中美贸易休战承压",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普与习近平会晤 中美贸易休战承压",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.765, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "纽约时报",
+          "url": "https://www.nytimes.com/2026/09/21/business/economy/trump-xi-china-trade.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "伊朗革命卫队称美以须撤出该地区",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "伊朗革命卫队称美以须撤出该地区",
+      "score": 79,
+      "selection_reason": "score=79, nw=0.74, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "半岛电视台",
+          "url": "https://www.aljazeera.com/news/liveblog/2026/9/22/iran-war-live-irgc-says-us-israel-must-accept-withdrawal-from-region?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "普京将出席深圳APEC峰会",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "普京将出席深圳APEC峰会",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.705, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20260922-9713665"
+        }
+      ]
+    },
+    {
+      "candidate_id": "英国向沙特战机提供防御性空中支援",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "英国向沙特战机提供防御性空中支援",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.68, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "卫报",
+          "url": "https://www.theguardian.com/politics/2026/sep/21/uk-to-give-support-to-saudi-jets-in-attempt-to-counter-houthi-fighters"
+        },
+        {
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20260922-9713575"
+        }
+      ]
+    },
+    {
+      "candidate_id": "统一俄罗斯党赢得议会超级多数",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "统一俄罗斯党赢得议会超级多数",
+      "score": 77,
+      "selection_reason": "score=77, nw=0.67, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "半岛电视台",
+          "url": "https://www.aljazeera.com/news/2026/9/21/pro-putin-party-wins-supermajority-amid-ramped-up-ukrainian-attacks?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "乌军无人艇在黑海击沉俄无人艇",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "乌军无人艇在黑海击沉俄无人艇",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.625, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Ars Technica",
+          "url": "https://arstechnica.com/gadgets/2026/09/military-milestone-ukrainian-naval-drone-sinks-russian-kamikaze-drone-boat/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "typhoon_dujuan_japan_20260922",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "强台风“杜鹃”袭击日本，数百万人被要求撤离…",
+      "score": 60,
+      "selection_reason": "score=60, nw=0.53, stage=跟进, slot=headline",
+      "sources": [
+        {
+          "title": "Millions urged to evacuate as powerful Typhoon Dujuan hits Japan",
+          "url": "https://www.bbc.co.uk/news/articles/cm3wj2lexl97o?at_medium=RSS&at_campaign=rss",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI 成立数学与人工智能顾问组",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "OpenAI 成立数学与人工智能顾问组",
+      "score": 82.0,
+      "selection_reason": "score=82.0, nw=0.64, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/21/openai-forms-math-advisory-group-as-its-ai-resolves-more-than-100-open-problems/"
+        },
+        {
+          "title": "OpenAI：Advisory Group on Mathematics and Artificial Intelligence",
+          "url": "https://openai.com/index/advisory-group-on-mathematics-and-ai"
+        },
+        {
+          "title": "AIHOT - AI 资讯精选",
+          "url": "https://aihot.news/items/cmubxnet80414ro9ikcakxogn"
+        }
+      ]
+    },
+    {
+      "candidate_id": "加州签署法案收紧数据中心水电规则",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "加州签署法案收紧数据中心水电规则",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.645, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "The Verge",
+          "url": "https://www.theverge.com/ai-artificial-intelligence/998453/california-ai-data-center-bills"
+        }
+      ]
+    },
+    {
+      "candidate_id": "欧盟提出数据中心可持续性标签制度",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "欧盟提出数据中心可持续性标签制度",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.545, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Engadget",
+          "url": "https://www.engadget.com/2264607/the-eu-will-force-data-centers-to-disclose-their-energy-and-water-use/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Meta 的 Muse 登顶美区应用商店",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Meta 的 Muse 登顶美区应用商店",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.585, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻",
+          "url": "https://wallstreetcn.com/articles/3782248"
+        },
+        {
+          "title": "AIHOT - AI 资讯精选",
+          "url": "https://aihot.news/items/cmubw42we058wro9968uzn2te"
+        }
+      ]
+    },
+    {
+      "candidate_id": "派拉蒙和解12州反垄断诉讼并承诺投资15亿美元",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "派拉蒙和解12州反垄断诉讼并承诺投资15亿美元",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.73, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Fortune",
+          "url": "https://fortune.com/2026/09/21/paramount-settlement-1-5-billion-investment-domestic-movies-board-editorial-independence-cnn-cbs-warner-bros-takeover/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "欧盟与菲律宾自贸协定谈判达成实质性一致",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "欧盟与菲律宾自贸协定谈判达成实质性一致",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.625, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "European Commission Press Corner",
+          "url": "https://ec.europa.eu/commission/presscorner/detail/en/statement_26_1922"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国地面运输委员会驳回撤销UP-NS合并案请求",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国地面运输委员会驳回撤销UP-NS合并案请求",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.52, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Supply Chain Dive",
+          "url": "https://www.supplychaindive.com/news/up-ns-merger-stb-denies-shippers-calls-for-dismissal/830906/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "PE巨头称我们正处在“1870年”",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "PE巨头称我们正处在“1870年”",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/charts/41959896"
+        }
+      ]
+    }
+  ]
+}
