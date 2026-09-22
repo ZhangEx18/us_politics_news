@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年9月22日 日报 — 2026-09-22</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年9月22日 日报</h1>
+<div class='date'>2026-09-22</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>三家媒体起诉特朗普政府白宫采访禁令</li>
+<li>特朗普与习近平会晤 中美贸易休战承压</li>
+<li>伊朗革命卫队称美以须撤出该地区</li>
+<li>派拉蒙和解 12 州反垄断诉讼并承诺投资 15 亿美元</li>
+<li>普京将出席深圳 APEC 峰会</li>
+<li>贝森特称美方提议建立中美 AI 安全通报机制 将提请峰会考虑</li>
+<li>英国向沙特战机提供防御性空中支援</li>
+<li>上诉法院支持密苏里州国会选区地图</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 三家媒体起诉特朗普政府白宫采访禁令 <span class="followup">持续跟踪</span></h3>
+<p>9 月 21 日，CNN、MS NOW 与 Politico 三家媒体起诉特朗普政府，指控白宫禁止其记者进入采访违反第一修正案。据《纽约时报》报道，多家电视网已暂停对特朗普的白宫联合采访报道。</p>
+</div>
+<div class='event'>
+<h3>2. 上诉法院支持密苏里州国会选区地图</h3>
+<p>9 月 21 日，一家联邦上诉法院裁定支持特朗普背书的密苏里州国会选区地图。《卫报》报道称，最高法院可能最终裁决这一选区地图。</p>
+</div>
+<div class='event'>
+<h3>3. 特朗普到访纽约市长官邸会见曼达尼</h3>
+<p>9 月 21 日，据《财富》报道，特朗普到访纽约市长官邸，称纽约市长曼达尼有潜力成为一位伟大的市长。特朗普同时提出为曼达尼的家乡皇后区一个住房项目提供联邦资金。</p>
+</div>
+<div class='event'>
+<h3>4. 分析｜德国两州选举极左极右分别得势 基民盟重挫默茨去留引争论</h3>
+<p>9 月 22 日，在 9 月 6 日极右翼的德国选择党在德国东部萨克森-安哈尔特州（下称“萨安州”）取得历史性胜利、挫败德国总理默茨所属的基民盟（CDU）后，基民盟在 9 月 20 日的另外两场州议会选举中再遭重创。9 月 20 日，德国东部的梅克伦堡-前波美拉尼亚州（下称“梅前州”）和首都柏林州举行州议会选举。在梅前州，9 月 21 日凌晨公布的初步计票结果显示，基民盟未能跨过 5%的得票率门槛，若投票结果最终确认，这将是基民盟在二战结束、联邦德国成立以来，首次在一。</p>
+</div>
+<div class='event'>
+<h3>5. 贝森特称美方提议建立中美 AI 安全通报机制 将提请峰会考虑</h3>
+<p>9 月 21 日，当地时间 9 月 20 日，中美经贸中方牵头人、国务院副总理 何立峰 与美方牵头人、美国财政部长贝森特和贸易代表格里尔在美国纽约举行经贸磋商。据新华社消息，双方以两国元首重要共识为引领，秉持相互尊重、和平共处、合作共赢的原则，围绕落实历次经贸磋商共识、促进双边贸易投资等双方共同关心的重要经贸问题，进行了坦诚、深入、富有建设性的交流，并就人工智能有关问题举行对话。这场中美经贸磋商在纽约的摩根大通总部举行。</p>
+</div>
+<ul class='headline-list'>
+<li>塔玛拉·基思与艾米·沃尔特谈特朗普攻击媒体</li>
+<li>特朗普忙碌周末：拱门、格陵兰与媒体被禁入白宫</li>
+<li>新泽西施工挖断 Verizon 光纤，致全美数百航班取消或延误，FAA 回应。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 特朗普与习近平会晤 中美贸易休战承压</h3>
+<p>9 月 21 日，美国总统特朗普与中国国家主席习近平举行会晤。《纽约时报》报道称，会晤期间两国仍互施报复性措施，贸易休战的稳定性受到质疑。</p>
+</div>
+<div class='event'>
+<h3>2. 伊朗革命卫队称美以须撤出该地区 <span class="followup">持续跟踪</span></h3>
+<p>9 月 22 日，伊朗革命卫队表示，美国和以色列必须接受撤出该地区。半岛电视台报道称，伊朗战事仍在持续。</p>
+</div>
+<div class='event'>
+<h3>3. 普京将出席深圳 APEC 峰会</h3>
+<p>9 月 22 日，联合早报引述消息人士称，俄罗斯总统普京将赴深圳出席亚太经合组织（APEC）峰会。普京很可能不出席美国主办的二十国集团（G20）峰会。</p>
+</div>
+<div class='event'>
+<h3>4. 英国向沙特战机提供防御性空中支援</h3>
+<p>9 月 22 日，据卫报报道，英国同意向沙特阿拉伯战机提供防御性空中支援，协助打击胡塞武装。英国首相伯纳姆作出了这一决定。联合早报的报道将支援内容表述为防御性空中加油支持。</p>
+</div>
+<div class='event'>
+<h3>5. 统一俄罗斯党赢得议会超级多数 <span class="followup">持续跟踪</span></h3>
+<p>9 月 21 日，俄罗斯议会选举中，普京所属的统一俄罗斯党赢得超级多数席位。半岛电视台报道称，选举期间乌克兰加大了对俄罗斯的袭击。</p>
+</div>
+<div class='event'>
+<h3>6. 乌军无人艇在黑海击沉俄无人艇 <span class="followup">持续跟踪</span></h3>
+<p>9 月 21 日，Ars Technica 报道称，乌克兰一艘海军无人艇在黑海击沉一艘俄罗斯自杀式无人艇。双方持续互袭黑海港口与船只。</p>
+</div>
+<ul class='headline-list'>
+<li>强台风“杜鹃”袭击日本，数百万人被要求撤离，气象厅随后下调警报。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. OpenAI 成立数学与人工智能顾问组</h3>
+<p>9 月 21 日，据 TechCrunch 和 AIHOT 报道，OpenAI 成立数学与人工智能顾问组。顾问组由九位数学家组成，其中三位是菲尔兹奖得主。OpenAI 的相关 AI 模型在 24 天内解决了 100 多个开放数学问题。</p>
+</div>
+<div class='event'>
+<h3>2. 加州签署法案收紧数据中心水电规则</h3>
+<p>9 月 22 日，据 The Verge 报道，加州州长纽森签署七项法案，收紧对 AI 数据中心能源与用水使用的规定。法案内容包括限制数据中心向居民转嫁水电成本。</p>
+</div>
+<div class='event'>
+<h3>3. 欧盟提出数据中心可持续性标签制度</h3>
+<p>9 月 21 日，据 Engadget 报道，欧盟提出数据中心可持续性标签制度。该制度要求运营方披露能耗与用水数据。</p>
+</div>
+<div class='event'>
+<h3>4. Meta 的 Muse 登顶美区应用商店 <span class="followup">持续跟踪</span></h3>
+<p>9 月 21 日，据华尔街见闻报道，Meta 旗下 AI 助手 Muse 上线六天下载量超过 90 万次，登上美国区苹果应用商店榜首。Meta 股价上涨 13%，另有报道写为 11%。9 月 22 日，AIHOT 的消息显示，Muse 将在 Shopify 商店启用 Shop Pay 结账。</p>
+</div>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 派拉蒙和解 12 州反垄断诉讼并承诺投资 15 亿美元</h3>
+<p>9 月 21 日，派拉蒙同意和解 12 个州提起的反垄断诉讼，以推进对华纳兄弟 810 亿美元的收购。据《财富》报道，和解协议要求派拉蒙向本土电影投资 15 亿美元。协议还要求为 CNN 和 CBS 设立负责编辑独立的董事会。</p>
+</div>
+<div class='event'>
+<h3>2. 欧盟与菲律宾自贸协定谈判达成实质性一致</h3>
+<p>9 月 22 日，欧盟委员会与菲律宾发布联合新闻声明，宣布双方自由贸易协定谈判达成实质性一致。声明由欧盟委员谢夫乔维奇与菲方代表罗克共同发表。</p>
+</div>
+<div class='event'>
+<h3>3. 美国地面运输委员会驳回撤销 UP-NS 合并案请求</h3>
+<p>9 月 21 日，美国地面运输委员会驳回了撤销联合太平洋与诺福克南方合并案的请求。提出该请求的是化工与化肥托运人。</p>
+</div>
+<ul class='headline-list'>
+<li>黑石集团总裁兼首席运营官 Jon Gray 表示当前似“1870 年”工业革命前夜。</li>
+</ul>
+</body>
+</html>
