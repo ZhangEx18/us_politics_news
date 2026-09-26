@@ -1,0 +1,378 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-26",
+  "coverage": {
+    "start": "2026-09-25T07:00:00+08:00",
+    "end": "2026-09-26T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "最高法院恢复选民公民身份数据库",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "最高法院恢复选民公民身份数据库",
+      "score": 86,
+      "selection_reason": "score=86, nw=0.77, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/what-the-supreme-courts-voter-citizenship-database-decision-means-for-the-midterms"
+        },
+        {
+          "title": "NPR",
+          "url": "https://www.npr.org/2026/09/25/nx-s1-5976804/supreme-court-trump-save-noncitizen-voting"
+        }
+      ]
+    },
+    {
+      "candidate_id": "最高法院第三次否决密苏里选区地图",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "最高法院第三次否决密苏里选区地图",
+      "score": 85,
+      "selection_reason": "score=85, nw=0.748, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/09/25/nx-s1-5978875/midterms-redistricting-trump-missouri"
+        },
+        {
+          "title": "The Hill",
+          "url": "https://thehill.com/regulation/court-battles/6112550-mo-congressional-redistricting-battle/"
+        },
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/politics/supreme-court-rejects-trump-backed-missouri-congressional-map-for-third-time"
+        },
+        {
+          "title": "AP News",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPanZ2VnlQc3dDZFJVd3JpOVhqa0VtUzVvaFpLMzB0NmlzN0lNVlBid2hfMVlpck5qZThIWFZFZ3VOWTBmemtPMkpXU0hOdm9XZnZfd3J3aEZKVlVIZnRCZXRVMUIyb0xGNGVQaXhhSGlodWFkc1FYcEh4NFlvWUM4RGFzYU9zY2JaSDgxZFoxN0pwb3lETDBhcE5MN19FTlY5a3lBMUdVSG95cWlYRkR1R1QzYzE?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普政府撤回近10亿美元已批支出",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普政府撤回近10亿美元已批支出",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.76, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "WTOP News",
+          "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPTk0tU2ZZUW1rc0d1ZTBmaDdzV0g2WlljVkZRXzVNMjZqNTZoSFZwZUtYUmVoeDZtZ29VMVBkSk5ISFl2OTRnM3cyMm1ieWk4LUJ6TDRHdWE3TjJlN09GTThhWjNFWDFqZnBqWEdNR29ZWVRuSDZyRVRnZk96OURreXRaYkVETjFBYWYxb0g3UEVvX3pnQ1dHbEdiaUd4UHg1UXk1OFZuYXR2SXBuTkxkczZQcEcweEtOejNtTzBqcF96clZuRFhQb2E5enplQzg?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "法官解除对三家媒体的白宫采访禁令",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "法官解除对三家媒体的白宫采访禁令",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.7, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cqe8ek7608mlo?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "上诉法院裁定各州可监管Kalshi体育合约",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "上诉法院裁定各州可监管Kalshi体育合约",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.605, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "CNBC",
+          "url": "https://www.cnbc.com/2026/09/25/appeals-court-rules-states-can-regulate-sports-prediction-markets.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "大西洋观察│国政之抉：以英国与以色列为例",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "大西洋观察│国政之抉：以英国与以色列为例",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-09-26/102488768.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "中美元首同意扩展建设性战略稳定关系内涵 相约APEC和G20峰会期间互访",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "中美元首同意扩展建设性战略稳定关系内涵 相约APEC和G20峰会期间互访",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-09-26/102488765.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "布鲁克斯与凯普哈特谈特朗普热情接待习近平",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "布鲁克斯与凯普哈特谈特朗普热情接待习近平",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/brooks-and-capehart-on-trumps-warm-welcome-for-chinas-xi-jinping"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国豆农寄望习近平访问白宫",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "美国豆农寄望习近平访问白宫",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "NPR National",
+          "url": "https://www.npr.org/2026/09/25/nx-s1-5977838/soybean-farmers-hopeful-for-xis-white-house-visit"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普拒绝伊朗7天停火提议",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普拒绝伊朗7天停火提议",
+      "score": 88,
+      "selection_reason": "score=88, nw=0.87, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻",
+          "url": "https://wallstreetcn.com/articles/3782570"
+        },
+        {
+          "title": "半岛电视台",
+          "url": "https://www.aljazeera.com/video/newsfeed/2026/9/25/iran-to-reopen-strait-of-hormuz-within-a-week-if-us-agrees-to-plan?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "欧盟拨付66亿欧元补偿对乌供武成员国",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "欧盟拨付66亿欧元补偿对乌供武成员国",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.68, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "法国24电视台",
+          "url": "https://www.france24.com/en/europe/20260925-eu-releases-%E2%82%AC6-6-billion-for-members-arming-ukraine-as-five-killed-in-kyiv"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普结束对中国国事访问",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普结束对中国国事访问",
+      "score": 80,
+      "selection_reason": "score=80, nw=0.64, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "白宫新闻",
+          "url": "https://www.whitehouse.gov/releases/2026/09/president-trump-first-lady-conclude-historic-china-state-visit/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普促泽连斯基赴莫斯科见普京遭回绝",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普促泽连斯基赴莫斯科见普京遭回绝",
+      "score": 73,
+      "selection_reason": "score=73, nw=0.705, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20260926-9739081"
+        },
+        {
+          "title": "波士顿先驱报",
+          "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQemRVOUhJa2pkVmQ5djhHWDNkT09pLTNaRGV1Mi15dnFFMXZQUlNUUW9lUGQ0RkxrTDZ3UmRDV0tUSEhtV2g4WVp0QXVwNEpvREFMU3ktX09nT1Z1TEZMNHRqS0lZN25pekhZMHpzN0VMTTJRXzhEWFUzUE5JaUctbXpxeldlcnd3ZnBwVVVxZw?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "联合国公布涉以色列定居点企业名单",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "联合国公布涉以色列定居点企业名单",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.655, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "纽约时报",
+          "url": "https://www.nytimes.com/2026/09/25/world/middleeast/un-companies-westbank-settlements.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "也门总统呼吁民众动员对抗胡塞武装",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "也门总统呼吁民众动员对抗胡塞武装",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.59, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "法国24电视台",
+          "url": "https://www.france24.com/en/middle-east/20260925-yemen-president-calls-on-his-people-to-mobilise-against-iran-backed-houthis"
+        }
+      ]
+    },
+    {
+      "candidate_id": "伊朗匿名高官：德黑兰绝不在核问题上做出让步",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "伊朗匿名高官：德黑兰绝不在核问题上做出让步",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.655, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报 - 国际",
+          "url": "https://www.zaobao.com/news/world/story20260926-9739027"
+        }
+      ]
+    },
+    {
+      "candidate_id": "伊朗称正等待美方回应七日止战路线图",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "伊朗称正等待美方回应七日止战路线图",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/9/25/iran-says-it-awaits-us-response-on-seven-day-roadmap-to-end-war?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI 承认 AI 代理改动美国政府网站",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "OpenAI 承认 AI 代理改动美国政府网站",
+      "score": 98.0,
+      "selection_reason": "score=98.0, nw=0.83, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "The New York Times",
+          "url": "https://www.nytimes.com/2026/09/25/technology/openais-ai-us-government-websites.html"
+        },
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/25/unsecured-openai-agents-posted-53-user-images-on-the-internet-without-the-labs-knowledge/"
+        },
+        {
+          "title": "Reuters",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQZUEtbWlTaWtWX0dYU2dvc0dCT3c4TW8wQS1nOWFVUWp4NU1nNFVxZXMybmhIWTlLVWlUalRVVk5JUVNrdVRfQVVRTlVtNWtwTndFTWlpOEZ1WW9OZi1peUNJNFZMRHdVWXQ1VkhNNkxkS1dVNjFNWGtPenNtYjJyVkdnZzF1ZXNzUWsxbjlPbm5EcDNTVkdaYkN6ckdlTkRrTmJqWUFQOXUtVTJTWGVTYnZlUzM?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "甲骨文新墨西哥州数据中心发出不可抗力通知",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "甲骨文新墨西哥州数据中心发出不可抗力通知",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.62, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻",
+          "url": "https://wallstreetcn.com/member/articles/3782545"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Crusoe 放弃 12.5 亿美元 AI 数据中心涡轮机计划",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Crusoe 放弃 12.5 亿美元 AI 数据中心涡轮机计划",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.525, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/09/25/crusoe-abandons-1-25b-plan-to-use-boom-turbines-at-ai-data-centers/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "安赛乐米塔尔停产乌克兰最大钢厂",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "安赛乐米塔尔停产乌克兰最大钢厂",
+      "score": 73,
+      "selection_reason": "score=73, nw=0.605, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "CBC News - World",
+          "url": "https://www.cbc.ca/news/world/ukraine-steel-arcelormittal-shutdown-9.7359241?cmp=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "市场对美联储10月底加息定价概率近70%",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "市场对美联储10月底加息定价概率近70%",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.645, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "NYT Business",
+          "url": "https://www.nytimes.com/2026/09/25/business/fed-interest-rates-midterms.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "30年期美债收益率盘中破5.5%",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "30年期美债收益率盘中破5.5%",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.59, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/articles/3782571"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国车在加拿大市场份额降至28.4%",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国车在加拿大市场份额降至28.4%",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.55, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Fortune",
+          "url": "https://fortune.com/2026/09/25/canada-purchase-american-cars-decreasing-tariffs-backfire-us-automakers/"
+        }
+      ]
+    }
+  ]
+}
