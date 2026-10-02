@@ -1,0 +1,39 @@
+product_key: kagi_digest
+content_type: kagi_digest
+report_types: [daily]
+
+publish:
+  site_root: docs/kagi_digest
+  feed_path: docs/feeds/kagi_digest.xml
+  legacy_aliases: false
+  title: Kagi 每日简报
+  base_url: https://zhangex18.github.io/us_politics_news
+
+storage:
+  db_path: data/products/kagi_digest/state.db
+
+schedule:
+  timezone: Asia/Shanghai
+  publish_at: "07:30"
+  daily:
+    workflow: publish-product.yml
+    cron: "30 23 * * *"
+    publish_at: "07:30"
+
+kagi:
+  api_base_url: https://news.kagi.com
+  columns:
+    usa:
+      label: 美国动态
+      categories: [usa]
+    world:
+      label: 国际动态
+      categories: [world]
+    science_technology:
+      label: 科学技术
+      categories: [tech, science]
+    business:
+      label: 商业经济
+      categories: [business]
+  translation_batch_size: 8
+  translation_concurrency: 2

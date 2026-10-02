@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       product_key:
-        description: '产品标识（news / algorithms）'
+        description: '产品标识（news / algorithms / kagi_digest）'
         required: true
         type: string
       report_type:
@@ -22,10 +22,20 @@ on:
         required: false
         default: false
         type: boolean
+      report_date:
+        description: 'Kagi 合刊发布日期 YYYY-MM-DD'
+        required: false
+        default: ''
+        type: string
+      force_publish:
+        description: '强制替换 Kagi 已发布合刊'
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       product_key:
-        description: '产品标识（news / algorithms）'
+        description: '产品标识（news / algorithms / kagi_digest）'
         required: true
         type: string
       report_type:
@@ -42,16 +52,51 @@ on:
         required: false
         default: false
         type: boolean
+      report_date:
+        required: false
+        default: ''
+        type: string
+      force_publish:
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
 
 concurrency:
-  group: publish-${{ inputs.product_key }}-${{ inputs.report_type }}
-  cancel-in-progress: true
+  # 所有产品共同更新 gh-pages，恢复历史和部署全过程必须串行。
+  group: publish-pages-${{ github.repository }}
+  cancel-in-progress: false
 
 jobs:
+  kagi-gate:
+    if: inputs.product_key == 'kagi_digest'
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.schedule.outputs.should_run }}
+      report_date: ${{ steps.schedule.outputs.report_date }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install pyyaml
+      - run: python3 scripts/sync_pages_state.py restore
+      - id: schedule
+        env:
+          REQUESTED_DATE: ${{ inputs.report_date }}
+          FORCE_PUBLISH: ${{ inputs.force_publish }}
+        run: |
+          ARGS=()
+          if [ -n "$REQUESTED_DATE" ]; then ARGS+=(--report-date "$REQUESTED_DATE"); fi
+          if [ "$FORCE_PUBLISH" = "true" ]; then ARGS+=(--force); fi
+          python3 scripts/kagi_schedule_gate.py "${ARGS[@]}" >> "$GITHUB_OUTPUT"
   publish:
+    needs: kagi-gate
+    if: always() && (inputs.product_key != 'kagi_digest' || needs.kagi-gate.outputs.should_run == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 90
     services:
@@ -136,6 +181,7 @@ jobs:
         run: python3 scripts/sync_pages_state.py restore
 
       - name: Wait for RSSHub
+        if: inputs.product_key == 'news'
         run: |
           for i in $(seq 1 30); do
             if curl -s -o /dev/null --max-time 3 http://localhost:1200/; then
@@ -151,8 +197,10 @@ jobs:
           PRODUCT="${{ inputs.product_key }}"
           REPORT_TYPE="${{ inputs.report_type }}"
           DIGEST_ONLY="${{ inputs.digest_only }}"
+          REPORT_DATE="${{ needs.kagi-gate.outputs.report_date }}"
 
           ARGS="--product $PRODUCT --report-type $REPORT_TYPE"
+          if [ -n "$REPORT_DATE" ]; then ARGS="$ARGS --report-date $REPORT_DATE"; fi
 
           if [ "$DIGEST_ONLY" = "true" ] && [ "$REPORT_TYPE" = "daily" ]; then
             ARGS="$ARGS --digest-only"
@@ -192,13 +240,18 @@ jobs:
           REPORT_TYPE="${{ inputs.report_type }}"
           SITE_ROOT="${{ steps.config.outputs.site_root }}"
           FEED_PATH="${{ steps.config.outputs.feed_path }}"
+          REPORT_DATE="${{ needs.kagi-gate.outputs.report_date }}"
 
           # 校验 product feed 存在且含 content:encoded
           [ -f "$FEED_PATH" ] || { echo "Feed 不存在: $FEED_PATH"; exit 1; }
           grep -q "content:encoded" "$FEED_PATH" || { echo "$FEED_PATH 缺少 content:encoded"; exit 1; }
 
           # 复用实际生成管线的 key 计算逻辑
-          REPORT_KEY=$(python3 scripts/report_key.py --product "$PRODUCT" --report-type "$REPORT_TYPE")
+          if [ -n "$REPORT_DATE" ]; then
+            REPORT_KEY="$REPORT_DATE"
+          else
+            REPORT_KEY=$(python3 scripts/report_key.py --product "$PRODUCT" --report-type "$REPORT_TYPE")
+          fi
           echo "报告 key: $REPORT_KEY"
 
           REPORT_FILE="${SITE_ROOT}/${REPORT_TYPE}/${REPORT_KEY}.md"
@@ -207,7 +260,9 @@ jobs:
           # 字数校验
           CHARS=$(wc -c < "$REPORT_FILE")
           echo "报告字节: $CHARS"
-          if [ "$REPORT_TYPE" = "daily" ]; then
+          if [ "$PRODUCT" = "kagi_digest" ]; then
+            python3 src/kagi_digest.py --report-date "$REPORT_KEY"
+          elif [ "$REPORT_TYPE" = "daily" ]; then
             [ "$CHARS" -gt 3000 ] || { echo "日报字数过少"; exit 1; }
           fi
 
