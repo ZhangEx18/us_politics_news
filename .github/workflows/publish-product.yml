@@ -118,6 +118,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Test Kagi pipeline contract
+        if: inputs.product_key == 'kagi_digest'
+        run: python3 -m pytest tests/test_kagi_digest.py -q
+
       - name: Read product config
         id: config
         run: |
