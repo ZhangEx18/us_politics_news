@@ -205,7 +205,11 @@ def _feed_revision(title: str, short_description: str, html_body: str) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
 
 
-def build_feed(items: list[str], base_url: str = "") -> str:
+def build_feed(
+    items: list[str], base_url: str = "", *, title: str = "观察日报",
+    description: str = "每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势",
+    feed_path: str = "feed.xml",
+) -> str:
     """
     拼装完整 RSS 2.0 feed XML
 
@@ -218,14 +222,14 @@ def build_feed(items: list[str], base_url: str = "") -> str:
 
     atom_link = ""
     if base_url:
-        atom_link = f'\n    <atom:link href="{_escape_xml(base_url)}/feed.xml" rel="self" type="application/rss+xml"/>'
+        atom_link = f'\n    <atom:link href="{_escape_xml(base_url)}/{_escape_xml(feed_path)}" rel="self" type="application/rss+xml"/>'
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="{ATOM_NS}" xmlns:content="{RSS_NS}">
   <channel>
-    <title>观察日报</title>
+    <title>{_escape_xml(title)}</title>
     <link>{_escape_xml(base_url) if base_url else "."}</link>
-    <description>每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势</description>
+    <description>{_escape_xml(description)}</description>
     <language>zh-cn</language>
     <lastBuildDate>{now}</lastBuildDate>{atom_link}
 {items_xml}

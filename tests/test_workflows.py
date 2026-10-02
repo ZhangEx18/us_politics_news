@@ -96,6 +96,20 @@ def test_publish_product_workflow_force_rescore_input():
 def test_publish_product_workflow_concurrency():
     workflow = _load_workflow("publish-product.yml")
     assert "publish-" in workflow["concurrency"]["group"]
+    assert workflow["concurrency"]["group"] == "publish-pages-${{ github.repository }}"
+    assert workflow["concurrency"]["cancel-in-progress"] is False
+
+
+def test_kagi_digest_has_daily_schedule_retry_and_publish_gate():
+    workflow = _load_workflow("kagi-digest-publish.yml")
+    schedules = _workflow_triggers(workflow)["schedule"]
+    assert {entry["cron"] for entry in schedules} == {"30 23 * * *", "30 0,2,4 * * *"}
+    assert workflow["jobs"]["delegate"]["with"]["product_key"] == "kagi_digest"
+    publish = _load_workflow("publish-product.yml")
+    assert "kagi-gate" in publish["jobs"]["publish"]["needs"]
+    assert "should_run" in publish["jobs"]["publish"]["if"]
+    validate = next(step for step in publish["jobs"]["publish"]["steps"] if step.get("name") == "Validate output")
+    assert "src/kagi_digest.py --report-date" in validate["run"]
 
 
 def test_publish_product_workflow_steps():

@@ -59,6 +59,10 @@ _REPORT_TYPE_DEFAULTS: dict[str, dict] = {
 
 # 产品级 UI 文案覆盖（仅文案，不重复定义产品存在性）
 _PRODUCT_UI: dict[str, dict] = {
+    "kagi_digest": {
+        "label": "Kagi 每日简报",
+        "description": "美国动态 · 国际动态 · 科学技术 · 商业经济，每日中文简讯",
+    },
     "news": {
         "label": "观察日报",
         "description": "每日国际新闻精选：美国政局 · 国际局势 · 科技前沿 · 经济走势",
