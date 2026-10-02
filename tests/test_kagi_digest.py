@@ -130,6 +130,21 @@ def test_translation_uses_repair_and_audit_models_by_stage(monkeypatch, config):
     assert calls == ["gpt-5.4-mini", "gpt-6.1-sol", "gpt-5.4", "gpt-6.1-sol"]
 
 
+def test_subjective_audit_failure_does_not_discard_deterministically_valid_batch(monkeypatch, config):
+    story = make_source()["categories"]["usa"][0]
+    valid = {"items": [{"id": "usa", "title_zh": TITLE, "summary_zh": SUMMARY}]}
+    audit_failure = {"items": [{"id": "usa", "ok": False, "reason": "主观措辞建议"}]}
+    responses = iter([json.dumps(valid), json.dumps(audit_failure), json.dumps(valid), json.dumps(audit_failure)])
+
+    async def llm(*args, **kwargs):
+        return next(responses)
+
+    monkeypatch.setattr(kagi_digest, "_call_llm", llm)
+    ai_config = {"model": "gpt-5.6-luna", "repair_model": "gpt-5.5", "audit_model": "gpt-5.5", "base_url": "https://example.com"}
+    result = asyncio.run(kagi_digest.translate_stories([story], config, ai_config))
+    assert result["usa"]["summary_zh"] == SUMMARY
+
+
 def test_ai_stage_models_read_from_environment(monkeypatch):
     monkeypatch.setenv("AI_API_KEY", "test-key")
     monkeypatch.setenv("AI_MODEL", "gpt-5.4-mini")
