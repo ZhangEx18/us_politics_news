@@ -200,8 +200,9 @@ async def translate_stories(stories: list[dict], config: dict, ai_config: dict) 
                             raise ValueError("Kagi 修复结果未完整覆盖输入")
                         for item in repaired_items:
                             validate_translation(item)
-                        if await audit_batch(repaired_items, batch):
-                            raise ValueError("Kagi 修复后仍未通过最终抽检")
+                        remaining_failures = await audit_batch(repaired_items, batch)
+                        if remaining_failures:
+                            print(f"[Kagi] 修复后仍有 {len(remaining_failures)} 条抽检意见，保留确定性校验通过的结果")
                         return repaired_items
                     return items
                 except (ValueError, KeyError, TypeError) as exc:
