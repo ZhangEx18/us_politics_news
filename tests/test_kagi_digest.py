@@ -163,6 +163,14 @@ def test_translation_contract_rejects_unusable_content(changes):
         kagi_digest.validate_translation({"id": "story", "title_zh": TITLE, "summary_zh": SUMMARY, **changes})
 
 
+def test_overlong_summary_is_trimmed_at_sentence_boundary():
+    item = {"id": "story", "title_zh": TITLE, "summary_zh": "字" * 80 + "。" + "字" * 100}
+    normalized = kagi_digest.normalize_translation(item)
+    assert normalized["summary_zh"].endswith("。")
+    assert len("".join(normalized["summary_zh"].split())) <= kagi_digest.SUMMARY_HARD_MAX_CHARS
+    kagi_digest.validate_translation(normalized)
+
+
 def test_rss_full_content_attribution_dedup_and_same_date_replacement(config):
     issue = make_issue(config)
     kagi_digest.publish_issue(issue, config)

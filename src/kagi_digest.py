@@ -126,6 +126,24 @@ def validate_translation(item: dict) -> None:
             raise ValueError(f"{item.get('id')}: {field} 包含标记或换行")
 
 
+def normalize_translation(item: dict) -> dict:
+    """收束偶发超长摘要，优先保留完整句子，再交给确定性校验。"""
+    normalized = dict(item)
+    summary = str(normalized.get("summary_zh", ""))
+    visible = "".join(summary.split())
+    if len(visible) <= SUMMARY_HARD_MAX_CHARS:
+        return normalized
+
+    limit = SUMMARY_HARD_MAX_CHARS - 1
+    prefix = summary[:limit]
+    boundaries = [index for index, char in enumerate(prefix) if char in "。！？；"]
+    if boundaries and boundaries[-1] >= 50:
+        summary = prefix[:boundaries[-1] + 1]
+    else:
+        summary = prefix.rstrip("，、：；, ") + "…"
+    normalized["summary_zh"] = summary
+    print(f"[Kagi] 摘要超长，已收束 {normalized.get('id')}: {len(visible)} -> {len(''.join(summary.split()))}")
+    return normalized
 async def translate_stories(stories: list[dict], config: dict, ai_config: dict) -> dict[str, dict]:
     """缓存已校验译文；格式错误只修复受影响的批次。"""
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
@@ -147,7 +165,7 @@ async def translate_stories(stories: list[dict], config: dict, ai_config: dict) 
             keys[story["id"]] = key
             cached = db.execute("SELECT payload FROM kagi_translations WHERE cache_key=?", (key,)).fetchone()
             if cached:
-                item = json.loads(cached[0])
+                item = normalize_translation(json.loads(cached[0]))
                 validate_translation(item)
                 results[story["id"]] = item
             else:
@@ -187,6 +205,7 @@ async def translate_stories(stories: list[dict], config: dict, ai_config: dict) 
                     ids = [item["id"] for item in items]
                     if len(ids) != len(batch) or set(ids) != {s["id"] for s in batch}:
                         raise ValueError("返回 id 未完整覆盖输入")
+                    items = [normalize_translation(item) for item in items]
                     for item in items:
                         validate_translation(item)
                     failures = await audit_batch(items, batch)
@@ -201,6 +220,7 @@ async def translate_stories(stories: list[dict], config: dict, ai_config: dict) 
                         repaired_items = _parse_jsonish_object(repaired).get("items")
                         if not isinstance(repaired_items, list) or {item.get("id") for item in repaired_items} != {story["id"] for story in batch}:
                             raise ValueError("Kagi 修复结果未完整覆盖输入")
+                        repaired_items = [normalize_translation(item) for item in repaired_items]
                         for item in repaired_items:
                             validate_translation(item)
                         remaining_failures = await audit_batch(repaired_items, batch)
