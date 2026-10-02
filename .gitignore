@@ -4,6 +4,7 @@
 # 数据库
 data/*.db
 data/*.json
+data/products/kagi_digest/
 
 # Python
 __pycache__/

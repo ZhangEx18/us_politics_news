@@ -57,6 +57,10 @@ def _load_ai_config() -> dict:
         "base_url": os.getenv("AI_BASE_URL") or "https://opencode.ai/zen/go/v1",
         "model": os.getenv("AI_MODEL") or "deepseek-v4.1-flash",
     }
+    # Kagi digest may assign cheaper/faster and stronger models to separate
+    # stages. Empty overrides intentionally fall back to the primary model.
+    config["repair_model"] = os.getenv("AI_REPAIR_MODEL", "").strip() or config["model"]
+    config["audit_model"] = os.getenv("AI_AUDIT_MODEL", "").strip()
     fallback_base_url = os.getenv("AI_FALLBACK_BASE_URL", "").strip()
     fallback_model = os.getenv("AI_FALLBACK_MODEL", "").strip()
     if fallback_base_url and fallback_model:

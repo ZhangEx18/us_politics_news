@@ -42,6 +42,11 @@ def test_restore_published_history_recovers_product_feeds_and_files(tmp_path):
             # algorithms feed
             ("cat-file", "-e", "origin/gh-pages:feeds/algorithms.xml"): SimpleNamespace(returncode=0, stdout="", stderr=""),
             ("show", "origin/gh-pages:feeds/algorithms.xml"): SimpleNamespace(returncode=0, stdout="<rss algo />", stderr=""),
+            ("show", "origin/gh-pages:feeds/kagi_digest.xml"): SimpleNamespace(returncode=0, stdout="<rss kagi />", stderr=""),
+            ("ls-tree", "-r", "--name-only", "origin/gh-pages", "kagi_digest/daily"): SimpleNamespace(
+                returncode=0, stdout="kagi_digest/daily/2026-10-02.json\n", stderr="",
+            ),
+            ("show", "origin/gh-pages:kagi_digest/daily/2026-10-02.json"): SimpleNamespace(returncode=0, stdout='{"batch_id":"batch"}', stderr=""),
             # news canonical
             ("ls-tree", "-r", "--name-only", "origin/gh-pages", "news/daily"): SimpleNamespace(
                 returncode=0, stdout="news/daily/2026-06-18.html\n", stderr="",
@@ -93,6 +98,8 @@ def test_restore_published_history_recovers_product_feeds_and_files(tmp_path):
     # product feeds
     assert (docs_dir / "feeds" / "news.xml").read_text(encoding="utf-8") == "<rss news />"
     assert (docs_dir / "feeds" / "algorithms.xml").read_text(encoding="utf-8") == "<rss algo />"
+    assert (docs_dir / "feeds" / "kagi_digest.xml").read_text(encoding="utf-8") == "<rss kagi />"
+    assert (docs_dir / "kagi_digest" / "daily" / "2026-10-02.json").read_text(encoding="utf-8") == '{"batch_id":"batch"}'
     # canonical paths
     assert (docs_dir / "news" / "metrics" / "latest.json").read_text(encoding="utf-8") == '{"report_key": "2026-06-18"}'
     assert (docs_dir / "news" / "daily" / "2026-06-18.html").read_text(encoding="utf-8") == "canonical daily"
@@ -145,6 +152,8 @@ def test_build_index_page_creates_global_and_product_indexes(tmp_path):
     assert "./algorithms/" in global_index
     assert "./feeds/news.xml" in global_index
     assert "./feeds/algorithms.xml" in global_index
+    assert "Kagi 每日简报" in global_index
+    assert "./feeds/kagi_digest.xml" in global_index
 
     # news 首页
     news_index = (docs_dir / "news" / "index.html").read_text(encoding="utf-8")

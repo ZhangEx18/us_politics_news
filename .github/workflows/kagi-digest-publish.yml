@@ -1,0 +1,29 @@
+name: Kagi Daily Digest
+on:
+  schedule:
+    # 北京时间 07:30，08:30 / 10:30 / 12:30 只重试未发布槽位。
+    - cron: '30 23 * * *'
+    - cron: '30 0,2,4 * * *'
+  workflow_dispatch:
+    inputs:
+      report_date:
+        description: '合刊发布日期 YYYY-MM-DD；留空使用北京时间今天'
+        required: false
+        default: ''
+        type: string
+      force_publish:
+        description: '重新生成并替换已发布的同日合刊'
+        required: false
+        default: false
+        type: boolean
+permissions:
+  contents: write
+jobs:
+  delegate:
+    uses: ./.github/workflows/publish-product.yml
+    with:
+      product_key: kagi_digest
+      report_type: daily
+      report_date: ${{ inputs.report_date || '' }}
+      force_publish: ${{ inputs.force_publish || false }}
+    secrets: inherit
