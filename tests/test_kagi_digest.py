@@ -141,7 +141,7 @@ def test_ai_stage_models_read_from_environment(monkeypatch):
     assert config["audit_model"] == "gpt-6.1-sol"
 
 
-@pytest.mark.parametrize("changes", [{"summary_zh": "Short English summary"}, {"summary_zh": "字" * 101},
+@pytest.mark.parametrize("changes", [{"summary_zh": "Short English summary"}, {"summary_zh": "字" * 121},
                                      {"title_zh": "标题"}, {"summary_zh": SUMMARY + "<script>"}])
 def test_translation_contract_rejects_unusable_content(changes):
     with pytest.raises(ValueError):

@@ -2,7 +2,7 @@
 
 **Kagi 每日简报** 的订阅地址为 [RSS](https://zhangex18.github.io/us_politics_news/feeds/kagi_digest.xml)（首次成功发布后可用）。每天北京时间 07:30 起发布一份四栏目中文合刊：美国动态、国际动态、科学技术、商业经济。五类 Kagi 当期新闻全部采集，Technology 与 Science 合并，同 story ID 去重；每条标题约 20 字、正文 50–100 字。内容仅依据 Kagi 摘要翻译概括，保留来源和不确定性，按 [Kagi API 的非商业署名条件](https://news.kagi.com/api-docs)发布。GitHub Actions 可能延迟触发，08:30、10:30、12:30 会重试未发布槽位。
 
-本地运行 `python3 src/run_product.py --product kagi_digest --report-type daily --report-date YYYY-MM-DD`，日期为中文合刊发布日期，输入为前一天 UTC 日的 Kagi 批次。使用 `AI_MODEL` 批量翻译，`AI_REPAIR_MODEL` 修复失败批次，`AI_AUDIT_MODEL` 做最终抽检；后两项留空时分别回退到主模型或跳过抽检。成功译文存入独立 SQLite 缓存。缺失分类、译文不完整或字数不合格会阻止本期发布，并保留上一期 RSS。手动补跑/替换使用 `Kagi Daily Digest` workflow 的 `report_date` / `force_publish` 输入。公开产物为 `docs/kagi_digest/daily/` 下的 Markdown、HTML、JSON 和 `docs/feeds/kagi_digest.xml`，Feed 保留最近 30 天。
+本地运行 `python3 src/run_product.py --product kagi_digest --report-type daily --report-date YYYY-MM-DD`，日期为中文合刊发布日期，输入为前一天 UTC 日的 Kagi 批次。使用 `AI_MODEL` 批量翻译，`AI_REPAIR_MODEL` 修复失败批次，`AI_AUDIT_MODEL` 做最终抽检；后两项留空时分别回退到主模型或跳过抽检。每条简讯目标 50–100 字，硬上限 120 字。成功译文存入独立 SQLite 缓存。缺失分类、译文不完整或字数不合格会阻止本期发布，并保留上一期 RSS。手动补跑/替换使用 `Kagi Daily Digest` workflow 的 `report_date` / `force_publish` 输入。公开产物为 `docs/kagi_digest/daily/` 下的 Markdown、HTML、JSON 和 `docs/feeds/kagi_digest.xml`，Feed 保留最近 30 天。
 
 每天自动生成中文新闻日报，覆盖美国政局、国际局势、科技前沿、经济走势四大维度。多接入方式新闻源并发抓取，AI 评分筛选、事件合并、AI 写作，输出 Markdown + HTML + RSS 全文 Feed，部署在 GitHub Pages，Reader 订阅即读。
 
