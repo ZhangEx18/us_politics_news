@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 import pytest
 
 import kagi_digest
+from ai_analyzer import _load_ai_config
 from config import load_product_config
 from feed_builder import RSS_NS
 
@@ -106,6 +107,38 @@ def test_translation_repairs_invalid_output_and_caches_validated_items(monkeypat
 
     monkeypatch.setattr(kagi_digest, "_call_llm", unavailable)
     assert asyncio.run(kagi_digest.translate_stories([story], config, ai_config)) == result
+
+
+def test_translation_uses_repair_and_audit_models_by_stage(monkeypatch, config):
+    story = make_source()["categories"]["usa"][0]
+    valid = {"items": [{"id": "usa", "title_zh": TITLE, "summary_zh": SUMMARY}]}
+    audit_failure = {"items": [{"id": "usa", "ok": False, "reason": "标题需要更准确"}]}
+    calls = []
+    responses = iter([json.dumps(valid), json.dumps(audit_failure), json.dumps(valid), json.dumps({"items": [{"id": "usa", "ok": True, "reason": ""}]})])
+
+    async def llm(prompt, options, **kwargs):
+        calls.append(options["model"])
+        return next(responses)
+
+    monkeypatch.setattr(kagi_digest, "_call_llm", llm)
+    ai_config = {
+        "model": "gpt-5.4-mini", "repair_model": "gpt-5.4",
+        "audit_model": "gpt-6.1-sol", "base_url": "https://example.com",
+    }
+    result = asyncio.run(kagi_digest.translate_stories([story], config, ai_config))
+    assert result["usa"]["title_zh"] == TITLE
+    assert calls == ["gpt-5.4-mini", "gpt-6.1-sol", "gpt-5.4", "gpt-6.1-sol"]
+
+
+def test_ai_stage_models_read_from_environment(monkeypatch):
+    monkeypatch.setenv("AI_API_KEY", "test-key")
+    monkeypatch.setenv("AI_MODEL", "gpt-5.4-mini")
+    monkeypatch.setenv("AI_REPAIR_MODEL", "gpt-5.4")
+    monkeypatch.setenv("AI_AUDIT_MODEL", "gpt-6.1-sol")
+    config = _load_ai_config()
+    assert config["model"] == "gpt-5.4-mini"
+    assert config["repair_model"] == "gpt-5.4"
+    assert config["audit_model"] == "gpt-6.1-sol"
 
 
 @pytest.mark.parametrize("changes", [{"summary_zh": "Short English summary"}, {"summary_zh": "字" * 101},

@@ -159,6 +159,8 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
           AI_MODEL: ${{ secrets.AI_MODEL }}
+          AI_REPAIR_MODEL: ${{ secrets.AI_REPAIR_MODEL }}
+          AI_AUDIT_MODEL: ${{ secrets.AI_AUDIT_MODEL }}
 
       - name: Restore state database
         run: |
@@ -217,6 +219,8 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
           AI_MODEL: ${{ secrets.AI_MODEL }}
+          AI_REPAIR_MODEL: ${{ secrets.AI_REPAIR_MODEL }}
+          AI_AUDIT_MODEL: ${{ secrets.AI_AUDIT_MODEL }}
           AI_FALLBACK_BASE_URL: ${{ secrets.AI_FALLBACK_BASE_URL }}
           AI_FALLBACK_MODEL: ${{ secrets.AI_FALLBACK_MODEL }}
           NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
