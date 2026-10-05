@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-05",
+  "coverage": {
+    "start": "2026-10-04T07:00:00+08:00",
+    "end": "2026-10-05T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "最高法院审理气候损害索赔案",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "最高法院审理气候损害索赔案",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.835, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Supreme Court starts a new term with a case about who pays for climate damage",
+          "url": "https://www.npr.org/2026/10/04/nx-s1-5985092/supreme-court-starts-a-new-term-with-a-case-about-who-pays-for-climate-damage"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普赴内布拉斯加州助阵参议院竞选",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普赴内布拉斯加州助阵参议院竞选",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.66, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Trump takes red state midterm blitz to Nebraska as GOP frets over Senate race",
+          "url": "https://thehill.com/homenews/campaign/6127091-trump-nebraska-senate-rally-ricketts-osborn/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "大西洋观察｜法律与秩序：新时代的选战话术",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "大西洋观察｜法律与秩序：新时代的选战话术",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-05/102490768.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "法国千所学校学生抗议酿成骚乱 数千人遭拘400警察负伤",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "法国千所学校学生抗议酿成骚乱 数千人遭拘400警察负伤",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.64, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-04/102490675.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "空客直升机适航指令",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "空客直升机适航指令",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Federal Register",
+          "url": "https://www.federalregister.gov/documents/2026/10/05/2026-20411/airworthiness-directives-airbus-helicopters"
+        }
+      ]
+    },
+    {
+      "candidate_id": "巴西总统选举进入决选",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "巴西总统选举进入决选",
+      "score": 88,
+      "selection_reason": "score=88, nw=0.83, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻",
+          "url": "https://wallstreetcn.com/articles/3782995"
+        },
+        {
+          "title": "英国广播公司",
+          "url": "https://www.bbc.co.uk/news/articles/ck1l34ed592no?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "title": "法国24电视台",
+          "url": "https://www.france24.com/en/americas/20261005-brazil-presidential-election-runoff-bolsonaro-lula"
+        },
+        {
+          "title": "印度时报",
+          "url": "https://timesofindia.indiatimes.com/world/rest-of-world/brazil-election-lula-flavio-bolsonaro-head-to-runoff-after-tight-first-round-vote/articleshow/134683419.cms"
+        }
+      ]
+    },
+    {
+      "candidate_id": "也门政府宣布对胡塞发动军事行动",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "也门政府宣布对胡塞发动军事行动",
+      "score": 87,
+      "selection_reason": "score=87, nw=0.9, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "半岛电视台",
+          "url": "https://www.aljazeera.com/news/liveblog/2026/10/5/iran-war-live-fighting-in-yemen-intensifies-tehran-says-ready-for-us-war?traffic_source=rss"
+        },
+        {
+          "title": "法国24电视台",
+          "url": "https://www.france24.com/en/middle-east/20261004-iran-us-military-middle-east-war-peace-talks"
+        },
+        {
+          "title": "南华早报",
+          "url": "https://www.scmp.com/news/world/middle-east/article/3369731/iran-tells-us-there-no-military-solution-middle-east-war?utm_source=rss_feed"
+        },
+        {
+          "title": "英国广播公司",
+          "url": "https://www.bbc.co.uk/news/articles/cx8dzj9vpp01o?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "title": "卫报",
+          "url": "https://www.theguardian.com/world/2026/oct/05/saudi-backed-yemen-government-military-drive-retake-houthi-territory"
+        }
+      ]
+    },
+    {
+      "candidate_id": "德国承诺向乌克兰提供10亿欧元援助",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "德国承诺向乌克兰提供10亿欧元援助",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.865, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "卫报",
+          "url": "https://www.theguardian.com/world/2026/oct/05/ukraine-war-briefing-germanys-merz-pledges-1bn-in-military-aid-to-kyiv-as-russia-ramps-up-attacks"
+        },
+        {
+          "title": "卫报",
+          "url": "https://www.theguardian.com/world/2026/oct/04/russia-strikes-kyiv-bridge-german-chancellor-merz-visits-ukraine"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美军撤出驻英基地全部轰炸机",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美军撤出驻英基地全部轰炸机",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.815, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "财富",
+          "url": "https://fortune.com/2026/10/04/air-force-all-bombers-british-base-raf-fairford-us-redeployment-terror-attack-iran/"
+        },
+        {
+          "title": "联合早报",
+          "url": "https://www.zaobao.com/news/world/story20261005-9784116"
+        },
+        {
+          "title": "半岛电视台",
+          "url": "https://www.aljazeera.com/news/2026/10/4/us-withdraws-b-1-bomber-aircraft-from-uks-fairford-base-amid-iran-fears?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普要求韩国参与阿拉斯加液化气项目",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普要求韩国参与阿拉斯加液化气项目",
+      "score": 81,
+      "selection_reason": "score=81, nw=0.82, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "CNBC",
+          "url": "https://www.cnbc.com/2026/10/05/trump-alaska-lng-south-korea-pay.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "中东原油出口量超战前水平 但油轮遇袭事件增加",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "中东原油出口量超战前水平 但油轮遇袭事件增加",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.73, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报 - 国际",
+          "url": "https://www.zaobao.com/news/world/story20261005-9784250"
+        }
+      ]
+    },
+    {
+      "candidate_id": "germany_ukraine_support_20261004",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "德国总理到访基辅，称乌克兰需要支持",
+      "score": 79,
+      "selection_reason": "score=79, nw=0.755, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "German Chancellor in Kyiv: \"Ukraine will need our support\"",
+          "url": "https://www.france24.com/en/german-chancellor-in-kyiv-ukraine-will-need-our-support",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "bosnia_election_dodik_20261005",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "波黑塞族民族主义者多迪克宣布其党胜选",
+      "score": 75,
+      "selection_reason": "score=75, nw=0.72, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Bosnian Serb nationalist Dodik declares party victory in Bosnia election",
+          "url": "https://www.theguardian.com/world/2026/oct/04/bosnian-serb-nationalist-dodik-declares-party-victory-in-bosnia-election",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "以色列队被指吐口水，爱尔兰主帅庆幸交手结束",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "以色列队被指吐口水，爱尔兰主帅庆幸交手结束",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/sports/2026/10/4/israel-face-spitting-allegation-as-ireland-boss-delighted-ties-after-over?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Google暂停开源漏洞赏金计划",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Google暂停开源漏洞赏金计划",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.64, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Google froze its open source bug bounty program due to a ‘significant rise’ in AI submissions - TechCrunch",
+          "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNV2dhMWFWdURrUldZWDk3dkZzWkxGN1RZNW1KdUtObHFGalBUeDlXSlRaRUF5RTUwaWVWc1lZcUprVGhQS2lMcGMyU1l2dGxnMVIyMkg4UktuenFsaFBXcmNvNTlKUlhmcHE1MW1BVGFmME41TGJzbF8wMXRnRkdCUVgydDU1VUlseTRTbEJXalJkSTZYekVWUjFjOXpqZ0RRV25IQm9PZDZsa3d5cHQwWjd0SmZMREtGZmRFbThXekFzZWFa?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Meta Muse被曝建立联系人关系档案",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Meta Muse被曝建立联系人关系档案",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.7, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Meta AI 助手 Muse 被曝为每位联系人建立个人档案，每小时汇总社交关系信息",
+          "url": "https://aihot.news/items/uleizm9b386cglcb9wc78vrcn"
+        }
+      ]
+    },
+    {
+      "candidate_id": "日本收紧外来人口政策",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "日本收紧外来人口政策",
+      "score": 75,
+      "selection_reason": "score=75, nw=0.625, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Japan’s population is shrinking at an accelerating rate, but the nationalist prime minister is making it harder for foreigners to live there",
+          "url": "https://fortune.com/2026/10/04/japan-population-decline-rate-2025-census-prime-minister-sanae-takaichi-foreigners-permanent-residency-immigration/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "日经225指数盘中重返70000点",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "日经225指数盘中重返70000点",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.55, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "日经225指数盘中重返70000点上方，日内涨超2.5%",
+          "url": "https://wallstreetcn.com/articles/3782996"
+        }
+      ]
+    },
+    {
+      "candidate_id": "贝森特称无法控制债市",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "贝森特称无法控制债市",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.565, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "Rebuked by Bond Market, Bessent Says ‘House’ Does Not Always Win",
+          "url": "https://www.nytimes.com/2026/10/04/business/bond-market-scott-bessent.html"
+        }
+      ]
+    }
+  ]
+}
