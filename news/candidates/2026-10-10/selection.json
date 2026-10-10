@@ -1,0 +1,376 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-10",
+  "coverage": {
+    "start": "2026-10-09T07:00:00+08:00",
+    "end": "2026-10-10T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "国际贸易法院认证关税集体诉讼",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "国际贸易法院认证关税集体诉讼",
+      "score": 85,
+      "selection_reason": "score=85, nw=0.75, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Federal court clears way for class-action suit against IEEPA tariffs",
+          "url": "https://www.supplychaindive.com/news/federal-court-clears-way-for-class-action-suit-against-ieepa-tariffs/832600/"
+        },
+        {
+          "title": "Trade Court Sides With Importers Seeking Class-Action Status for Tariff Refund Push - WWD",
+          "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNMXhxOHlXTGtlejNxUEZ6Z0diM2YydF8zYXNXWHpZTkxSV0JVVHBxeGVGeHlLd01JQi1mdWVTSUNhbjV6anJuNm5hWEsyOHBUUEhpelpESmcxSnBSQzFNVlNkUUFxbU8zUHVSZERUZ255dEhzMWJsc19STWY2QnZxUkRybHN1aXA0VWRyVUhJQ1VxcXZGT0RscFp6WHhiRlNKX2N4MElXYw?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普选定白宫新新闻秘书",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普选定白宫新新闻秘书",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.65, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Katie Zacharia Picked as Trump’s New White House Press Secretary",
+          "url": "https://www.nytimes.com/2026/10/09/us/politics/katie-zacharia-trump-white-house-press-secretary.html"
+        },
+        {
+          "title": "Who is Katie Zacharia, potential new White House press secretary?",
+          "url": "https://thehill.com/homenews/administration/5743349-who-is-katie-zacharia-new-dhs-spokesperson/"
+        },
+        {
+          "title": "特朗普任命保守派评论员为白宫新闻秘书",
+          "url": "https://www.zaobao.com/news/world/story20261010-9814135"
+        },
+        {
+          "title": "Trump says he picked ‘devoted fan’ Katie Zacharia to be next press secretary",
+          "url": "https://www.theguardian.com/us-news/2026/oct/09/katie-zacharia-new-white-house-press-secretary-trump"
+        },
+        {
+          "title": "Commentator Katie Zacharia picked as new White House press secretary",
+          "url": "https://www.bbc.co.uk/news/articles/c5rmy73zr0rro?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "ICE纽约枪击加剧美联邦与州府紧张",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "ICE纽约枪击加剧美联邦与州府紧张",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.705, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "ICE shooting in NYC fuels tension between New York officials and Trump administration",
+          "url": "https://www.npr.org/2026/10/09/nx-s1-5996654/ice-shooting-in-nyc-fuels-tension-between-new-york-officials-and-trump-administration"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普签署《美国音乐旅游法》",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普签署《美国音乐旅游法》",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.578, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Congressional Bills S. 195 Signed into Law",
+          "url": "https://www.whitehouse.gov/briefings-statements/2026/10/congressional-bills-s-195-signed-into-law/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普回应吉尔福伊尔资金争议",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普回应吉尔福伊尔资金争议",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.535, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "Trump offers first remarks on Guilfoyle controversy",
+          "url": "https://thehill.com/homenews/administration/6139973-trump-guilfoyle-debt-controversy/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "俄伊尔库茨克州解除防疫措施 世卫组织仍呼吁提供更多信息",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "俄伊尔库茨克州解除防疫措施 世卫组织仍呼吁提供更多信息",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-09/102491757.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "WHO总干事谭德塞将卸任 中国提名卫健委妇幼健康司宋莉竞选",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "WHO总干事谭德塞将卸任 中国提名卫健委妇幼健康司宋莉竞选",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.655, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-09/102491781.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "布鲁克斯与凯普哈特谈战场州争夺参院控制权",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "布鲁克斯与凯普哈特谈战场州争夺参院控制权",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/brooks-and-capehart-on-the-fight-for-senate-control-in-battleground-states"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普称美将购俄柴油，中期选前对俄减压降价",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "特朗普称美将购俄柴油，中期选前对俄减压降价",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.815, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/10/09/nx-s1-5996912/trump-says-u-s-to-get-diesel-from-russia-relaxing-pressure-on-moscow-to-ease-prices-before-midterms"
+        }
+      ]
+    },
+    {
+      "candidate_id": "campaign_finance_summary_20261010",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "联邦选举委员会公布2025至2026选举周…",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.54, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Statistical Summary of 18-Month Campaign Activity of the 2025-2026 Election Cycle",
+          "url": "https://www.fec.gov/updates/statistical-summary-of-18-month-campaign-activity-of-the-2025-2026-election-cycle/",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普政府扩大对国际刑事法院制裁",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普政府扩大对国际刑事法院制裁",
+      "score": 87,
+      "selection_reason": "score=87, nw=0.85, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "‘Piece by piece’: Trump administration vows to dismantle the International Criminal Court with sweeping new sanctions",
+          "url": "https://fortune.com/2026/10/09/trump-international-criminal-court-icc-sanctions/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美乌欧代表会谈后俄乌和谈出现分歧",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美乌欧代表会谈后俄乌和谈出现分歧",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.755, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "美乌欧代表迈阿密长谈六小时 美特使称讨论富有成效",
+          "url": "https://www.zaobao.com/news/world/story20261010-9813899"
+        },
+        {
+          "title": "Putin tells Trump peace talks are unlikely, cites Ukraine drone attacks",
+          "url": "https://www.aljazeera.com/news/2026/10/10/putin-tells-trump-peace-talks-are-unlikely-cites-ukraine-drone-attacks?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "也门被联合国特使警告重陷全面战争",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "也门被联合国特使警告重陷全面战争",
+      "score": 79,
+      "selection_reason": "score=79, nw=0.81, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Security Council LIVE: Yemen has fallen back into full-scale war, warns UN envoy",
+          "url": "https://news.un.org/feed/view/en/story/2026/10/1168559"
+        }
+      ]
+    },
+    {
+      "candidate_id": "承包商承认将英伟达芯片服务器转运至中国",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "承包商承认将英伟达芯片服务器转运至中国",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.695, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Super Micro contractor pleads guilty in scheme to divert AI servers with Nvidia chips to China - Reuters",
+          "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOd1RmaEFMYlkxNEZMMFBaYmd6dlMxMkpXSW9rTDA2TVMxeHBDOFlJVjZPOE4zOWhCRUx5ZUVxcTdBQnhHd2c5TzJzQ25SQ2Y4SnhBb1I2M01Ndmh5V2NNMFFHODhlSHZVUHBCeUYzdUxDVFc5dlc1cFhYWkVFVVRjdWlEeExfbmJCZWhZLWJyMmFhM0l1TVJhd3RyamJoU1d5WFA1Z2NQSEw3bWtBc1h5SVhINEVMRmFRenVYRi12QkhaRlhJYWI0RHJGU1M?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "联合国称苏丹疑遭无人机袭击致40人死亡",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "联合国称苏丹疑遭无人机袭击致40人死亡",
+      "score": 77,
+      "selection_reason": "score=77, nw=0.723, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "World News in Brief: ‘Horrific’ attack in Sudan, Israeli incursions in Syria intensify, most women and girls homeless in Gaza",
+          "url": "https://news.un.org/feed/view/en/story/2026/10/1168567"
+        }
+      ]
+    },
+    {
+      "candidate_id": "delhi_protest_security_20261010",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "德里部署数千名安保人员，应对“蟑螂”抗议",
+      "score": 66,
+      "selection_reason": "score=66, nw=0.515, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Thousands of security personnel deployed as Delhi braces for ‘cockroach’ protest",
+          "url": "https://www.bbc.co.uk/news/articles/cm2d6xd2g4w2o?at_medium=RSS&at_campaign=rss",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "TypeSafe AI获约8.7亿美元融资",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "TypeSafe AI获约8.7亿美元融资",
+      "score": 95.0,
+      "selection_reason": "score=95.0, nw=0.75, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "a16z领投，AI决策模型Jev爆火数周即完成8.7亿融资，估值75亿美元",
+          "url": "https://wallstreetcn.com/articles/3783313"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Anthropic限制内部评测联网",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Anthropic限制内部评测联网",
+      "score": 86.0,
+      "selection_reason": "score=86.0, nw=0.732, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Anthropic can’t reliably control its AI agents. It’s cutting off its internal evals from the live internet instead",
+          "url": "https://techcrunch.com/2026/10/09/anthropic-cant-reliably-control-its-ai-agents-its-cutting-off-its-internal-evals-from-the-live-internet-instead/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "谷歌将Claude接入Gemini企业智能体",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "谷歌将Claude接入Gemini企业智能体",
+      "score": 85.0,
+      "selection_reason": "score=85.0, nw=0.77, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Opus 5.5接入一切，OpenAI遭全硅谷围剿，谷歌马斯克集体叛变了",
+          "url": "https://www.36kr.com/p/4018115010809730"
+        },
+        {
+          "title": "Google unveils new cloud-based AI agent to compete with Meta, OpenAI - Fox News",
+          "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE02R2JXc3R5SUdoNWI2bjZKZXZzM0VaRHRDTDkyaDFnd1J3dDIzaE16c0V1X0owNElaY3pmR3JWajMtSlRVNEdiN2Qwd2Jtd1k4bXhob05yNEpWSE1IY2hPTnp4TGRTMWFzbmtBWHMyUkFvODBkYVpybmwtNzI?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "苹果与Huxe达成人才与技术协议",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "苹果与Huxe达成人才与技术协议",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.68, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "苹果与 Huxe 达成人才引进与技术许可协议，后者由前 Google NotebookLM 团队创立",
+          "url": "https://aihot.news/items/ai9df5zdj6pjnmdd63ihuz41g"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Nuvacore据称寻求融资",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Nuvacore据称寻求融资",
+      "score": 73,
+      "selection_reason": "score=73, nw=0.525, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "EXCLUSIVE: Sequoia-backed chip startup Nuvacore raising funds at about a $2.5 billion valuation, sources say - Reuters",
+          "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxQclRtS0tkNGE0bkJ3X1c0SGNIeUNibWZLVlp4VEpFdURROExjbXZmMGUtcWNKYU1uOHVBVFJqRXFKYVpwOFFzLS11Nmp3bWVGRTZCbVJvQnhPelZSMHhWMDFrdmZ4eVJaMWFtOVhRUXlhaXdjMUZneWVWbjl5U043bTVwdmVuanA2Y012S3dPMjhLbFVmOWhzM0RUazdDa3hmc0dHR0drWWt4cWk5aE5JV18xX0V3MVdaY3ZCOGJNU3NQYkpWTTZIdFlwazdCZw?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "白银价格跌超2%",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "白银价格跌超2%",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.59, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "跟跌不跟涨！白银陷入困境",
+          "url": "https://wallstreetcn.com/articles/3783312"
+        }
+      ]
+    },
+    {
+      "candidate_id": "中欧举行第二轮贸易投资磋商",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "中欧举行第二轮贸易投资磋商",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.55, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Joint Statement at the second meeting of the EU-China Trade and Investment Consultations",
+          "url": "https://ec.europa.eu/commission/presscorner/detail/en/statement_26_2122"
+        }
+      ]
+    },
+    {
+      "candidate_id": "垃圾债券亮黄灯，警示信号显现",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "垃圾债券亮黄灯，警示信号显现",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/09/junk-bonds-are-flashing-yellow-watch-these-warning-signs.html"
+        }
+      ]
+    }
+  ]
+}
