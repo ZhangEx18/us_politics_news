@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年10月15日 日报 — 2026-10-15</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年10月15日 日报</h1>
+<div class='date'>2026-10-15</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>伊朗称将继续作战，美军称摧毁可疑船只</li>
+<li>八州总检察长起诉 OpenAI</li>
+<li>151 款应用拒绝豆包手机助手</li>
+<li>泽连斯基指责特朗普限制乌克兰使用星链</li>
+<li>法官延长白宫媒体禁令</li>
+<li>日本出资赴美建晶圆厂 美国政府补贴变资产首次入股</li>
+<li>日本拟投 210 亿美元建美国晶圆厂</li>
+<li>Anthropic 营收增至 168 亿美元</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 法官延长白宫媒体禁令 <span class="followup">持续跟踪</span></h3>
+<p>10 月 14 日，美国公共电视网《新闻时刻》报道，联邦法官再次要求白宫恢复三家媒体的采访权限。命令涉及 CNN、MS NOW 和 Politico。案件仍待审理。</p>
+</div>
+<div class='event'>
+<h3>2. 库克律师质疑白宫调查委员会 <span class="followup">持续跟踪</span></h3>
+<p>10 月 14 日，美国公共电视网《新闻时刻》报道，美联储理事丽莎·库克的律师称白宫调查委员会存在明显偏见。律师针对特朗普设立的白宫听证会提出这一指控。</p>
+</div>
+<div class='event'>
+<h3>3. 特朗普为共和党候选人拉票</h3>
+<p>10 月 15 日，卫报报道，特朗普为共和党候选人拉票。民主党参议院超级政治行动委员会向关键选举投放数百万美元。</p>
+</div>
+<div class='event'>
+<h3>4. 美国 9 月 CPI 环比上涨 0.6%达半年来最高 年内再加息 50 基点预期上升</h3>
+<p>10 月 15 日，10 月 14 日，美国劳工部下属的劳工统计局发布的通胀数据显示，受能源价格持续推高物价的影响，美国 9 月消费者物价指数（CPI）环比上涨 0.6%，达到半年来的最大涨幅，虽然符合预期 0.6%，但高于前值 0.4%；同比上涨 3.7%，达 4 个月来的最高，超出预期 3.6%，也高于前值 3.4%。如果不考虑油价震荡的因素，剔除食品和能源成本的美国核心 CPI 也继续保持粘性，在 9 月环比上涨 0.3%，高于预期 0.2%，和前值一致；同比上涨 2.6%，。</p>
+</div>
+<div class='event'>
+<h3>5. 桥水基金创始人达利欧：美国债市熊市还远未结束</h3>
+<p>10 月 14 日，过去一个月，全球资产出现反直觉的现象。一方面美国长期国债收益率不断走高，并且衡量 债券 市场波动率的 MOVE 指数也一度飙升到年内高位，但衡量美股波动率的 VIX 指数仍处于低位，且美股还在创新高。如何解释这种反常的现象？</p>
+</div>
+<ul class='headline-list'>
+<li>白宫新任新闻秘书首次简报会遇挫</li>
+<li>数据中心引发的反弹或影响美国中期选举</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 伊朗称将继续作战，美军称摧毁可疑船只 <span class="followup">持续跟踪</span></h3>
+<p>10 月 15 日，伊朗称将继续作战，直至美国接受其要求，半岛电视台报道。10 月 14 日，美国称在阿曼湾摧毁一艘涉嫌承担伊朗指挥与监视任务的船只。</p>
+</div>
+<div class='event'>
+<h3>2. 泽连斯基指责特朗普限制乌克兰使用星链</h3>
+<p>10 月 14 日，乌克兰总统泽连斯基指责美国总统特朗普限制乌克兰军方使用星链，卫报报道。乌克兰方面称，SpaceX 再次限制了星链服务。</p>
+</div>
+<div class='event'>
+<h3>3. 中美磋商人工智能事故处理框架</h3>
+<p>10 月 15 日，中美就人工智能事故处理框架持续磋商，南华早报称。相关磋商发生在习近平与特朗普于深圳会谈之前。</p>
+</div>
+<div class='event'>
+<h3>4. 中俄外长讨论合作及乌克兰、伊朗局势</h3>
+<p>10 月 14 日，俄罗斯外长拉夫罗夫与中国外交部长王毅在亚洲安全会议会面，路透社报道。双方讨论了合作问题。两人还讨论乌克兰和伊朗局势。</p>
+</div>
+<div class='event'>
+<h3>5. 卢拉所属政党指责 Meta 干预巴西选举</h3>
+<p>10 月 14 日，巴西总统卢拉所属政党指责 Meta 干预选举，法新社报道。该党拟就相关指控向美洲国家组织投诉。</p>
+</div>
+<div class='event'>
+<h3>6. 美联储褐皮书：能源价格走高 美部分地区面临物价压力</h3>
+<p>10 月 15 日，美国联邦储备局星期三（10 月 14 日）发布的最新褐皮书报告显示，随着能源价格上涨渗透至地方经济，美国 12 个美联储辖区中，有半数在最近几周面临强劲或加剧的物价上涨压力。除了能源因素外，许多辖区的企业还提到来自其他大宗商品、关税以及保险费用的通胀压力。报告强调，持续处于高位的柴油价格以及随之产生的燃料附加费，正将不断上升的成本沿着整个供应链向上下游传递。</p>
+</div>
+<div class='event'>
+<h3>7. 日本出资赴美建晶圆厂 美国政府补贴变资产首次入股</h3>
+<p>10 月 15 日，美国半导体制造商格芯（GlobalFoundries）星期三（10 月 14 日）宣布，日本将出资高达 210 亿美元（约 284 亿新元），在美国纽约州兴建最多两座晶圆厂。此举不仅是日美重大投资协议落地的最新成果，美国政府也将借此取得格芯 7%的股权，开创政府将补贴资金转化为国家资产的先例。综合路透社和法新社报道，根据双方协议，首座 12 英寸（300 毫米）晶圆厂预计于今年内开工，计划在 2029 年投产，首期投资约 100 亿美元。</p>
+</div>
+<ul class='headline-list'>
+<li>英国首相伯恩汉姆在唐宁街会见乌克兰总统泽连斯基。</li>
+<li>赫格塞思：自主战争指挥部一直是最终目标</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 八州总检察长起诉 OpenAI</h3>
+<p>10 月 14 日，Engadget 报道称，八州总检察长起诉 OpenAI，指控 ChatGPT 诱导青少年自伤。报道涉及爱荷华州、内布拉斯加州和另外六州。</p>
+</div>
+<div class='event'>
+<h3>2. Anthropic 营收增至 168 亿美元 <span class="followup">持续跟踪</span></h3>
+<p>10 月 15 日，BBC 报道称，Anthropic 营收增至 168 亿美元。华尔街见闻称，公司第三季度营收增长并实现调整后盈利。MarketWatch 报道称，Anthropic 营收增速放缓，预计年内上市。</p>
+</div>
+<div class='event'>
+<h3>3. 151 款应用拒绝豆包手机助手</h3>
+<p>10 月 14 日，36 氪报道称，151 款应用拒绝豆包手机助手通过 GUI 自动化操作其服务。报道标题列出微信、淘宝和美团等应用。</p>
+</div>
+<div class='event'>
+<h3>4. 日本拟投 210 亿美元建美国晶圆厂</h3>
+<p>10 月 14 日，联合早报报道称，日本拟向格芯美国晶圆厂投资 210 亿美元。报道还称，美国政府将获得该晶圆厂 7% 股权。</p>
+</div>
+<div class='event'>
+<h3>5. CoreWeave 股价下跌 15% <span class="followup">持续跟踪</span></h3>
+<p>10 月 14 日，华尔街见闻报道称，CoreWeave 股价下跌 15%。报道还称，该公司的债券和信用市场同步恶化。</p>
+</div>
+<ul class='headline-list'>
+<li>Meta 发布 Muse Wonder 系列智能体模型，称其达到 SOTA 表现。</li>
+<li>Ricursive Intelligence 研发可自动迭代的 AI 芯片设计系统。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 标普 500 指数跌 1.1%</h3>
+<p>10 月 14 日，NYT 报道，标普 500 指数下跌 1.1%。这是该指数两个月来最大跌幅。</p>
+</div>
+<ul class='headline-list'>
+<li>通胀担忧冲击科技股，AI 交易分裂</li>
+</ul>
+</body>
+</html>
