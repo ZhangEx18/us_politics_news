@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年10月16日 日报 — 2026-10-16</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年10月16日 日报</h1>
+<div class='date'>2026-10-16</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>俄乌互袭升级，能源停火努力破裂</li>
+<li>以色列暂停商业货物进入加沙</li>
+<li>黑海油轮遭无人机袭击，7 名船员失踪</li>
+<li>沙特指责胡塞犯战争罪，美国警告机场遇袭</li>
+<li>胡塞导弹袭击也门总统府，5 人死亡</li>
+<li>ChatGPT Chrome 扩展可操作标签页</li>
+<li>卢拉宣告巴西六天工作制终结 每周最高工时将缩减至 40 小时</li>
+<li>谷歌 Antigravity 发现新型抗菌肽候选分子</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 可疑信件寄往参议员及选举办公室</h3>
+<p>10 月 16 日，英国广播公司报道，多州参议员和选举办公室收到含可疑物质的信件。美国联邦调查局和美国邮政检查局正在调查寄给选举官员及国会办公室的可疑信件。</p>
+</div>
+<div class='event'>
+<h3>2. 缅因州参议院候选人完成最终辩论</h3>
+<p>10 月 15 日，柯林斯与杰克逊参加缅因州参议院选举最终辩论并发生交锋。The Hill 将这场辩论列为缅因州参议院选举的最终辩论。</p>
+</div>
+<div class='event'>
+<h3>3. 五角大楼称特朗普与赫格塞思同意取消执行直播</h3>
+<p>10 月 15 日，卫报报道，五角大楼称美国总统特朗普与赫格塞思同意取消枪决执行直播。取消的内容是得州胡德堡枪击案凶手执行死刑的直播。</p>
+</div>
+<div class='event'>
+<h3>4. 特朗普将赴佐治亚为参议员候选人助选</h3>
+<p>10 月 15 日，PBS NewsHour 报道，美国总统特朗普将赴佐治亚州为共和党参议员候选人柯林斯助选。报道将这场竞选描述为柯林斯对阵奥索夫的参议院选举。</p>
+</div>
+<div class='event'>
+<h3>5. AP-NORC 民调显示多数选民希望中期选举带来改变</h3>
+<p>10 月 15 日，PBS NewsHour 报道，AP-NORC 发布关于美国中期选举的民调。民调显示，多数选民希望中期选举带来重大改变。</p>
+</div>
+<div class='event'>
+<h3>6. 华盛顿邮报披露白宫舞厅捐款人名单</h3>
+<p>10 月 15 日，《国会山报》报道，《华盛顿邮报》披露白宫舞厅项目私人捐款人名单。报道所述私人捐款总额超过 3.3 亿美元。</p>
+</div>
+<div class='event'>
+<h3>7. 美国 9 月 CPI 环比上涨 0.6%达半年来最高 年内再加息 50 基点预期上升</h3>
+<p>10 月 15 日，10 月 14 日，美国劳工部下属的劳工统计局发布的通胀数据显示，受能源价格持续推高物价的影响，美国 9 月消费者物价指数（CPI）环比上涨 0.6%，达到半年来的最大涨幅，虽然符合预期 0.6%，但高于前值 0.4%；同比上涨 3.7%，达 4 个月来的最高，超出预期 3.6%，也高于前值 3.4%。如果不考虑油价震荡的因素，剔除食品和能源成本的美国核心 CPI 也继续保持粘性，在 9 月环比上涨 0.3%，高于预期 0.2%，和前值一致；同比上涨 2.6%，。</p>
+</div>
+<div class='event'>
+<h3>8. 卢拉宣告巴西六天工作制终结 每周最高工时将缩减至 40 小时</h3>
+<p>10 月 15 日，相关报道 巴西大选首轮投票极右翼前总统之子领先 80 岁卢拉连任遇险关 分析｜巴西大选前瞻：拉美右翼浪潮会否席卷拉美第一大经济体？【财新网】 当地时间 10 月 14 日，巴西参议院通过一项宪法修正案，将该国每周最高工作时长由 44 小时缩减至 40 小时，且薪资保持不变。巴西现任的左翼总统卢拉支持该提案。</p>
+</div>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 俄乌互袭升级，能源停火努力破裂 <span class="followup">持续跟踪</span></h3>
+<p>10 月 15 日，卫报报道称，俄罗斯与乌克兰互相发动袭击，特朗普推动的能源停火努力宣告破裂。乌克兰方面称，俄罗斯持续攻击摧毁了关键医疗物资。俄罗斯指责乌克兰袭击一座炼油厂。</p>
+</div>
+<div class='event'>
+<h3>2. 黑海油轮遭无人机袭击，7 名船员失踪 <span class="followup">持续跟踪</span></h3>
+<p>10 月 15 日，卫报报道称，无人机袭击罗马尼亚黑海沿岸附近的两艘油轮。7 名船员在袭击后失踪。</p>
+</div>
+<div class='event'>
+<h3>3. 沙特指责胡塞犯战争罪，美国警告机场遇袭 <span class="followup">持续跟踪</span></h3>
+<p>10 月 16 日，半岛电视台报道，沙特指责胡塞武装犯下战争罪。美国警告沙特机场可能遭到袭击。</p>
+</div>
+<div class='event'>
+<h3>4. 以色列暂停商业货物进入加沙 <span class="followup">持续跟踪</span></h3>
+<p>10 月 15 日，半岛电视台报道，以色列暂停商业货物进入加沙。哈马斯否认有关税收的指控。</p>
+</div>
+<div class='event'>
+<h3>5. 胡塞导弹袭击也门总统府，5 人死亡 <span class="followup">持续跟踪</span></h3>
+<p>10 月 15 日，英国广播公司报道称，胡塞武装导弹袭击也门总统府。也门一名部长称，袭击造成 5 人死亡。</p>
+</div>
+<div class='event'>
+<h3>6. 日本拟扩大安保支出，回避 3.5%军费目标</h3>
+<p>10 月 16 日，联合早报报道称，日本政府拟扩大安全支出。日本政府拟避免承诺防卫费达到国内生产总值的 3.5%。</p>
+</div>
+<ul class='headline-list'>
+<li>巴士撞上英法海峡隧道法方停驶列车，19 人受伤</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. ChatGPT Chrome 扩展可操作标签页</h3>
+<p>10 月 15 日，The Verge 称，OpenAI 升级了 ChatGPT Chrome 扩展。升级后的扩展可读取并操作已打开的浏览器标签页。</p>
+</div>
+<div class='event'>
+<h3>2. 美国海军演示无人机无 GPS 着舰</h3>
+<p>10 月 16 日，美国海军展示了无人机在舰上着陆。美国国防部称，演示在无 GPS 和无人工操控条件下完成。</p>
+</div>
+<div class='event'>
+<h3>3. Meta 发布开放权重模型 Muse Spark Open</h3>
+<p>10 月 16 日，卫报称，Meta 发布了开放权重人工智能模型 Muse Spark Open。AIHOT 列出的资料称，该模型总参数量为 8160 亿，并支持 100 万 token 上下文。</p>
+</div>
+<div class='event'>
+<h3>4. 谷歌 Antigravity 发现新型抗菌肽候选分子</h3>
+<p>10 月 15 日，AIHOT 称，谷歌 Antigravity 发现了新型抗菌肽候选分子。该项目已启动实验验证。</p>
+</div>
+<ul class='headline-list'>
+<li>指以色列公司借数字广告植入间谍软件。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. AI 忧虑压低美元</h3>
+<p>10 月 15 日，美元指数创逾一个月最大单日跌幅，华尔街见闻称 AI 风险情绪压制美元。通胀利好未能抵消 AI 风险情绪带来的美元压力。</p>
+</div>
+<div class='event'>
+<h3>2. 美国 PPI 同比上涨 6.3%</h3>
+<p>10 月 15 日，美国生产者价格同比上涨 6.3%，Wolf Street 报道称涨幅为 2022 年以来最高。该涨幅明显高于面向消费者的通胀水平。</p>
+</div>
+<div class='event'>
+<h3>3. 台积电公布三季度业绩并上调预期 <span class="followup">持续跟踪</span></h3>
+<p>10 月 15 日，Investor's Business Daily 报道称，台积电公布第三季度业绩。台积电上调预期。</p>
+</div>
+<ul class='headline-list'>
+<li>AI 股遭抛售，投资者转向何处</li>
+<li>科技股遭遇抛售之际，资金正加速流向大型医药板块。</li>
+<li>美墨关税协议谈判停滞。</li>
+</ul>
+</body>
+</html>
