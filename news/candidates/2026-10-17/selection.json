@@ -1,0 +1,448 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-17",
+  "coverage": {
+    "start": "2026-10-16T07:00:00+08:00",
+    "end": "2026-10-17T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "美国司法部警告加州官员处理疑似非公民选票或被起诉",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "美国司法部警告加州官员处理疑似非公民选票或被起诉",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.79, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "DOJ says California officials who process ballots from suspected noncitizens risk prosecution",
+          "url": "https://www.pbs.org/newshour/politics/doj-says-california-officials-who-process-ballots-from-suspected-noncitizens-risk-prosecution"
+        },
+        {
+          "title": "Officials who process ballots from suspected noncitizens risk prosecution, US warns",
+          "url": "https://abcnews.com/Politics/wireStory/california-officials-process-ballots-suspected-noncitizens-risk-prosecution-137336555"
+        }
+      ]
+    },
+    {
+      "candidate_id": "上诉法院质疑司法部白宫档案主张",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "上诉法院质疑司法部白宫档案主张",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.673, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Appeals Court Questions Justice Dept. Claim that Trump Owns White House Records",
+          "url": "https://www.nytimes.com/2026/10/16/us/politics/appeals-court-trump-presidential-records.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普在佐治亚州质疑奥索夫当选合法性",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普在佐治亚州质疑奥索夫当选合法性",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.585, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Trump in Georgia falsely claims election of Jon Ossoff was illegitimate",
+          "url": "https://www.theguardian.com/us-news/2026/oct/16/trump-georgia-rally-jon-ossoff"
+        }
+      ]
+    },
+    {
+      "candidate_id": "大西洋观察｜尾大不掉的英国福利开支",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "大西洋观察｜尾大不掉的英国福利开支",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-17/102494206.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "凯普哈特、孔蒂内蒂谈白宫新闻秘书离职",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "凯普哈特、孔蒂内蒂谈白宫新闻秘书离职",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/show/capehart-and-continetti-on-the-white-house-press-secretarys-quick-exit"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国中期选举参议院激辩要点",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "美国中期选举参议院激辩要点",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "BBC US & Canada",
+          "url": "https://www.bbc.co.uk/news/articles/cqly03y3zg7lo?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "白宫宣布新闻秘书凯蒂·扎卡里离任",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "白宫宣布新闻秘书凯蒂·扎卡里离任",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.718, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Katie Zacharia is out as press secretary, White House says",
+          "url": "https://www.npr.org/2026/10/16/nx-s1-6005302/katie-zacharia-is-out-as-press-secretary-white-house-says"
+        },
+        {
+          "title": "白宫新任发言人上任一周遭解雇 特朗普劝其重新考虑职业",
+          "url": "https://international.caixin.com/2026-10-17/102494186.html"
+        },
+        {
+          "title": "Katie Zacharia fired after five days as White House press secretary",
+          "url": "https://www.theguardian.com/us-news/2026/oct/16/katie-zacharia-fired-press-secretary"
+        }
+      ]
+    },
+    {
+      "candidate_id": "campaign_finance_summary_20261017",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "联邦选举委员会公布2025-2026选举周…",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.652, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "Statistical Summary of 18-Month Campaign Activity of the 2025-2026 Election Cycle",
+          "url": "https://www.fec.gov/updates/statistical-summary-of-18-month-campaign-activity-of-the-2025-2026-election-cycle/",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普签署对俄伊制裁执行行动",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普签署对俄伊制裁执行行动",
+      "score": 88,
+      "selection_reason": "score=88, nw=0.86, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Implementing the Lindsey O. Graham Sanctioning Russia and Iran Act of 2026",
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "联合国称乌克兰平民伤亡持续高位",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "联合国称乌克兰平民伤亡持续高位",
+      "score": 87,
+      "selection_reason": "score=87, nw=0.82, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Ukraine: Civilian casualty rates among ‘deadliest’ in years, as energy attacks intensify",
+          "url": "https://news.un.org/feed/view/en/story/2026/10/1168614"
+        }
+      ]
+    },
+    {
+      "candidate_id": "泽连斯基请求欧洲追加700亿欧元援乌资金",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "泽连斯基请求欧洲追加700亿欧元援乌资金",
+      "score": 83,
+      "selection_reason": "score=83, nw=0.797, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Zelensky turns to Europe for backing as ties with Trump deteriorate",
+          "url": "https://www.france24.com/en/europe/20261016-zelensky-turns-to-europe-for-backing-as-ties-with-trump-deteriorate"
+        },
+        {
+          "title": "Ukrainian President Zelenskyy speaks at EU summit amid spat with Donald Trump",
+          "url": "https://www.dw.com/en/ukrainian-president-zelenskyy-speaks-at-eu-summit-amid-spat-with-donald-trump/a-79684340?maca=en-rss-en-all-1573-rdf"
+        }
+      ]
+    },
+    {
+      "candidate_id": "联合国秘书长竞选进入第六轮意向投票",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "联合国秘书长竞选进入第六轮意向投票",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.775, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "联合国秘书长竞选冲刺 哥斯达黎加前副总统暂居领先",
+          "url": "https://www.zaobao.com.sg/news/world/story20261017-9851323"
+        }
+      ]
+    },
+    {
+      "candidate_id": "地拉那发生冲突，阿总理指责外国势力",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "地拉那发生冲突，阿总理指责外国势力",
+      "score": 77,
+      "selection_reason": "score=77, nw=0.665, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Clashes grip Tirana as Albanian PM blames 'foreign hands' for mounting unrest",
+          "url": "https://www.france24.com/en/europe/20261016-clashes-grip-tirana-as-albanian-pm-blames-foreign-hands"
+        }
+      ]
+    },
+    {
+      "candidate_id": "china_japan_trade_delegation_20261017",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "中国批准扩大日本贸易代表团访华，经济热政治冷",
+      "score": 71,
+      "selection_reason": "score=71, nw=0.598, stage=跟进, slot=headline",
+      "sources": [
+        {
+          "title": "‘Hot economics, cold politics’: why China gave nod for expanded Japanese trade trip",
+          "url": "https://www.scmp.com/news/china/diplomacy/article/3371192/hot-economics-cold-politics-why-china-gave-nod-expanded-japanese-trade-trip?utm_source=rss_feed",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普否认限制乌克兰使用星链",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "特朗普否认限制乌克兰使用星链",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/ckz65g34wyd8o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普称美海军封锁霍尔木兹海峡拦截伊朗船只",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "特朗普称美海军封锁霍尔木兹海峡拦截伊朗船只",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/liveblog/2026/10/17/draft-2?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "乌军攻势推动俄军后撤，星链发挥关键作用",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "乌军攻势推动俄军后撤，星链发挥关键作用",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cvx284w16z1po?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Replit停止与Anthropic合作",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Replit停止与Anthropic合作",
+      "score": 84.0,
+      "selection_reason": "score=84.0, nw=0.645, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Replit is no longer working with Anthropic, CEO says",
+          "url": "https://techcrunch.com/2026/10/16/replit-is-no-longer-working-with-anthropic-ceo-says/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "苹果发布折叠屏iPhone Duo",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "苹果发布折叠屏iPhone Duo",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.69, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "All the news about the iPhone Duo",
+          "url": "https://www.theverge.com/tech/1010131/apple-iphone-duo-news-announcements"
+        }
+      ]
+    },
+    {
+      "candidate_id": "苹果规则禁止非自愿裸照生成应用",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "苹果规则禁止非自愿裸照生成应用",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.65, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Apple’s updated App Store rules go after ‘nudify’ AI apps",
+          "url": "https://www.theverge.com/tech/1013314/apple-app-store-nudify-ai-apps-harassment"
+        }
+      ]
+    },
+    {
+      "candidate_id": "NIST发布芯片化光学测量设备",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "NIST发布芯片化光学测量设备",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.64, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "New Chip-Based ‘Tape Measure’ for Light Could Revolutionize Mobile Timekeeping and Enhance National Security",
+          "url": "https://www.nist.gov/news-events/news/2026/10/new-chip-based-tape-measure-light-could-revolutionize-mobile-timekeeping"
+        }
+      ]
+    },
+    {
+      "candidate_id": "台积电评估扩大德州产能",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "台积电评估扩大德州产能",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.635, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "TSMC explores Texas expansion as AI chip demand outpaces production - The American Bazaar",
+          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPMlVjSEJIaVVBbFBJZGlUSlV2TWQzY3VBTVNoZ2h2aE9LM2J1VEhVaGFhdm8xT25TeGF2czhVeTBFRWxST2R0UjNnWFRFX1pRY2hJS1NiUGloQjdwT3kyOWtFb2tqUjkxcTFmeXdWVlZDSFdMODJuMWtCbWw1T3V0bUtlMXJXS3M2cExFbmRjNlFpdDl6UlNNRDJCQ3NIdVJ6b0FfRjVMMlI0ckp5Q2t5Uk5POFltSHQyelg0?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Google.org向佐治亚理工提供500万美元",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Google.org向佐治亚理工提供500万美元",
+      "score": null,
+      "selection_reason": "slot=detailed",
+      "sources": [
+        {
+          "title": "Georgia Tech Receives $5 Million From Google.org to Expand Access to AI for Scientific Discovery | Newswise - Newswise",
+          "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPZDVyd1lQUDdfUTB2cFRRZjF0aGRpMERWb003ZUk1NElvaUl6emswNlJNRWEzQnYxZm0xcmh0QVF4dVFLbldoRWE1QW5HRkN5NWVWdTJwVUpaVnBNQ1d0QUpoMF9heDg0RWRRLTZNM0w4RU9HNlgxOVBQSmhfcWV2Y2haRkgzVUhnTjYxWm05eHRzMkR5Ylp6R1dzcG9NcEYybldCeFVNcnc4eTQ2OHFNWFNBM3dxXzhTbmVkUGQzWXNQc21DdjRtdIByAFBVV95cUxPZDVyd1lQUDdfUTB2cFRRZjF0aGRpMERWb003ZUk1NElvaUl6emswNlJNRWEzQnYxZm0xcmh0QVF4dVFLbldoRWE1QW5HRkN5NWVWdTJwVUpaVnBNQ1d0QUpoMF9heDg0RWRRLTZNM0w4RU9HNlgxOVBQSmhfcWV2Y2haRkgzVUhnTjYxWm05eHRzMkR5Ylp6R1dzcG9NcEYybldCeFVNcnc4eTQ2OHFNWFNBM3dxXzhTbmVkUGQzWXNQc21DdjRtdg?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI模型攻破加密钱包并入侵更多网站",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "OpenAI模型攻破加密钱包并入侵更多网站",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Ars Technica",
+          "url": "https://arstechnica.com/security/2026/10/openai-models-hacked-a-crypto-wallet-and-breached-more-websites/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国9月进口价格环比上涨1.1%",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国9月进口价格环比上涨1.1%",
+      "score": 85,
+      "selection_reason": "score=85, nw=0.745, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "美国9月进口价格涨幅超预期，核心进口与资本品齐升印证通胀扩散",
+          "url": "https://wallstreetcn.com/articles/3783820"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国2026财年赤字接近2万亿美元",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国2026财年赤字接近2万亿美元",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.71, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "U.S. budget deficit swells to almost $2 trillion for fiscal 2026, up 12% in a single year",
+          "url": "https://www.cnbc.com/2026/10/16/us-budget-deficit-2026.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Netflix裁员1000人并撤换内容主管",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "Netflix裁员1000人并撤换内容主管",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.635, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Netflix Hurries to Rewrite Its Narrative With Layoffs and a Sudden Firing",
+          "url": "https://www.nytimes.com/2026/10/16/business/media/netflix-layoffs-bela-bajaria.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "华尔街开出中期选举价码：民主党因子暴涨20%，大盘却深陷“盲区”",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "华尔街开出中期选举价码：民主党因子暴涨20%，大盘却深陷“盲区”",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/articles/3783825"
+        }
+      ]
+    },
+    {
+      "candidate_id": "债市无视两次通胀冲击，股市投资者需警惕",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "债市无视两次通胀冲击，股市投资者需警惕",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "MarketWatch Top Stories",
+          "url": "https://www.marketwatch.com/story/the-bond-market-shrugged-off-two-inflation-shocks-why-stock-investors-should-pay-attention-5da4f771?mod=mw_rss_topstories"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美联储终止对加德纳银行、小企业银行执法",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "美联储终止对加德纳银行、小企业银行执法",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Federal Reserve",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20261016a.htm"
+        }
+      ]
+    }
+  ]
+}
