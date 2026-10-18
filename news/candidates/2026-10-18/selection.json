@@ -1,0 +1,378 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-18",
+  "coverage": {
+    "start": "2026-10-17T07:00:00+08:00",
+    "end": "2026-10-18T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "亚利桑那州反对科罗拉多河配水削减",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "亚利桑那州反对科罗拉多河配水削减",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.695, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Arizona joins Nevada to fight proposed cuts to their shares of Colorado River",
+          "url": "https://www.theguardian.com/us-news/2026/oct/17/arizona-nevada-water-rights-colorado-river"
+        }
+      ]
+    },
+    {
+      "candidate_id": "明尼苏达州参议院候选人围绕欺诈问题辩论",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "明尼苏达州参议院候选人围绕欺诈问题辩论",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.6, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Fraud, affordability and Trump policies drive friction in Minnesota Senate debate",
+          "url": "https://www.npr.org/2026/10/17/nx-s1-6004910/minn-us-senate-race"
+        }
+      ]
+    },
+    {
+      "candidate_id": "大西洋观察｜尾大不掉的英国福利开支",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "大西洋观察｜尾大不掉的英国福利开支",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-17/102494206.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "众议长约翰逊借助信仰力保共和党多数席位",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "众议长约翰逊借助信仰力保共和党多数席位",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/politics/house-speaker-mike-johnson-draws-on-faith-as-he-fights-to-hold-the-republican-majority"
+        }
+      ]
+    },
+    {
+      "candidate_id": "爱荷华州中期选举投票或决定国会权力平衡",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "爱荷华州中期选举投票或决定国会权力平衡",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "NPR National",
+          "url": "https://www.npr.org/2026/10/17/nx-s1-6003962/iowas-vote-in-midterms-may-help-determine-balance-of-power-in-congress"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普在华盛顿地标留下更多印记",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "特朗普在华盛顿地标留下更多印记",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "NPR National",
+          "url": "https://www.npr.org/2026/10/17/nx-s1-6001826/president-trumps-widening-stamp-on-d-c-landmarks"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普解雇任职未满一周的白宫发言人",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "特朗普解雇任职未满一周的白宫发言人",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.685, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "白宫新任发言人上任一周遭解雇 特朗普劝其重新考虑职业",
+          "url": "https://international.caixin.com/2026-10-17/102494186.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "格雷厄姆反对特朗普暂缓对俄制裁",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "格雷厄姆反对特朗普暂缓对俄制裁",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.745, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "Graham Breaks With Trump Over Russia Sanctions Law Her Brother Championed",
+          "url": "https://www.nytimes.com/2026/10/17/us/politics/graham-trump-russia-sanctions-law.html"
+        },
+        {
+          "title": "Trump’s decision to waive Russian sanctions outrages Congress, but no quick counter seen - AP News",
+          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQQzV3OUN4YUtURHoxVG1sTV9uMjVTdFU0Tmlqc2hod0trU1hzQnMzUTc5UE12TGJsMVJmOVU1VEFxWXVSOEJxOU5sR3FwUFc2OFY0b2NKczZOR3pjX0xTWlJacDZSdWk1SmgxVjJvVTRWQVZyckd3MW14dFRiM0RJb3F6bG15MGNyTFJtOU1IVDVLeTNHSjZsMzl2aFB1azZZRG5TajhNTUVGUQ?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "以色列定居者袭击约旦河西岸欧洲外交人员",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "以色列定居者袭击约旦河西岸欧洲外交人员",
+      "score": 85,
+      "selection_reason": "score=85, nw=0.775, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Israeli settlers attack European diplomats in West Bank",
+          "url": "https://www.theguardian.com/world/2026/oct/17/israeli-settlers-attack-european-diplomats-in-west-bank"
+        },
+        {
+          "title": "Israeli settlers attack European delegation convoy in West Bank, beat French mayor",
+          "url": "https://www.france24.com/en/middle-east/20261017-israeli-settlers-attack-european-delegation-convoy-in-west-bank-beat-french-mayor"
+        },
+        {
+          "title": "West Bank: Israeli settlers attack EU diplomats, French mayor",
+          "url": "https://www.dw.com/en/west-bank-israeli-settlers-attack-eu-diplomats-french-mayor/a-79688819?maca=en-rss-en-all-1573-rdf"
+        },
+        {
+          "title": "美摄影记者约旦西岸遇袭 鲁比奥：美国政府感到不安",
+          "url": "https://www.zaobao.com.sg/news/world/story20261018-9854482"
+        },
+        {
+          "title": "Israeli settlers attack European diplomats in the occupied West Bank",
+          "url": "https://www.aljazeera.com/video/newsfeed/2026/10/18/israeli-settlers-attack-european-diplomats-in-the-occupied-west-bank?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "法国生活成本抗议演变为暴力冲突",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "法国生活成本抗议演变为暴力冲突",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.78, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Violent clashes, looting and buildings ablaze in France as over 1,000 arrested after protests",
+          "url": "https://www.bbc.co.uk/news/articles/c6d937wedj7jo?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "title": "How day of protests unfolded as disorder breaks out across France",
+          "url": "https://www.bbc.co.uk/news/videos/cwz0vy770gpzo?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "乌克兰外长称俄控城镇是死亡陷阱",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "乌克兰外长称俄控城镇是死亡陷阱",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.725, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "Ukraine FM says Russian-held town a 'death trap,' Zelesnky calls it 'genocide' - The Jerusalem Post",
+          "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQSUR4VGpfQ05uR2F4ampvY3c0X2tRTFQ5bVlIZzE1UjQ2WDVQUHJDbUlybGtFek5hbE5OSk1xWUltWlNUOTJKcVdSUktpdzVqUElpOE91em5WOVVlQzBzazQweHNLTWd4LURCNmJNbkl1dUdqLUdOeW5GY3NOdE5ZbWlFWWlIZk5WVnc?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美摄影记者约旦西岸遇袭 鲁比奥：美国政府感到不安",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "美摄影记者约旦西岸遇袭 鲁比奥：美国政府感到不安",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.738, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报 - 国际",
+          "url": "https://www.zaobao.com.sg/news/world/story20261018-9854482"
+        }
+      ]
+    },
+    {
+      "candidate_id": "鲁比奥：美暂停对俄制裁 将有60天缓冲期分析对经济冲击",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "鲁比奥：美暂停对俄制裁 将有60天缓冲期分析对经济冲击",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.89, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "联合早报 - 国际",
+          "url": "https://www.zaobao.com.sg/news/world/story20261018-9854457"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国大使促以色列起诉袭击美国记者者",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "美国大使促以色列起诉袭击美国记者者",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/10/17/us-ambassador-calls-on-israel-to-prosecute-settlers-over-journalist-attack?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "赫格塞思感谢诺克斯维尔请缨青年",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "赫格塞思感谢诺克斯维尔请缨青年",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "U.S. Department of Defense",
+          "url": "https://www.war.gov/News/News-Stories/Article/Article/4628064/hegseth-thanks-young-americans-in-knoxville-who-say-send-me/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美俄协议及特朗普泽连斯基冲突或令乌克兰受冷落",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "美俄协议及特朗普泽连斯基冲突或令乌克兰受冷落",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "South China Morning Post",
+          "url": "https://www.scmp.com/news/world/russia-central-asia/article/3371280/us-russia-deal-trump-zelensky-clash-could-leave-ukraine-out-cold?utm_source=rss_feed"
+        }
+      ]
+    },
+    {
+      "candidate_id": "瑞萨电子成立物理AI团队",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "瑞萨电子成立物理AI团队",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.56, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Renesas Launches Physical AI Team to Expand Humanoid Chip Business - THE ELEC, Korea Electronics Industry Media",
+          "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE9KS0JIOTR0YTJMUlhCb1E3dUVmQjNsakxEZWI1Q2NzVm0xbjR1VWptbzMwX3B4bk5ybnpfMWx5Q2w1VmNwNDBkUlJoVnVRT09hSjZ1ZWF2aFBidG9uLTQ2TGFtM3Uxanc?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Meta删除内容使用条款表述",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "Meta删除内容使用条款表述",
+      "score": 72,
+      "selection_reason": "score=72, nw=0.56, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Meta removes language that may have allowed it to scrape news sites",
+          "url": "https://www.theverge.com/tech/1013409/meta-removes-language-that-may-have-allowed-it-to-scrape-news-sites"
+        },
+        {
+          "title": "Meta 删除商业服务条款中“用于训练 AI”相关表述",
+          "url": "https://aihot.news/items/ldxe9lobhx20mp543ffkmqpxy"
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI研发人形机器人，机身并非真正难题",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "OpenAI研发人形机器人，机身并非真正难题",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Engadget",
+          "url": "https://www.engadget.com/2285040/openai-humanoid-robot-sam-altman-statement-real-challenge/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "Anthropic撤销疑似泄露密钥",
+      "column": "technology",
+      "slot": "headline",
+      "title_zh": "Anthropic撤销疑似泄露密钥",
+      "score": 89.0,
+      "selection_reason": "score=89.0, nw=0.72, stage=跟进, slot=headline",
+      "sources": [
+        {
+          "title": "Anthropic 就 OpenCode 安全泄露事件撤销受影响的 Claude API 密钥",
+          "url": "https://aihot.news/items/l77k5lljwa77u0w19gsgesqq0"
+        },
+        {
+          "title": "OpenCode 通报安全漏洞事件，1.4% Console 用户受大规模蒸馏攻击影响",
+          "url": "https://aihot.news/items/phuuhs87dbdqoj2qygg9kdox2"
+        }
+      ]
+    },
+    {
+      "candidate_id": "美国2026财年利息支出升至1.05万亿美元",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "美国2026财年利息支出升至1.05万亿美元",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.695, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "U.S. debt interest payments hit $3 billion a day and jumped 8% in fiscal 2026 — faster than total federal spending, revenue and GDP growth",
+          "url": "https://fortune.com/2026/10/17/us-debt-interest-payments-fiscal-2026-1-trillion-federal-spending-revenue-gdp-growth-treasury-yields/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "公开施压！泽连斯基称“星链”限速“有意为之，仅针对乌克兰”，特朗普签署行政令豁免对俄多项制裁",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "公开施压！泽连斯基称“星链”限速“有意为之，仅针对乌克兰”，特朗普签署行政令豁免对俄多项制裁",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.84, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/articles/3783843"
+        }
+      ]
+    },
+    {
+      "candidate_id": "马斯克反思DOGE：“政府内部”无法解决赤字，只有AI和机器人才能救美国",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "马斯克反思DOGE：“政府内部”无法解决赤字，只有AI和机器人才能救美国",
+      "score": 0,
+      "selection_reason": "score=0, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/articles/3783841"
+        }
+      ]
+    },
+    {
+      "candidate_id": "人工智能股暴跌，通胀升温下仍有投资机会",
+      "column": "economy",
+      "slot": "headline",
+      "title_zh": "人工智能股暴跌，通胀升温下仍有投资机会",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "CNBC Top News",
+          "url": "https://www.cnbc.com/investingclub/2026/10/17/ai-stocks-plunge-inflation-heats-up-where-were-still-finding-opportunities.html"
+        }
+      ]
+    }
+  ]
+}

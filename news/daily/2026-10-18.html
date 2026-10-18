@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年10月18日 日报 — 2026-10-18</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年10月18日 日报</h1>
+<div class='date'>2026-10-18</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>鲁比奥：美暂停对俄制裁 将有 60 天缓冲期分析对经济冲击</li>
+<li>公开施压，泽连斯基称“星链”限速“有意为之，仅针对乌克兰”，特朗普签署行政令豁免对俄多项制…</li>
+<li>法国生活成本抗议演变为暴力冲突</li>
+<li>以色列定居者袭击约旦河西岸欧洲外交人员</li>
+<li>格雷厄姆反对特朗普暂缓对俄制裁</li>
+<li>美摄影记者约旦西岸遇袭 鲁比奥：美国政府感到不安</li>
+<li>乌克兰外长称俄控城镇是死亡陷阱</li>
+<li>亚利桑那州反对科罗拉多河配水削减</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<div class='event'>
+<h3>1. 亚利桑那州反对科罗拉多河配水削减</h3>
+<p>10 月 18 日，卫报称，亚利桑那州加入内华达州，反对特朗普政府拟削减两州的科罗拉多河配水。争议涉及两州在科罗拉多河获得的配水份额。</p>
+</div>
+<div class='event'>
+<h3>2. 明尼苏达州参议院候选人围绕欺诈问题辩论</h3>
+<p>10 月 17 日，美国国家公共电台称，明尼苏达州参议院两党候选人在辩论中围绕欺诈问题交锋。双方还讨论了民生负担和特朗普政策。</p>
+</div>
+<div class='event'>
+<h3>3. 大西洋观察｜尾大不掉的英国福利开支</h3>
+<p>10 月 17 日，一项设计初衷良好的制度，有可能在落地的长期实践中遭受滥用而变得千疮百孔，最终沦为尾大不掉的糟糕制度。英国在“二战”后引入的残障扶助制度，初衷是为因工伤残疾，或因疾病导致长期无法工作的弱势人群提供必要的生活补助。但这项以现金方式发放的扶助体制，近年来遭滥用而成为严重拖累英国经济发展的最大因素之一。</p>
+</div>
+<ul class='headline-list'>
+<li>众议长约翰逊借助信仰力保共和党多数席位</li>
+<li>爱荷华州中期选举投票或决定国会权力平衡</li>
+<li>特朗普在华盛顿地标留下更多印记</li>
+<li>特朗普解雇任职未满一周的白宫发言人。</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 格雷厄姆反对特朗普暂缓对俄制裁 <span class="followup">持续跟踪</span></h3>
+<p>10 月 18 日，据《纽约时报》报道，美国参议员达琳·格雷厄姆反对特朗普将俄罗斯排除在制裁法案之外。该制裁法案曾由格雷厄姆的兄弟推动。</p>
+</div>
+<div class='event'>
+<h3>2. 以色列定居者袭击约旦河西岸欧洲外交人员</h3>
+<p>10 月 17 日，据《卫报》报道，以色列定居者在约旦河西岸袭击欧洲外交人员及法国地方官员。法国一名市长在袭击中遭到殴打。</p>
+</div>
+<div class='event'>
+<h3>3. 法国生活成本抗议演变为暴力冲突</h3>
+<p>10 月 17 日，据英国广播公司报道，法国抗议者与警方发生暴力冲突。警方逮捕超过 1,000 人。</p>
+</div>
+<div class='event'>
+<h3>4. 乌克兰外长称俄控城镇是死亡陷阱</h3>
+<p>10 月 17 日，据《耶路撒冷邮报》报道，乌克兰外长称一座俄军控制的城镇是“死亡陷阱”。泽连斯基将该城镇情况称为“种族灭绝”。</p>
+</div>
+<div class='event'>
+<h3>5. 美摄影记者约旦西岸遇袭 鲁比奥：美国政府感到不安</h3>
+<p>10 月 18 日，美国国务卿鲁比奥说，美国希望以色列采取更多措施，遏制定居者在约旦西岸发动的袭击。路透社报道，鲁比奥星期六（10 月 17 日）说：“我们对这些画面以及我们所看到的情况深感不安。我们已经要求以色列方面严厉打击此类行为，并将继续这样做。</p>
+</div>
+<div class='event'>
+<h3>6. 鲁比奥：美暂停对俄制裁 将有 60 天缓冲期分析对经济冲击</h3>
+<p>10 月 18 日，美国国务卿鲁比奥说，美国总统特朗普暂停对俄罗斯实施全面制裁和关税的决定，将给予 60 天的缓冲期，以便“分析”这些制裁和关税对全球经济的影响。路透社报道，鲁比奥星期六（10 月 17 日）说：“总统希望利用这 60 天的时间来分析实施制裁和关税对全球经济乃至美国经济的意义。” 他也指出，这些经济限制措施涉及多个国家，而不仅是俄罗斯。</p>
+</div>
+<ul class='headline-list'>
+<li>美国大使促以色列起诉袭击美国记者者</li>
+<li>赫格塞思感谢诺克斯维尔请缨青年</li>
+<li>美俄协议及特朗普泽连斯基冲突或令乌克兰受冷落</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 瑞萨电子成立物理 AI 团队</h3>
+<p>10 月 17 日，据韩国电子产业媒体《THE ELEC》报道，瑞萨电子成立物理 AI 团队。该团队用于扩大瑞萨电子的人形机器人芯片业务。</p>
+</div>
+<div class='event'>
+<h3>2. Meta 删除内容使用条款表述</h3>
+<p>10 月 17 日，《The Verge》报道 Meta 删除了可能允许其抓取新闻网站内容的条款。10 月 18 日，AIHOT 页面列出 Meta 删除商业服务条款中允许使用企业内容训练 AI 的相关表述。</p>
+</div>
+<ul class='headline-list'>
+<li>OpenAI 研发人形机器人，机身并非真正难题</li>
+<li>Anthropic 撤销疑似泄露密钥。</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 美国 2026 财年利息支出升至 1.05 万亿美元</h3>
+<p>10 月 17 日，《财富》援引美国财政数据称，美国 2026 财年净利息支出升至 1.05 万亿美元。该财年日均利息支出约为 30 亿美元，较前一财年增长 8%。</p>
+</div>
+<div class='event'>
+<h3>2. 公开施压！泽连斯基称“星链”限速“有意为之，仅针对乌克兰”，特朗普签署行政令豁免对俄多项制裁</h3>
+<p>10 月 18 日，当地时间 17 日，乌克兰总统泽连斯基表示，乌方通过在欧盟国家开展对比测试获得证据，显示“星链”卫星通信终端的速度限制仅在乌克兰境内生效。泽连斯基指出，目前乌境内“星链”终端时速限制为 161 公里，一旦超速便完全失去连接，导致依赖该系统的无人机失控。为查明这究竟是技术故障还是有意限制，乌方派出多辆配备终端的车辆赴欧盟国家测试——在允许高速行驶的道路上，车辆以超过 180 公里时速行驶时，终端仍保持正常运行。</p>
+</div>
+<div class='event'>
+<h3>3. 马斯克反思 DOGE：“政府内部”无法解决赤字，只有 AI 和机器人才能救美国</h3>
+<p>10 月 18 日，埃隆·马斯克承认，他主导的政府效率部（DOGE）实验以失败告终，并直言唯有人工智能与机器人技术才能真正解决美国财政赤字问题。在传记作家 Walter Isaacson 主持的最新播客节目中，马斯克表示，DOGE 的经历证明"我们不可能从政府内部解决赤字问题"。他坦言，削减开支的意愿在总统、众议院、参议院乃至司法机构“没有市场”，"基本上，政府中没有任何掌权者真正想要削减开支"。</p>
+</div>
+<ul class='headline-list'>
+<li>人工智能股暴跌，通胀升温下仍有投资机会</li>
+</ul>
+</body>
+</html>
