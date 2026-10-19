@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang='zh'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>2026年10月19日 日报 — 2026-10-19</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    line-height: 1.7;
+    color: #212121;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e5e7eb;
+}
+header h1 {
+    font-family: 'Noto Serif SC', 'Georgia', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #000000;
+}
+header .date {
+    font-size: 0.85rem;
+    color: #93939f;
+    font-variant-numeric: tabular-nums;
+}
+header .lead {
+    font-size: 1rem;
+    color: #212121;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ── Highlights ── */
+.highlights {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+}
+.highlights h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #000000;
+    border: none;
+    padding: 0;
+}
+.highlights ul {
+    list-style: none;
+    padding: 0;
+}
+.highlights li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.highlights li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.highlights li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #1863dc;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Section ── */
+h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: -0.01em;
+    color: #000000;
+}
+
+/* ── Event Card ── */
+.event {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+}
+.event:hover {
+    border-color: #d9d9dd;
+}
+.event:last-child {
+    margin-bottom: 0;
+}
+.event h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+    line-height: 1.4;
+}
+.event p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.7;
+    margin: 0;
+}
+.event .followup {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93939f;
+    border: 1px solid #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* ── Headline Only ── */
+.headline-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+}
+.headline-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 0.9rem;
+    color: #212121;
+    line-height: 1.5;
+}
+.headline-list li:last-child {
+    border-bottom: none;
+}
+.headline-list li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #d9d9dd;
+    border-radius: 50%;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+/* ── Overview ── */
+.overview {
+    background: #fafafa;
+    border: 1px solid #f2f2f2;
+    border-radius: 22px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+}
+.overview h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #93939f;
+    margin-bottom: 12px;
+}
+.overview p {
+    font-size: 0.95rem;
+    color: #212121;
+    line-height: 1.6;
+}
+
+/* ── Footer ── */
+footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    color: #93939f;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    body { padding: 24px 16px 48px; }
+    header h1 { font-size: 1.6rem; }
+    .highlights { padding: 20px; }
+    .event { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<header>
+<h1>2026年10月19日 日报</h1>
+<div class='date'>2026-10-19</div>
+</header>
+<div class='highlights'>
+<h2>今日要点</h2>
+<ul>
+<li>特朗普暂停对俄制裁维持谈判</li>
+<li>立陶宛疑似无人机爆炸</li>
+<li>阿尔巴尼亚抗议持续至第六天</li>
+<li>特朗普支持内塔尼亚胡竞选</li>
+<li>英国钢企电价较法国同行高近 30 英镑</li>
+<li>收到炸弹威胁 特拉维夫飞往维也纳客机迫降保加利亚</li>
+<li>印度财长称持续资本外流是 2027 年主要风险之一</li>
+<li>韩美半导体在美国设立枢纽</li>
+</ul>
+</div>
+<h2> 一、美国政局</h2>
+<ul class='headline-list'>
+<li>不满农民或助堪萨斯州参议院席位易主</li>
+<li>鲁比奥前往中亚，有人质疑他是否回避紧迫议题</li>
+</ul>
+<h2> 二、国际局势</h2>
+<div class='event'>
+<h3>1. 特朗普暂停对俄制裁维持谈判 <span class="followup">持续跟踪</span></h3>
+<p>10 月 18 日，英国广播公司称，特朗普暂停对俄罗斯制裁，以维持和平谈判。南华早报称，10 月 19 日，泽连斯基与美国特使会谈。联合早报称，泽连斯基指责美国施压乌克兰屈服。</p>
+</div>
+<div class='event'>
+<h3>2. 立陶宛疑似无人机爆炸</h3>
+<p>10 月 18 日，南华早报称，疑似无人机在立陶宛爆炸。立陶宛居民进入避难状态。北约战机紧急升空，德国之声称乌克兰就疑似无人机坠落致移动汽车受损道歉。</p>
+</div>
+<div class='event'>
+<h3>3. 阿尔巴尼亚抗议持续至第六天 <span class="followup">持续跟踪</span></h3>
+<p>10 月 18 日，南华早报称，阿尔巴尼亚总理拉马拒绝辞职。警方驱散了持续第六天的暴力抗议。欧盟委员会谴责抗议中的纵火及袭击国家机构行为。</p>
+</div>
+<div class='event'>
+<h3>4. 特朗普支持内塔尼亚胡竞选</h3>
+<p>10 月 18 日，法国 24 台称，特朗普在以色列 10 月 27 日大选前支持内塔尼亚胡。特朗普称内塔尼亚胡是美国最佳伙伴。</p>
+</div>
+<div class='event'>
+<h3>5. 收到炸弹威胁 特拉维夫飞往维也纳客机迫降保加利亚</h3>
+<p>10 月 19 日，一架从以色列特拉维夫飞往奥地利维也纳的航班因收到炸弹威胁，被迫紧急备降保加利亚。法新社报道，保加利亚当局与执飞事发航班的奥地利航空（Austrian Airlines）证实，一架客机星期天（10 月 18 日）紧急备降在保加利亚首都索非亚的机场。保加利亚交通部声明指出，客机在飞近罗马尼亚领空时收到炸弹威胁，奥地利航空机组人员决定在索非亚紧急降落。</p>
+</div>
+<ul class='headline-list'>
+<li>探秘俄罗斯境内反普京破坏行动</li>
+<li>抗议者扰乱本-格维尔活动，迫其离台</li>
+<li>以色列定居者袭击欧洲外交车队。</li>
+</ul>
+<h2> 三、科技前沿</h2>
+<div class='event'>
+<h3>1. 韩美半导体在美国设立枢纽</h3>
+<p>10 月 19 日，《朝鲜商报》报道称，韩美半导体在美国开设业务枢纽。该枢纽用于加强对 AI 芯片封装业务的支持。</p>
+</div>
+<ul class='headline-list'>
+<li>谷歌 SynthID 人工智能检测网站使用指南</li>
+</ul>
+<h2> 四、经济走势</h2>
+<div class='event'>
+<h3>1. 英国钢企电价较法国同行高近 30 英镑</h3>
+<p>10 月 19 日，英国钢企电价较法国同行每兆瓦时高近 30 英镑。卫报称，英国钢企在与欧盟竞争对手比较时处于三年来最不利的位置。</p>
+</div>
+<div class='event'>
+<h3>2. 印度财长称持续资本外流是 2027 年主要风险之一</h3>
+<p>10 月 18 日，印度财政部长将持续资本外流列为印度 2027 年面临的最大风险之一。CNBC 报道称，她把股市表现不佳归因于投资者容易退出和流动性过剩。</p>
+</div>
+</body>
+</html>
