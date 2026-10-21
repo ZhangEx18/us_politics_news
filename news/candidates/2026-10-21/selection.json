@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-21",
+  "coverage": {
+    "start": "2026-10-20T07:00:00+08:00",
+    "end": "2026-10-21T07:00:00+08:00"
+  },
+  "items": [
+    {
+      "candidate_id": "特朗普或裁定司法部举报奖励",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普或裁定司法部举报奖励",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.745, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Trump suggests he could be ‘arbitrator’ in DoJ anti-fraud whistleblower scheme",
+          "url": "https://www.theguardian.com/us-news/2026/oct/20/trump-doj-anti-fraud-tip"
+        }
+      ]
+    },
+    {
+      "candidate_id": "费城为选举日准备投票流程",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "费城为选举日准备投票流程",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.59, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Inside Philadelphia's preparations for Election Day",
+          "url": "https://www.pbs.org/newshour/show/inside-philadelphias-preparations-for-election-day"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普推动撤出白宫记者",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普推动撤出白宫记者",
+      "score": 70,
+      "selection_reason": "score=70, nw=0.66, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Trump Pushes to Evict White House Press Corps",
+          "url": "https://www.nytimes.com/2026/10/20/us/politics/trump-white-house-media.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "伊利诺伊州参议员候选人举行论坛",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "伊利诺伊州参议员候选人举行论坛",
+      "score": 69,
+      "selection_reason": "score=69, nw=0.53, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "WATCH LIVE: Illinois U.S. Senate candidates face off in forum to replace Durbin",
+          "url": "https://www.pbs.org/newshour/politics/watch-live-illinois-u-s-senate-candidates-face-off-in-forum-to-replace-durbin"
+        }
+      ]
+    },
+    {
+      "candidate_id": "密西西比州总检察长认定警员用武正当",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "密西西比州总检察长认定警员用武正当",
+      "score": 69,
+      "selection_reason": "score=69, nw=0.545, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "Mississippi AG says officers did not use excessive force in toddler death",
+          "url": "https://www.npr.org/2026/10/20/nx-s1-6009249/mississippi-ag-says-officers-did-not-use-excessive-force-in-toddler-death"
+        }
+      ]
+    },
+    {
+      "candidate_id": "CNN威胁就空军一号媒体限制起诉",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "CNN威胁就空军一号媒体限制起诉",
+      "score": 68,
+      "selection_reason": "score=68, nw=0.615, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "CNN threatens Trump’s DOJ with further legal action over Air Force One blocks",
+          "url": "https://thehill.com/homenews/media/6161064-cnn-threatens-doj-legal-action/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "人物｜从以军总参谋长到总理挑战者，艾森科特为何脱下戎装从政",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "人物｜从以军总参谋长到总理挑战者，艾森科特为何脱下戎装从政",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.705, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-20/102495392.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普为内塔尼亚胡选前送暖 以色列大选牵动地区紧张神经",
+      "column": "us_politics",
+      "slot": "detailed",
+      "title_zh": "特朗普为内塔尼亚胡选前送暖 以色列大选牵动地区紧张神经",
+      "score": 0,
+      "selection_reason": "score=0, nw=0.725, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "财新国际 - 美国政治",
+          "url": "https://international.caixin.com/2026-10-20/102495367.html"
+        }
+      ]
+    },
+    {
+      "candidate_id": "牛肉生产商或影响今年中期选举",
+      "column": "us_politics",
+      "slot": "headline",
+      "title_zh": "牛肉生产商或影响今年中期选举",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "NPR Politics",
+          "url": "https://www.npr.org/2026/10/20/nx-s1-6000194/beef-producers-could-play-a-big-role-in-this-years-midterm-elections"
+        }
+      ]
+    },
+    {
+      "candidate_id": "泽连斯基称美国恢复向乌分享俄军袭击情报",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "泽连斯基称美国恢复向乌分享俄军袭击情报",
+      "score": 85,
+      "selection_reason": "score=85, nw=0.83, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "US has resumed sharing intelligence with Ukraine about Russian strikes, says Zelenskyy",
+          "url": "https://www.theguardian.com/world/2026/oct/20/us-has-resumed-sharing-intelligence-with-ukraine-about-russian-strikes-says-zelenskyy"
+        },
+        {
+          "title": "Zelensky says US intelligence sharing 'works now' after talks with Trump envoy in Oslo",
+          "url": "https://www.bbc.co.uk/news/articles/cq5ynkx3xy11o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "伊朗拒绝运出浓缩核材料",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "伊朗拒绝运出浓缩核材料",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.805, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "伊朗拒绝运出浓缩核材料 要求美国先解除威胁与制裁",
+          "url": "https://www.zaobao.com.sg/news/world/story20261021-9868726"
+        }
+      ]
+    },
+    {
+      "candidate_id": "内塔尼亚胡称曾与特朗普讨论推翻伊朗政权",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "内塔尼亚胡称曾与特朗普讨论推翻伊朗政权",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.875, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Netanyahu says he discussed ‘eliminating’ Iran’s regime with Trump",
+          "url": "https://www.aljazeera.com/video/newsfeed/2026/10/20/netanyahu-says-he-discussed-eliminating-irans-regime-with-trump?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特朗普称乌克兰必须有意愿与普京解决战争",
+      "column": "global_affairs",
+      "slot": "detailed",
+      "title_zh": "特朗普称乌克兰必须有意愿与普京解决战争",
+      "score": 79,
+      "selection_reason": "score=79, nw=0.76, stage=回应, slot=detailed",
+      "sources": [
+        {
+          "title": "'Russia is a big machine': Trump says Ukraine 'has to want' to settle war with Putin",
+          "url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxObFhNeFJoOU5qRVE3cHVGTHJfOXUwYUYxaXZ3bExOUDdxUWRoUkg3WERONllsb1k5RDY0QjZMekllZ1RnektXd1NxbC01bDVJdnFndklCMkN3SWdrLTBUVTBVYU5Oa0lDdE55MlRrai1aX1NGX2RLcjk2emRBWHpodlJYRlI1aVc4TF8wRi1iVnZaeWMtZ0xTODFBM0RWUmVMd1JTanNpRFZhaTI4Yjd0eU9SX2hHeENyaVg4b184QUNvb0NtVzFCMlgzUEc5X0NtUk43bWN1clBmTUZ6VTVRUzFRLWN2VnQzVkHSAe8BQVVfeXFMTmlheGstREtoWTllUmRic1VKWWpLbHQydmdDajhHSUVrRnpnTk9SU01uRVhiY2V6elZHbVdPeFJqU3VaelFUb05zUTY0TlNNRHRKdXdMMElnTzl3T1RPODZUMG9PaDY2VDI2Z0RKZDB0VFRsai1XTVJCUjZ6Sm03aFpZZVZMd1FOa0UyVEtRaGJIVkFRZmZoX2M5Q3FpMzVzZEZ5Qk9kVmNtTi1uazBHdnVEVEhkUWswMHdjYmk3UnJlMHV0RGlMRVRQTGxUQ0xKTld3TEJmQUFlem1rcVg2Z1pMbFpOYTRTQk1ZNTFIMlk?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "无人机袭击后，北约将向黑海增派巡逻机",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "无人机袭击后，北约将向黑海增派巡逻机",
+      "score": 0,
+      "selection_reason": "score=0, slot=headline",
+      "sources": [
+        {
+          "title": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/10/20/nato-to-send-additional-patrol-planes-to-black-sea-after-drone-attacks?traffic_source=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "俄罗斯军用卫星曾接近支持乌军的欧洲商业卫星",
+      "column": "global_affairs",
+      "slot": "headline",
+      "title_zh": "俄罗斯军用卫星曾接近支持乌军的欧洲商业卫星",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.765, stage=首发, slot=headline",
+      "sources": [
+        {
+          "title": "俄罗斯卫星危险接近支持乌克兰军方的欧洲卫星",
+          "url": "https://www.zaobao.com.sg/news/world/story20261021-9868706"
+        }
+      ]
+    },
+    {
+      "candidate_id": "OpenAI收购Orchestra Bio",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "OpenAI收购Orchestra Bio",
+      "score": 95.0,
+      "selection_reason": "score=95.0, nw=0.855, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "TechCrunch",
+          "url": "https://techcrunch.com/2026/10/20/openai-acquires-startup-orchestra-bio%e2%81%a0-to-beef-up-its-biotech-business/"
+        }
+      ]
+    },
+    {
+      "candidate_id": "AWS被曝因缺电暂存英伟达芯片",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "AWS被曝因缺电暂存英伟达芯片",
+      "score": 84,
+      "selection_reason": "score=84, nw=0.74, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "华尔街见闻 - 宏观/全球",
+          "url": "https://wallstreetcn.com/articles/3784080"
+        }
+      ]
+    },
+    {
+      "candidate_id": "L&T半导体与塔塔电子合作造芯片",
+      "column": "technology",
+      "slot": "detailed",
+      "title_zh": "L&T半导体与塔塔电子合作造芯片",
+      "score": 76,
+      "selection_reason": "score=76, nw=0.615, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Google News - Semiconductor",
+          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQR18wcFR0SzlLak1XaHpDOVowZlhhM1hRbEhDMm9RMHRjRnM0Mk1zZEhNaTdmcFNJeXBJQ3JWUmpQLTBsRGFicGs1eWtsNm83dHZCeVd0N2p1dGJqMmdFeVZ6N2VabXljV1NidWtPb3RJMHlPVmhmTmxtcUJFbnBlQ2xXaEpzVkY5Wml6V196SXdaSzBqRVluejJSWmZvNnJzN2c?oc=5"
+        }
+      ]
+    },
+    {
+      "candidate_id": "特斯拉与SpaceX讨论合并可能性",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "特斯拉与SpaceX讨论合并可能性",
+      "score": 83,
+      "selection_reason": "score=83, nw=0.815, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "Tesla and SpaceX are discussing a possible merger, Musk says",
+          "url": "https://www.theverge.com/science/1014984/spacex-tesla-merger-elon-musk-special-committees"
+        },
+        {
+          "title": "Elon Musk says Tesla-SpaceX merger being considered",
+          "url": "https://www.bbc.co.uk/news/articles/cmlyl09xjke4o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "新泽西进口商起诉挑战对加拿大商品征收的关税",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "新泽西进口商起诉挑战对加拿大商品征收的关税",
+      "score": 82,
+      "selection_reason": "score=82, nw=0.74, stage=首发, slot=detailed",
+      "sources": [
+        {
+          "title": "New Jersey food importer files lawsuit challenging Trump's 50% tariffs on Canadian goods - ABC News - Breaking News, Latest News and Videos",
+          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPb1cwQU1zMWVKVjU2UDZBVmFZVUtkRkVLSlQ2WkVlS3FEV3FQQzVvY2pkZ25TMUdkVjNTSzFaaDNSLV9fanJHRGprY2szMTZYZm1uMnpkSmFrYWpLbTZ0ODZHdm9iZnJFaDU4bzV4ZGttdGVkMHc4ZjJHSDRnMDVZXy1kV25LMEpETVU0b1NPLTU5dUdaSEMwbGRPR1RxT1p6VFHSAacBQVVfeXFMT0UxZm5mSEtVVEdPUFBGTXptYzE2SS12QnNEWERIZ2JuUFl4cU53WUwxaWZDUWp2cTM0SnMzc1pJZHlWYzBVM29OV0ZQMjNfWGpKYnc2ZDZVaFhiNVNiVGpoMFJmNER3TndrNEFIVVg3eXI5bENLcE9fSmZfVjlkTmxMMHhzQkEyRkctNFNPOXVPYlRJMzFFOTBubGkzdmt6X0pRY0FyMEk?oc=5"
+        },
+        {
+          "title": "Trump sued over Canadian tariffs in latest legal challenge",
+          "url": "https://www.bbc.co.uk/news/articles/cqrkyj13m588o?at_medium=RSS&at_campaign=rss"
+        }
+      ]
+    },
+    {
+      "candidate_id": "日本平均电价单周上涨逾25%",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "日本平均电价单周上涨逾25%",
+      "score": 78,
+      "selection_reason": "score=78, nw=0.675, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "天然气和煤炭价格飙升，日本电价大涨25%",
+          "url": "https://wallstreetcn.com/articles/3784084"
+        }
+      ]
+    },
+    {
+      "candidate_id": "摩根士丹利数据显示AI相关公司CDS交易量增长",
+      "column": "economy",
+      "slot": "detailed",
+      "title_zh": "摩根士丹利数据显示AI相关公司CDS交易量增长",
+      "score": 74,
+      "selection_reason": "score=74, nw=0.655, stage=跟进, slot=detailed",
+      "sources": [
+        {
+          "title": "2008年再现？CDS重回市场焦点",
+          "url": "https://wallstreetcn.com/articles/3784083"
+        }
+      ]
+    }
+  ]
+}
