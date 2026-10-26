@@ -1,5 +1,9 @@
 # 观察日报 -- AI 驱动的每日国际新闻长文日报
 
+**Kagi 每日简报** 的订阅地址为 [RSS](https://zhangex18.github.io/us_politics_news/feeds/kagi_digest.xml)（首次成功发布后可用）。每天北京时间 07:30 起发布一份四栏目中文合刊：美国动态、国际动态、科学技术、商业经济。五类 Kagi 当期新闻全部采集，Technology 与 Science 合并，同 story ID 去重；每条标题约 20 字、正文 50–100 字。内容仅依据 Kagi 摘要翻译概括，保留来源和不确定性，按 [Kagi API 的非商业署名条件](https://news.kagi.com/api-docs)发布。GitHub Actions 可能延迟触发，08:30、10:30、12:30 会重试未发布槽位。
+
+本地运行 `python3 src/run_product.py --product kagi_digest --report-type daily --report-date YYYY-MM-DD`，日期为中文合刊发布日期，输入为前一天 UTC 日的 Kagi 批次。使用 `AI_MODEL` 批量翻译，`AI_REPAIR_MODEL` 修复失败批次，`AI_AUDIT_MODEL` 做最终抽检；后两项留空时分别回退到主模型或跳过抽检。每条简讯目标 50–100 字，硬上限 120 字。成功译文存入独立 SQLite 缓存。缺失分类、译文不完整或字数不合格会阻止本期发布，并保留上一期 RSS。手动补跑/替换使用 `Kagi Daily Digest` workflow 的 `report_date` / `force_publish` 输入。公开产物为 `docs/kagi_digest/daily/` 下的 Markdown、HTML、JSON 和 `docs/feeds/kagi_digest.xml`，Feed 保留最近 30 天。
+
 每天自动生成中文新闻日报，覆盖美国政局、国际局势、科技前沿、经济走势四大维度。多接入方式新闻源并发抓取，AI 评分筛选、事件合并、AI 写作，输出 Markdown + HTML + RSS 全文 Feed，部署在 GitHub Pages，Reader 订阅即读。
 
 ## 快速开始
@@ -260,6 +264,8 @@ AI 资讯另有 [AIHOT](https://aihot.news) 精选源（`https://aihot.news/feed
 | `AI_PROVIDER` | openai / deepseek / moonshot 等 | 否（默认 openai） |
 | `AI_BASE_URL` | API 端点 | 否（默认 OpenCode Zen Go `https://opencode.ai/zen/go/v1`） |
 | `AI_MODEL` | 模型名称 | 否（默认 `deepseek-v4.1-flash`） |
+| `AI_REPAIR_MODEL` | Kagi 失败批次修复模型 | 否（留空复用 `AI_MODEL`） |
+| `AI_AUDIT_MODEL` | Kagi 最终抽检模型 | 否（留空跳过抽检） |
 | `AI_FALLBACK_BASE_URL` | 备用通道 API 端点（主通道失败自动切换） | 否 |
 | `AI_FALLBACK_MODEL` | 备用模型名称（当前 `glm-5.3-flash`） | 否 |
 | `AI_FALLBACK_API_KEY` | 备用通道 Key（留空复用主 Key） | 否 |

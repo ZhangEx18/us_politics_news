@@ -21,10 +21,18 @@ def _validate_report_type(config: dict, report_type: str) -> None:
         raise ValueError(f"product {config.get('product_key')} 不支持 report_type={report_type}")
 
 
-def run_product(product_key: str, report_type: str, hours: int = 24, digest_only: bool = False) -> dict:
+def run_product(product_key: str, report_type: str, hours: int = 24, digest_only: bool = False, report_date: str | None = None) -> dict:
     config = load_product_config(product_key)
     _validate_report_type(config, report_type)
     content_type = config.get("content_type")
+
+    if content_type == "kagi_digest":
+        from kagi_digest import run_kagi_daily
+        if digest_only:
+            raise ValueError("Kagi 简报不支持 digest-only")
+        return run_kagi_daily(report_date=report_date)
+    if report_date:
+        raise ValueError("指定 report-date 目前仅支持 Kagi 简报")
 
     if content_type == "news_digest":
         if report_type == "daily":
@@ -46,9 +54,10 @@ def main() -> None:
     parser.add_argument("--report-type", default="daily", choices=["daily", "weekly", "monthly"])
     parser.add_argument("--hours", type=int, default=24)
     parser.add_argument("--digest-only", action="store_true")
+    parser.add_argument("--report-date", help="Kagi 合刊发布日期 YYYY-MM-DD；输入批次为前一天")
     args = parser.parse_args()
 
-    stats = run_product(args.product, args.report_type, hours=args.hours, digest_only=args.digest_only)
+    stats = run_product(args.product, args.report_type, hours=args.hours, digest_only=args.digest_only, report_date=args.report_date)
     if stats.get("total_selected", stats.get("total_fetched", 1)) == 0:
         raise SystemExit(1)
     print(stats)
