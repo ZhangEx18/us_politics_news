@@ -6,7 +6,7 @@
   "status": "pass",
   "visualReview": "pending",
   "artifact": {
-    "path": "/Users/zex/Documents/Code/Crawlers/us_politics_news/docs/runtime-architecture.html",
+    "path": "docs/runtime-architecture.html",
     "sha256": "a296646ba2e105ceb7b93df0abc80525c4e041a58bc29054bc5009da79bd21fe",
     "bytes": 816542
   },
